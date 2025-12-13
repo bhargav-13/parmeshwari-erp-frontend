@@ -19,13 +19,14 @@ const SubcontractingPage: React.FC = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<SubcontractingStatus | ''>('');
   const [loading, setLoading] = useState(true);
   const [page] = useState(0);
 
   useEffect(() => {
     fetchSubcontracts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery]);
+  }, [page, searchQuery, statusFilter]);
 
   const fetchSubcontracts = async () => {
     try {
@@ -34,6 +35,7 @@ const SubcontractingPage: React.FC = () => {
         page,
         size: 10,
         search: searchQuery || undefined,
+        status: statusFilter || undefined,
       });
 
       setSubcontracts(response.data);
@@ -144,10 +146,20 @@ const SubcontractingPage: React.FC = () => {
           />
         </div>
 
-        <button type="button" className="filter-button">
+        <div className="filter-button">
           <img src={FilterIcon} alt="Filter" className="filter-icon" />
-          <span className="filter-text">Filter</span>
-        </button>
+          <select
+            className="filter-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as SubcontractingStatus | '')}
+            title="Filter by status"
+          >
+            <option value="">All Status</option>
+            <option value={SubcontractingStatus.IN_PROCESS}>In Progress</option>
+            <option value={SubcontractingStatus.COMPLETED}>Completed</option>
+            <option value={SubcontractingStatus.REJECTED}>Rejected</option>
+          </select>
+        </div>
       </div>
 
       <div className="subcontracts-list">

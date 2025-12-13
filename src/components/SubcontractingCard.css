@@ -172,13 +172,13 @@
   color: #888888;
 }
 
-.processes-section {
+.subcontracting-card .processes-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.processes-label {
+.subcontracting-card .processes-label {
   font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 13px;
@@ -186,34 +186,45 @@
   color: #888888;
 }
 
-.process-actions {
+.subcontracting-card .process-actions {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
-.status-dropdown {
+.subcontracting-card .status-dropdown {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-width: 155px;
 }
 
-.status-select {
-  padding: 6px 16px;
-  border-radius: 20px;
-  border: none;
+.subcontracting-card .status-select {
+  width: 100%;
+  padding: 0 42px 0 20px;
+  border-radius: 999px;
+  border: 1px solid transparent;
   font-family: 'Jost', sans-serif;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 14px;
   line-height: 20px;
+  height: 40px;
   cursor: pointer;
   outline: none;
   appearance: none;
-  padding-right: 40px;
+  box-shadow: 0 8px 18px rgba(23, 52, 77, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.status-dropdown-icon {
+.subcontracting-card .status-select:focus-visible {
+  box-shadow: 0 10px 22px rgba(23, 52, 77, 0.15);
+  transform: translateY(-1px);
+}
+
+.subcontracting-card .status-dropdown-icon {
   position: absolute;
-  right: 12px;
+  right: 18px;
   top: 50%;
   transform: translateY(-50%);
   width: 14px;
@@ -221,44 +232,47 @@
   pointer-events: none;
 }
 
-.status-completed {
+.subcontracting-card .status-select.status-completed {
   background: #D1FFE2;
   color: #275B22;
 }
 
-.status-in-process {
-  background: #FFE5CC;
-  color: #8B4500;
+.subcontracting-card .status-select.status-in-process {
+  background: #ffe8d6;
+  color: #7a3c00;
 }
 
-.status-rejected {
+.subcontracting-card .status-select.status-rejected {
   background: #FFD1D1;
   color: #8B0000;
 }
 
-.return-record-button {
+.subcontracting-card .return-record-button {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 16px;
+  gap: 8px;
+  padding: 0 22px;
   background: #D1EEFF;
   border: none;
-  border-radius: 20px;
+  border-radius: 999px;
   font-family: 'Jost', sans-serif;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 14px;
   line-height: 20px;
   color: #17344D;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
+  height: 40px;
+  box-shadow: 0 8px 18px rgba(23, 52, 77, 0.08);
 }
 
-.return-record-button:hover {
-  background: #b8dfff;
+.subcontracting-card .return-record-button:hover {
+  background: #b9e1ff;
+  transform: translateY(-1px);
 }
 
 /* Return Icon */
-.return-icon {
+.subcontracting-card .return-icon {
   width: 18px;
   height: 18px;
   display: block;

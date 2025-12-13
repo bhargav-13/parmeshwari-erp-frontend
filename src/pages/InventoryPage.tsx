@@ -28,6 +28,8 @@ const InventoryPage: React.FC = () => {
   const [editingRawItem, setEditingRawItem] = useState<RawItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [rawSearchQuery, setRawSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<InventoryStatus | ''>('');
+  const [rawStatusFilter, setRawStatusFilter] = useState<InventoryStatus | ''>('');
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [editingLoadingId, setEditingLoadingId] = useState<number | null>(null);
   const [rawDeletingId, setRawDeletingId] = useState<number | null>(null);
@@ -170,10 +172,14 @@ const InventoryPage: React.FC = () => {
 
   const filteredItems = stockItems.filter((item) => {
     const searchLower = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       item.product.productName.toLowerCase().includes(searchLower) ||
-      item.category.categoryName.toLowerCase().includes(searchLower)
-    );
+      item.category.categoryName.toLowerCase().includes(searchLower);
+
+    const itemStatus = getActualStatus(item.quantityInPc, item.lowStockAlert);
+    const matchesStatus = !statusFilter || itemStatus === statusFilter;
+
+    return matchesSearch && matchesStatus;
   });
 
   const totalRawItems = rawItems.length;
@@ -181,9 +187,14 @@ const InventoryPage: React.FC = () => {
     (item) => item.quantityInKg <= item.lowStockAlert
   ).length;
 
-  const filteredRawItems = rawItems.filter((item) =>
-    item.product.productName.toLowerCase().includes(rawSearchQuery.toLowerCase())
-  );
+  const filteredRawItems = rawItems.filter((item) => {
+    const matchesSearch = item.product.productName.toLowerCase().includes(rawSearchQuery.toLowerCase());
+
+    const itemStatus = getActualStatusForRaw(item.quantityInKg, item.lowStockAlert);
+    const matchesStatus = !rawStatusFilter || itemStatus === rawStatusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const handleCopyLink = async () => {
     try {
@@ -295,10 +306,19 @@ const InventoryPage: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button type="button" className="filter-button">
+            <div className="filter-button">
               <img src={FilterIcon} alt="Filter" className="filter-icon" />
-              <span className="filter-text">Filter</span>
-            </button>
+              <select
+                className="filter-select"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as InventoryStatus | '')}
+                title="Filter by status"
+              >
+                <option value="">All Status</option>
+                <option value={InventoryStatus.IN_STOCK}>In Stock</option>
+                <option value={InventoryStatus.LOW_STOCK}>Low Stock</option>
+              </select>
+            </div>
           </div>
 
           <div className="inventory-table-container">
@@ -415,10 +435,19 @@ const InventoryPage: React.FC = () => {
                 onChange={(e) => setRawSearchQuery(e.target.value)}
               />
             </div>
-            <button type="button" className="filter-button">
+            <div className="filter-button">
               <img src={FilterIcon} alt="Filter" className="filter-icon" />
-              <span className="filter-text">Filter</span>
-            </button>
+              <select
+                className="filter-select"
+                value={rawStatusFilter}
+                onChange={(e) => setRawStatusFilter(e.target.value as InventoryStatus | '')}
+                title="Filter by status"
+              >
+                <option value="">All Status</option>
+                <option value={InventoryStatus.IN_STOCK}>In Stock</option>
+                <option value={InventoryStatus.LOW_STOCK}>Low Stock</option>
+              </select>
+            </div>
           </div>
 
           <div className="inventory-table-container">
