@@ -12,7 +12,8 @@
 }
 
 .sidebar-header {
-  padding: 20px 16px;
+  height: 64px;
+  padding: 0 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -48,6 +49,7 @@
 .logo-img {
   width: 100%;
   max-width: 200px;
+  max-height: 44px;
   height: auto;
   display: block;
 }
@@ -167,6 +169,10 @@
 @media (max-width: 768px) {
   .sidebar {
     width: 280px;
+  }
+
+  .sidebar-header {
+    height: 60px;
   }
 
   .sidebar-nav {
