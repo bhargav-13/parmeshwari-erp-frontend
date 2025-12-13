@@ -1,0 +1,466 @@
+import React, { useMemo, useState } from 'react';
+import type { Order, OrderProductRequest, OrderRequest } from '../types';
+import './AddOrderModal.css';
+import DeleteIcon from '../assets/delete.svg';
+
+interface AddOrderModalProps {
+  onClose: () => void;
+  onSubmit: (payload: OrderRequest) => Promise<void>;
+  initialData?: Order | null;
+}
+
+type ActiveTab = 'order' | 'lineItems';
+
+const createEmptyProduct = (): OrderProductRequest => ({
+  productName: '',
+  quantityKg: 0,
+  marketRate: 0,
+  rateDifference: 0,
+  totalAmount: 0,
+});
+
+const normalizeInitialData = (initialData?: Order | null): OrderRequest => {
+  if (!initialData) {
+    return {
+      customerName: '',
+      customerMobileNo: '',
+      customerEmail: '',
+      orderDate: '',
+      expectedDeliveryDate: '',
+      paymentDate: '',
+      totalItems: 0,
+      offlineBillPercent: 0,
+      offlineTotal: 0,
+      officialBillAmount: 0,
+      gst: 0,
+      grandTotal: 0,
+      productsTotal: 0,
+      products: [createEmptyProduct()],
+    };
+  }
+
+  const { id, orderStatus, products, ...rest } = initialData;
+  return {
+    ...rest,
+    products:
+      products && products.length
+        ? products.map(({ id: productId, ...item }) => ({
+            ...item,
+          }))
+        : [createEmptyProduct()],
+  };
+};
+
+const recalculateTotals = (data: OrderRequest): OrderRequest => {
+  const productsTotal = data.products.reduce((sum, product) => sum + (Number(product.totalAmount) || 0), 0);
+  const offlineBillPercent = Number(data.offlineBillPercent) || 0;
+  const offlineTotal = (offlineBillPercent / 100) * productsTotal;
+  const officialBillAmount = Math.max(productsTotal - offlineTotal, 0);
+  const gst = officialBillAmount * 0.18;
+  const grandTotal = offlineTotal + officialBillAmount + gst;
+
+  return {
+    ...data,
+    productsTotal: Number(productsTotal.toFixed(2)),
+    offlineTotal: Number(offlineTotal.toFixed(2)),
+    officialBillAmount: Number(officialBillAmount.toFixed(2)),
+    gst: Number(gst.toFixed(2)),
+    grandTotal: Number(grandTotal.toFixed(2)),
+    totalItems: data.products.length,
+  };
+};
+
+const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initialData }) => {
+  const [activeTab, setActiveTab] = useState<ActiveTab>('order');
+  const [formData, setFormData] = useState<OrderRequest>(() => recalculateTotals(normalizeInitialData(initialData)));
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const isEditMode = Boolean(initialData);
+
+  const updateFormData = (updater: (prev: OrderRequest) => OrderRequest) => {
+    setFormData((prev) => recalculateTotals(updater(prev)));
+  };
+
+  const handleFieldChange = (field: keyof OrderRequest, value: string | number) => {
+    updateFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleProductChange = (index: number, field: keyof OrderProductRequest, value: string | number) => {
+    updateFormData((prev) => {
+      const products = prev.products.map((product, idx) => {
+        if (idx !== index) return product;
+
+        const updated: OrderProductRequest = {
+          ...product,
+          [field]: value,
+        };
+
+        if (field === 'quantityKg' || field === 'marketRate' || field === 'rateDifference') {
+          const qty = Number(field === 'quantityKg' ? value : updated.quantityKg) || 0;
+          const market = Number(field === 'marketRate' ? value : updated.marketRate) || 0;
+          const diff = Number(field === 'rateDifference' ? value : updated.rateDifference) || 0;
+          updated.totalAmount = Number(((market + diff) * qty).toFixed(2));
+        }
+
+        if (field === 'totalAmount') {
+          updated.totalAmount = Number(value) || 0;
+        }
+
+        return updated;
+      });
+
+      return {
+        ...prev,
+        products,
+      };
+    });
+  };
+
+  const handleAddProduct = () => {
+    updateFormData((prev) => ({
+      ...prev,
+      products: [...prev.products, createEmptyProduct()],
+    }));
+  };
+
+  const handleRemoveProduct = (index: number) => {
+    updateFormData((prev) => {
+      if (prev.products.length === 1) return prev;
+      return {
+        ...prev,
+        products: prev.products.filter((_, idx) => idx !== index),
+      };
+    });
+  };
+
+  const validateForm = () => {
+    if (!formData.customerName.trim()) {
+      setError('Customer name is required.');
+      setActiveTab('order');
+      return false;
+    }
+
+    if (!formData.orderDate) {
+      setError('Order date is required.');
+      setActiveTab('order');
+      return false;
+    }
+
+    if (!formData.expectedDeliveryDate) {
+      setError('Expected delivery date is required.');
+      setActiveTab('order');
+      return false;
+    }
+
+    if (!formData.products.length) {
+      setError('Add at least one product.');
+      setActiveTab('lineItems');
+      return false;
+    }
+
+    const invalidProduct = formData.products.find(
+      (product) =>
+        !product.productName.trim() ||
+        Number(product.quantityKg) <= 0 ||
+        Number(product.marketRate) <= 0
+    );
+
+    if (invalidProduct) {
+      setError('Each product requires name, quantity, and market rate.');
+      setActiveTab('lineItems');
+      return false;
+    }
+
+    setError(null);
+    return true;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setIsSaving(true);
+      await onSubmit(formData);
+    } catch (submitError: any) {
+      setError(submitError?.response?.data?.message || 'Failed to save order. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const formatCurrency = (value?: number | null) => {
+    if (value === undefined || value === null || Number.isNaN(value)) return '';
+    return `₹ ${Number(value).toLocaleString('en-IN')}`;
+  };
+
+  const formattedProductsTotal = useMemo(() => formatCurrency(formData.productsTotal), [formData.productsTotal]);
+
+  return (
+    <div className="order-modal-overlay" onClick={onClose}>
+      <div className="order-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="order-modal-header">
+          <div>
+            <p className="order-modal-subtitle">{isEditMode ? 'Update existing order' : 'Create a new order'}</p>
+            <h2 className="order-modal-title">{isEditMode ? 'Update Order' : 'Create a new order'}</h2>
+          </div>
+          <button type="button" className="order-modal-close" onClick={onClose} aria-label="Close">
+            ✕
+          </button>
+        </div>
+
+        <div className="order-modal-tabs">
+          <button
+            type="button"
+            className={`order-modal-tab ${activeTab === 'order' ? 'active' : ''}`}
+            onClick={() => setActiveTab('order')}
+          >
+            Order Details
+          </button>
+          <button
+            type="button"
+            className={`order-modal-tab ${activeTab === 'lineItems' ? 'active' : ''}`}
+            onClick={() => setActiveTab('lineItems')}
+          >
+            Line Items
+          </button>
+        </div>
+
+        <form className="order-modal-body" onSubmit={handleSubmit}>
+          {activeTab === 'order' && (
+            <div className="order-details-grid">
+              <div className="order-form-group">
+                <label>Customer Name*</label>
+                <input
+                  type="text"
+                  value={formData.customerName}
+                  onChange={(e) => handleFieldChange('customerName', e.target.value)}
+                  placeholder="Acme Corp"
+                  required
+                />
+              </div>
+              <div className="order-form-group">
+                <label>Order Date*</label>
+                <input
+                  type="date"
+                  value={formData.orderDate}
+                  max={formData.expectedDeliveryDate || undefined}
+                  onChange={(e) => handleFieldChange('orderDate', e.target.value)}
+                  required
+                />
+              </div>
+              <div className="order-form-group">
+                <label>Contact Number*</label>
+                <input
+                  type="tel"
+                  value={formData.customerMobileNo || ''}
+                  onChange={(e) => handleFieldChange('customerMobileNo', e.target.value)}
+                  placeholder="+91 95467 90777"
+                  required
+                />
+              </div>
+              <div className="order-form-group">
+                <label>Email ID*</label>
+                <input
+                  type="email"
+                  value={formData.customerEmail || ''}
+                  onChange={(e) => handleFieldChange('customerEmail', e.target.value)}
+                  placeholder="acmecorp@email.com"
+                  required
+                />
+              </div>
+              <div className="order-form-group">
+                <label>Expected Delivery Date*</label>
+                <input
+                  type="date"
+                  value={formData.expectedDeliveryDate}
+                  onChange={(e) => handleFieldChange('expectedDeliveryDate', e.target.value)}
+                  required
+                />
+              </div>
+              <div className="order-form-group">
+                <label>Total Items</label>
+                <input type="number" value={formData.totalItems || 0} readOnly />
+              </div>
+              <div className="order-form-group">
+                <label>Payment Date*</label>
+                <input
+                  type="date"
+                  value={formData.paymentDate || ''}
+                  onChange={(e) => handleFieldChange('paymentDate', e.target.value)}
+                  required
+                />
+              </div>
+              <div className="order-form-group">
+                <label>Products Total</label>
+                <input type="text" value={formattedProductsTotal} readOnly />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'lineItems' && (
+            <div className="line-items-section">
+              <div className="line-items-header">
+                <h3>Add Products</h3>
+                <button type="button" className="add-item-btn" onClick={handleAddProduct}>
+                  + Add Item
+                </button>
+              </div>
+
+              {formData.products.map((product, index) => (
+                <div className="line-item-card" key={`product-${index}`}>
+                  <div className="line-item-card-header">
+                    <div className="line-item-pill">Item {String(index + 1).padStart(2, '0')}</div>
+                    <button
+                      type="button"
+                      className="order-btn"
+                      data-variant="danger"
+                      data-shape="icon"
+                      onClick={() => handleRemoveProduct(index)}
+                      disabled={formData.products.length === 1}
+                      aria-label="Remove product"
+                    >
+                      <img src={DeleteIcon} alt="Remove" />
+                    </button>
+                  </div>
+                  <div className="line-item-grid">
+                    <div className="line-item-field line-item-field--lg">
+                      <label>Product Name*</label>
+                      <input
+                        type="text"
+                        value={product.productName}
+                        onChange={(e) => handleProductChange(index, 'productName', e.target.value)}
+                        placeholder="Add product"
+                        required
+                      />
+                    </div>
+                    <div className="line-item-field">
+                      <label>Qty (Kg)*</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={product.quantityKg || ''}
+                        onChange={(e) => handleProductChange(index, 'quantityKg', Number(e.target.value))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="line-item-field">
+                      <label>Market Rate*</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={product.marketRate || ''}
+                        onChange={(e) => handleProductChange(index, 'marketRate', Number(e.target.value))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="line-item-field">
+                      <label>Rate Diff*</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={product.rateDifference || ''}
+                        onChange={(e) => handleProductChange(index, 'rateDifference', Number(e.target.value))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="line-item-field">
+                      <label>Total ₹*</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={product.totalAmount || ''}
+                        onChange={(e) => handleProductChange(index, 'totalAmount', Number(e.target.value))}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <div className="line-item-total">
+                <label>Items Total*</label>
+                <input type="text" value={formatCurrency(formData.productsTotal)} readOnly />
+              </div>
+
+              <div className="amount-summary">
+                <h3>Amount Total</h3>
+                <div className="amount-grid">
+                  <div className="order-form-group">
+                    <label>Offline Bill %*</label>
+                    <select
+                      value={formData.offlineBillPercent || ''}
+                      onChange={(e) => handleFieldChange('offlineBillPercent', Number(e.target.value) || 0)}
+                    >
+                      <option value="">Select %</option>
+                      {[0, 10, 15, 20, 25, 30, 40, 50].map((percent) => (
+                        <option value={percent} key={percent}>
+                          {percent}%
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="order-form-group">
+                    <label>Items Total*</label>
+                    <input type="text" value={formatCurrency(formData.productsTotal)} readOnly />
+                  </div>
+                  <div className="order-form-group">
+                    <label>Offline Total*</label>
+                    <input type="text" value={formatCurrency(formData.offlineTotal)} readOnly />
+                  </div>
+                  <div className="order-form-group">
+                    <label>Official Bill Amount*</label>
+                    <input type="text" value={formatCurrency(formData.officialBillAmount)} readOnly />
+                  </div>
+                  <div className="order-form-group">
+                    <label>GST*</label>
+                    <input type="text" value={formatCurrency(formData.gst)} readOnly />
+                  </div>
+                  <div className="order-form-group">
+                    <label>Grand Total*</label>
+                    <input type="text" value={formatCurrency(formData.grandTotal)} readOnly />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {error && <div className="order-modal-error">{error}</div>}
+
+          <div className="order-modal-actions">
+            {activeTab === 'order' && (
+              <button
+                type="button"
+                className="order-btn"
+                data-variant="primary"
+                onClick={() => setActiveTab('lineItems')}
+              >
+                Save &amp; Continue
+              </button>
+            )}
+            {activeTab === 'lineItems' && (
+              <>
+                <button type="submit" className="order-btn" data-variant="primary" disabled={isSaving}>
+                  {isSaving ? 'Saving…' : isEditMode ? 'Update Order' : 'Save Order'}
+                </button>
+                <button type="button" className="order-btn" data-variant="secondary" onClick={onClose}>
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AddOrderModal;

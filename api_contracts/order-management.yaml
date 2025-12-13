@@ -1,0 +1,402 @@
+openapi: 3.0.3
+info:
+  title: Order Management API
+  version: 1.0.0
+  description: OpenAPI for order management
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://parmeshwari-erp.onrender.com
+    description: Production Server
+
+tags:
+  - name: Orders
+    description: All operations for managing customer orders.
+
+paths:
+  # ------------------------------------------------------------
+  # ORDER CRUD
+  # ------------------------------------------------------------
+  /api/v1/orders:
+    post:
+      tags:
+        - Orders
+      operationId: createOrder
+      summary: Create a new order (with products & billing details)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '201':
+          description: Order successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '500':
+          description: Internal Server Error
+      security:
+        - oauth2: [ ]
+
+    get:
+      tags:
+        - Orders
+      operationId: getOrderList
+      summary: Get paginated list of orders
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/sizeParam'
+        - name: status
+          in: query
+          required: false
+          description: Filter by order status
+          schema:
+            type: string
+        - name: search
+          in: query
+          required: false
+          description: Search by customer name or mobile number
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated list of orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResultOrder'
+        '500':
+          description: Internal Server Error
+      security:
+        - oauth2: [ ]
+
+  /api/v1/orders/{orderId}:
+    get:
+      tags:
+        - Orders
+      operationId: getOrderById
+      summary: Get order by ID
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Order found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Order not found
+      security:
+        - oauth2: [ ]
+
+    put:
+      tags:
+        - Orders
+      operationId: updateOrder
+      summary: Update order details, billing, and product list
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '200':
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Order not found
+        '500':
+          description: Internal Server Error
+      security:
+        - oauth2: [ ]
+
+    delete:
+      tags:
+        - Orders
+      operationId: deleteOrder
+      summary: Delete an order and all associated products.
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Order successfully deleted
+        '404':
+          description: Order not found
+        '500':
+          description: Internal Server Error
+      security:
+        - oauth2: [ ]
+
+  /api/v1/orders/{orderId}/status:
+    patch:
+      tags:
+        - Orders
+      operationId: updateOrderStatus
+      summary: Update only the status of an order
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderStatus
+              properties:
+                orderStatus:
+                  $ref: '#/components/schemas/OrderStatus'
+      responses:
+        '200':
+          description: Status updated
+        '404':
+          description: Order not found
+        '400':
+          description: Invalid status
+      security:
+        - oauth2: [ ]
+# ------------------------------------------------------------
+# COMPONENTS
+# ------------------------------------------------------------
+components:
+  securitySchemes:
+    oauth2:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    pageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 0
+      description: Page number starting from 0
+
+    sizeParam:
+      name: size
+      in: query
+      schema:
+        type: integer
+        default: 10
+      description: Number of items per page
+
+  schemas:
+
+    # ------------------------------------------------------------
+    # Order Request
+    # ------------------------------------------------------------
+    OrderRequest:
+      type: object
+      required:
+        - customerName
+        - orderDate
+        - expectedDeliveryDate
+      properties:
+        customerName:
+          type: string
+        customerMobileNo:
+          type: string
+          nullable: true
+        customerEmail:
+          type: string
+          nullable: true
+        orderDate:
+          type: string
+          format: date
+        expectedDeliveryDate:
+          type: string
+          format: date
+        paymentDate:
+          type: string
+          format: date
+        totalItems:
+          type: integer
+          nullable: true
+
+        # Billing fields
+        offlineBillPercent:
+          type: number
+          format: double
+        offlineTotal:
+          type: number
+          format: double
+          nullable: true
+        officialBillAmount:
+          type: number
+          format: double
+        gst:
+          type: number
+          format: double
+        grandTotal:
+          type: number
+          format: double
+        productsTotal:
+          type: number
+          format: double
+
+        # Product list
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderProductRequest'
+
+    # Product request
+    OrderProductRequest:
+      type: object
+      required:
+        - productName
+        - quantityKg
+        - marketRate
+        - rateDifference
+        - totalAmount
+      properties:
+        productName:
+          type: string
+        quantityKg:
+          type: number
+          format: double
+        marketRate:
+          type: number
+          format: double
+        rateDifference:
+          type: number
+          format: double
+        totalAmount:
+          type: number
+          format: double
+
+    # ------------------------------------------------------------
+    # Order Response
+    # ------------------------------------------------------------
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        customerName:
+          type: string
+        customerMobileNo:
+          type: string
+          nullable: true
+        customerEmail:
+          type: string
+          nullable: true
+        orderDate:
+          type: string
+          format: date
+        expectedDeliveryDate:
+          type: string
+          format: date
+        paymentDate:
+          type: string
+          format: date
+        totalItems:
+          type: integer
+          nullable: true
+        orderStatus:
+          $ref: '#/components/schemas/OrderStatus'
+
+        offlineBillPercent:
+          type: number
+        offlineTotal:
+          type: number
+          nullable: true
+        officialBillAmount:
+          type: number
+        gst:
+          type: number
+        grandTotal:
+          type: number
+        productsTotal:
+          type: number
+
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderProduct'
+
+    # Product response
+    OrderProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+        productName:
+          type: string
+        quantityKg:
+          type: number
+          format: double
+        marketRate:
+          type: number
+          format: double
+        rateDifference:
+          type: number
+          format: double
+        totalAmount:
+          type: number
+          format: double
+
+    OrderStatus:
+      type: string
+      enum:
+        - PENDING
+        - COMPLETED
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+        detail:
+          type: object
+          additionalProperties: true
+
+    PaginatedResultOrder:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        empty:
+          type: boolean
+        last:
+          type: boolean
+        first:
+          type: boolean
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        size:
+          type: integer

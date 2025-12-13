@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import SubcontractingPage from './pages/SubcontractingPage';
+import OrderManagementPage from './pages/OrderManagementPage';
 import InventoryPage from './pages/InventoryPage';
 import ProductCatalogPage from './pages/ProductCatalogPage';
 import './App.css';
@@ -38,7 +39,7 @@ function App() {
             <Route path="dashboard" element={<div className="placeholder">Dashboard Coming Soon</div>} />
             <Route path="crm" element={<div className="placeholder">CRM & Sales Coming Soon</div>} />
             <Route path="inventory" element={<InventoryPage />} />
-            <Route path="orders" element={<div className="placeholder">Order Management Coming Soon</div>} />
+            <Route path="orders" element={<OrderManagementPage />} />
             <Route path="subcontracting" element={<SubcontractingPage />} />
             <Route path="invoices" element={<div className="placeholder">Invoices Coming Soon</div>} />
             <Route path="payment-reminder" element={<div className="placeholder">Payment Reminder Coming Soon</div>} />

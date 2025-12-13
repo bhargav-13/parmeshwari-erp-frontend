@@ -197,3 +197,53 @@ export interface RawItemRequest {
 export interface RawItemStatusRequest {
   status: InventoryStatus;
 }
+
+// Order Management Types
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+
+export interface OrderProductRequest {
+  productName: string;
+  quantityKg: number;
+  marketRate: number;
+  rateDifference: number;
+  totalAmount: number;
+}
+
+export interface OrderRequest {
+  customerName: string;
+  customerMobileNo?: string | null;
+  customerEmail?: string | null;
+  orderDate: string;
+  expectedDeliveryDate: string;
+  paymentDate?: string | null;
+  totalItems?: number | null;
+  offlineBillPercent: number;
+  offlineTotal?: number | null;
+  officialBillAmount: number;
+  gst: number;
+  grandTotal: number;
+  productsTotal: number;
+  products: OrderProductRequest[];
+}
+
+export interface OrderProduct extends OrderProductRequest {
+  id: number;
+}
+
+export interface Order extends Omit<OrderRequest, 'products'> {
+  id: number;
+  orderStatus: OrderStatus;
+  products: OrderProduct[];
+}
+
+export interface OrderStats {
+  totalOrders: number;
+  pendingOrders: number;
+  completedOrders: number;
+  totalAmount: number;
+}
