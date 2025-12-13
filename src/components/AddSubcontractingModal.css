@@ -1,0 +1,300 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #FFFFFF;
+  border-radius: 16px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content > * {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.modal-title {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 28px;
+  color: #17344D;
+  margin: 0 0 20px 0;
+  padding-top: 24px;
+  flex-shrink: 0;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+
+.modal-form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-form::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+.modal-form::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+
+.modal-form::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+}
+
+.form-input {
+  padding: 10px 14px;
+  border: 1px solid rgba(125, 153, 169, 0.3);
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+  background: #F5F5F5;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: #17344D;
+}
+
+.form-input::placeholder {
+  color: #A7A7A7;
+}
+
+.price-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.price-input {
+  flex: 1;
+}
+
+.unit-select {
+  padding: 10px 14px;
+  border: 1px solid rgba(125, 153, 169, 0.3);
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+  background: #F5F5F5;
+  outline: none;
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.form-textarea {
+  padding: 10px 14px;
+  border: 1px solid rgba(125, 153, 169, 0.3);
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+  background: #F5F5F5;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.form-textarea:focus {
+  border-color: #17344D;
+}
+
+.form-textarea::placeholder {
+  color: #A7A7A7;
+}
+
+.error-message {
+  padding: 10px 14px;
+  background: #FFE5E5;
+  border: 1px solid #FF0101;
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: #FF0101;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.save-button,
+.cancel-button {
+  padding: 10px 32px;
+  border-radius: 20px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 22px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button {
+  background: #D1EEFF;
+  color: #17344D;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #b8dfff;
+}
+
+.save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: transparent;
+  color: #17344D;
+  border: 1px solid #17344D;
+}
+
+.cancel-button:hover {
+  background: #F5F5F5;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+    max-height: 85vh;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    line-height: 24px;
+    margin-bottom: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .form-group {
+    gap: 4px;
+  }
+
+  .form-label {
+    font-size: 13px;
+  }
+
+  .form-input,
+  .form-textarea,
+  .unit-select {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .price-input-group {
+    gap: 8px;
+  }
+
+  .unit-select {
+    min-width: 70px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .save-button,
+  .cancel-button {
+    width: 100%;
+    padding: 10px 24px;
+    font-size: 14px;
+  }
+
+  .error-message {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    padding: 16px;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .form-label {
+    font-size: 12px;
+  }
+
+  .form-input,
+  .form-textarea,
+  .unit-select {
+    font-size: 12px;
+  }
+
+  .save-button,
+  .cancel-button {
+    font-size: 13px;
+    padding: 9px 20px;
+  }
+}

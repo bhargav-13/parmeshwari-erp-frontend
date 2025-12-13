@@ -1,0 +1,451 @@
+.subcontracting-card {
+  border: 1px solid rgba(125, 153, 169, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  background: #FFFFFF;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.card-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-order-id {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 22px;
+  color: #17344D;
+  margin: 0;
+}
+
+.card-contractor {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #888888;
+  margin: 0;
+}
+
+.card-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button:hover {
+  transform: scale(1.1);
+}
+
+.icon-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Icon Images */
+.icon-img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Loading Icon - Spinner */
+.loading-icon {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #17344D;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.card-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.card-date {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  color: #888888;
+}
+
+.card-body {
+  border: 1px solid rgba(125, 153, 169, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.material-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-title {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 24px;
+  color: #17344D;
+  margin: 0;
+  text-align: center;
+}
+
+.stock-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stock-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.stock-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: #888888;
+}
+
+.stock-values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stock-value {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 20px;
+  color: #17344D;
+}
+
+.stock-pieces,
+.stock-total {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: #888888;
+}
+
+.processes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.processes-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: #888888;
+}
+
+.process-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.status-select {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: none;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  padding-right: 40px;
+}
+
+.status-dropdown-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 9px;
+  pointer-events: none;
+}
+
+.status-completed {
+  background: #D1FFE2;
+  color: #275B22;
+}
+
+.status-in-process {
+  background: #FFE5CC;
+  color: #8B4500;
+}
+
+.status-rejected {
+  background: #FFD1D1;
+  color: #8B0000;
+}
+
+.return-record-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #D1EEFF;
+  border: none;
+  border-radius: 20px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.return-record-button:hover {
+  background: #b8dfff;
+}
+
+/* Return Icon */
+.return-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.remark-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.remark-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+  color: #17344D;
+}
+
+.remark-text {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
+  color: #888888;
+  margin: 0;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .subcontracting-card {
+    padding: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-header-left {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card-title-group {
+    width: 100%;
+  }
+
+  .card-order-id {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .card-contractor {
+    font-size: 13px;
+  }
+
+  .card-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .card-dates {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .card-date {
+    font-size: 11px;
+  }
+
+  .card-body {
+    padding: 12px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .stock-info {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .stock-item {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .stock-label {
+    font-size: 12px;
+    min-width: 80px;
+  }
+
+  .stock-values {
+    align-items: flex-end;
+  }
+
+  .stock-value {
+    font-size: 14px;
+    text-align: right;
+  }
+
+  .stock-pieces,
+  .stock-total {
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .process-actions {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .status-dropdown {
+    width: 100%;
+  }
+
+  .status-select {
+    width: 100%;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .return-record-button {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .icon-button {
+    font-size: 20px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .subcontracting-card {
+    padding: 10px;
+  }
+
+  .card-order-id {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .card-contractor {
+    font-size: 12px;
+  }
+
+  .card-body {
+    padding: 10px;
+  }
+
+  .section-title {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .stock-label {
+    font-size: 11px;
+    min-width: 70px;
+  }
+
+  .stock-value {
+    font-size: 13px;
+  }
+
+  .stock-pieces,
+  .stock-total {
+    font-size: 11px;
+  }
+
+  .status-select,
+  .return-record-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .remark-label,
+  .remark-text {
+    font-size: 12px;
+  }
+}

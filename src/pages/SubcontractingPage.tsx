@@ -1,0 +1,180 @@
+import React, { useState, useEffect } from 'react';
+import { subcontractingApi } from '../api/subcontracting';
+import type { Subcontracting, SubOrderRequest, SubcontractingStats } from '../types';
+import { SubcontractingStatus } from '../types';
+import AddSubcontractingModal from '../components/AddSubcontractingModal';
+import SubcontractingCard from '../components/SubcontractingCard';
+import Loading from '../components/Loading';
+import SearchIcon from '../assets/search.svg';
+import FilterIcon from '../assets/filter.svg';
+import './SubcontractingPage.css';
+
+const SubcontractingPage: React.FC = () => {
+  const [subcontracts, setSubcontracts] = useState<Subcontracting[]>([]);
+  const [stats, setStats] = useState<SubcontractingStats>({
+    totalOrders: 0,
+    inProgress: 0,
+    completed: 0,
+    totalBilledAmount: 0,
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [page] = useState(0);
+
+  useEffect(() => {
+    fetchSubcontracts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, searchQuery]);
+
+  const fetchSubcontracts = async () => {
+    try {
+      setLoading(true);
+      const response = await subcontractingApi.getSubcontractingList({
+        page,
+        size: 10,
+        search: searchQuery || undefined,
+      });
+
+      setSubcontracts(response.data);
+
+      // Calculate stats
+      calculateStats(response.data);
+    } catch (error) {
+      console.error('Error fetching subcontracts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateStats = (data: Subcontracting[]) => {
+    const inProgress = data.filter((s) => s.status === SubcontractingStatus.IN_PROCESS).length;
+    const completed = data.filter((s) => s.status === SubcontractingStatus.COMPLETED).length;
+
+    // Calculate total amount on frontend: (sentStock - returnStock) * price
+    const totalBilledAmount = data.reduce((sum, s) => {
+      const usedStock = s.sentStock - (s.returnStock || 0);
+      const amount = usedStock * s.price;
+      return sum + amount;
+    }, 0);
+
+    setStats({
+      totalOrders: data.length,
+      inProgress,
+      completed,
+      totalBilledAmount,
+    });
+  };
+
+  const handleAddSubcontract = async (data: SubOrderRequest) => {
+    try {
+      await subcontractingApi.addSubcontracting(data);
+      setIsModalOpen(false);
+      fetchSubcontracts();
+    } catch (error) {
+      console.error('Error adding subcontract:', error);
+      throw error;
+    }
+  };
+
+  const handleDeleteSubcontract = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this subcontracting order?')) {
+      try {
+        await subcontractingApi.deleteSubcontracting(id);
+        fetchSubcontracts();
+      } catch (error) {
+        console.error('Error deleting subcontract:', error);
+      }
+    }
+  };
+
+  return (
+    <div className="subcontracting-page">
+      <div className="page-header">
+        <div className="page-title-section">
+          <h1 className="page-title">Subcontracting Management</h1>
+          <p className="page-subtitle">Track materials, processes, and billing for subcontracting work.</p>
+        </div>
+
+        <button type="button" className="add-button" onClick={() => setIsModalOpen(true)}>
+          <span className="add-icon">+</span>
+          <span className="add-text">Add Subcontracting Order</span>
+        </button>
+      </div>
+
+      <div className="stats-cards">
+        <div className="stat-card">
+          <div className="stat-content">
+            <span className="stat-label">Total Orders</span>
+            <span className="stat-value">{stats.totalOrders}</span>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-content">
+            <span className="stat-label">In Progress</span>
+            <span className="stat-value">{stats.inProgress}</span>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-content">
+            <span className="stat-label">Completed</span>
+            <span className="stat-value">{stats.completed}</span>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-content">
+            <span className="stat-label">Total Billed Amount</span>
+            <span className="stat-value">₹ {stats.totalBilledAmount.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="search-filter-bar">
+        <div className="search-box">
+          <img src={SearchIcon} alt="Search" className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+
+        <button type="button" className="filter-button">
+          <img src={FilterIcon} alt="Filter" className="filter-icon" />
+          <span className="filter-text">Filter</span>
+        </button>
+      </div>
+
+      <div className="subcontracts-list">
+        {loading ? (
+          <Loading message="Loading subcontracting orders..." size="large" />
+        ) : subcontracts.length === 0 ? (
+          <div className="no-data">No subcontracting orders found.</div>
+        ) : (
+          subcontracts.map((subcontract) => (
+            <SubcontractingCard
+              key={subcontract.subcontractingId}
+              subcontract={subcontract}
+              onDelete={handleDeleteSubcontract}
+              onRefresh={fetchSubcontracts}
+            />
+          ))
+        )}
+      </div>
+
+      {isModalOpen && (
+        <AddSubcontractingModal
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleAddSubcontract}
+        />
+      )}
+    </div>
+  );
+};
+
+export default SubcontractingPage;

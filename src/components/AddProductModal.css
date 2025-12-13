@@ -1,0 +1,132 @@
+.modal-content.small-modal {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 450px;
+  width: 100%;
+}
+
+.modal-title {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 26px;
+  color: #17344D;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.error-message {
+  background: #FFE5E5;
+  color: #8B0000;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+}
+
+.form-input {
+  padding: 10px 14px;
+  border: 1px solid rgba(125, 153, 169, 0.3);
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: #17344D;
+}
+
+.form-input::placeholder {
+  color: #A7A7A7;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.save-button,
+.cancel-button {
+  flex: 1;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 22px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+}
+
+.save-button {
+  background: #D1EEFF;
+  color: #17344D;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #b8dfff;
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: #FFFFFF;
+  color: #17344D;
+  border: 1px solid rgba(125, 153, 169, 0.3);
+}
+
+.cancel-button:hover {
+  background: #F5F5F5;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .modal-content.small-modal {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .modal-title {
+    font-size: 16px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .save-button,
+  .cancel-button {
+    width: 100%;
+  }
+}
