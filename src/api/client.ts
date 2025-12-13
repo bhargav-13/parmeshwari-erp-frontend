@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL?.trim() || 'http://localhost:8080';
 
 class ApiClient {
   private client: AxiosInstance;
