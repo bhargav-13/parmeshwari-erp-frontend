@@ -24,9 +24,9 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Calculate total amount on frontend: (sentStock - returnStock) * price
-  const usedStock = subcontract.sentStock - (subcontract.returnStock || 0);
-  const totalAmount = usedStock * subcontract.price;
+  // Use backend-calculated values directly
+  const usedStock = subcontract.usedStock || (subcontract.sentStock - (subcontract.returnStock || 0));
+  const totalAmount = subcontract.totalAmount || 0;
 
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'dd-MM-yyyy');

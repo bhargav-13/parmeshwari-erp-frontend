@@ -28,6 +28,13 @@
   margin-bottom: 24px;
 }
 
+.login-logo-img {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  display: block;
+}
+
 .login-title {
   font-family: 'Jost', sans-serif;
   font-weight: 500;

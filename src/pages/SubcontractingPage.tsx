@@ -53,11 +53,9 @@ const SubcontractingPage: React.FC = () => {
     const inProgress = data.filter((s) => s.status === SubcontractingStatus.IN_PROCESS).length;
     const completed = data.filter((s) => s.status === SubcontractingStatus.COMPLETED).length;
 
-    // Calculate total amount on frontend: (sentStock - returnStock) * price
+    // Use backend-calculated totalAmount directly
     const totalBilledAmount = data.reduce((sum, s) => {
-      const usedStock = s.sentStock - (s.returnStock || 0);
-      const amount = usedStock * s.price;
-      return sum + amount;
+      return sum + (s.totalAmount || 0);
     }, 0);
 
     setStats({
