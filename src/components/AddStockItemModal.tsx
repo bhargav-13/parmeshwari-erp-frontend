@@ -10,7 +10,7 @@ import type {
   CategoryRequest,
   StockItemImage,
 } from '../types';
-import { QuantityUnit } from '../types';
+import { QuantityUnit, InventoryFloor } from '../types';
 import './AddStockItemModal.css';
 
 interface AddStockItemModalProps {
@@ -19,6 +19,7 @@ interface AddStockItemModalProps {
   products: Product[];
   categories: Category[];
   initialData?: StockItem | null;
+  fixedFloor?: InventoryFloor;
 }
 
 const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || '';
@@ -36,6 +37,7 @@ const defaultFormData: StockItemRequest = {
   weightPerPc: 0,
   pricePerKg: 0,
   quantityUnit: QuantityUnit.KG,
+  inventoryFloor: InventoryFloor.GROUND_FLOOR,
   lowStockAlert: 0,
 };
 
@@ -45,6 +47,7 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
   products,
   categories,
   initialData,
+  fixedFloor,
 }) => {
   const isEditMode = !!initialData;
   const [formData, setFormData] = useState<StockItemRequest>({
@@ -56,6 +59,7 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
     weightPerPc: initialData?.weightPerPc || 0,
     pricePerKg: initialData?.pricePerKg || 0,
     quantityUnit: initialData?.quantityUnit || QuantityUnit.KG,
+    inventoryFloor: fixedFloor || initialData?.inventoryFloor || InventoryFloor.GROUND_FLOOR,
     lowStockAlert: initialData?.lowStockAlert || 0,
   });
 
@@ -331,10 +335,13 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
 
       const uploadedImagesData = await imageApi.uploadMultipleImages(selectedFiles);
 
-      const newImages: StockItemImage[] = uploadedImagesData.images.map((img) => ({
+      const newImages: StockItemImage[] = uploadedImagesData.data.map((img) => ({
         imageName: img.imageName,
         imageLocation: img.imageLocation,
         publicId: img.publicId,
+        format: img.format,
+        width: img.width,
+        height: img.height,
       }));
 
       setUploadedImages([...uploadedImages, ...newImages]);
@@ -611,7 +618,7 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
           </div>
 
           <div className="form-row">
-            <div className="form-group full-width">
+            <div className="form-group">
               <label className="form-label">Low Stock Warning</label>
               <input
                 type="number"
@@ -623,6 +630,21 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
                 step="0.01"
                 min="0"
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Inventory Floor</label>
+              <select
+                name="inventoryFloor"
+                value={formData.inventoryFloor}
+                onChange={handleChange}
+                className="form-select"
+                aria-label="Inventory Floor"
+                disabled={!!fixedFloor}
+              >
+                <option value={InventoryFloor.GROUND_FLOOR}>Ground Floor</option>
+                <option value={InventoryFloor.FIRST_FLOOR}>First Floor</option>
+              </select>
             </div>
           </div>
 

@@ -203,7 +203,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/StockItemList'
+                  $ref: '#/components/schemas/StockItem'
         '500':
           description: Internal Server Error
           content:
@@ -250,7 +250,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
-
+  /api/v1/stock-item/floor/{floor}:
     get:
       tags:
         - Stock Inventory
@@ -260,6 +260,23 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/sizeParam'
+        - name: floor
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/InventoryFloor'
+        - name: status
+          in: query
+          description: Filter by status
+          required: false
+          schema:
+            type: string
+            enum: [ IN_STOCK, LOW_STOCK ]
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Paginated list of Stock items
@@ -485,6 +502,18 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/sizeParam'
+        - name: status
+          in: query
+          description: Filter by status
+          required: false
+          schema:
+            type: string
+            enum: [ IN_STOCK, LOW_STOCK ]
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Paginated list of Raw items
@@ -776,38 +805,8 @@ components:
           $ref: '#/components/schemas/QuantityUnit'
         status:
           $ref: '#/components/schemas/InventoryStatus'
-        lowStockAlert:
-          type: number
-          format: double
-
-    StockItemList:
-      type: object
-      properties:
-        stockItemId:
-          type: integer
-        product:
-          $ref: '#/components/schemas/Product'
-        category:
-          $ref: '#/components/schemas/Category'
-        quantityInKg:
-          type: number
-          format: double
-        quantityInPc:
-          type: number
-          format: double
-        weightPerPc:
-          type: number
-          format: double
-        pricePerKg:
-          type: number
-          format: double
-        totalPrice:
-          type: number
-          format: double
-        quantityUnit:
-          $ref: '#/components/schemas/QuantityUnit'
-        status:
-          $ref: '#/components/schemas/InventoryStatus'
+        inventoryFloor:
+          $ref: '#/components/schemas/InventoryFloor'
         lowStockAlert:
           type: number
           format: double
@@ -868,6 +867,8 @@ components:
           $ref: '#/components/schemas/QuantityUnit'
         status:
           $ref: '#/components/schemas/InventoryStatus'
+        inventoryFloor:
+          $ref: '#/components/schemas/InventoryFloor'
         lowStockAlert:
           type: number
           format: double
@@ -906,6 +907,11 @@ components:
       enum:
         - IN_STOCK
         - LOW_STOCK
+    InventoryFloor:
+      type: string
+      enum:
+        - GROUND_FLOOR
+        - FIRST_FLOOR
     PaginatedResultStockItem:
       type: object
       properties:

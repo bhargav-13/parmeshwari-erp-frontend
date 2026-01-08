@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { Order, OrderRequest, OrderStatus, PaginatedResult } from '../types';
+import type { Order, OrderRequest, OrderStatus, OrderFloor, PaginatedResult } from '../types';
 
 export const ordersApi = {
   createOrder: async (payload: OrderRequest): Promise<Order> => {
@@ -8,16 +8,18 @@ export const ordersApi = {
   },
 
   getOrderList: async (params: {
+    floor: OrderFloor;
     page?: number;
     size?: number;
     status?: OrderStatus | '';
     search?: string;
   }): Promise<PaginatedResult<Order>> => {
-    const response = await apiClient.get<PaginatedResult<Order>>('/api/v1/orders', {
+    const { floor, ...queryParams } = params;
+    const response = await apiClient.get<PaginatedResult<Order>>(`/api/v1/orders/floor/${floor}`, {
       params: {
-        ...params,
-        status: params.status || undefined,
-        search: params.search || undefined,
+        ...queryParams,
+        status: queryParams.status || undefined,
+        search: queryParams.search || undefined,
       },
     });
     return response.data;

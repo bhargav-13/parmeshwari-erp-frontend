@@ -13,10 +13,13 @@ export interface ImageInfo {
   imageName: string;
   imageLocation: string;
   publicId: string;
+  format?: string;
+  width?: number;
+  height?: number;
 }
 
 export interface MultipleImageUploadResponse {
-  images: ImageInfo[];
+  data: ImageInfo[];
   count: number;
 }
 
