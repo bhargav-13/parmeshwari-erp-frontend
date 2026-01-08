@@ -61,7 +61,7 @@ apiClient.callApi = function (
 
           // Use promise wrapper for the refresh call
           const refreshData = await new Promise<any>((resolve, reject) => {
-            authApi.refreshToken({ refreshToken }, (err: any, data: any) => {
+            authApi.refreshToken({ refreshToken }, (err, data) => {
               if (err) reject(err);
               else resolve(data);
             });
@@ -136,7 +136,7 @@ export function promisify<T>(
   fn: (callback: (error: any, data: T, response: any) => void) => void
 ): Promise<T> {
   return new Promise((resolve, reject) => {
-    fn((error: any, data: T, _response: any) => {
+    fn((error, data, response) => {
       if (error) {
         reject(error);
       } else {
