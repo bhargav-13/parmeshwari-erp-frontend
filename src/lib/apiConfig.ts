@@ -136,7 +136,7 @@ export function promisify<T>(
   fn: (callback: (error: any, data: T, response: any) => void) => void
 ): Promise<T> {
   return new Promise((resolve, reject) => {
-    fn((error, data, response) => {
+    fn((error: any, data: T, _response: any) => {
       if (error) {
         reject(error);
       } else {
