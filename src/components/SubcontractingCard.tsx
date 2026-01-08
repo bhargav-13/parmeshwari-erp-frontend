@@ -25,7 +25,8 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Use backend-calculated values directly
-  const usedStock = subcontract.usedStock || (subcontract.sentStock - (subcontract.returnStock || 0));
+  const returnStock = subcontract.subReturn?.returnStock || 0;
+  const usedStock = subcontract.usedStock || (subcontract.sentStock - returnStock);
   const totalAmount = subcontract.totalAmount || 0;
 
   const formatDate = (dateString: string) => {
@@ -143,8 +144,8 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
         <div className="card-dates">
           <span className="card-date">Order Date : {formatDate(subcontract.orderDate)}</span>
-          {subcontract.returnDate && (
-            <span className="card-date">Return Date : {formatDate(subcontract.returnDate)}</span>
+          {subcontract.subReturn?.returnDate && (
+            <span className="card-date">Return Date : {formatDate(subcontract.subReturn.returnDate)}</span>
           )}
         </div>
       </div>
@@ -170,10 +171,10 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
               <span className="stock-label">Returned</span>
               <div className="stock-values">
                 <span className="stock-value">
-                  {subcontract.returnStock || 0} {subcontract.unit}
+                  {returnStock} {subcontract.unit}
                 </span>
                 <span className="stock-pieces">
-                  {((subcontract.returnStock || 0) * 25).toLocaleString('en-IN')} Pc.
+                  {(returnStock * 25).toLocaleString('en-IN')} Pc.
                 </span>
               </div>
             </div>

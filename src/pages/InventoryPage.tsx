@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { stockItemApi, productApi, categoryApi, rawItemApi } from '../api/inventory';
 import type { StockItem, Product, Category, RawItem } from '../types';
-import { InventoryStatus } from '../types';
+import { InventoryStatus, InventoryFloor } from '../types';
 import Loading from '../components/Loading';
 import AddStockItemModal from '../components/AddStockItemModal';
 import AddRawItemModal from '../components/AddRawItemModal';
@@ -15,6 +15,7 @@ import DeleteIcon from '../assets/delete.svg';
 
 const InventoryPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'stock' | 'raw'>('stock');
+  const [selectedFloor, setSelectedFloor] = useState<InventoryFloor>(InventoryFloor.GROUND_FLOOR);
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [rawItems, setRawItems] = useState<RawItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,21 +39,33 @@ const InventoryPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedFloor, searchQuery, statusFilter, rawSearchQuery, rawStatusFilter]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [stockData, productsData, categoriesData, rawItemsResult] = await Promise.all([
-        stockItemApi.getAllStockItems(),
+      const [stockItemsResult, productsData, categoriesData, rawItemsResult] = await Promise.all([
+        stockItemApi.getStockItems(
+          selectedFloor,
+          0,
+          1000,
+          statusFilter || undefined,
+          searchQuery || undefined
+        ),
         productApi.getProducts(),
         categoryApi.getCategories(),
-        rawItemApi.getRawItems(0, 1000),
+        rawItemApi.getRawItems(
+          0,
+          1000,
+          rawStatusFilter || undefined,
+          rawSearchQuery || undefined
+        ),
       ]);
+      const stockData = (stockItemsResult as any)?.data ?? [];
       setStockItems(stockData);
       setProducts(productsData);
       setCategories(categoriesData);
-      const rawData = (rawItemsResult as any)?.data ?? (rawItemsResult as any)?.content ?? [];
+      const rawData = (rawItemsResult as any)?.data ?? [];
       setRawItems(rawData);
     } catch (error) {
       console.error('Error fetching inventory data:', error);
@@ -221,6 +234,15 @@ const InventoryPage: React.FC = () => {
         </div>
 
         <div className="header-actions">
+          <select
+            className="floor-select"
+            value={selectedFloor}
+            onChange={(e) => setSelectedFloor(e.target.value as InventoryFloor)}
+            title="Select floor"
+          >
+            <option value={InventoryFloor.GROUND_FLOOR}>Ground Floor</option>
+            <option value={InventoryFloor.FIRST_FLOOR}>First Floor</option>
+          </select>
           <button
             type="button"
             className="action-button secondary-button"

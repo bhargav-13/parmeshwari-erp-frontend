@@ -70,6 +70,23 @@ export const Unit = {
 
 export type Unit = typeof Unit[keyof typeof Unit];
 
+export const PackagingType = {
+  BAG: 'BAG',
+  FOAM: 'FOAM',
+  PETI: 'PETI',
+  DRUM: 'DRUM',
+} as const;
+
+export type PackagingType = typeof PackagingType[keyof typeof PackagingType];
+
+export const ReturnType = {
+  MAAL: 'MAAL',
+  CHHOL: 'CHHOL',
+  TAYAR_MAAL: 'TAYAR_MAAL',
+} as const;
+
+export type ReturnType = typeof ReturnType[keyof typeof ReturnType];
+
 export interface SubOrderRequest {
   contractorName: string;
   materialName: string;
@@ -83,6 +100,19 @@ export interface SubOrderRequest {
 export interface SubReturnRequest {
   returnDate: string; // ISO date format
   returnStock: number;
+  returnElement?: number | null;
+  packagingType: PackagingType;
+  returnElementDrumValue?: number | null;
+  returnType: ReturnType;
+}
+
+export interface SubReturn {
+  returnDate: string;
+  returnStock: number;
+  returnElement?: number | null;
+  packagingType: PackagingType;
+  returnElementDrumValue?: number | null;
+  returnType: ReturnType;
 }
 
 export interface Subcontracting {
@@ -92,8 +122,7 @@ export interface Subcontracting {
   orderDate: string;
   sentStock: number;
   price: number;
-  returnDate?: string;
-  returnStock?: number;
+  subReturn?: SubReturn | null;
   usedStock?: number;
   totalAmount?: number;
   unit: Unit;
@@ -115,6 +144,13 @@ export const InventoryStatus = {
 } as const;
 
 export type InventoryStatus = typeof InventoryStatus[keyof typeof InventoryStatus];
+
+export const InventoryFloor = {
+  GROUND_FLOOR: 'GROUND_FLOOR',
+  FIRST_FLOOR: 'FIRST_FLOOR',
+} as const;
+
+export type InventoryFloor = typeof InventoryFloor[keyof typeof InventoryFloor];
 
 export const QuantityUnit = {
   KG: 'KG',
@@ -146,6 +182,9 @@ export interface StockItemImage {
   imageName: string;
   imageLocation: string;
   publicId?: string;
+  format?: string;
+  width?: number;
+  height?: number;
 }
 
 export interface StockItem {
@@ -159,6 +198,7 @@ export interface StockItem {
   totalPrice: number;
   quantityUnit: QuantityUnit;
   status: InventoryStatus;
+  inventoryFloor?: InventoryFloor;
   lowStockAlert: number;
   images?: StockItemImage[];
 }
@@ -171,6 +211,7 @@ export interface StockItemRequest {
   weightPerPc: number;
   pricePerKg: number;
   quantityUnit: QuantityUnit;
+  inventoryFloor?: InventoryFloor;
   lowStockAlert: number;
   images?: StockItemImage[];
 }
@@ -206,9 +247,17 @@ export const OrderStatus = {
 
 export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
 
+export const OrderFloor = {
+  GROUND_FLOOR: 'GROUND_FLOOR',
+  FIRST_FLOOR: 'FIRST_FLOOR',
+} as const;
+
+export type OrderFloor = typeof OrderFloor[keyof typeof OrderFloor];
+
 export interface OrderProductRequest {
   productName: string;
-  quantityKg: number;
+  quantityKg?: number;
+  quantityPc?: number;
   marketRate: number;
   rateDifference: number;
   totalAmount: number;
@@ -222,6 +271,7 @@ export interface OrderRequest {
   expectedDeliveryDate: string;
   paymentDate?: string | null;
   totalItems?: number | null;
+  orderFloor?: OrderFloor;
   offlineBillPercent: number;
   offlineTotal?: number | null;
   officialBillAmount: number;
@@ -238,6 +288,7 @@ export interface OrderProduct extends OrderProductRequest {
 export interface Order extends Omit<OrderRequest, 'products'> {
   id: number;
   orderStatus: OrderStatus;
+  orderFloor?: OrderFloor;
   products: OrderProduct[];
 }
 

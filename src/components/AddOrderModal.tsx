@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { Order, OrderProductRequest, OrderRequest } from '../types';
+import { OrderFloor } from '../types';
 import './AddOrderModal.css';
 import DeleteIcon from '../assets/delete.svg';
 
@@ -7,6 +8,7 @@ interface AddOrderModalProps {
   onClose: () => void;
   onSubmit: (payload: OrderRequest) => Promise<void>;
   initialData?: Order | null;
+  fixedFloor?: OrderFloor;
 }
 
 type ActiveTab = 'order' | 'lineItems';
@@ -19,7 +21,7 @@ const createEmptyProduct = (): OrderProductRequest => ({
   totalAmount: 0,
 });
 
-const normalizeInitialData = (initialData?: Order | null): OrderRequest => {
+const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloor): OrderRequest => {
   if (!initialData) {
     return {
       customerName: '',
@@ -29,6 +31,7 @@ const normalizeInitialData = (initialData?: Order | null): OrderRequest => {
       expectedDeliveryDate: '',
       paymentDate: '',
       totalItems: 0,
+      orderFloor: fixedFloor || OrderFloor.GROUND_FLOOR,
       offlineBillPercent: 0,
       offlineTotal: 0,
       officialBillAmount: 0,
@@ -42,6 +45,7 @@ const normalizeInitialData = (initialData?: Order | null): OrderRequest => {
   const { id, orderStatus, products, ...rest } = initialData;
   return {
     ...rest,
+    orderFloor: fixedFloor || rest.orderFloor,
     products:
       products && products.length
         ? products.map(({ id: productId, ...item }) => ({
@@ -70,9 +74,9 @@ const recalculateTotals = (data: OrderRequest): OrderRequest => {
   };
 };
 
-const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initialData }) => {
+const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initialData, fixedFloor }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('order');
-  const [formData, setFormData] = useState<OrderRequest>(() => recalculateTotals(normalizeInitialData(initialData)));
+  const [formData, setFormData] = useState<OrderRequest>(() => recalculateTotals(normalizeInitialData(initialData, fixedFloor)));
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -285,6 +289,18 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
               <div className="order-form-group">
                 <label>Total Items</label>
                 <input type="number" value={formData.totalItems || 0} readOnly />
+              </div>
+              <div className="order-form-group">
+                <label>Order Floor*</label>
+                <select
+                  value={formData.orderFloor}
+                  onChange={(e) => handleFieldChange('orderFloor', e.target.value as OrderFloor)}
+                  required
+                  disabled={!!fixedFloor}
+                >
+                  <option value={OrderFloor.GROUND_FLOOR}>Ground Floor</option>
+                  <option value={OrderFloor.FIRST_FLOOR}>First Floor</option>
+                </select>
               </div>
               <div className="order-form-group">
                 <label>Payment Date*</label>

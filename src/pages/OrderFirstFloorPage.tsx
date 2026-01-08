@@ -34,13 +34,12 @@ const statusChip = (status: OrderStatus) => {
   }
 };
 
-const OrderManagementPage: React.FC = () => {
+const OrderFirstFloorPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<OrderStats>(initialStats);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
-  const [selectedFloor, setSelectedFloor] = useState<OrderFloor>(OrderFloor.GROUND_FLOOR);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
@@ -53,7 +52,7 @@ const OrderManagementPage: React.FC = () => {
     try {
       setLoading(true);
       const response = await ordersApi.getOrderList({
-        floor: selectedFloor,
+        floor: OrderFloor.FIRST_FLOOR,
         page: 0,
         size: 50,
         status: statusFilter,
@@ -76,7 +75,7 @@ const OrderManagementPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedFloor, searchQuery, statusFilter]);
+  }, [searchQuery, statusFilter]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -165,19 +164,10 @@ const OrderManagementPage: React.FC = () => {
     <div className="order-page">
       <div className="order-page-header">
         <div>
-          <h1>Order Management</h1>
-          <p>Track confirmed orders and production status.</p>
+          <h1>Order Management - First Floor</h1>
+          <p>Track confirmed orders and production status for first floor.</p>
         </div>
         <div className="order-header-actions">
-          <select
-            className="floor-select"
-            value={selectedFloor}
-            onChange={(e) => setSelectedFloor(e.target.value as OrderFloor)}
-            title="Select floor"
-          >
-            <option value={OrderFloor.GROUND_FLOOR}>Ground Floor</option>
-            <option value={OrderFloor.FIRST_FLOOR}>First Floor</option>
-          </select>
           <button type="button" className="add-button order-add-button" onClick={handleAddOrder}>
             <span className="add-icon">+</span>
             <span className="add-text">Add Order</span>
@@ -285,7 +275,12 @@ const OrderManagementPage: React.FC = () => {
       </div>
 
       {isModalOpen && (
-        <AddOrderModal onClose={handleModalClose} onSubmit={handleSubmitOrder} initialData={editingOrder} />
+        <AddOrderModal
+          onClose={handleModalClose}
+          onSubmit={handleSubmitOrder}
+          initialData={editingOrder}
+          fixedFloor={OrderFloor.FIRST_FLOOR}
+        />
       )}
 
       {detailOrder && !detailLoading && (
@@ -308,4 +303,4 @@ const OrderManagementPage: React.FC = () => {
   );
 };
 
-export default OrderManagementPage;
+export default OrderFirstFloorPage;

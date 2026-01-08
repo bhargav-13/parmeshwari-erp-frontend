@@ -40,7 +40,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ImageUploadResponse'
+                $ref: '#/components/schemas/ImageResponse'
         '400':
           description: Bad Request - Invalid file or upload failed
           content:
@@ -60,7 +60,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
-        - oauth2: []
+        - oauth2: [ ]
 
   /api/v1/images/upload/multiple:
     post:
@@ -90,7 +90,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MultipleImageUploadResponse'
+                $ref: '#/components/schemas/ImageListResponse'
         '400':
           description: Bad Request - Invalid files or upload failed
           content:
@@ -110,7 +110,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
-        - oauth2: []
+        - oauth2: [ ]
 
   /api/v1/images/{publicId}:
     delete:
@@ -158,11 +158,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
-        - oauth2: []
+        - oauth2: [ ]
 
 components:
   schemas:
-    ImageUploadResponse:
+    ImageResponse:
       type: object
       properties:
         imageName:
@@ -184,27 +184,13 @@ components:
           type: integer
           description: Height of the uploaded image in pixels
 
-    ImageInfo:
+    ImageListResponse:
       type: object
       properties:
-        imageName:
-          type: string
-          description: Original name of the uploaded image
-        imageLocation:
-          type: string
-          description: Secure URL of the uploaded image
-        publicId:
-          type: string
-          description: Public ID of the uploaded image in Cloudinary
-
-    MultipleImageUploadResponse:
-      type: object
-      properties:
-        images:
+        data:
           type: array
           items:
-            $ref: '#/components/schemas/ImageInfo'
-          description: List of uploaded images
+            $ref: '#/components/schemas/ImageResponse'
         count:
           type: integer
           description: Total number of images uploaded

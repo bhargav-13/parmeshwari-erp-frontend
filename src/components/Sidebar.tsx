@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
 import Logo from '../assets/parmeshwari-logo.svg';
+import DashboardSVG from '../assets/icon/dashboard.svg'
+import CRMSSVG from '../assets/icon/crm.svg'
+import InventorySVG from '../assets/icon/inventory.svg'
+import InvoiceIcon from '../assets/icon/invoice.svg'
+import OrderIcon from '../assets/icon/order.svg'
+import ReminderIcon from '../assets/icon/reminder.svg'
+import SettingIcon from '../assets/icon/settings.svg'
+import SubcontractIcon from '../assets/icon/subcontract.svg'
+import ProfileSVG from '../assets/icon/profile.svg'
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,16 +19,34 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const [inventoryExpanded, setInventoryExpanded] = useState(
+    location.pathname.startsWith('/inventory')
+  );
+  const [ordersExpanded, setOrdersExpanded] = useState(
+    location.pathname.startsWith('/orders')
+  );
+
+  const isInventoryActive = location.pathname.startsWith('/inventory');
+  const isOrdersActive = location.pathname.startsWith('/orders');
 
   const menuItems = [
-    { path: '/dashboard', icon: '📊', label: 'Dashboard' },
-    { path: '/crm', icon: '💍', label: 'CRM & Sales' },
-    { path: '/inventory', icon: '📦', label: 'Inventory' },
-    { path: '/orders', icon: '🛒', label: 'Order Management' },
-    { path: '/subcontracting', icon: '💼', label: 'Subcontracting' },
-    { path: '/invoices', icon: '📄', label: 'Invoices' },
-    { path: '/payment-reminder', icon: '⏰', label: 'Payment Reminder' },
-    { path: '/settings', icon: '⚙️', label: 'Setting' },
+    { path: '/dashboard', icon: <img src={DashboardSVG}  alt='dashboard'/>, label: 'Dashboard' },
+    { path: '/crm', icon: <img src={CRMSSVG} alt='CRM'/>, label: 'CRM & Sales' },
+    { path: '/subcontracting', icon: <img src={SubcontractIcon} alt='subcontracting'/>, label: 'Subcontracting' },
+    { path: '/invoices', icon: <img src={InvoiceIcon} alt='invoices'/>, label: 'Invoices' },
+    { path: '/payment-reminder', icon: <img src={ReminderIcon} alt='Payment Reminder'/>, label: 'Payment Reminder' },
+    { path: '/settings', icon: <img src = {SettingIcon} alt = "setting" />, label: 'Setting' },
+  ];
+
+  const inventorySubItems = [
+    { path: '/inventory/ground-floor', label: 'Ground Floor' },
+    { path: '/inventory/first-floor', label: 'First Floor' },
+    { path: '/inventory/raw-materials', label: 'Raw Materials' },
+  ];
+
+  const ordersSubItems = [
+    { path: '/orders/ground-floor', label: 'Ground Floor' },
+    { path: '/orders/first-floor', label: 'First Floor' },
   ];
 
   return (
@@ -41,7 +68,81 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <div className="sidebar-divider"></div>
 
       <nav className="sidebar-nav">
-        {menuItems.map((item) => (
+        {menuItems.slice(0, 2).map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
+            onClick={onClose}
+          >
+            <span className="sidebar-icon">{item.icon}</span>
+            <span className="sidebar-label">{item.label}</span>
+          </Link>
+        ))}
+
+        {/* Inventory Section with Subsections */}
+        <div className="sidebar-section">
+          <div
+            className={`sidebar-item ${isInventoryActive ? 'active' : ''}`}
+            onClick={() => setInventoryExpanded(!inventoryExpanded)}
+          >
+            <span className="sidebar-icon">
+              <img src={InventorySVG} alt='Inventory'/>
+            </span>
+            <span className="sidebar-label">Inventory</span>
+            <span className={`expand-icon ${inventoryExpanded ? 'expanded' : ''}`}>
+              ▼
+            </span>
+          </div>
+
+          {inventoryExpanded && (
+            <div className="sidebar-subsection">
+              {inventorySubItems.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                  onClick={onClose}
+                >
+                  <span className="sidebar-sublabel">{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Order Management Section with Subsections */}
+        <div className="sidebar-section">
+          <div
+            className={`sidebar-item ${isOrdersActive ? 'active' : ''}`}
+            onClick={() => setOrdersExpanded(!ordersExpanded)}
+          >
+            <span className="sidebar-icon">
+              <img src={OrderIcon} alt='Order Management'/>
+            </span>
+            <span className="sidebar-label">Order Management</span>
+            <span className={`expand-icon ${ordersExpanded ? 'expanded' : ''}`}>
+              ▼
+            </span>
+          </div>
+
+          {ordersExpanded && (
+            <div className="sidebar-subsection">
+              {ordersSubItems.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                  onClick={onClose}
+                >
+                  <span className="sidebar-sublabel">{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {menuItems.slice(2).map((item) => (
           <Link
             key={item.path}
             to={item.path}
@@ -57,7 +158,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <div className="sidebar-footer">
         <div className="user-profile">
           <div className="user-avatar">
-            <span className="avatar-icon">👤</span>
+            <span className="avatar-icon"><img src={ProfileSVG} alt="profile"/></span>
           </div>
           <span className="user-name">Admin</span>
         </div>

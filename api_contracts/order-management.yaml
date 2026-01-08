@@ -40,7 +40,7 @@ paths:
           description: Internal Server Error
       security:
         - oauth2: [ ]
-
+  /api/v1/orders/floor/{floor}:
     get:
       tags:
         - Orders
@@ -49,6 +49,11 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/sizeParam'
+        - name: floor
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/OrderFloor'
         - name: status
           in: query
           required: false
@@ -240,7 +245,8 @@ components:
         totalItems:
           type: integer
           nullable: true
-
+        orderFloor:
+          $ref: '#/components/schemas/OrderFloor'
         # Billing fields
         offlineBillPercent:
           type: number
@@ -273,14 +279,17 @@ components:
       type: object
       required:
         - productName
-        - quantityKg
         - marketRate
         - rateDifference
         - totalAmount
+        - orderFloor
       properties:
         productName:
           type: string
         quantityKg:
+          type: number
+          format: double
+        quantityPc:
           type: number
           format: double
         marketRate:
@@ -323,7 +332,8 @@ components:
           nullable: true
         orderStatus:
           $ref: '#/components/schemas/OrderStatus'
-
+        orderFloor:
+          $ref: '#/components/schemas/OrderFloor'
         offlineBillPercent:
           type: number
         offlineTotal:
@@ -354,6 +364,9 @@ components:
         quantityKg:
           type: number
           format: double
+        quantityPc:
+          type: number
+          format: double
         marketRate:
           type: number
           format: double
@@ -369,7 +382,11 @@ components:
       enum:
         - PENDING
         - COMPLETED
-
+    OrderFloor:
+      type: string
+      enum:
+        - GROUND_FLOOR
+        - FIRST_FLOOR
     ErrorResponse:
       type: object
       properties:

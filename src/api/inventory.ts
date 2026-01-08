@@ -11,6 +11,8 @@ import type {
   Category,
   CategoryRequest,
   PaginatedResult,
+  InventoryFloor,
+  InventoryStatus,
 } from '../types';
 
 // Stock Item API
@@ -21,10 +23,21 @@ export const stockItemApi = {
     return response.data;
   },
 
-  // Get all stock items with pagination
-  getStockItems: async (page: number = 0, size: number = 10): Promise<PaginatedResult<StockItem>> => {
-    const response = await apiClient.get('/api/v1/stock-item', {
-      params: { page, size },
+  // Get all stock items with pagination by floor
+  getStockItems: async (
+    floor: InventoryFloor,
+    page: number = 0,
+    size: number = 10,
+    status?: InventoryStatus,
+    search?: string
+  ): Promise<PaginatedResult<StockItem>> => {
+    const response = await apiClient.get(`/api/v1/stock-item/floor/${floor}`, {
+      params: {
+        page,
+        size,
+        status: status || undefined,
+        search: search || undefined,
+      },
     });
     return response.data;
   },
@@ -71,9 +84,19 @@ export const rawItemApi = {
   },
 
   // Get all raw items with pagination
-  getRawItems: async (page: number = 0, size: number = 10): Promise<PaginatedResult<RawItem>> => {
+  getRawItems: async (
+    page: number = 0,
+    size: number = 10,
+    status?: InventoryStatus,
+    search?: string
+  ): Promise<PaginatedResult<RawItem>> => {
     const response = await apiClient.get('/api/v1/raw-item', {
-      params: { page, size },
+      params: {
+        page,
+        size,
+        status: status || undefined,
+        search: search || undefined,
+      },
     });
     return response.data;
   },

@@ -4,8 +4,11 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import SubcontractingPage from './pages/SubcontractingPage';
-import OrderManagementPage from './pages/OrderManagementPage';
-import InventoryPage from './pages/InventoryPage';
+import InventoryGroundFloorPage from './pages/InventoryGroundFloorPage';
+import InventoryFirstFloorPage from './pages/InventoryFirstFloorPage';
+import RawInventoryPage from './pages/RawInventoryPage';
+import OrderGroundFloorPage from './pages/OrderGroundFloorPage';
+import OrderFirstFloorPage from './pages/OrderFirstFloorPage';
 import ProductCatalogPage from './pages/ProductCatalogPage';
 import './App.css';
 
@@ -35,11 +38,14 @@ function App() {
               </PrivateRoute>
             }
           >
-            <Route index element={<Navigate to="/inventory" replace />} />
+            <Route index element={<Navigate to="/inventory/ground-floor" replace />} />
             <Route path="dashboard" element={<div className="placeholder">Dashboard Coming Soon</div>} />
             <Route path="crm" element={<div className="placeholder">CRM & Sales Coming Soon</div>} />
-            <Route path="inventory" element={<InventoryPage />} />
-            <Route path="orders" element={<OrderManagementPage />} />
+            <Route path="inventory/ground-floor" element={<InventoryGroundFloorPage />} />
+            <Route path="inventory/first-floor" element={<InventoryFirstFloorPage />} />
+            <Route path="inventory/raw-materials" element={<RawInventoryPage />} />
+            <Route path="orders/ground-floor" element={<OrderGroundFloorPage />} />
+            <Route path="orders/first-floor" element={<OrderFirstFloorPage />} />
             <Route path="subcontracting" element={<SubcontractingPage />} />
             <Route path="invoices" element={<div className="placeholder">Invoices Coming Soon</div>} />
             <Route path="payment-reminder" element={<div className="placeholder">Payment Reminder Coming Soon</div>} />
