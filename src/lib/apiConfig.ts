@@ -61,7 +61,7 @@ apiClient.callApi = function (
 
           // Use promise wrapper for the refresh call
           const refreshData = await new Promise<any>((resolve, reject) => {
-            authApi.refreshToken({ refreshToken }, (err, data) => {
+            authApi.refreshToken({ refreshToken }, (err: any, data: any) => {
               if (err) reject(err);
               else resolve(data);
             });
