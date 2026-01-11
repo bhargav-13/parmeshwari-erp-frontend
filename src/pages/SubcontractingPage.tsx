@@ -132,26 +132,19 @@ const SubcontractingPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="search-filter-bar">
-        <div className="search-box">
-          <img src={SearchIcon} alt="Search" className="search-icon" />
+      <div className="order-filters">
+        <div className="order-search">
+          <img src={SearchIcon} alt="Search" />
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search by name or order"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
           />
         </div>
-
-        <div className="filter-button">
-          <img src={FilterIcon} alt="Filter" className="filter-icon" />
-          <select
-            className="filter-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as SubcontractingStatus | '')}
-            title="Filter by status"
-          >
+        <div className="order-status-filter">
+          <img src={FilterIcon} alt="Filter" />
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as SubcontractingStatus | '')} title="Filter by status">
             <option value="">All Status</option>
             <option value={SubcontractingStatus.IN_PROCESS}>In Progress</option>
             <option value={SubcontractingStatus.COMPLETED}>Completed</option>

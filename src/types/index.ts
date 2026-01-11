@@ -298,3 +298,74 @@ export interface OrderStats {
   completedOrders: number;
   totalAmount: number;
 }
+
+// Invoice Types
+export const InvoiceStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type InvoiceStatus = typeof InvoiceStatus[keyof typeof InvoiceStatus];
+
+export const InvoiceFloor = {
+  GROUND_FLOOR: 'GROUND_FLOOR',
+  FIRST_FLOOR: 'FIRST_FLOOR',
+} as const;
+
+export type InvoiceFloor = typeof InvoiceFloor[keyof typeof InvoiceFloor];
+
+export interface Invoice {
+  id: number;
+  order: Order;
+  invoiceStatus: InvoiceStatus;
+  floorEnum: InvoiceFloor;
+}
+
+export interface InvoiceStats {
+  totalOfficialBill: number;
+  totalOfflineBill: number;
+  totalBilledAmount: number;
+}
+
+// Payment Reminder Types
+export const PaymentStatus = {
+  OVERDUE: 'OVERDUE',
+  DUE_SOON: 'DUE_SOON',
+  UPCOMING: 'UPCOMING',
+} as const;
+
+export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
+
+export const PaymentFloor = {
+  GROUND_FLOOR: 'GROUND_FLOOR',
+  FIRST_FLOOR: 'FIRST_FLOOR',
+} as const;
+
+export type PaymentFloor = typeof PaymentFloor[keyof typeof PaymentFloor];
+
+export interface Payment {
+  id: number;
+  orderId: number;
+  customerName?: string; // May be included by backend
+  receivedAmount: number | null;
+  lastReceivedDate: string | null;
+  newReceivedAmount?: number | null;
+  newReceivedDate?: string | null;
+  totalAmount: number | null;
+  lastReminder: string | null;
+  dueDate: string;
+  paymentStatus: PaymentStatus;
+  floor: PaymentFloor;
+}
+
+export interface PaymentReceiveRequest {
+  newReceivedAmount: number;
+  newReceivedDate: string;
+}
+
+export interface PaymentStats {
+  overduePayments: number;
+  overdueAmount: number;
+  dueSoonCount: number;
+  totalOutstanding: number;
+}

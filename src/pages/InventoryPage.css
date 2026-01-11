@@ -200,97 +200,6 @@
   font-size: 14px;
 }
 
-.inventory-page .search-filter-bar {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  width: 100%;
-  max-width: 100%;
-}
-
-.inventory-page .search-box {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 18px;
-  background: #f5f7fa;
-  border: 1px solid rgba(23, 52, 77, 0.2);
-  border-radius: 14px;
-  height: 44px;
-  max-width: 100%;
-  box-shadow: 0 6px 20px rgba(23, 52, 77, 0.05);
-}
-
-.inventory-page .search-icon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  display: block;
-}
-
-.inventory-page .search-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-family: 'Jost', sans-serif;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 22px;
-  color: #000000;
-  outline: none;
-}
-
-.inventory-page .search-input::placeholder {
-  color: #A7A7A7;
-}
-
-.inventory-page .filter-button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
-  background: #f5f7fa;
-  border: 1px solid rgba(23, 52, 77, 0.15);
-  border-radius: 14px;
-  cursor: pointer;
-  height: 44px;
-  box-shadow: 0 6px 14px rgba(23, 52, 77, 0.04);
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.inventory-page .filter-button:hover {
-  background: #ecf3fb;
-  transform: translateY(-1px);
-}
-
-.inventory-page .filter-icon {
-  width: 16px;
-  height: 12px;
-}
-
-.inventory-page .filter-text {
-  font-family: 'Jost', sans-serif;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 22px;
-  color: #A7A7A7;
-}
-
-.inventory-page .filter-select {
-  border: none;
-  background: transparent;
-  font-family: 'Jost', sans-serif;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 22px;
-  color: #17344D;
-  outline: none;
-  cursor: pointer;
-  padding: 0;
-  min-width: 100px;
-}
-
 .inventory-table-container {
   overflow-x: auto;
   margin-bottom: 20px;
@@ -515,23 +424,6 @@
     font-size: 13px;
   }
 
-  .search-filter-bar {
-    flex-direction: column;
-    gap: 8px;
-    max-width: 100%;
-  }
-
-  .search-box {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .filter-button {
-    width: 100%;
-    max-width: 100%;
-    justify-content: center;
-  }
-
   .inventory-table-container {
     margin-left: -10px;
     margin-right: -10px;
@@ -683,21 +575,6 @@
   }
 
   .button-text {
-    font-size: 12px;
-  }
-
-  .search-box,
-  .filter-button {
-    height: 34px;
-    padding: 6px 8px;
-    max-width: 100%;
-  }
-
-  .search-input {
-    font-size: 12px;
-  }
-
-  .filter-text {
     font-size: 12px;
   }
 

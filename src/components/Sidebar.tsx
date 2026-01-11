@@ -25,17 +25,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [ordersExpanded, setOrdersExpanded] = useState(
     location.pathname.startsWith('/orders')
   );
+  const [invoicesExpanded, setInvoicesExpanded] = useState(
+    location.pathname.startsWith('/invoices')
+  );
+  const [paymentReminderExpanded, setPaymentReminderExpanded] = useState(
+    location.pathname.startsWith('/payment-reminder')
+  );
 
   const isInventoryActive = location.pathname.startsWith('/inventory');
   const isOrdersActive = location.pathname.startsWith('/orders');
+  const isInvoicesActive = location.pathname.startsWith('/invoices');
+  const isPaymentReminderActive = location.pathname.startsWith('/payment-reminder');
 
   const menuItems = [
     { path: '/dashboard', icon: <img src={DashboardSVG}  alt='dashboard'/>, label: 'Dashboard' },
     { path: '/crm', icon: <img src={CRMSSVG} alt='CRM'/>, label: 'CRM & Sales' },
-    { path: '/subcontracting', icon: <img src={SubcontractIcon} alt='subcontracting'/>, label: 'Subcontracting' },
-    { path: '/invoices', icon: <img src={InvoiceIcon} alt='invoices'/>, label: 'Invoices' },
-    { path: '/payment-reminder', icon: <img src={ReminderIcon} alt='Payment Reminder'/>, label: 'Payment Reminder' },
-    { path: '/settings', icon: <img src = {SettingIcon} alt = "setting" />, label: 'Setting' },
   ];
 
   const inventorySubItems = [
@@ -47,6 +51,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const ordersSubItems = [
     { path: '/orders/ground-floor', label: 'Ground Floor' },
     { path: '/orders/first-floor', label: 'First Floor' },
+  ];
+
+  const invoicesSubItems = [
+    { path: '/invoices/ground-floor', label: 'Ground Floor' },
+    { path: '/invoices/first-floor', label: 'First Floor' },
+  ];
+
+  const paymentReminderSubItems = [
+    { path: '/payment-reminder/ground-floor', label: 'Ground Floor' },
+    { path: '/payment-reminder/first-floor', label: 'First Floor' },
   ];
 
   return (
@@ -72,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <Link
             key={item.path}
             to={item.path}
-            className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
+            className={`sidebar-item ${location.pathname.startsWith(item.path) ? 'active' : ''}`}
             onClick={onClose}
           >
             <span className="sidebar-icon">{item.icon}</span>
@@ -142,17 +156,91 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           )}
         </div>
 
-        {menuItems.slice(2).map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
-            onClick={onClose}
+        {/* Subcontracting - single item */}
+        <Link
+          to="/subcontracting"
+          className={`sidebar-item ${location.pathname === '/subcontracting' ? 'active' : ''}`}
+          onClick={onClose}
+        >
+          <span className="sidebar-icon">
+            <img src={SubcontractIcon} alt='Subcontracting'/>
+          </span>
+          <span className="sidebar-label">Subcontracting</span>
+        </Link>
+
+        {/* Invoices Section with Subsections */}
+        <div className="sidebar-section">
+          <div
+            className={`sidebar-item ${isInvoicesActive ? 'active' : ''}`}
+            onClick={() => setInvoicesExpanded(!invoicesExpanded)}
           >
-            <span className="sidebar-icon">{item.icon}</span>
-            <span className="sidebar-label">{item.label}</span>
-          </Link>
-        ))}
+            <span className="sidebar-icon">
+              <img src={InvoiceIcon} alt='Invoices'/>
+            </span>
+            <span className="sidebar-label">Invoices</span>
+            <span className={`expand-icon ${invoicesExpanded ? 'expanded' : ''}`}>
+              ▼
+            </span>
+          </div>
+
+          {invoicesExpanded && (
+            <div className="sidebar-subsection">
+              {invoicesSubItems.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                  onClick={onClose}
+                >
+                  <span className="sidebar-sublabel">{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Payment Reminder Section with Subsections */}
+        <div className="sidebar-section">
+          <div
+            className={`sidebar-item ${isPaymentReminderActive ? 'active' : ''}`}
+            onClick={() => setPaymentReminderExpanded(!paymentReminderExpanded)}
+          >
+            <span className="sidebar-icon">
+              <img src={ReminderIcon} alt='Payment Reminder'/>
+            </span>
+            <span className="sidebar-label">Payment Reminder</span>
+            <span className={`expand-icon ${paymentReminderExpanded ? 'expanded' : ''}`}>
+              ▼
+            </span>
+          </div>
+
+          {paymentReminderExpanded && (
+            <div className="sidebar-subsection">
+              {paymentReminderSubItems.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                  onClick={onClose}
+                >
+                  <span className="sidebar-sublabel">{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Settings */}
+        <Link
+          to="/settings"
+          className={`sidebar-item ${location.pathname === '/settings' ? 'active' : ''}`}
+          onClick={onClose}
+        >
+          <span className="sidebar-icon">
+            <img src={SettingIcon} alt='Setting'/>
+          </span>
+          <span className="sidebar-label">Setting</span>
+        </Link>
       </nav>
 
       <div className="sidebar-footer">

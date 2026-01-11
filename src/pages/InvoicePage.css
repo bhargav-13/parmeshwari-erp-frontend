@@ -1,9 +1,9 @@
-.subcontracting-page {
+.invoice-page {
   padding: 20px 24px;
   max-width: 100%;
 }
 
-.page-header {
+.invoice-page .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -11,13 +11,13 @@
   gap: 40px;
 }
 
-.page-title-section {
+.invoice-page .page-title-section {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.page-title {
+.invoice-page .page-title {
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 22px;
@@ -26,7 +26,7 @@
   margin: 0;
 }
 
-.page-subtitle {
+.invoice-page .page-subtitle {
   font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
@@ -35,46 +35,13 @@
   margin: 0;
 }
 
-.add-button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  background: #D1EEFF;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  height: auto;
-  transition: background-color 0.3s ease;
-}
-
-.add-button:hover {
-  background: #b8dfff;
-}
-
-.add-icon {
-  font-size: 20px;
-  font-weight: 300;
-  line-height: 1;
-  color: #17344D;
-}
-
-.add-text {
-  font-family: 'Jost', sans-serif;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 22px;
-  color: #17344D;
-  white-space: nowrap;
-}
-
-.stats-cards {
+.invoice-page .stats-cards {
   display: flex;
   gap: 16px;
   margin-bottom: 20px;
 }
 
-.stat-card {
+.invoice-page .stat-card {
   flex: 1;
   border: 1px solid #17344D;
   border-radius: 12px;
@@ -83,14 +50,14 @@
   align-items: center;
 }
 
-.stat-content {
+.invoice-page .stat-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: 100%;
 }
 
-.stat-label {
+.invoice-page .stat-label {
   font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 13px;
@@ -98,7 +65,7 @@
   color: #8E8E8E;
 }
 
-.stat-value {
+.invoice-page .stat-value {
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 24px;
@@ -106,14 +73,20 @@
   color: #17344D;
 }
 
-.subcontracts-list {
+.invoices-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.loading,
-.no-data {
+.invoice-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.invoice-page .loading,
+.invoice-page .no-data {
   text-align: center;
   padding: 32px;
   font-family: 'Jost', sans-serif;
@@ -122,80 +95,84 @@
 }
 
 /* Mobile Responsive Styles */
+@media (max-width: 1200px) {
+  .invoice-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
-  .subcontracting-page {
+  .invoice-page {
     padding: 12px 16px;
   }
 
-  .page-header {
+  .invoice-page .page-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
 
-  .page-title {
+  .invoice-page .page-title {
     font-size: 20px;
     line-height: 26px;
   }
 
-  .page-subtitle {
+  .invoice-page .page-subtitle {
     font-size: 13px;
     line-height: 18px;
   }
 
-  .add-button {
-    width: 100%;
-    justify-content: center;
-    padding: 10px 16px;
-  }
-
-  .add-text {
-    font-size: 14px;
-  }
-
-  .stats-cards {
+  .invoice-page .stats-cards {
     flex-direction: column;
     gap: 12px;
   }
 
-  .stat-card {
+  .invoice-page .stat-card {
     width: 100%;
   }
 
-  .stat-value {
+  .invoice-page .stat-value {
     font-size: 20px;
     line-height: 28px;
   }
 
-  .subcontracts-list {
+  .invoices-list {
     gap: 12px;
+  }
+
+  .invoice-cards-grid {
+    gap: 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .subcontracting-page {
+  .invoice-page {
     padding: 8px 12px;
   }
 
-  .page-title {
+  .invoice-page .page-title {
     font-size: 18px;
     line-height: 24px;
   }
 
-  .stats-cards {
+  .invoice-page .stats-cards {
     gap: 10px;
   }
 
-  .stat-card {
+  .invoice-page .stat-card {
     padding: 12px;
   }
 
-  .stat-label {
+  .invoice-page .stat-label {
     font-size: 12px;
   }
 
-  .stat-value {
+  .invoice-page .stat-value {
     font-size: 18px;
     line-height: 24px;
+  }
+
+  .invoice-cards-grid {
+    gap: 12px;
   }
 }
