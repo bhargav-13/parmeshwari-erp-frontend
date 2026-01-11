@@ -1,6 +1,6 @@
 import React from 'react';
 import './RecentOrdersTable.css';
-import { Order } from '../types';
+import type { Order } from '../types';
 
 interface RecentOrdersTableProps {
   orders: Order[];

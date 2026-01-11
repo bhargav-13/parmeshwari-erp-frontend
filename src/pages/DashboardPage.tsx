@@ -17,15 +17,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { dashboardApi } from '../api/dashboard';
-import type {
-  FullDashboardData,
-  KeyMetrics,
-  FloorMetrics,
-  PaymentStatusData,
-  TopCustomer,
-  TopProduct,
-  DailyTrend,
-} from '../api/dashboard';
+import type { FullDashboardData } from '../api/dashboard';
 import type { Order, Invoice, Payment, StockItem, RawItem, Subcontracting } from '../types';
 import './DashboardPage.css';
 
@@ -139,19 +131,6 @@ const KPICard: React.FC<KPICardProps> = ({ title, value, subtitle, trend, trendV
   </div>
 );
 
-// Section Header Component
-interface SectionHeaderProps {
-  title: string;
-  subtitle?: string;
-}
-
-const SectionHeader: React.FC<SectionHeaderProps> = ({ title, subtitle }) => (
-  <div className="section-header">
-    <h2 className="section-title">{title}</h2>
-    {subtitle && <span className="section-subtitle">{subtitle}</span>}
-  </div>
-);
-
 // Chart Card Component
 interface ChartCardProps {
   title: string;
@@ -172,11 +151,11 @@ const ChartCard: React.FC<ChartCardProps> = ({ title, children, className = '' }
 interface DataTableProps<T> {
   title: string;
   data: T[];
-  columns: { key: keyof T | string; label: string; render?: (item: T) => React.ReactNode }[];
+  columns: { key: string; label: string; render?: (item: T) => React.ReactNode }[];
   emptyMessage?: string;
 }
 
-function DataTable<T extends { [key: string]: unknown }>({
+function DataTable<T>({
   title,
   data,
   columns,
@@ -196,7 +175,7 @@ function DataTable<T extends { [key: string]: unknown }>({
             <thead>
               <tr>
                 {columns.map((col) => (
-                  <th key={String(col.key)}>{col.label}</th>
+                  <th key={col.key}>{col.label}</th>
                 ))}
               </tr>
             </thead>
@@ -204,8 +183,8 @@ function DataTable<T extends { [key: string]: unknown }>({
               {data.map((item, idx) => (
                 <tr key={idx}>
                   {columns.map((col) => (
-                    <td key={String(col.key)}>
-                      {col.render ? col.render(item) : String(item[col.key as keyof T] ?? '')}
+                    <td key={col.key}>
+                      {col.render ? col.render(item) : String((item as Record<string, unknown>)[col.key] ?? '')}
                     </td>
                   ))}
                 </tr>
@@ -219,10 +198,7 @@ function DataTable<T extends { [key: string]: unknown }>({
 }
 
 // Status Badge Component
-const StatusBadge: React.FC<{ status: string; type?: 'order' | 'payment' | 'subcontracting' }> = ({
-  status,
-  type = 'order',
-}) => {
+const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   const getStatusClass = () => {
     const statusLower = status.toLowerCase().replace(/_/g, '-');
     return `status-badge status-${statusLower}`;
@@ -414,8 +390,8 @@ const DashboardPage: React.FC = () => {
                     stroke="#6b7280"
                   />
                   <Tooltip
-                    formatter={(value: number) => [formatCurrency(value), 'Sales']}
-                    labelFormatter={(label) => formatDate(label)}
+                    formatter={(value) => [formatCurrency(Number(value)), 'Sales']}
+                    labelFormatter={(label) => formatDate(String(label))}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
                   />
                   <Area
@@ -436,7 +412,7 @@ const DashboardPage: React.FC = () => {
                   <XAxis type="number" tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} />
                   <YAxis dataKey="floor" type="category" tick={{ fontSize: 12 }} width={100} />
                   <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value) => formatCurrency(Number(value))}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
                   />
                   <Legend />
@@ -452,22 +428,27 @@ const DashboardPage: React.FC = () => {
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie
-                    data={paymentStatusBreakdown}
+                    data={paymentStatusBreakdown.map((p) => ({
+                      name: p.status,
+                      value: p.count,
+                      amount: p.amount,
+                      color: p.color,
+                    }))}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
                     outerRadius={100}
                     paddingAngle={2}
-                    dataKey="count"
-                    nameKey="status"
+                    dataKey="value"
+                    nameKey="name"
                   >
                     {paymentStatusBreakdown.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number, name: string, entry: { payload: PaymentStatusData }) => [
-                      `${value} (${formatCurrency(entry.payload.amount)})`,
+                    formatter={(value, name, entry) => [
+                      `${value} (${formatCurrency((entry.payload as { amount: number }).amount)})`,
                       name,
                     ]}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
@@ -487,7 +468,7 @@ const DashboardPage: React.FC = () => {
                     outerRadius={100}
                     dataKey="value"
                     nameKey="name"
-                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
                     labelLine={false}
                   >
                     {categoryDistribution.slice(0, 6).map((_, index) => (
@@ -495,7 +476,7 @@ const DashboardPage: React.FC = () => {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value) => formatCurrency(Number(value))}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
                   />
                 </PieChart>
@@ -531,7 +512,7 @@ const DashboardPage: React.FC = () => {
                 {
                   key: 'orderStatus',
                   label: 'Status',
-                  render: (o: Order) => <StatusBadge status={o.orderStatus} type="order" />,
+                  render: (o: Order) => <StatusBadge status={o.orderStatus} />,
                 },
               ]}
             />
@@ -590,11 +571,11 @@ const DashboardPage: React.FC = () => {
                   <YAxis yAxisId="left" tickFormatter={(v) => formatCurrency(v)} tick={{ fontSize: 12 }} />
                   <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
                   <Tooltip
-                    formatter={(value: number, name: string) => [
-                      name === 'Sales' ? formatCurrency(value) : value,
+                    formatter={(value, name) => [
+                      name === 'Sales' ? formatCurrency(Number(value)) : value,
                       name,
                     ]}
-                    labelFormatter={formatDate}
+                    labelFormatter={(label) => formatDate(String(label))}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
                   />
                   <Legend />
@@ -648,7 +629,7 @@ const DashboardPage: React.FC = () => {
                   <XAxis type="number" tickFormatter={(v) => formatCurrency(v)} tick={{ fontSize: 12 }} />
                   <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={120} />
                   <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value) => formatCurrency(Number(value))}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
                   />
                   <Bar dataKey="revenue" fill={COLORS.info} name="Revenue" radius={[0, 4, 4, 0]} />
@@ -694,7 +675,7 @@ const DashboardPage: React.FC = () => {
                 {
                   key: 'orderStatus',
                   label: 'Status',
-                  render: (o: Order) => <StatusBadge status={o.orderStatus} type="order" />,
+                  render: (o: Order) => <StatusBadge status={o.orderStatus} />,
                 },
               ]}
             />
@@ -738,10 +719,10 @@ const DashboardPage: React.FC = () => {
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={categoryDistribution.slice(0, 10)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, angle: -45 }} textAnchor="end" height={80} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-45} textAnchor="end" height={80} />
                   <YAxis tickFormatter={(v) => formatCurrency(v)} tick={{ fontSize: 12 }} />
                   <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value) => formatCurrency(Number(value))}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
                   />
                   <Bar dataKey="value" fill={COLORS.primary} name="Value" radius={[4, 4, 0, 0]}>
@@ -805,7 +786,7 @@ const DashboardPage: React.FC = () => {
                 {
                   key: 'status',
                   label: 'Status',
-                  render: (s: Subcontracting) => <StatusBadge status={s.status} type="subcontracting" />,
+                  render: (s: Subcontracting) => <StatusBadge status={s.status} />,
                 },
               ]}
               emptyMessage="No active subcontracts"
@@ -874,8 +855,8 @@ const DashboardPage: React.FC = () => {
                   <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
                   <YAxis yAxisId="right" orientation="right" tickFormatter={(v) => formatCurrency(v)} tick={{ fontSize: 12 }} />
                   <Tooltip
-                    formatter={(value: number, name: string) => [
-                      name === 'Amount' ? formatCurrency(value) : value,
+                    formatter={(value, name) => [
+                      name === 'Amount' ? formatCurrency(Number(value)) : value,
                       name,
                     ]}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
@@ -891,14 +872,17 @@ const DashboardPage: React.FC = () => {
               <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
                   <Pie
-                    data={dashboardData.invoiceStatusBreakdown}
+                    data={dashboardData.invoiceStatusBreakdown.map((inv) => ({
+                      name: inv.status,
+                      value: inv.count,
+                    }))}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
                     outerRadius={100}
                     paddingAngle={3}
-                    dataKey="count"
-                    nameKey="status"
+                    dataKey="value"
+                    nameKey="name"
                   >
                     <Cell fill={COLORS.warning} />
                     <Cell fill={COLORS.success} />
@@ -936,7 +920,7 @@ const DashboardPage: React.FC = () => {
                 {
                   key: 'paymentStatus',
                   label: 'Status',
-                  render: (p: Payment) => <StatusBadge status={p.paymentStatus} type="payment" />,
+                  render: (p: Payment) => <StatusBadge status={p.paymentStatus} />,
                 },
               ]}
               emptyMessage="No overdue payments"
@@ -966,7 +950,7 @@ const DashboardPage: React.FC = () => {
                 {
                   key: 'invoiceStatus',
                   label: 'Status',
-                  render: (inv: Invoice) => <StatusBadge status={inv.invoiceStatus} type="order" />,
+                  render: (inv: Invoice) => <StatusBadge status={inv.invoiceStatus} />,
                 },
               ]}
               emptyMessage="No recent invoices"

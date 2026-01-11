@@ -1,6 +1,6 @@
 import React from 'react';
 import './SubcontractingOverview.css';
-import { Subcontracting } from '../types';
+import type { Subcontracting } from '../types';
 
 interface SubcontractingOverviewProps {
   subcontracts: Subcontracting[];

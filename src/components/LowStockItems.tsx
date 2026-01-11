@@ -1,6 +1,6 @@
 import React from 'react';
 import './LowStockItems.css';
-import { StockItem } from '../types';
+import type { StockItem } from '../types';
 
 interface LowStockItemsProps {
   items: StockItem[];
