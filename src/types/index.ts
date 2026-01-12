@@ -369,3 +369,11 @@ export interface PaymentStats {
   dueSoonCount: number;
   totalOutstanding: number;
 }
+
+// Billing Type
+export const BillingType = {
+  OFFICIAL: 'OFFICIAL',
+  OFFLINE: 'OFFLINE',
+} as const;
+
+export type BillingType = typeof BillingType[keyof typeof BillingType];

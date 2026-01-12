@@ -2,6 +2,7 @@ import { apiClient } from './client';
 import type {
   Invoice,
   PaginatedResult,
+  BillingType,
 } from '../types';
 import { InvoiceStatus, InvoiceFloor } from '../types';
 
@@ -9,14 +10,15 @@ export const invoiceApi = {
   // Get all invoices by floor with pagination
   getInvoiceList: async (params: {
     floor: InvoiceFloor;
+    mode: BillingType;
     page?: number;
     size?: number;
     status?: InvoiceStatus;
     search?: string;
   }): Promise<PaginatedResult<Invoice>> => {
-    const { floor, ...queryParams } = params;
-    const response = await apiClient.get<PaginatedResult<Invoice>>(`/api/v1/invoices/floor/${floor}`, {
-      params: queryParams,
+    const { floor, mode, ...restParams } = params;
+    const response = await apiClient.get<PaginatedResult<Invoice>>(`/api/v1/invoices/floor/${floor}/mode/${mode}`, {
+      params: { mode, ...restParams },
     });
     return response.data;
   },

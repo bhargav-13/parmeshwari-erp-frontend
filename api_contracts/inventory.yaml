@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
-  - url: https://parmeshwari-erp.onrender.com
+  - url: http://ec2-65-1-248-131.ap-south-1.compute.amazonaws.com
     description: Production Server
 
 tags:
@@ -277,6 +277,8 @@ paths:
           required: false
           schema:
             type: string
+        - $ref: '#/components/parameters/SortByStockFields'
+        - $ref: '#/components/parameters/directionParam'
       responses:
         '200':
           description: Paginated list of Stock items
@@ -514,6 +516,8 @@ paths:
           required: false
           schema:
             type: string
+        - $ref: '#/components/parameters/SortByStockFields'
+        - $ref: '#/components/parameters/directionParam'
       responses:
         '200':
           description: Paginated list of Raw items
@@ -719,6 +723,30 @@ components:
       schema:
         type: integer
         default: 10
+
+    directionParam:
+      name: direction
+      in: query
+      description: Sort direction
+      schema:
+        type: string
+        enum: [ ASC, DESC ]
+
+    SortByStockFields:
+      name: sortByFields
+      in: query
+      description: Field to sort by
+      schema:
+        type: string
+        enum: [ lastUpdatedAt , createdAt , category, product , status ]
+
+    SortByRawFields:
+      name: sortByFields
+      in: query
+      description: Field to sort by
+      schema:
+        type: string
+        enum: [ lastUpdatedAt , createdAt , product , status ]
 
   schemas:
     Product:

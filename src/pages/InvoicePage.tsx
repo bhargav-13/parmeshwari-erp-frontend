@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { invoiceApi } from '../api/invoice';
-import type { Invoice, InvoiceStats } from '../types';
+import type { Invoice, InvoiceStats, BillingType } from '../types';
 import { InvoiceStatus, InvoiceFloor } from '../types';
 import InvoiceCard from '../components/InvoiceCard';
 import Loading from '../components/Loading';
@@ -10,9 +10,10 @@ import './InvoicePage.css';
 
 interface InvoicePageProps {
   floor: InvoiceFloor;
+  mode: BillingType;
 }
 
-const InvoicePage: React.FC<InvoicePageProps> = ({ floor }) => {
+const InvoicePage: React.FC<InvoicePageProps> = ({ floor, mode }) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [stats, setStats] = useState<InvoiceStats>({
     totalOfficialBill: 0,
@@ -27,13 +28,14 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor }) => {
   useEffect(() => {
     fetchInvoices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery, statusFilter, floor]);
+  }, [page, searchQuery, statusFilter, floor, mode]);
 
   const fetchInvoices = async () => {
     try {
       setLoading(true);
       const response = await invoiceApi.getInvoiceList({
         floor,
+        mode,
         page,
         size: 10,
         search: searchQuery || undefined,

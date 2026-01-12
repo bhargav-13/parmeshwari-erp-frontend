@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
-  - url: https://parmeshwari-erp.onrender.com
+  - url: http://ec2-65-1-248-131.ap-south-1.compute.amazonaws.com
     description: Production Server
 
 tags:

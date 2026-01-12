@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { paymentApi } from '../api/payment';
-import type { Payment, PaymentStats } from '../types';
+import type { Payment, PaymentStats, BillingType } from '../types';
 import { PaymentStatus, PaymentFloor } from '../types';
 import PaymentReceivedModal from '../components/PaymentReceivedModal';
 import Loading from '../components/Loading';
@@ -11,9 +11,10 @@ import './PaymentReminderPage.css';
 
 interface PaymentReminderPageProps {
   floor: PaymentFloor;
+  mode: BillingType;
 }
 
-const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
+const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor, mode }) => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [stats, setStats] = useState<PaymentStats>({
     overduePayments: 0,
@@ -32,13 +33,14 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
   useEffect(() => {
     fetchPayments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery, statusFilter, floor]);
+  }, [page, searchQuery, statusFilter, floor, mode]);
 
   const fetchPayments = async () => {
     try {
       setLoading(true);
       const response = await paymentApi.getPaymentList({
         floor,
+        mode,
         page,
         size: 50,
         search: searchQuery || undefined,

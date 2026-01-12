@@ -11,6 +11,7 @@ import {
   PaymentStatus,
   InventoryStatus,
   SubcontractingStatus,
+  BillingType,
 } from '../types';
 import type {
   Order,
@@ -131,29 +132,42 @@ export interface FullDashboardData {
 }
 
 export const dashboardApi = {
-  // Fetch all data for both floors
+  // Fetch all data for both floors and both billing modes
   fetchAllData: async () => {
     const [
       groundFloorOrders,
       firstFloorOrders,
-      groundFloorInvoices,
-      firstFloorInvoices,
-      groundFloorPayments,
-      firstFloorPayments,
+      groundFloorInvoicesOfficial,
+      groundFloorInvoicesOffline,
+      firstFloorInvoicesOfficial,
+      firstFloorInvoicesOffline,
+      groundFloorPaymentsOfficial,
+      groundFloorPaymentsOffline,
+      firstFloorPaymentsOfficial,
+      firstFloorPaymentsOffline,
       allStockItems,
       allRawItems,
       allSubcontracts,
     ] = await Promise.all([
       fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.GROUND_FLOOR, page, size: 100 })),
       fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.FIRST_FLOOR, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, page, size: 100 })),
+      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
+      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
+      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
+      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
+      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
       stockItemApi.getAllStockItems(),
       rawItemApi.getRawItems(0, 1000).then(res => res.data),
       fetchAll<Subcontracting>(page => subcontractingApi.getSubcontractingList({ page, size: 100 })),
     ]);
+
+    const groundFloorInvoices = [...groundFloorInvoicesOfficial, ...groundFloorInvoicesOffline];
+    const firstFloorInvoices = [...firstFloorInvoicesOfficial, ...firstFloorInvoicesOffline];
+    const groundFloorPayments = [...groundFloorPaymentsOfficial, ...groundFloorPaymentsOffline];
+    const firstFloorPayments = [...firstFloorPaymentsOfficial, ...firstFloorPaymentsOffline];
 
     return {
       groundFloorOrders,
@@ -375,6 +389,7 @@ export const dashboardApi = {
     // Top Products
     const productData: { [name: string]: { quantity: number; revenue: number } } = {};
     for (const order of allOrders) {
+      if (!order.products) continue;
       for (const product of order.products) {
         if (!productData[product.productName]) {
           productData[product.productName] = { quantity: 0, revenue: 0 };
@@ -414,13 +429,31 @@ export const dashboardApi = {
     const firstFloorOrders = await fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.FIRST_FLOOR, page, size: 100 }));
     const allOrders = [...groundFloorOrders, ...firstFloorOrders];
 
-    const groundFloorInvoices = await fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, page, size: 100 }));
-    const firstFloorInvoices = await fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, page, size: 100 }));
-    const allInvoices = [...groundFloorInvoices, ...firstFloorInvoices];
+    const [
+      groundFloorInvoicesOfficial,
+      groundFloorInvoicesOffline,
+      firstFloorInvoicesOfficial,
+      firstFloorInvoicesOffline,
+    ] = await Promise.all([
+      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
+      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
+      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+    ]);
+    const allInvoices = [...groundFloorInvoicesOfficial, ...groundFloorInvoicesOffline, ...firstFloorInvoicesOfficial, ...firstFloorInvoicesOffline];
 
-    const groundFloorPayments = await fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, page, size: 100 }));
-    const firstFloorPayments = await fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, page, size: 100 }));
-    const allPayments = [...groundFloorPayments, ...firstFloorPayments];
+    const [
+      groundFloorPaymentsOfficial,
+      groundFloorPaymentsOffline,
+      firstFloorPaymentsOfficial,
+      firstFloorPaymentsOffline,
+    ] = await Promise.all([
+      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
+      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
+      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+    ]);
+    const allPayments = [...groundFloorPaymentsOfficial, ...groundFloorPaymentsOffline, ...firstFloorPaymentsOfficial, ...firstFloorPaymentsOffline];
 
     const totalSales = allOrders.reduce((sum, order) => sum + order.grandTotal, 0);
     const totalOrders = allOrders.length;

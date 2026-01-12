@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
-  - url: https://parmeshwari-erp.onrender.com
+  - url: http://ec2-65-1-248-131.ap-south-1.compute.amazonaws.com
     description: Production Server
 
 tags:
@@ -20,7 +20,7 @@ paths:
   # INVOICE CRUD
   # ------------------------------------------------------------
 
-  /api/v1/invoices/floor/{floor}:
+  /api/v1/invoices/floor/{floor}/mode/{mode}:
     get:
       tags:
         - Invoices
@@ -40,12 +40,19 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/FloorEnum'
+        - name: mode
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingType'
         - name: search
           in: query
           required: false
           description: Filter by Order id and customer name
           schema:
             type: string
+        - $ref: '#/components/parameters/SortByInvoiceFields'
+        - $ref: '#/components/parameters/directionParam'
       responses:
         '200':
           description: Paginated list of invoices
@@ -162,6 +169,10 @@ paths:
           description: Invoice not found
       security:
         - oauth2: [ ]
+
+  # ------------------------------------------------------------
+  # PAYMENT CRUD
+  # ------------------------------------------------------------
   /api/v1/payments/{paymentId}/receive:
     post:
       tags:
@@ -244,7 +255,7 @@ paths:
           description: Internal Server Error
       security:
         - oauth2: [ ]
-  /api/v1/payments/floor/{floor}:
+  /api/v1/payments/floor/{floor}/mode/{mode}:
     get:
       tags:
         - Payments
@@ -258,6 +269,11 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/FloorEnum'
+        - name: mode
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingType'
         - name: status
           in: query
           required: false
@@ -270,6 +286,8 @@ paths:
           description: Filter by Order id and customer name
           schema:
             type: string
+        - $ref: '#/components/parameters/SortByPaymentFields'
+        - $ref: '#/components/parameters/directionParam'
       responses:
         '200':
           description: Paginated list of payments
@@ -368,6 +386,29 @@ components:
         default: 10
       description: Number of items per page
 
+    directionParam:
+      name: direction
+      in: query
+      description: Sort direction
+      schema:
+        type: string
+        enum: [ ASC, DESC ]
+
+    SortByInvoiceFields:
+      name: sortByFields
+      in: query
+      description: Field to sort by
+      schema:
+        type: string
+        enum: [ lastUpdatedAt , createdAt , orderId , invoiceStatus, mode ]
+
+    SortByPaymentFields:
+      name: sortByFields
+      in: query
+      description: Field to sort by
+      schema:
+        type: string
+        enum: [ lastUpdatedAt , createdAt , orderId , lastReminder , dueDate , paymentStatus , mode ]
   schemas:
     OrderReplica:
       type: object
@@ -460,6 +501,11 @@ components:
       enum:
         - GROUND_FLOOR
         - FIRST_FLOOR
+    BillingType:
+      type: string
+      enum:
+        - OFFICIAL
+        - OFFLINE
     Invoice:
       type: object
       properties:
@@ -471,6 +517,8 @@ components:
           $ref: '#/components/schemas/InvoiceStatus'
         floorEnum:
           $ref: '#/components/schemas/FloorEnum'
+        mode:
+          $ref: '#/components/schemas/BillingType'
 
     PaginatedResultInvoice:
       type: object
@@ -561,6 +609,8 @@ components:
           $ref: '#/components/schemas/PaymentStatus'
         floor:
           $ref: '#/components/schemas/FloorEnum'
+        mode:
+          $ref: '#/components/schemas/BillingType'
     PaymentStatus:
       type: string
       enum:

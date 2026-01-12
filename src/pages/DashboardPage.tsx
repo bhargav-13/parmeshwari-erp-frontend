@@ -86,7 +86,10 @@ const IconFolder = () => (
   </svg>
 );
 
-const formatCurrency = (value: number): string => {
+const formatCurrency = (value: number | null | undefined): string => {
+  if (value === null || value === undefined) {
+    return '₹0';
+  }
   if (value >= 10000000) {
     return `₹${(value / 10000000).toFixed(2)}Cr`;
   } else if (value >= 100000) {
@@ -97,7 +100,8 @@ const formatCurrency = (value: number): string => {
   return `₹${value.toFixed(0)}`;
 };
 
-const formatDate = (dateStr: string): string => {
+const formatDate = (dateStr: string | null | undefined): string => {
+  if (!dateStr) return '—';
   const date = new Date(dateStr);
   return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 };

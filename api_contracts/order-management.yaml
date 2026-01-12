@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
-  - url: https://parmeshwari-erp.onrender.com
+  - url: http://ec2-65-1-248-131.ap-south-1.compute.amazonaws.com
     description: Production Server
 
 tags:
@@ -66,6 +66,8 @@ paths:
           description: Search by customer name or mobile number
           schema:
             type: string
+        - $ref: '#/components/parameters/SortByFields'
+        - $ref: '#/components/parameters/directionParam'
       responses:
         '200':
           description: Paginated list of orders
@@ -213,6 +215,22 @@ components:
         default: 10
       description: Number of items per page
 
+    directionParam:
+      name: direction
+      in: query
+      description: Sort direction
+      schema:
+        type: string
+        enum: [ ASC, DESC ]
+
+    SortByFields:
+      name: sortByFields
+      in: query
+      description: Field to sort by
+      schema:
+        type: string
+        enum: [ lastUpdatedAt , createdAt , orderDate , expectedDeliveryDate , orderStatus ]
+
   schemas:
 
     # ------------------------------------------------------------
@@ -348,10 +366,10 @@ components:
         productsTotal:
           type: number
 
-        products:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderProduct'
+    products:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrderProduct'
 
     # Product response
     OrderProduct:
