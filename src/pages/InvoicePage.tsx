@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { invoiceApi } from '../api/invoice';
-import type { Invoice, InvoiceStats, BillingType } from '../types';
-import { InvoiceStatus, InvoiceFloor } from '../types';
+import type { Invoice, InvoiceStats } from '../types';
+import { InvoiceStatus, InvoiceFloor, BillingType } from '../types';
 import InvoiceCard from '../components/InvoiceCard';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
@@ -10,10 +10,9 @@ import './InvoicePage.css';
 
 interface InvoicePageProps {
   floor: InvoiceFloor;
-  mode: BillingType;
 }
 
-const InvoicePage: React.FC<InvoicePageProps> = ({ floor, mode }) => {
+const InvoicePage: React.FC<InvoicePageProps> = ({ floor }) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [stats, setStats] = useState<InvoiceStats>({
     totalOfficialBill: 0,
@@ -24,18 +23,19 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor, mode }) => {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | ''>('');
   const [loading, setLoading] = useState(true);
   const [page] = useState(0);
+  const [selectedMode, setSelectedMode] = useState<BillingType>(BillingType.OFFICIAL);
 
   useEffect(() => {
     fetchInvoices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery, statusFilter, floor, mode]);
+  }, [page, searchQuery, statusFilter, floor, selectedMode]);
 
   const fetchInvoices = async () => {
     try {
       setLoading(true);
       const response = await invoiceApi.getInvoiceList({
         floor,
-        mode,
+        mode: selectedMode,
         page,
         size: 10,
         search: searchQuery || undefined,
@@ -78,6 +78,22 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor, mode }) => {
         <div className="page-title-section">
           <h1 className="page-title">Billing Management</h1>
           <p className="page-subtitle">Manage and track all your billing records</p>
+        </div>
+        <div className="mode-toggle">
+          <button
+            type="button"
+            className={`mode-btn ${selectedMode === BillingType.OFFICIAL ? 'active' : ''}`}
+            onClick={() => setSelectedMode(BillingType.OFFICIAL)}
+          >
+            Official
+          </button>
+          <button
+            type="button"
+            className={`mode-btn ${selectedMode === BillingType.OFFLINE ? 'active' : ''}`}
+            onClick={() => setSelectedMode(BillingType.OFFLINE)}
+          >
+            Offline
+          </button>
         </div>
       </div>
 
@@ -135,6 +151,7 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor, mode }) => {
               <InvoiceCard
                 key={invoice.id}
                 invoice={invoice}
+                billingType={selectedMode}
                 onDelete={handleDeleteInvoice}
                 onRefresh={fetchInvoices}
               />

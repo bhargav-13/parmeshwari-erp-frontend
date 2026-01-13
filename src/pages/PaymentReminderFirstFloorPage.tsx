@@ -1,9 +1,9 @@
 import React from 'react';
 import PaymentReminderPage from './PaymentReminderPage';
-import { PaymentFloor, BillingType } from '../types';
+import { PaymentFloor } from '../types';
 
 const PaymentReminderFirstFloorPage: React.FC = () => {
-  return <PaymentReminderPage floor={PaymentFloor.FIRST_FLOOR} mode={BillingType.OFFICIAL} />;
+  return <PaymentReminderPage floor={PaymentFloor.FIRST_FLOOR} />;
 };
 
 export default PaymentReminderFirstFloorPage;

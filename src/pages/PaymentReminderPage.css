@@ -35,6 +35,46 @@
   margin: 0;
 }
 
+.payment-reminder-page .page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.payment-reminder-page .mode-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid #17344D;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.payment-reminder-page .mode-btn {
+  padding: 10px 24px;
+  background: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+  transition: all 0.3s ease;
+}
+
+.payment-reminder-page .mode-btn:first-child {
+  border-right: 1px solid #17344D;
+}
+
+.payment-reminder-page .mode-btn:hover:not(.active) {
+  background: #F5F5F5;
+}
+
+.payment-reminder-page .mode-btn.active {
+  background: #17344D;
+  color: #FFFFFF;
+}
+
 .bulk-reminder-button {
   display: flex;
   align-items: center;
@@ -251,6 +291,21 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+  }
+
+  .payment-reminder-page .page-header-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .payment-reminder-page .mode-toggle {
+    width: 100%;
+  }
+
+  .payment-reminder-page .mode-btn {
+    flex: 1;
+    text-align: center;
   }
 
   .bulk-reminder-button {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { paymentApi } from '../api/payment';
-import type { Payment, PaymentStats, BillingType } from '../types';
-import { PaymentStatus, PaymentFloor } from '../types';
+import type { Payment, PaymentStats } from '../types';
+import { PaymentStatus, PaymentFloor, BillingType } from '../types';
 import PaymentReceivedModal from '../components/PaymentReceivedModal';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
@@ -11,11 +11,11 @@ import './PaymentReminderPage.css';
 
 interface PaymentReminderPageProps {
   floor: PaymentFloor;
-  mode: BillingType;
 }
 
-const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor, mode }) => {
+const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [selectedMode, setSelectedMode] = useState<BillingType>(BillingType.OFFICIAL);
   const [stats, setStats] = useState<PaymentStats>({
     overduePayments: 0,
     overdueAmount: 0,
@@ -33,14 +33,14 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor, mode }
   useEffect(() => {
     fetchPayments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery, statusFilter, floor, mode]);
+  }, [page, searchQuery, statusFilter, floor, selectedMode]);
 
   const fetchPayments = async () => {
     try {
       setLoading(true);
       const response = await paymentApi.getPaymentList({
         floor,
-        mode,
+        mode: selectedMode,
         page,
         size: 50,
         search: searchQuery || undefined,
@@ -151,10 +151,29 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor, mode }
           <p className="page-subtitle">Track and send payment reminder to customers</p>
         </div>
 
-        <button type="button" className="bulk-reminder-button">
-          <img src={SendIcon} alt="Send" className="send-icon" />
-          <span>Send Bulk Reminder</span>
-        </button>
+        <div className="page-header-actions">
+          <div className="mode-toggle">
+            <button
+              type="button"
+              className={`mode-btn ${selectedMode === BillingType.OFFICIAL ? 'active' : ''}`}
+              onClick={() => setSelectedMode(BillingType.OFFICIAL)}
+            >
+              Official
+            </button>
+            <button
+              type="button"
+              className={`mode-btn ${selectedMode === BillingType.OFFLINE ? 'active' : ''}`}
+              onClick={() => setSelectedMode(BillingType.OFFLINE)}
+            >
+              Offline
+            </button>
+          </div>
+
+          <button type="button" className="bulk-reminder-button">
+            <img src={SendIcon} alt="Send" className="send-icon" />
+            <span>Send Bulk Reminder</span>
+          </button>
+        </div>
       </div>
 
       <div className="stats-cards">

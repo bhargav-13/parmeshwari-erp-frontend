@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import type { Invoice } from '../types';
-import { InvoiceStatus } from '../types';
+import type { Invoice, BillingType } from '../types';
+import { InvoiceStatus, BillingType as BillingTypeEnum } from '../types';
 import { invoiceApi } from '../api/invoice';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
@@ -11,11 +11,12 @@ import './InvoiceCard.css';
 
 interface InvoiceCardProps {
   invoice: Invoice;
+  billingType: BillingType;
   onDelete: (id: number) => void;
   onRefresh: () => void;
 }
 
-const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onDelete, onRefresh }) => {
+const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelete, onRefresh }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [status, setStatus] = useState(invoice.invoiceStatus);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -159,15 +160,15 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onDelete, onRefresh 
 
       <div className="invoice-card-body">
         <div className="invoice-amount-row">
-          <span className="invoice-amount-label">White Bill Amount:</span>
+          <span className="invoice-amount-label">Billed Amount:</span>
           <span className="invoice-amount-value">
-            ₹{order.officialBillAmount.toLocaleString('en-IN')}
+            ₹{(billingType === BillingTypeEnum.OFFICIAL ? order.officialBillAmount : order.offlineTotal || 0).toLocaleString('en-IN')}
           </span>
         </div>
         <div className="invoice-amount-row">
-          <span className="invoice-amount-label">Offline Bill Amount:</span>
+          <span className="invoice-amount-label">GST:</span>
           <span className="invoice-amount-value">
-            ₹{(order.offlineTotal || 0).toLocaleString('en-IN')}
+            {billingType === BillingTypeEnum.OFFICIAL ? `₹${(order.gst || 0).toLocaleString('en-IN')}` : '-'}
           </span>
         </div>
       </div>
@@ -178,7 +179,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onDelete, onRefresh 
         <div className="invoice-amount-row">
           <span className="invoice-total-label">Total:</span>
           <span className="invoice-total-value">
-            ₹{order.grandTotal.toLocaleString('en-IN')}
+            ₹{(order.grandTotal || 0).toLocaleString('en-IN')}
           </span>
         </div>
       </div>

@@ -1,9 +1,9 @@
 import React from 'react';
 import InvoicePage from './InvoicePage';
-import { InvoiceFloor, BillingType } from '../types';
+import { InvoiceFloor } from '../types';
 
 const InvoiceFirstFloorPage: React.FC = () => {
-  return <InvoicePage floor={InvoiceFloor.FIRST_FLOOR} mode={BillingType.OFFICIAL} />;
+  return <InvoicePage floor={InvoiceFloor.FIRST_FLOOR} />;
 };
 
 export default InvoiceFirstFloorPage;
