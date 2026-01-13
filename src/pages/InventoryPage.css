@@ -200,6 +200,68 @@
   font-size: 14px;
 }
 
+.inventory-page .order-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.inventory-page .order-search,
+.inventory-page .order-status-filter {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(23, 52, 77, 0.2);
+  border-radius: 14px;
+  background: #f5f7fa;
+  padding: 12px 16px;
+}
+
+.inventory-page .order-status-filter {
+  flex: 0 0 auto;
+  min-width: 180px;
+  max-width: 200px;
+}
+
+.inventory-page .order-search img,
+.inventory-page .order-status-filter img {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.inventory-page .order-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  color: #17344d;
+  flex: 1;
+  width: 100%;
+}
+
+.inventory-page .order-search input::placeholder {
+  color: #8E8E8E;
+}
+
+.inventory-page .order-status-filter select {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  color: #17344d;
+  flex: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 .inventory-table-container {
   overflow-x: auto;
   margin-bottom: 20px;
@@ -378,6 +440,12 @@
     align-items: flex-start;
     gap: 12px;
     margin: 0;
+  }
+
+.inventory-page .order-status-filter {
+    max-width: unset;
+    min-width: unset;
+    flex: 1;
   }
 
   .header-actions {

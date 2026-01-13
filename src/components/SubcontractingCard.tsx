@@ -8,8 +8,8 @@ import AddSubcontractingModal from './AddSubcontractingModal';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import ReturnIcon from '../assets/return.svg';
-import DropdownIcon from '../assets/dropdown.svg';
 import './SubcontractingCard.css';
+import '../styles/StatusDropdown.css';
 
 interface SubcontractingCardProps {
   subcontract: Subcontracting;
@@ -24,9 +24,9 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Use backend-calculated values directly
-  const returnStock = subcontract.subReturn?.returnStock || 0;
-  const usedStock = subcontract.usedStock || (subcontract.sentStock - returnStock);
+  // Use backend-calculated values directly, rounded to 3 decimal places
+  const returnStock = Math.round((subcontract.subReturn?.returnStock || 0) * 1000) / 1000;
+  const usedStock = Math.round((subcontract.usedStock || (subcontract.sentStock - returnStock)) * 1000) / 1000;
   const totalAmount = subcontract.totalAmount || 0;
 
   const formatDate = (dateString: string) => {
@@ -171,10 +171,10 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
               <span className="stock-label">Returned</span>
               <div className="stock-values">
                 <span className="stock-value">
-                  {returnStock} {subcontract.unit}
+                  {returnStock.toFixed(3)} {subcontract.unit}
                 </span>
                 <span className="stock-pieces">
-                  {(returnStock * 25).toLocaleString('en-IN')} Pc.
+                  {(returnStock * 25).toFixed(2)} Pc.
                 </span>
               </div>
             </div>
@@ -183,7 +183,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
               <span className="stock-label">Used</span>
               <div className="stock-values">
                 <span className="stock-value">
-                  {usedStock} {subcontract.unit}
+                  {usedStock.toFixed(3)} {subcontract.unit}
                 </span>
               </div>
             </div>
@@ -201,22 +201,19 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
             <span className="processes-label">Processes</span>
 
             <div className="process-actions">
-              <div className="status-dropdown">
-                <select
-                  value={status}
-                  onChange={(e) => handleStatusChange(e.target.value as SubcontractingStatus)}
-                  className={`status-select ${getStatusClass(status)}`}
-                  disabled={isUpdatingStatus}
-                  title="Update order status"
-                >
-                  <option value={SubcontractingStatus.IN_PROCESS}>
-                    {isUpdatingStatus ? 'Updating...' : 'In Process'}
-                  </option>
-                  <option value={SubcontractingStatus.COMPLETED}>Complete</option>
-                  <option value={SubcontractingStatus.REJECTED}>Rejected</option>
-                </select>
-                <img src={DropdownIcon} alt="Dropdown" className="status-dropdown-icon" />
-              </div>
+              <select
+                value={status}
+                onChange={(e) => handleStatusChange(e.target.value as SubcontractingStatus)}
+                className={`status-select-modern ${getStatusClass(status)}`}
+                disabled={isUpdatingStatus}
+                title="Update order status"
+              >
+                <option value={SubcontractingStatus.IN_PROCESS}>
+                  {isUpdatingStatus ? 'Updating...' : 'In Process'}
+                </option>
+                <option value={SubcontractingStatus.COMPLETED}>Completed</option>
+                <option value={SubcontractingStatus.REJECTED}>Rejected</option>
+              </select>
 
               <button
                 type="button"

@@ -122,7 +122,10 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
 
   useEffect(() => {
     if (!initialData) {
-      setFormData(defaultFormData);
+      setFormData({
+        ...defaultFormData,
+        inventoryFloor: fixedFloor || InventoryFloor.GROUND_FLOOR,
+      });
       setUploadedImages([]);
       setSelectedFiles([]);
       resetSelectedPreviews();
@@ -144,11 +147,12 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
       pricePerKg: initialData.pricePerKg || 0,
       quantityUnit: initialData.quantityUnit || QuantityUnit.KG,
       lowStockAlert: initialData.lowStockAlert || 0,
+      inventoryFloor: fixedFloor || initialData.inventoryFloor || InventoryFloor.GROUND_FLOOR,
     });
     setUploadedImages(latestImages);
     setSelectedFiles([]);
     resetSelectedPreviews();
-  }, [initialData, resetSelectedPreviews]);
+  }, [initialData, fixedFloor, resetSelectedPreviews]);
 
   useEffect(() => {
     if (selectedFiles.length === 0) {
@@ -196,6 +200,7 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
           pricePerKg: latestData.pricePerKg || 0,
           quantityUnit: latestData.quantityUnit || QuantityUnit.KG,
           lowStockAlert: latestData.lowStockAlert || 0,
+          inventoryFloor: fixedFloor || latestData.inventoryFloor || InventoryFloor.GROUND_FLOOR,
         });
 
         const normalizedImages = (latestData.images || []).map((img) => ({
@@ -221,7 +226,7 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [initialData?.stockItemId]);
+  }, [initialData?.stockItemId, fixedFloor]);
 
   const calculateQuantityInPc = (quantityInKg: number, weightPerPc: number, unit: QuantityUnit): number => {
     if (weightPerPc === 0) return 0;

@@ -164,21 +164,19 @@ const RawInventoryPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="search-filter-bar">
-        <div className="search-box">
-          <img src={SearchIcon} alt="Search" className="search-icon" />
+      <div className="order-filters">
+        <div className="order-search">
+          <img src={SearchIcon} alt="Search" />
           <input
             type="text"
-            placeholder="Search raw items"
-            className="search-input"
+            placeholder="Search by product name"
             value={rawSearchQuery}
             onChange={(e) => setRawSearchQuery(e.target.value)}
           />
         </div>
-        <div className="filter-button">
-          <img src={FilterIcon} alt="Filter" className="filter-icon" />
+        <div className="order-status-filter">
+          <img src={FilterIcon} alt="Filter" />
           <select
-            className="filter-select"
             value={rawStatusFilter}
             onChange={(e) => setRawStatusFilter(e.target.value as InventoryStatus | '')}
             title="Filter by status"

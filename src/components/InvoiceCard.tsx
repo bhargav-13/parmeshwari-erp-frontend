@@ -6,8 +6,8 @@ import { invoiceApi } from '../api/invoice';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import DownloadIcon from '../assets/download.svg';
-import DropdownIcon from '../assets/dropdown.svg';
 import './InvoiceCard.css';
+import '../styles/StatusDropdown.css';
 
 interface InvoiceCardProps {
   invoice: Invoice;
@@ -138,21 +138,18 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelet
         </div>
 
         <div className="invoice-card-status">
-          <div className="status-dropdown">
-            <select
-              value={status}
-              onChange={(e) => handleStatusChange(e.target.value as InvoiceStatus)}
-              className={`status-select ${getStatusClass(status)}`}
-              disabled={isUpdatingStatus}
-              title="Update invoice status"
-            >
-              <option value={InvoiceStatus.PENDING}>
-                {isUpdatingStatus ? 'Updating...' : 'Pending'}
-              </option>
-              <option value={InvoiceStatus.COMPLETED}>Complete</option>
-            </select>
-            <img src={DropdownIcon} alt="Dropdown" className="status-dropdown-icon" />
-          </div>
+          <select
+            value={status}
+            onChange={(e) => handleStatusChange(e.target.value as InvoiceStatus)}
+            className={`status-select-modern ${getStatusClass(status)}`}
+            disabled={isUpdatingStatus}
+            title="Update invoice status"
+          >
+            <option value={InvoiceStatus.PENDING}>
+              {isUpdatingStatus ? 'Updating...' : 'Pending'}
+            </option>
+            <option value={InvoiceStatus.COMPLETED}>Completed</option>
+          </select>
         </div>
       </div>
 

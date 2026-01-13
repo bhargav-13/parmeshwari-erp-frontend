@@ -100,6 +100,7 @@ export interface SubOrderRequest {
 export interface SubReturnRequest {
   returnDate: string; // ISO date format
   returnStock: number;
+  grossReturn?: number | null; // Input return in Kg before deduction
   returnElement?: number | null;
   packagingType: PackagingType;
   returnElementDrumValue?: number | null;
@@ -109,6 +110,7 @@ export interface SubReturnRequest {
 export interface SubReturn {
   returnDate: string;
   returnStock: number;
+  grossReturn?: number | null;
   returnElement?: number | null;
   packagingType: PackagingType;
   returnElementDrumValue?: number | null;

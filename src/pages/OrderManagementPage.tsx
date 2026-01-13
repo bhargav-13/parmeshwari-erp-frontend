@@ -11,6 +11,7 @@ import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import ViewIcon from '../assets/view.svg';
 import './OrderManagementPage.css';
+import '../styles/StatusDropdown.css';
 
 const initialStats: OrderStats = {
   totalOrders: 0,
@@ -253,14 +254,13 @@ const OrderManagementPage: React.FC = () => {
                   <td>{formatCurrency(order.grandTotal)}</td>
                   <td>
                     <select
-                      className={`status-dropdown ${statusChip(order.orderStatus)}`}
+                      className={`status-select-modern ${statusChip(order.orderStatus)}`}
                       value={order.orderStatus}
                       onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
                       disabled={statusUpdating === order.id}
-                      title="Change order status"
                     >
                       <option value="PENDING">Pending</option>
-                      <option value="COMPLETED">Complete</option>
+                      <option value="COMPLETED">Completed</option>
                     </select>
                   </td>
                   <td>{order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toLocaleDateString('en-IN') : '—'}</td>
