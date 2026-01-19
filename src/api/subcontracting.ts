@@ -4,6 +4,8 @@ import type {
   SubOrderRequest,
   SubReturnRequest,
   PaginatedResult,
+  SubcontractingBySubcontractInfo,
+  SubcontractingBySubcontractList,
 } from '../types';
 import { SubcontractingStatus } from '../types';
 
@@ -56,5 +58,43 @@ export const subcontractingApi = {
   // Update subcontracting status
   updateSubcontractingStatus: async (id: number, status: SubcontractingStatus): Promise<void> => {
     await apiClient.patch(`/api/v1/subcontracting/${id}/status`, { status });
+  },
+
+  // Get all subcontractors list (for Subcontract page)
+  getSubcontractingListBySubcontract: async (search?: string): Promise<SubcontractingBySubcontractInfo[]> => {
+    const response = await apiClient.get<SubcontractingBySubcontractInfo[]>(
+      '/api/v1/subcontracting/getBySubcontract',
+      { params: search ? { search } : {} }
+    );
+    return response.data;
+  },
+
+  // Get subcontract details by contractor name with date range
+  getSubcontractByCustomerName: async (
+    contractorName: string,
+    startDate: string,
+    endDate: string
+  ): Promise<SubcontractingBySubcontractList> => {
+    const response = await apiClient.get<SubcontractingBySubcontractList>(
+      `/api/v1/subcontracting/getBySubcontract/${encodeURIComponent(contractorName)}`,
+      { params: { startDate, endDate } }
+    );
+    return response.data;
+  },
+
+  // Download subcontract PDF by contractor name
+  getSubcontractByCustomerNamePdf: async (
+    contractorName: string,
+    startDate: string,
+    endDate: string
+  ): Promise<Blob> => {
+    const response = await apiClient.get(
+      `/api/v1/subcontracting/getBySubcontract/${encodeURIComponent(contractorName)}/pdf`,
+      {
+        params: { startDate, endDate },
+        responseType: 'blob',
+      }
+    );
+    return response.data;
   },
 };

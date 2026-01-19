@@ -17,15 +17,30 @@ const PACKAGING_WEIGHTS: Record<PackagingType, number | null> = {
   [PackagingType.DRUM]: null, // Manual input
 };
 
+// Internal form state that includes grossReturn and drumValue for calculation
+interface ReturnFormState {
+  returnItemName: string;
+  returnDate: string;
+  returnStock: number;
+  grossReturn: number | null;
+  returnElement: number | null;
+  packagingType: PackagingType;
+  returnType: ReturnType;
+  drumWeight: number | null; // Weight per drum element in grams
+  returnRemark: string;
+}
+
 const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit }) => {
-  const [formData, setFormData] = useState<SubReturnRequest>({
+  const [formData, setFormData] = useState<ReturnFormState>({
+    returnItemName: '',
     returnDate: new Date().toISOString().split('T')[0],
     returnStock: 0,
     grossReturn: null,
+    returnElement: null,
     packagingType: PackagingType.DRUM,
     returnType: ReturnType.MAAL,
-    returnElement: null,
-    returnElementDrumValue: null,
+    drumWeight: null,
+    returnRemark: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -34,7 +49,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
   // Get packaging weight for current type (in grams)
   const getPackagingWeight = (): number => {
     if (formData.packagingType === PackagingType.DRUM) {
-      return formData.returnElementDrumValue || 0;
+      return formData.drumWeight || 0;
     }
     return PACKAGING_WEIGHTS[formData.packagingType] || 0;
   };
@@ -45,14 +60,14 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
     grossReturn: number | null,
     returnElement: number | null,
     packagingType: PackagingType,
-    drumValue: number | null
+    drumWeight: number | null
   ): number => {
     const gross = grossReturn || 0;
     const element = returnElement || 0;
 
     let packagingWeightGm: number;
     if (packagingType === PackagingType.DRUM) {
-      packagingWeightGm = drumValue || 0;
+      packagingWeightGm = drumWeight || 0;
     } else {
       packagingWeightGm = PACKAGING_WEIGHTS[packagingType] || 0;
     }
@@ -69,11 +84,11 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
     return Math.max(0, totalReturn); // Ensure non-negative
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     let processedValue: any = value;
 
-    if (name === 'returnStock' || name === 'returnElement' || name === 'returnElementDrumValue' || name === 'grossReturn') {
+    if (name === 'returnStock' || name === 'returnElement' || name === 'drumWeight' || name === 'grossReturn') {
       processedValue = value === '' ? null : parseFloat(value) || 0;
     }
 
@@ -83,13 +98,13 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
     };
 
     // Recalculate return stock when relevant fields change
-    if (name === 'grossReturn' || name === 'returnElement' || name === 'returnElementDrumValue' || name === 'packagingType') {
+    if (name === 'grossReturn' || name === 'returnElement' || name === 'drumWeight' || name === 'packagingType') {
       const grossReturn = name === 'grossReturn' ? processedValue : updatedData.grossReturn;
       const element = name === 'returnElement' ? processedValue : updatedData.returnElement;
-      const drumValue = name === 'returnElementDrumValue' ? processedValue : updatedData.returnElementDrumValue;
+      const drumWeight = name === 'drumWeight' ? processedValue : updatedData.drumWeight;
       const packagingType = name === 'packagingType' ? processedValue : updatedData.packagingType;
 
-      updatedData.returnStock = calculateTotalReturn(grossReturn, element, packagingType, drumValue);
+      updatedData.returnStock = calculateTotalReturn(grossReturn, element, packagingType, drumWeight);
     }
 
     setFormData(updatedData);
@@ -98,6 +113,11 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!formData.returnItemName) {
+      setError('Return Item Name is required');
+      return;
+    }
 
     if (formData.returnStock <= 0) {
       setError('Total return must be greater than 0');
@@ -109,9 +129,20 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
       return;
     }
 
+    // Prepare data for API (only include fields from SubReturnRequest)
+    const submitData: SubReturnRequest = {
+      returnItemName: formData.returnItemName,
+      returnDate: formData.returnDate,
+      returnStock: formData.returnStock,
+      returnElement: formData.returnElement,
+      packagingType: formData.packagingType,
+      returnType: formData.returnType,
+      returnRemark: formData.returnRemark || null,
+    };
+
     try {
       setLoading(true);
-      await onSubmit(formData);
+      await onSubmit(submitData);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to return record');
     } finally {
@@ -122,7 +153,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
   // Get display text for packaging weight
   const getPackagingWeightDisplay = (): string => {
     if (formData.packagingType === PackagingType.DRUM) {
-      return formData.returnElementDrumValue ? `${formData.returnElementDrumValue} gm` : 'Enter weight';
+      return formData.drumWeight ? `${formData.drumWeight} gm` : 'Enter weight';
     }
     const weight = PACKAGING_WEIGHTS[formData.packagingType];
     return weight !== null ? `${weight} gm` : '';
@@ -142,17 +173,32 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
         <h2 className="modal-title">Add Return</h2>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
-            <label className="form-label">Returned Date</label>
-            <input
-              type="date"
-              name="returnDate"
-              value={formData.returnDate}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="DD/MM/YYYY"
-              required
-            />
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Return Item Name:</label>
+              <input
+                type="text"
+                name="returnItemName"
+                value={formData.returnItemName}
+                onChange={handleChange}
+                placeholder="Enter return item name"
+                className="form-input"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Return Date:</label>
+              <input
+                type="date"
+                name="returnDate"
+                value={formData.returnDate}
+                onChange={handleChange}
+                className="form-input"
+                title="Return Date"
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
@@ -184,8 +230,8 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
               {formData.packagingType === PackagingType.DRUM && (
                 <input
                   type="number"
-                  name="returnElementDrumValue"
-                  value={formData.returnElementDrumValue ?? ''}
+                  name="drumWeight"
+                  value={formData.drumWeight ?? ''}
                   onChange={handleChange}
                   placeholder="Weight in gm"
                   className="form-input element-weight"
@@ -246,6 +292,19 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
               <span className="calc-label">Total Return:</span>
               <span className="calc-value total">{formData.returnStock.toFixed(3)} Kg</span>
             </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Remark:</label>
+            <textarea
+              name="returnRemark"
+              value={formData.returnRemark}
+              onChange={handleChange}
+              placeholder="Enter remark (optional)"
+              title="Return Remark"
+              className="form-textarea"
+              rows={3}
+            />
           </div>
 
           {error && <div className="error-message">{error}</div>}

@@ -98,9 +98,10 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   // Prepare initial data for edit modal
   const initialEditData: SubOrderRequest = {
     contractorName: subcontract.contractorName,
-    materialName: subcontract.materialName,
+    itemName: subcontract.itemName,
     orderDate: subcontract.orderDate,
     sentStock: subcontract.sentStock,
+    jobWorkPay: subcontract.jobWorkPay,
     price: subcontract.price,
     unit: subcontract.unit,
     remark: subcontract.remark || '',
@@ -152,7 +153,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
       <div className="card-body">
         <div className="material-section">
-          <h4 className="section-title">{subcontract.materialName}</h4>
+          <h4 className="section-title">{subcontract.itemName}</h4>
 
           <div className="stock-info">
             <div className="stock-item">

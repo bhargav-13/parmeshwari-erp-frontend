@@ -25,6 +25,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [ordersExpanded, setOrdersExpanded] = useState(
     location.pathname.startsWith('/orders')
   );
+  const [subcontractingExpanded, setSubcontractingExpanded] = useState(
+    location.pathname.startsWith('/subcontracting') || location.pathname.startsWith('/subcontractor')
+  );
   const [invoicesExpanded, setInvoicesExpanded] = useState(
     location.pathname.startsWith('/invoices')
   );
@@ -34,6 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const isInventoryActive = location.pathname.startsWith('/inventory');
   const isOrdersActive = location.pathname.startsWith('/orders');
+  const isSubcontractingActive = location.pathname.startsWith('/subcontracting') || location.pathname.startsWith('/subcontractor');
   const isInvoicesActive = location.pathname.startsWith('/invoices');
   const isPaymentReminderActive = location.pathname.startsWith('/payment-reminder');
 
@@ -61,6 +65,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const paymentReminderSubItems = [
     { path: '/payment-reminder/ground-floor', label: 'Ground Floor' },
     { path: '/payment-reminder/first-floor', label: 'First Floor' },
+  ];
+
+  const subcontractingSubItems = [
+    { path: '/subcontracting', label: 'Subcontracting' },
+    { path: '/subcontractor', label: 'Subcontractor' },
   ];
 
   return (
@@ -156,17 +165,36 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           )}
         </div>
 
-        {/* Subcontracting - single item */}
-        <Link
-          to="/subcontracting"
-          className={`sidebar-item ${location.pathname === '/subcontracting' ? 'active' : ''}`}
-          onClick={onClose}
-        >
-          <span className="sidebar-icon">
-            <img src={SubcontractIcon} alt='Subcontracting'/>
-          </span>
-          <span className="sidebar-label">Subcontracting</span>
-        </Link>
+        {/* Subcontracting Section with Subsections */}
+        <div className="sidebar-section">
+          <div
+            className={`sidebar-item ${isSubcontractingActive ? 'active' : ''}`}
+            onClick={() => setSubcontractingExpanded(!subcontractingExpanded)}
+          >
+            <span className="sidebar-icon">
+              <img src={SubcontractIcon} alt='Subcontracting'/>
+            </span>
+            <span className="sidebar-label">Subcontracting</span>
+            <span className={`expand-icon ${subcontractingExpanded ? 'expanded' : ''}`}>
+              ▼
+            </span>
+          </div>
+
+          {subcontractingExpanded && (
+            <div className="sidebar-subsection">
+              {subcontractingSubItems.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                  onClick={onClose}
+                >
+                  <span className="sidebar-sublabel">{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Invoices Section with Subsections */}
         <div className="sidebar-section">

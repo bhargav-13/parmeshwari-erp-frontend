@@ -17,9 +17,10 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
   const [formData, setFormData] = useState<SubOrderRequest>(
     initialData || {
       contractorName: '',
-      materialName: '',
+      itemName: '',
       orderDate: new Date().toISOString().split('T')[0],
       sentStock: 0,
+      jobWorkPay: 0,
       price: 0,
       unit: Unit.KG,
       remark: '',
@@ -33,7 +34,7 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'sentStock' || name === 'price' ? parseFloat(value) || 0 : value,
+      [name]: name === 'sentStock' || name === 'price' || name === 'jobWorkPay' ? parseFloat(value) || 0 : value,
     }));
   };
 
@@ -41,8 +42,8 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
     e.preventDefault();
     setError(null);
 
-    if (!formData.contractorName || !formData.materialName) {
-      setError('Contractor Name and Material Name are required');
+    if (!formData.contractorName || !formData.itemName) {
+      setError('Contractor Name and Item Name are required');
       return;
     }
 
@@ -81,13 +82,13 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label className="form-label">Material Name:</label>
+              <label className="form-label">Item Name:</label>
               <input
                 type="text"
-                name="materialName"
-                value={formData.materialName}
+                name="itemName"
+                value={formData.itemName}
                 onChange={handleChange}
-                placeholder="Enter Contractor name"
+                placeholder="Enter Item name"
                 className="form-input"
                 required
               />
@@ -124,6 +125,21 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
           </div>
 
           <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Job Work Pay:</label>
+              <input
+                type="number"
+                name="jobWorkPay"
+                value={formData.jobWorkPay}
+                onChange={handleChange}
+                placeholder="Enter Job Work Pay"
+                className="form-input"
+                step="0.01"
+                min="0"
+                required
+              />
+            </div>
+
             <div className="form-group">
               <label className="form-label">Price Per kg/Pc.</label>
               <div className="price-input-group">

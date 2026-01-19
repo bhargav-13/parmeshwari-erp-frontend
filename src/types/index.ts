@@ -89,40 +89,42 @@ export type ReturnType = typeof ReturnType[keyof typeof ReturnType];
 
 export interface SubOrderRequest {
   contractorName: string;
-  materialName: string;
+  itemName: string;
   orderDate: string; // ISO date format
   sentStock: number;
+  jobWorkPay: number;
   price: number;
   unit: Unit;
   remark?: string;
 }
 
 export interface SubReturnRequest {
+  returnItemName: string;
   returnDate: string; // ISO date format
   returnStock: number;
-  grossReturn?: number | null; // Input return in Kg before deduction
   returnElement?: number | null;
   packagingType: PackagingType;
-  returnElementDrumValue?: number | null;
   returnType: ReturnType;
+  returnRemark?: string | null;
 }
 
 export interface SubReturn {
+  returnItemName: string;
   returnDate: string;
   returnStock: number;
-  grossReturn?: number | null;
   returnElement?: number | null;
   packagingType: PackagingType;
-  returnElementDrumValue?: number | null;
   returnType: ReturnType;
+  returnRemark?: string | null;
 }
 
 export interface Subcontracting {
   subcontractingId: number;
   contractorName: string;
-  materialName: string;
+  itemName: string;
   orderDate: string;
   sentStock: number;
+  jobWorkPay: number;
   price: number;
   subReturn?: SubReturn | null;
   usedStock?: number;
@@ -379,3 +381,36 @@ export const BillingType = {
 } as const;
 
 export type BillingType = typeof BillingType[keyof typeof BillingType];
+
+// Subcontract Types (for Subcontractors list/view)
+export interface SubcontractingBySubcontractInfo {
+  contractorName: string;
+  lastUpdatedAt: string;
+  itemName: string;
+}
+
+export interface SubcontractingBySubcontract {
+  orderDate: string;
+  price: number;
+  jobWorkPay: number;
+  itemName: string;
+  sentStock: number;
+  returnDate: string;
+  returnItemName: string;
+  returnStock: number;
+  returnElement: number;
+  packagingType: PackagingType;
+  usedStock: number;
+  netWeight: number;
+  totalJobPay: number;
+  totalAmount: number;
+}
+
+export interface SubcontractingBySubcontractList {
+  contractorName: string;
+  subcontractList: SubcontractingBySubcontract[];
+  totalPaidRs: number;
+  totalSentStock: number;
+  totalReturnStock: number;
+  totalUsed: number;
+}

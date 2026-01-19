@@ -10,14 +10,16 @@ servers:
     description: Production Server
 
 tags:
-  - name: Subcontract
+  - name: Subcontracting
     description: Subcontracting order and return related endpoints
+  - name: Subcontract
+    description: Subcontract related endpoints
 
 paths:
   /api/v1/subcontracting:
     post:
       tags:
-        - Subcontract
+        - Subcontracting
       operationId: addSubcontracting
       summary: Create a new subcontracting order
       description: Adds a new subcontracting record into the system.
@@ -50,7 +52,7 @@ paths:
         - oauth2: [ ]
     get:
       tags:
-        - Subcontract
+        - Subcontracting
       operationId: getSubcontractingList
       summary: Get all subcontracting orders with pagination
       description: Returns a paginated list of all subcontracting orders.
@@ -96,7 +98,7 @@ paths:
   /api/v1/subcontracting/{subcontractingId}:
     put:
       tags:
-        - Subcontract
+        - Subcontracting
       operationId: updateSubcontracting
       summary: Update subcontracting order
       description: Updates subcontracting order fields (not return fields).
@@ -141,7 +143,7 @@ paths:
         - oauth2: [ ]
     get:
       tags:
-        - Subcontract
+        - Subcontracting
       operationId: getSubcontractingById
       summary: Get subcontracting order by ID
       description: Returns a single subcontracting order based on its ID.
@@ -174,7 +176,7 @@ paths:
         - oauth2: [ ]
     delete:
       tags:
-        - Subcontract
+        - Subcontracting
       operationId: deleteSubcontracting
       summary: Delete subcontracting order
       description: Deletes a subcontracting order based on its ID.
@@ -211,7 +213,7 @@ paths:
   /api/v1/subcontracting/{subcontractingId}/return:
     post:
       tags:
-        - Subcontract
+        - Subcontracting
       operationId: returnSubcontracting
       summary: Return Subcontracting Order
       description: Return subcontracting record into the system.
@@ -251,7 +253,7 @@ paths:
   /api/v1/subcontracting/{subcontractingId}/status:
     patch:
       tags:
-        - Subcontract
+        - Subcontracting
       operationId: updateSubcontractingStatus
       summary: Update subcontracting order status
       description: Updates only the status of a subcontracting order.
@@ -295,7 +297,135 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
-
+  /api/v1/subcontracting/getBySubcontract:
+    get:
+      tags:
+        - Subcontract
+      operationId: getSubcontractingListBySubcontract
+      summary: Get all subcontracting orders By Subcontract
+      description: Returns list of all subcontracting orders.
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: list of subcontracting orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubcontractingBySubcontractInfo'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+  /api/v1/subcontracting/getBySubcontract/{contractorName}:
+    get:
+      tags:
+        - Subcontract
+      operationId: getSubcontractByCustomerName
+      summary: Get Subcontract by customer name
+      description: Returns list of all subcontracting orders.
+      parameters:
+        - name: contractorName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: list of subcontracting orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractingBySubcontractList'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+  /api/v1/subcontracting/getBySubcontract/{contractorName}/pdf:
+    get:
+      tags:
+        - Subcontract
+      operationId: getSubcontractByCustomerNamePdf
+      summary: Get Subcontract by customer name as pdf
+      description: Returns list of all subcontracting orders.
+      parameters:
+        - name: contractorName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: PDF generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
 components:
   securitySchemes:
     oauth2:
@@ -341,20 +471,24 @@ components:
       type: object
       required:
         - contractorName
-        - materialName
+        - itemName
         - orderDate
         - sentStock
+        - jobWorkPay
         - price
         - unit
       properties:
         contractorName:
           type: string
-        materialName:
+        itemName:
           type: string
         orderDate:
           type: string
           format: date
         sentStock:
+          type: number
+          format: double
+        jobWorkPay:
           type: number
           format: double
         price:
@@ -368,50 +502,48 @@ components:
     SubReturnRequest:
       type: object
       required:
+        - returnItemName
         - returnDate
         - returnStock
         - packagingType
         - returnType
       properties:
+        returnItemName:
+          type: string
         returnDate:
           type: string
           format: date
-        returnElement:
-          type: number
-          format: double
-          nullable: true
-        packagingType:
-          $ref: '#/components/schemas/PackagingType'
-        returnElementDrumValue:
-          type: number
-          format: double
-          nullable: true
-        returnType:
-          $ref: '#/components/schemas/ReturnType'
         returnStock:
           type: number
           format: double
+        returnElement:
+          type: number
+          format: double
+        packagingType:
+          $ref: '#/components/schemas/PackagingType'
+        returnRemark:
+          type: string
+          nullable: true
+
     SubReturn:
       type: object
       properties:
+        returnItemName:
+          type: string
         returnDate:
           type: string
           format: date
-        returnElement:
-          type: number
-          format: double
-          nullable: true
-        packagingType:
-          $ref: '#/components/schemas/PackagingType'
-        returnElementDrumValue:
-          type: number
-          format: double
-          nullable: true
-        returnType:
-          $ref: '#/components/schemas/ReturnType'
         returnStock:
           type: number
           format: double
+        returnElement:
+          type: number
+          format: double
+        packagingType:
+          $ref: '#/components/schemas/PackagingType'
+        returnRemark:
+          type: string
+          nullable: true
     Subcontracting:
       type: object
       properties:
@@ -419,12 +551,15 @@ components:
           type: integer
         contractorName:
           type: string
-        materialName:
+        itemName:
           type: string
         orderDate:
           type: string
           format: date
         sentStock:
+          type: number
+          format: double
+        jobWorkPay:
           type: number
           format: double
         price:
@@ -445,6 +580,79 @@ components:
         remark:
           type: string
           nullable: true
+    SubcontractingBySubcontractInfo:
+      type: object
+      properties:
+        contractorName:
+          type: string
+        lastUpdatedAt:
+          type: string
+          format: date
+        itemName:
+          type: string
+    SubcontractingBySubcontractList:
+      type: object
+      properties:
+        contractorName:
+          type: string
+        subcontractList:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubcontractingBySubcontract'
+        totalPaidRs:
+          type: number
+          format: double
+        totalSentStock:
+          type: number
+          format: double
+        totalReturnStock:
+          type: number
+          format: double
+        totalUsed:
+          type: number
+          format: double
+    SubcontractingBySubcontract:
+      type: object
+      properties:
+        orderDate:
+          type: string
+          format: date
+        price:
+          type: number
+          format: double
+        jobWorkPay:
+          type: number
+          format: double
+        itemName:
+          type: string
+        sentStock:
+          type: number
+          format: double
+        returnDate:
+          type: string
+          format: date
+        returnItemName:
+          type: string
+        returnStock:
+          type: number
+          format: double
+        returnElement:
+          type: number
+          format: double
+        packagingType:
+          $ref: '#/components/schemas/PackagingType'
+        usedStock:
+          type: number
+          format: double
+        netWeight:
+          type: number
+          format: double
+        totalJobPay:
+          type: number
+          format: double
+        totalAmount:
+          type: number
+          format: double
     subcontractingStatus:
       type: string
       enum:
