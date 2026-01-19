@@ -23,7 +23,7 @@ const SubcontractingOverview: React.FC<SubcontractingOverviewProps> = ({ subcont
           {subcontracts.map((subcontract) => (
             <tr key={subcontract.subcontractingId}>
               <td>{subcontract.contractorName}</td>
-              <td>{subcontract.materialName}</td>
+              <td>{subcontract.itemName}</td>
               <td>{subcontract.sentStock} {subcontract.unit}</td>
               <td>
                 <span className={`status-badge status-${subcontract.status.toLowerCase()}`}>
