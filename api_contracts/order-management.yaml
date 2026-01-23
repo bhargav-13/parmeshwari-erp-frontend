@@ -188,6 +188,44 @@ paths:
           description: Invalid status
       security:
         - oauth2: [ ]
+
+  /api/v1/orders/{orderId}/dispatch:
+    put:
+      tags:
+        - Orders
+      operationId: dispatchOrder
+      summary: Dispatch order and deduct quantities from inventory
+      description: Deducts specified quantities from stock inventory for each item and marks the order as DISPATCHED
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DispatchRequest'
+      responses:
+        '200':
+          description: Order dispatched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Insufficient inventory quantity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+      security:
+        - oauth2: [ ]
+
 # ------------------------------------------------------------
 # COMPONENTS
 # ------------------------------------------------------------
@@ -296,14 +334,16 @@ components:
     OrderProductRequest:
       type: object
       required:
-        - productName
+        - itemId
         - marketRate
         - rateDifference
         - totalAmount
         - orderFloor
       properties:
-        productName:
-          type: string
+        itemId:
+          type: integer
+          format: int64
+          description: Reference to stock_item.item_id from inventory
         quantityKg:
           type: number
           format: double
@@ -365,11 +405,10 @@ components:
           type: number
         productsTotal:
           type: number
-
-    products:
-      type: array
-      items:
-        $ref: '#/components/schemas/OrderProduct'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderProduct'
 
     # Product response
     OrderProduct:
@@ -377,8 +416,13 @@ components:
       properties:
         id:
           type: integer
+        itemId:
+          type: integer
+          format: int64
+          description: Reference to stock_item.item_id from inventory
         productName:
           type: string
+          description: Product name for display purposes
         quantityKg:
           type: number
           format: double
@@ -400,6 +444,34 @@ components:
       enum:
         - PENDING
         - COMPLETED
+        - DISPATCHED
+
+    # Dispatch request schemas
+    DispatchRequest:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DispatchItem'
+
+    DispatchItem:
+      type: object
+      required:
+        - itemId
+        - quantity
+      properties:
+        itemId:
+          type: integer
+          format: int64
+          description: Reference to stock_item.item_id from inventory
+        quantity:
+          type: number
+          format: double
+          description: Quantity to deduct from inventory (in kg)
+
     OrderFloor:
       type: string
       enum:

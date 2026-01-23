@@ -602,6 +602,9 @@ components:
         totalPaidRs:
           type: number
           format: double
+        totalJobPaidAmount:
+          type: number
+          format: double
         totalSentStock:
           type: number
           format: double
