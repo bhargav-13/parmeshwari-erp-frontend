@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { Order, OrderRequest, OrderStatus, OrderFloor, PaginatedResult } from '../types';
+import type { Order, OrderRequest, OrderStatus, OrderFloor, PaginatedResult, DispatchRequest } from '../types';
 
 export const ordersApi = {
   createOrder: async (payload: OrderRequest): Promise<Order> => {
@@ -41,5 +41,10 @@ export const ordersApi = {
 
   updateOrderStatus: async (orderId: number, status: OrderStatus): Promise<void> => {
     await apiClient.patch(`/api/v1/orders/${orderId}/status`, { orderStatus: status });
+  },
+
+  dispatchOrder: async (orderId: number, payload: DispatchRequest): Promise<Order> => {
+    const response = await apiClient.put<Order>(`/api/v1/orders/${orderId}/dispatch`, payload);
+    return response.data;
   },
 };

@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
-import type { Order, OrderProductRequest, OrderRequest } from '../types';
+import React, { useEffect, useMemo, useState } from 'react';
+import type { Order, OrderProductRequest, OrderRequest, StockItem } from '../types';
 import { OrderFloor } from '../types';
+import { stockItemApi } from '../api/inventory';
 import './AddOrderModal.css';
 import DeleteIcon from '../assets/delete.svg';
 
@@ -14,6 +15,7 @@ interface AddOrderModalProps {
 type ActiveTab = 'order' | 'lineItems';
 
 const createEmptyProduct = (): OrderProductRequest => ({
+  itemId: 0,
   productName: '',
   quantityKg: 0,
   marketRate: 0,
@@ -79,8 +81,25 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
   const [formData, setFormData] = useState<OrderRequest>(() => recalculateTotals(normalizeInitialData(initialData, fixedFloor)));
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [stockItemsLoading, setStockItemsLoading] = useState(false);
 
   const isEditMode = Boolean(initialData);
+
+  useEffect(() => {
+    const fetchStockItems = async () => {
+      try {
+        setStockItemsLoading(true);
+        const items = await stockItemApi.getAllStockItems();
+        setStockItems(items);
+      } catch (err) {
+        console.error('Failed to fetch stock items', err);
+      } finally {
+        setStockItemsLoading(false);
+      }
+    };
+    fetchStockItems();
+  }, []);
 
   const updateFormData = (updater: (prev: OrderRequest) => OrderRequest) => {
     setFormData((prev) => recalculateTotals(updater(prev)));
@@ -168,13 +187,13 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
 
     const invalidProduct = formData.products.find(
       (product) =>
-        !product.productName.trim() ||
+        !product.itemId ||
         Number(product.quantityKg) <= 0 ||
         Number(product.marketRate) <= 0
     );
 
     if (invalidProduct) {
-      setError('Each product requires name, quantity, and market rate.');
+      setError('Each product requires a selected item, quantity, and market rate.');
       setActiveTab('lineItems');
       return false;
     }
@@ -345,14 +364,28 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                   </div>
                   <div className="line-item-grid">
                     <div className="line-item-field line-item-field--lg">
-                      <label>Product Name*</label>
-                      <input
-                        type="text"
-                        value={product.productName}
-                        onChange={(e) => handleProductChange(index, 'productName', e.target.value)}
-                        placeholder="Add product"
+                      <label>Product*</label>
+                      <select
+                        value={product.itemId || ''}
+                        onChange={(e) => {
+                          const selectedItemId = Number(e.target.value);
+                          const selectedItem = stockItems.find((item) => item.stockItemId === selectedItemId);
+                          handleProductChange(index, 'itemId', selectedItemId);
+                          if (selectedItem) {
+                            handleProductChange(index, 'productName', selectedItem.product.productName);
+                          }
+                        }}
                         required
-                      />
+                        disabled={stockItemsLoading}
+                        title="Select a product"
+                      >
+                        <option value="">Select Product</option>
+                        {stockItems.map((item) => (
+                          <option key={item.stockItemId} value={item.stockItemId}>
+                            {item.product.productName}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="line-item-field">
                       <label>Qty (Kg)*</label>

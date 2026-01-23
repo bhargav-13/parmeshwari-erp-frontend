@@ -247,6 +247,7 @@ export interface RawItemStatusRequest {
 export const OrderStatus = {
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED',
+  DISPATCHED: 'DISPATCHED',
 } as const;
 
 export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
@@ -259,12 +260,22 @@ export const OrderFloor = {
 export type OrderFloor = typeof OrderFloor[keyof typeof OrderFloor];
 
 export interface OrderProductRequest {
-  productName: string;
+  itemId: number;
+  productName?: string;
   quantityKg?: number;
   quantityPc?: number;
   marketRate: number;
   rateDifference: number;
   totalAmount: number;
+}
+
+export interface DispatchItem {
+  itemId: number;
+  quantity: number;
+}
+
+export interface DispatchRequest {
+  items: DispatchItem[];
 }
 
 export interface OrderRequest {
@@ -285,8 +296,15 @@ export interface OrderRequest {
   products: OrderProductRequest[];
 }
 
-export interface OrderProduct extends OrderProductRequest {
+export interface OrderProduct {
   id: number;
+  itemId: number;
+  productName: string;
+  quantityKg?: number;
+  quantityPc?: number;
+  marketRate: number;
+  rateDifference: number;
+  totalAmount: number;
 }
 
 export interface Order extends Omit<OrderRequest, 'products'> {

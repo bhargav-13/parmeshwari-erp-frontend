@@ -5,6 +5,7 @@ import { OrderFloor } from '../types';
 import AddOrderModal from '../components/AddOrderModal';
 import OrderDetailsModal from '../components/OrderDetailsModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import DispatchOrderModal from '../components/DispatchOrderModal';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
@@ -29,6 +30,8 @@ const statusChip = (status: OrderStatus) => {
   switch (status) {
     case 'COMPLETED':
       return 'status-complete';
+    case 'DISPATCHED':
+      return 'status-dispatched';
     case 'PENDING':
     default:
       return 'status-pending';
@@ -48,6 +51,7 @@ const OrderFirstFloorPage: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState<number | null>(null);
+  const [dispatchOrder, setDispatchOrder] = useState<Order | null>(null);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -153,6 +157,19 @@ const OrderFirstFloorPage: React.FC = () => {
     }
   };
 
+  const handleDispatchOrder = (order: Order) => {
+    setDispatchOrder(order);
+  };
+
+  const handleDispatchClose = () => {
+    setDispatchOrder(null);
+  };
+
+  const handleDispatchSuccess = () => {
+    setDispatchOrder(null);
+    fetchOrders();
+  };
+
   const tableRows = useMemo(() => {
     if (!orders.length) return [];
     return orders.map((order) => ({
@@ -230,6 +247,7 @@ const OrderFirstFloorPage: React.FC = () => {
                 <th>Items</th>
                 <th>Total Amount</th>
                 <th>Status</th>
+                <th>Order</th>
                 <th>Delivery Date</th>
                 <th>Actions</th>
               </tr>
@@ -247,11 +265,23 @@ const OrderFirstFloorPage: React.FC = () => {
                       className={`status-select-modern ${statusChip(order.orderStatus)}`}
                       value={order.orderStatus}
                       onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
-                      disabled={statusUpdating === order.id}
+                      disabled={statusUpdating === order.id || order.orderStatus === 'DISPATCHED'}
+                      title="Order status"
                     >
                       <option value="PENDING">Pending</option>
                       <option value="COMPLETED">Completed</option>
+                      <option value="DISPATCHED">Dispatched</option>
                     </select>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="dispatch-btn"
+                      onClick={() => handleDispatchOrder(order)}
+                      disabled={order.orderStatus === 'DISPATCHED'}
+                    >
+                      Dispatch
+                    </button>
                   </td>
                   <td>{order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toLocaleDateString('en-IN') : '—'}</td>
                   <td>
@@ -297,6 +327,14 @@ const OrderFirstFloorPage: React.FC = () => {
           onCancel={() => setDeleteTarget(null)}
           onConfirm={confirmDelete}
           loading={deleteLoading}
+        />
+      )}
+
+      {dispatchOrder && (
+        <DispatchOrderModal
+          order={dispatchOrder}
+          onClose={handleDispatchClose}
+          onSuccess={handleDispatchSuccess}
         />
       )}
     </div>

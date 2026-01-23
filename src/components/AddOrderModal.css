@@ -211,7 +211,8 @@
   color: #5a738b;
 }
 
-.line-item-field input {
+.line-item-field input,
+.line-item-field select {
   border: 1px solid rgba(23, 52, 77, 0.13);
   border-radius: 10px;
   padding: 8px 10px;
@@ -223,9 +224,19 @@
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.line-item-field input:focus {
+.line-item-field input:focus,
+.line-item-field select:focus {
   border-color: #4a8fdc;
   background: #ffffff;
+}
+
+.line-item-field select {
+  cursor: pointer;
+}
+
+.line-item-field select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .line-item-total {
