@@ -14,7 +14,7 @@ interface CromeModalProps {
 const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSuccess }) => {
   const [parties, setParties] = useState<Party[]>([]);
   const [cromeInfo, setCromeInfo] = useState<SubcontractingCromeInfo | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{\n    partyId: string;\n    cromeDate: string;\n    sentStock: string;\n    packagingType: PackagingType;\n    packagingWeight: string;\n    packagingCount: string;\n    remark: string;\n  }>({
     partyId: '',
     cromeDate: new Date().toISOString().split('T')[0],
     sentStock: '',

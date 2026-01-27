@@ -11,7 +11,7 @@ interface CromeReturnModalProps {
     onSubmit: (data: CromeReturnRequest) => Promise<void>;
 }
 
-const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ cromeId, itemName, crome, onClose, onSubmit }) => {
+const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
         returnDate: new Date().toISOString().split('T')[0],
         returnStock: '',
@@ -43,25 +43,23 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ cromeId, itemName, 
         const returnStockNum = parseNum(allData.returnStock);
         const packagingWeightNum = parseNum(allData.packagingWeight);
         const packagingCountNum = parseNum(allData.packagingCount);
-        const priceNum = parseNum(allData.inventoryPricePerKg);
-        const qtyNum = parseNum(allData.inventoryQuantityPc);
 
         switch (name) {
             case 'returnDate':
                 if (!value) return 'Return Date is required';
-                // Date consistency: Return date >= Sent date
-                if (crome.sentDate && new Date(value) < new Date(crome.sentDate)) {
-                    return 'Return date cannot be before sent date';
+                // Date consistency: Return date >= Crome date
+                if (crome.cromeDate && new Date(value) < new Date(crome.cromeDate)) {
+                    return 'Return date cannot be before crome date';
                 }
                 return null;
 
             case 'returnStock': {
                 const valueNum = parseNum(value);
                 if (!value || valueNum <= 0) return 'Gross return must be > 0';
-                // Over-return prevention
-                const pendingStock = crome.pendingStock || 0;
-                if (valueNum > pendingStock) {
-                    return `Cannot return more than pending stock (${pendingStock.toFixed(3)} Kg)`;
+                // Over-return prevention: Cannot return more than sent
+                const sentStock = crome.sentStock || 0;
+                if (valueNum > sentStock) {
+                    return `Cannot return more than sent stock (${sentStock.toFixed(3)} Kg)`;
                 }
                 return null;
             }
@@ -188,10 +186,10 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ cromeId, itemName, 
             newWarnings.push('You are recording a return in the future.');
         }
 
-        // Balance check: Auto-suggest completion
-        const returnStockNum = parseNum(formData.returnStock);
-        const pendingStock = crome.pendingStock || 0;
-        if (returnStockNum === pendingStock && crome.status !== SubcontractingStatus.COMPLETED) {
+        // Balance check: Auto-suggest completion when all stock returned
+        const grossReturnNum = parseNum(formData.returnStock);
+        const sentStock = crome.sentStock || 0;
+        if (grossReturnNum === sentStock && crome.status === SubcontractingStatus.IN_PROCESS) {
             newWarnings.push('This return completes the order. Consider marking it as "Completed".');
         }
 

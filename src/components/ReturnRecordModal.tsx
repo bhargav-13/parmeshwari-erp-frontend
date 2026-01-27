@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Subcontracting, SubReturnRequest } from '../types';
-import { PackagingType, ReturnType, SubcontractingStatus } from '../types';
+import { PackagingType, ReturnType } from '../types';
 import './ReturnRecordModal.css';
 
 interface ReturnRecordModalProps {
@@ -240,7 +240,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
     // Balance check: Auto-suggest completion
     const grossReturnNum = parseNum(formData.grossReturn);
     const sentStock = subcontract.sentStock || 0;
-    if (grossReturnNum === sentStock && subcontract.status !== 'COMPLETED') {
+    if (grossReturnNum === sentStock && subcontract.status === 'IN_PROCESS') {
       newWarnings.push('This return completes the order. Consider marking it as "Completed".');
     }
 
