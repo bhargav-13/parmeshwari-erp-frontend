@@ -5,6 +5,7 @@ import { SubcontractingStatus } from '../types';
 import { subcontractingApi } from '../api/subcontracting';
 import ReturnRecordModal from './ReturnRecordModal';
 import AddSubcontractingModal from './AddSubcontractingModal';
+import CromeModal from './CromeModal';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import ReturnIcon from '../assets/return.svg';
@@ -20,6 +21,7 @@ interface SubcontractingCardProps {
 const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, onDelete, onRefresh }) => {
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCromeModalOpen, setIsCromeModalOpen] = useState(false);
   const [status, setStatus] = useState(subcontract.status);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -97,8 +99,8 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
   // Prepare initial data for edit modal
   const initialEditData: SubOrderRequest = {
-    contractorName: subcontract.contractorName,
-    itemName: subcontract.itemName,
+    contractorId: subcontract.contractor.contractorId,
+    itemId: subcontract.item.subItemId,
     orderDate: subcontract.orderDate,
     sentStock: subcontract.sentStock,
     jobWorkPay: subcontract.jobWorkPay,
@@ -115,7 +117,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
             <h3 className="card-order-id">
               PBI-{subcontract.subcontractingId} ({new Date(subcontract.orderDate).getFullYear()})
             </h3>
-            <p className="card-contractor">{subcontract.contractorName}</p>
+            <p className="card-contractor">{subcontract.contractor.name}</p>
           </div>
 
           <div className="card-actions">
@@ -153,7 +155,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
       <div className="card-body">
         <div className="material-section">
-          <h4 className="section-title">{subcontract.itemName}</h4>
+          <h4 className="section-title">{subcontract.item.name}</h4>
 
           <div className="stock-info">
             <div className="stock-item">
@@ -224,6 +226,16 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <img src={ReturnIcon} alt="Return" className="return-icon" />
                 <span>Return Record</span>
               </button>
+
+              <button
+                type="button"
+                className="crome-button"
+                onClick={() => setIsCromeModalOpen(true)}
+                disabled={!subcontract.canCreateCrome}
+                title={subcontract.canCreateCrome ? 'Send to Crome' : 'No stock available for Crome'}
+              >
+                <span>Crome</span>
+              </button>
             </div>
           </div>
 
@@ -249,6 +261,14 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
           onClose={() => setIsEditModalOpen(false)}
           onSubmit={handleEdit}
           initialData={initialEditData}
+        />
+      )}
+
+      {isCromeModalOpen && (
+        <CromeModal
+          subcontractingId={subcontract.subcontractingId}
+          onClose={() => setIsCromeModalOpen(false)}
+          onSuccess={onRefresh}
         />
       )}
     </div>

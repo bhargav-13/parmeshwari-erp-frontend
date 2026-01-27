@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Subcontracting, SubReturnRequest } from '../types';
-import { PackagingType, ReturnType } from '../types';
+import { PackagingType, ReturnType, SubcontractingStatus } from '../types';
 import './ReturnRecordModal.css';
 
 interface ReturnRecordModalProps {
@@ -17,126 +17,247 @@ const PACKAGING_WEIGHTS: Record<PackagingType, number | null> = {
   [PackagingType.DRUM]: null, // Manual input
 };
 
-// Internal form state that includes grossReturn and drumValue for calculation
+// Internal form state
 interface ReturnFormState {
-  returnItemName: string;
   returnDate: string;
-  returnStock: number;
-  grossReturn: number | null;
-  returnElement: number | null;
+  returnStock: number; // Calculated total return
+  grossReturn: string; // User input as string
+  returnElement: string; // Box/Bag count as string
   packagingType: PackagingType;
   returnType: ReturnType;
-  drumWeight: number | null; // Weight per drum element in grams
+  drumWeight: string; // Weight per drum element as string
   returnRemark: string;
 }
 
-const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit }) => {
+const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onClose, onSubmit }) => {
   const [formData, setFormData] = useState<ReturnFormState>({
-    returnItemName: '',
     returnDate: new Date().toISOString().split('T')[0],
     returnStock: 0,
-    grossReturn: null,
-    returnElement: null,
+    grossReturn: '',
+    returnElement: '',
     packagingType: PackagingType.DRUM,
     returnType: ReturnType.MAAL,
-    drumWeight: null,
+    drumWeight: '',
     returnRemark: '',
   });
 
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [warnings, setWarnings] = useState<string[]>([]);
+
+  // Helper: Parse numeric string values
+  const parseNum = (val: string | number): number => {
+    if (typeof val === 'number') return val;
+    const parsed = parseFloat(val);
+    return isNaN(parsed) ? 0 : parsed;
+  };
 
   // Get packaging weight for current type (in grams)
   const getPackagingWeight = (): number => {
     if (formData.packagingType === PackagingType.DRUM) {
-      return formData.drumWeight || 0;
+      return parseNum(formData.drumWeight);
     }
     return PACKAGING_WEIGHTS[formData.packagingType] || 0;
   };
 
   // Calculate total return: grossReturn - (packagingWeight * returnElement)
-  // packagingWeight is in grams, need to convert to kg
   const calculateTotalReturn = (
-    grossReturn: number | null,
-    returnElement: number | null,
+    grossReturn: string | number,
+    returnElement: string | number,
     packagingType: PackagingType,
-    drumWeight: number | null
+    drumWeight: string | number
   ): number => {
-    const gross = grossReturn || 0;
-    const element = returnElement || 0;
+    const gross = parseNum(grossReturn);
+    const element = parseNum(returnElement);
 
     let packagingWeightGm: number;
     if (packagingType === PackagingType.DRUM) {
-      packagingWeightGm = drumWeight || 0;
+      packagingWeightGm = parseNum(drumWeight);
     } else {
       packagingWeightGm = PACKAGING_WEIGHTS[packagingType] || 0;
     }
 
-    // Convert packaging weight from grams to kg
     const packagingWeightKg = packagingWeightGm / 1000;
-
-    // Total deduction = number of elements * weight per element
     const deduction = element * packagingWeightKg;
-
-    // Total return = gross return - deduction
     const totalReturn = gross - deduction;
 
-    return Math.max(0, totalReturn); // Ensure non-negative
+    return Math.max(0, totalReturn);
+  };
+
+  // Enhanced validation with all 5 business rule categories
+  const validateField = (name: string, value: any, allData = formData): string | null => {
+    const grossReturnNum = parseNum(allData.grossReturn);
+    const returnElementNum = parseNum(allData.returnElement);
+    const drumWeightNum = parseNum(allData.drumWeight);
+
+    switch (name) {
+      case 'returnDate':
+        if (!value) return 'Return Date is required';
+        // Date consistency: Return date >= Order date
+        if (subcontract.orderDate && new Date(value) < new Date(subcontract.orderDate)) {
+          return 'Return date cannot be before order date';
+        }
+        return null;
+
+      case 'grossReturn': {
+        const valueNum = parseNum(value);
+        if (!value || valueNum <= 0) return 'Gross return must be > 0';
+        // Over-return prevention: Cannot return more than sent
+        const sentStock = subcontract.sentStock || 0;
+        if (valueNum > sentStock) {
+          return `Cannot return more than sent stock (${sentStock.toFixed(3)} Kg)`;
+        }
+        return null;
+      }
+
+      case 'returnElement': {
+        const valueNum = parseNum(value);
+        if (valueNum < 0) return 'Element count must be >= 0';
+        // Weight integrity: Check if total packaging < gross
+        let packagingWeightGm: number;
+        if (allData.packagingType === PackagingType.DRUM) {
+          packagingWeightGm = drumWeightNum;
+        } else {
+          packagingWeightGm = PACKAGING_WEIGHTS[allData.packagingType] || 0;
+        }
+        const totalPackagingKg = (valueNum * packagingWeightGm) / 1000;
+        if (totalPackagingKg >= grossReturnNum && grossReturnNum > 0) {
+          return 'Total packaging weight cannot exceed gross return';
+        }
+        return null;
+      }
+
+      case 'drumWeight': {
+        const valueNum = parseNum(value);
+        if (allData.packagingType === PackagingType.DRUM && valueNum <= 0) {
+          return 'Drum weight is required';
+        }
+        // Weight integrity check
+        const totalPackagingKg = (returnElementNum * valueNum) / 1000;
+        if (totalPackagingKg >= grossReturnNum && grossReturnNum > 0) {
+          return 'Total packaging weight cannot exceed gross return';
+        }
+        return null;
+      }
+
+      default:
+        return null;
+    }
+  };
+
+  const getFieldError = (name: string) => {
+    if (!touched[name]) return null;
+    return validateField(name, formData[name as keyof typeof formData]);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setTouched(prev => ({ ...prev, [e.target.name]: true }));
+  };
+
+  // Handle numeric input (text with numeric-only validation)
+  const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    // Allow digits, decimal point, and empty string
+    const numericValue = value.replace(/[^0-9.]/g, '');
+    // Prevent multiple decimal points
+    const parts = numericValue.split('.');
+    const cleanValue = parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : numericValue;
+
+    const updatedData = {
+      ...formData,
+      [name]: cleanValue,
+    };
+
+    // Recalculate return stock when relevant fields change
+    if (name === 'grossReturn' || name === 'returnElement' || name === 'drumWeight') {
+      updatedData.returnStock = calculateTotalReturn(
+        updatedData.grossReturn,
+        updatedData.returnElement,
+        updatedData.packagingType,
+        updatedData.drumWeight
+      );
+    }
+
+    setFormData(updatedData);
+    setWarnings([]);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    let processedValue: any = value;
-
-    if (name === 'returnStock' || name === 'returnElement' || name === 'drumWeight' || name === 'grossReturn') {
-      processedValue = value === '' ? null : parseFloat(value) || 0;
-    }
 
     const updatedData = {
       ...formData,
-      [name]: processedValue,
+      [name]: value,
     };
 
-    // Recalculate return stock when relevant fields change
-    if (name === 'grossReturn' || name === 'returnElement' || name === 'drumWeight' || name === 'packagingType') {
-      const grossReturn = name === 'grossReturn' ? processedValue : updatedData.grossReturn;
-      const element = name === 'returnElement' ? processedValue : updatedData.returnElement;
-      const drumWeight = name === 'drumWeight' ? processedValue : updatedData.drumWeight;
-      const packagingType = name === 'packagingType' ? processedValue : updatedData.packagingType;
-
-      updatedData.returnStock = calculateTotalReturn(grossReturn, element, packagingType, drumWeight);
+    // Recalculate return stock when packaging type changes
+    if (name === 'packagingType') {
+      updatedData.returnStock = calculateTotalReturn(
+        updatedData.grossReturn,
+        updatedData.returnElement,
+        value as PackagingType,
+        updatedData.drumWeight
+      );
     }
 
     setFormData(updatedData);
+    setWarnings([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setWarnings([]);
 
-    if (!formData.returnItemName) {
-      setError('Return Item Name is required');
+    // Workflow state protection
+    if (subcontract.status === 'COMPLETED') {
+      setError('Cannot add return to a completed order. Please reopen it first.');
       return;
     }
+
+    // Mark all as touched
+    const allTouched = Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+    setTouched(allTouched);
+
+    // Validate
+    const errors = Object.keys(formData).map(key => validateField(key, formData[key as keyof typeof formData])).filter(Boolean);
+    if (errors.length > 0) return;
 
     if (formData.returnStock <= 0) {
       setError('Total return must be greater than 0');
       return;
     }
 
-    if (!formData.grossReturn || formData.grossReturn <= 0) {
-      setError('Please enter gross return weight');
-      return;
+    // Check warnings
+    const newWarnings: string[] = [];
+
+    // Future date warning
+    if (new Date(formData.returnDate) > new Date()) {
+      newWarnings.push('You are recording a return in the future.');
     }
 
-    // Prepare data for API (only include fields from SubReturnRequest)
+    // Balance check: Auto-suggest completion
+    const grossReturnNum = parseNum(formData.grossReturn);
+    const sentStock = subcontract.sentStock || 0;
+    if (grossReturnNum === sentStock && subcontract.status !== 'COMPLETED') {
+      newWarnings.push('This return completes the order. Consider marking it as "Completed".');
+    }
+
+    if (newWarnings.length > 0) {
+      setWarnings(newWarnings);
+      // Don't block submission, just show warnings
+    }
+
+    const packagingWeightGm = getPackagingWeight();
+    const packagingWeightKg = packagingWeightGm / 1000;
+
     const submitData: SubReturnRequest = {
-      returnItemName: formData.returnItemName,
       returnDate: formData.returnDate,
-      returnStock: formData.returnStock,
-      returnElement: formData.returnElement,
+      returnStock: parseNum(formData.grossReturn),
       packagingType: formData.packagingType,
-      returnType: formData.returnType,
+      packagingWeight: packagingWeightKg,
+      packagingCount: parseNum(formData.returnElement),
       returnRemark: formData.returnRemark || null,
     };
 
@@ -161,7 +282,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
 
   // Calculate deduction for display
   const getDeductionDisplay = (): string => {
-    const element = formData.returnElement || 0;
+    const element = parseNum(formData.returnElement);
     const packagingWeightGm = getPackagingWeight();
     const deductionKg = (element * packagingWeightGm) / 1000;
     return deductionKg.toFixed(3);
@@ -172,21 +293,8 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
       <div className="modal-content return-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">Add Return</h2>
 
-        <form onSubmit={handleSubmit} className="modal-form">
+        <form onSubmit={handleSubmit} className="modal-form" noValidate>
           <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Return Item Name:</label>
-              <input
-                type="text"
-                name="returnItemName"
-                value={formData.returnItemName}
-                onChange={handleChange}
-                placeholder="Enter return item name"
-                className="form-input"
-                required
-              />
-            </div>
-
             <div className="form-group">
               <label className="form-label">Return Date:</label>
               <input
@@ -194,10 +302,11 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
                 name="returnDate"
                 value={formData.returnDate}
                 onChange={handleChange}
-                className="form-input"
-                title="Return Date"
+                onBlur={handleBlur}
+                className={`form-input ${getFieldError('returnDate') ? 'invalid' : ''}`}
                 required
               />
+              {getFieldError('returnDate') && <span className="field-error-text">{getFieldError('returnDate')}</span>}
             </div>
           </div>
 
@@ -209,8 +318,9 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
                 name="returnElement"
                 value={formData.returnElement ?? ''}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 placeholder="e.g. 10"
-                className="form-input element-count"
+                className={`form-input element-count ${getFieldError('returnElement') ? 'invalid' : ''}`}
                 step="1"
                 min="0"
               />
@@ -219,8 +329,6 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
                 value={formData.packagingType}
                 onChange={handleChange}
                 className="form-input element-type"
-                title="Packaging Type"
-                required
               >
                 <option value={PackagingType.BAG}>Bag (0.075 gm)</option>
                 <option value={PackagingType.FOAM}>Foam (150 gm)</option>
@@ -229,17 +337,18 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
               </select>
               {formData.packagingType === PackagingType.DRUM && (
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   name="drumWeight"
-                  value={formData.drumWeight ?? ''}
-                  onChange={handleChange}
+                  value={formData.drumWeight}
+                  onChange={handleNumericInput}
+                  onBlur={handleBlur}
                   placeholder="Weight in gm"
-                  className="form-input element-weight"
-                  step="0.01"
-                  min="0"
+                  className={`form-input element-weight ${getFieldError('drumWeight') ? 'invalid' : ''}`}
                 />
               )}
             </div>
+            {getFieldError('returnElement') && <span className="field-error-text">{getFieldError('returnElement')}</span>}
             <span className="packaging-weight-hint">
               Packaging weight: {getPackagingWeightDisplay()}
             </span>
@@ -252,7 +361,6 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
               value={formData.returnType}
               onChange={handleChange}
               className="form-input"
-              title="Return In Type"
               required
             >
               <option value={ReturnType.MAAL}>Return Maal</option>
@@ -264,22 +372,23 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
           <div className="form-group">
             <label className="form-label">Gross Return (Kg)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
               name="grossReturn"
-              value={formData.grossReturn ?? ''}
-              onChange={handleChange}
-              className="form-input"
+              value={formData.grossReturn}
+              onChange={handleNumericInput}
+              onBlur={handleBlur}
+              className={`form-input ${getFieldError('grossReturn') ? 'invalid' : ''}`}
               placeholder="Enter return weight in Kg"
-              step="0.001"
-              min="0"
               required
             />
+            {getFieldError('grossReturn') && <span className="field-error-text">{getFieldError('grossReturn')}</span>}
           </div>
 
           <div className="calculation-summary">
             <div className="calc-row">
               <span className="calc-label">Gross Return:</span>
-              <span className="calc-value">{(formData.grossReturn || 0).toFixed(3)} Kg</span>
+              <span className="calc-value">{parseNum(formData.grossReturn).toFixed(3)} Kg</span>
             </div>
             <div className="calc-row">
               <span className="calc-label">Packaging Deduction:</span>
@@ -301,7 +410,6 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ onClose, onSubmit
               value={formData.returnRemark}
               onChange={handleChange}
               placeholder="Enter remark (optional)"
-              title="Return Remark"
               className="form-textarea"
               rows={3}
             />
