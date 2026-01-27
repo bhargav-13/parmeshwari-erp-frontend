@@ -44,6 +44,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [warnings, setWarnings] = useState<string[]>([]);
 
   // Helper: Parse numeric string values
