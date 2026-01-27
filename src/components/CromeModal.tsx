@@ -14,7 +14,7 @@ interface CromeModalProps {
 const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSuccess }) => {
   const [parties, setParties] = useState<Party[]>([]);
   const [cromeInfo, setCromeInfo] = useState<SubcontractingCromeInfo | null>(null);
-  const [formData, setFormData] = useState<{partyId: string; cromeDate: string; sentStock: string; packagingType: PackagingType; packagingWeight: string; packagingCount: string; remark: string;}>({
+  const [formData, setFormData] = useState<{ partyId: string; cromeDate: string; sentStock: string; packagingType: PackagingType; packagingWeight: string; packagingCount: string; remark: string; }>({
     partyId: '',
     cromeDate: new Date().toISOString().split('T')[0],
     sentStock: '',
@@ -43,14 +43,18 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
         setParties(partiesData);
         setCromeInfo(infoData);
 
-        // Pre-fill packaging info from return if available
-        if (infoData.returnPackagingType) {
-          setFormData(prev => ({
-            ...prev,
-            packagingType: infoData.returnPackagingType!,
+        // Pre-fill fields from return info
+        setFormData(prev => ({
+          ...prev,
+          // Always pre-fill sentStock with what's available
+          sentStock: (infoData.availableStockForCrome || 0).toString(),
+          // Pre-fill packaging info if available
+          ...(infoData.returnPackagingType ? {
+            packagingType: infoData.returnPackagingType,
             packagingWeight: infoData.returnPackagingWeight?.toString() || '',
-          }));
-        }
+            packagingCount: infoData.returnPackagingCount?.toString() || '',
+          } : {})
+        }));
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Failed to load data');

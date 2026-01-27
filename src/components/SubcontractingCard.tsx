@@ -192,10 +192,23 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
             </div>
 
             <div className="stock-item">
-              <span className="stock-label">Price/KG</span>
+              <span className="stock-label">Pricing</span>
               <div className="stock-values">
-                <span className="stock-value">₹{subcontract.price}</span>
-                <span className="stock-total">Total : ₹{totalAmount.toLocaleString('en-IN')}</span>
+                <span className="stock-value">Price: ₹{subcontract.price}</span>
+                <span className="stock-pieces">Job Work: ₹{subcontract.jobWorkPay}</span>
+                <span className="stock-total">Total: ₹{totalAmount.toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+
+            <div className="stock-item">
+              <span className="stock-label">Crome Available</span>
+              <div className="stock-values">
+                <span className="stock-value">
+                  {subcontract.availableStockForCrome?.toFixed(3) || '0.000'} {subcontract.unit}
+                </span>
+                <span className="stock-pieces">
+                  Sent Orders: {subcontract.cromeCount || 0}
+                </span>
               </div>
             </div>
           </div>
