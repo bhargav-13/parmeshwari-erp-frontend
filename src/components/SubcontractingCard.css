@@ -42,6 +42,42 @@
   margin: 0;
 }
 
+/* New Crome Card Styles */
+.card-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.card-sub-id {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  color: #888888;
+}
+
+.card-info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.card-info-row .info-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #888888;
+}
+
+.card-info-row .info-value {
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #17344D;
+}
+
 .card-actions {
   display: flex;
   gap: 12px;
@@ -87,8 +123,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .card-dates {
@@ -271,6 +312,42 @@
   transform: translateY(-1px);
 }
 
+.subcontracting-card .crome-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 6px 25px;
+  gap: 16px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid #17344D;
+  border-radius: 10px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #17344D;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.subcontracting-card .crome-button:hover {
+  background: rgba(23, 52, 77, 0.05);
+  transform: translateY(-1px);
+}
+
+.subcontracting-card .crome-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: transparent;
+  transform: none;
+}
+
+.subcontracting-card .crome-button:disabled:hover {
+  background: transparent;
+  transform: none;
+}
+
 /* Return Icon */
 .subcontracting-card .return-icon {
   width: 18px;
@@ -402,7 +479,8 @@
     font-size: 13px;
   }
 
-  .return-record-button {
+  .return-record-button,
+  .crome-button {
     width: 100%;
     justify-content: center;
     padding: 8px 16px;
@@ -453,7 +531,8 @@
   }
 
   .status-select,
-  .return-record-button {
+  .return-record-button,
+  .crome-button {
     font-size: 12px;
     padding: 6px 12px;
   }

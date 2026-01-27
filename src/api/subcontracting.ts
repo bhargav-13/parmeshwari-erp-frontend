@@ -6,10 +6,36 @@ import type {
   PaginatedResult,
   SubcontractingBySubcontractInfo,
   SubcontractingBySubcontractList,
+  Contractor,
+  SubItem,
 } from '../types';
 import { SubcontractingStatus } from '../types';
 
 export const subcontractingApi = {
+  // Get all contractors
+  getContractorList: async (): Promise<Contractor[]> => {
+    const response = await apiClient.get<Contractor[]>('/api/v1/contractor');
+    return response.data;
+  },
+
+  // Add new contractor
+  addContractor: async (name: string): Promise<Contractor> => {
+    const response = await apiClient.post<Contractor>('/api/v1/contractor', { name });
+    return response.data;
+  },
+
+  // Get all subitems
+  getSubItemList: async (): Promise<SubItem[]> => {
+    const response = await apiClient.get<SubItem[]>('/api/v1/subitem');
+    return response.data;
+  },
+
+  // Add new subitem
+  addSubItem: async (name: string): Promise<SubItem> => {
+    const response = await apiClient.post<SubItem>('/api/v1/subitem', { name });
+    return response.data;
+  },
+
   // Create new subcontracting order
   addSubcontracting: async (data: SubOrderRequest): Promise<Subcontracting> => {
     const response = await apiClient.post<Subcontracting>('/api/v1/subcontracting', data);

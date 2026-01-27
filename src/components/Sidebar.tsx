@@ -26,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     location.pathname.startsWith('/orders')
   );
   const [subcontractingExpanded, setSubcontractingExpanded] = useState(
-    location.pathname.startsWith('/subcontracting') || location.pathname.startsWith('/subcontractor')
+    location.pathname.startsWith('/subcontracting') || location.pathname.startsWith('/subcontractor') || location.pathname.startsWith('/crome')
   );
   const [invoicesExpanded, setInvoicesExpanded] = useState(
     location.pathname.startsWith('/invoices')
@@ -37,13 +37,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const isInventoryActive = location.pathname.startsWith('/inventory');
   const isOrdersActive = location.pathname.startsWith('/orders');
-  const isSubcontractingActive = location.pathname.startsWith('/subcontracting') || location.pathname.startsWith('/subcontractor');
+  const isSubcontractingActive = location.pathname.startsWith('/subcontracting') || location.pathname.startsWith('/subcontractor') || location.pathname.startsWith('/crome');
   const isInvoicesActive = location.pathname.startsWith('/invoices');
   const isPaymentReminderActive = location.pathname.startsWith('/payment-reminder');
 
   const menuItems = [
-    { path: '/dashboard', icon: <img src={DashboardSVG}  alt='dashboard'/>, label: 'Dashboard' },
-    { path: '/crm', icon: <img src={CRMSSVG} alt='CRM'/>, label: 'CRM & Sales' },
+    { path: '/dashboard', icon: <img src={DashboardSVG} alt='dashboard' />, label: 'Dashboard' },
+    { path: '/crm', icon: <img src={CRMSSVG} alt='CRM' />, label: 'CRM & Sales' },
   ];
 
   const inventorySubItems = [
@@ -70,6 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const subcontractingSubItems = [
     { path: '/subcontracting', label: 'Subcontracting' },
     { path: '/subcontractor', label: 'Subcontractor' },
+    { path: '/crome', label: 'Crome' },
   ];
 
   return (
@@ -110,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             onClick={() => setInventoryExpanded(!inventoryExpanded)}
           >
             <span className="sidebar-icon">
-              <img src={InventorySVG} alt='Inventory'/>
+              <img src={InventorySVG} alt='Inventory' />
             </span>
             <span className="sidebar-label">Inventory</span>
             <span className={`expand-icon ${inventoryExpanded ? 'expanded' : ''}`}>
@@ -141,7 +142,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             onClick={() => setOrdersExpanded(!ordersExpanded)}
           >
             <span className="sidebar-icon">
-              <img src={OrderIcon} alt='Order Management'/>
+              <img src={OrderIcon} alt='Order Management' />
             </span>
             <span className="sidebar-label">Order Management</span>
             <span className={`expand-icon ${ordersExpanded ? 'expanded' : ''}`}>
@@ -172,7 +173,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             onClick={() => setSubcontractingExpanded(!subcontractingExpanded)}
           >
             <span className="sidebar-icon">
-              <img src={SubcontractIcon} alt='Subcontracting'/>
+              <img src={SubcontractIcon} alt='Subcontracting' />
             </span>
             <span className="sidebar-label">Subcontracting</span>
             <span className={`expand-icon ${subcontractingExpanded ? 'expanded' : ''}`}>
@@ -203,7 +204,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             onClick={() => setInvoicesExpanded(!invoicesExpanded)}
           >
             <span className="sidebar-icon">
-              <img src={InvoiceIcon} alt='Invoices'/>
+              <img src={InvoiceIcon} alt='Invoices' />
             </span>
             <span className="sidebar-label">Invoices</span>
             <span className={`expand-icon ${invoicesExpanded ? 'expanded' : ''}`}>
@@ -234,7 +235,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             onClick={() => setPaymentReminderExpanded(!paymentReminderExpanded)}
           >
             <span className="sidebar-icon">
-              <img src={ReminderIcon} alt='Payment Reminder'/>
+              <img src={ReminderIcon} alt='Payment Reminder' />
             </span>
             <span className="sidebar-label">Payment Reminder</span>
             <span className={`expand-icon ${paymentReminderExpanded ? 'expanded' : ''}`}>
@@ -265,7 +266,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           onClick={onClose}
         >
           <span className="sidebar-icon">
-            <img src={SettingIcon} alt='Setting'/>
+            <img src={SettingIcon} alt='Setting' />
           </span>
           <span className="sidebar-label">Setting</span>
         </Link>
@@ -274,7 +275,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <div className="sidebar-footer">
         <div className="user-profile">
           <div className="user-avatar">
-            <span className="avatar-icon"><img src={ProfileSVG} alt="profile"/></span>
+            <span className="avatar-icon"><img src={ProfileSVG} alt="profile" /></span>
           </div>
           <span className="user-name">Admin</span>
         </div>

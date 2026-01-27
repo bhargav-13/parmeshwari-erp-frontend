@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import SubcontractingPage from './pages/SubcontractingPage';
 import SubcontractPage from './pages/SubcontractPage';
+import CromePage from './pages/CromePage';
 import InventoryGroundFloorPage from './pages/InventoryGroundFloorPage';
 import InventoryFirstFloorPage from './pages/InventoryFirstFloorPage';
 import RawInventoryPage from './pages/RawInventoryPage';
@@ -54,6 +55,7 @@ function App() {
             <Route path="orders/first-floor" element={<OrderFirstFloorPage />} />
             <Route path="subcontracting" element={<SubcontractingPage />} />
             <Route path="subcontractor" element={<SubcontractPage />} />
+            <Route path="crome" element={<CromePage />} />
             <Route path="invoices/ground-floor" element={<InvoiceGroundFloorPage />} />
             <Route path="invoices/first-floor" element={<InvoiceFirstFloorPage />} />
             <Route path="payment-reminder/ground-floor" element={<PaymentReminderGroundFloorPage />} />

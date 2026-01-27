@@ -1135,8 +1135,16 @@ const DashboardPage: React.FC = () => {
               title="Active Subcontracts"
               data={dashboardData.activeSubcontracts}
               columns={[
-                { key: "contractorName", label: "Contractor" },
-                { key: "materialName", label: "Material" },
+                {
+                  key: "contractor",
+                  label: "Contractor",
+                  render: (s: Subcontracting) => s.contractor.name,
+                },
+                {
+                  key: "item",
+                  label: "Material",
+                  render: (s: Subcontracting) => s.item.name,
+                },
                 {
                   key: "sentStock",
                   label: "Sent",

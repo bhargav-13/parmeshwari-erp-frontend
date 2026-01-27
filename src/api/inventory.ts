@@ -1,4 +1,10 @@
-import { apiClient } from './client';
+import {
+  stockInventoryApi as generatedStockApi,
+  rawInventoryApi as generatedRawApi,
+  categoryApi as generatedCategoryApi,
+  productApi as generatedProductApi,
+  promisify,
+} from '../lib/apiConfig';
 import type {
   StockItem,
   StockItemRequest,
@@ -18,151 +24,111 @@ import type {
 // Stock Item API
 export const stockItemApi = {
   // Create stock item
-  createStockItem: async (data: StockItemRequest): Promise<StockItem> => {
-    const response = await apiClient.post('/api/v1/stock-item', data);
-    return response.data;
-  },
+  createStockItem: (data: StockItemRequest): Promise<StockItem> =>
+    promisify<StockItem>(cb => generatedStockApi.addStockItem(data, cb)),
 
   // Get all stock items with pagination by floor
-  getStockItems: async (
+  getStockItems: (
     floor: InventoryFloor,
     page: number = 0,
     size: number = 10,
     status?: InventoryStatus,
     search?: string
-  ): Promise<PaginatedResult<StockItem>> => {
-    const response = await apiClient.get(`/api/v1/stock-item/floor/${floor}`, {
-      params: {
-        page,
-        size,
-        status: status || undefined,
-        search: search || undefined,
-      },
-    });
-    return response.data;
-  },
+  ): Promise<PaginatedResult<StockItem>> =>
+    promisify<PaginatedResult<StockItem>>(cb =>
+      generatedStockApi.getStockItemList(
+        floor,
+        { page, size, status, search },
+        cb
+      )
+    ),
 
   // Get all stock items without pagination
-  getAllStockItems: async (): Promise<StockItem[]> => {
-    const response = await apiClient.get('/api/v1/stock-item/all');
-    return response.data;
-  },
+  getAllStockItems: (): Promise<StockItem[]> =>
+    promisify<StockItem[]>(cb => generatedStockApi.getAllStockItemList(cb)),
 
   // Get stock item by ID
-  getStockItemById: async (stockItemId: number): Promise<StockItem> => {
-    const response = await apiClient.get(`/api/v1/stock-item/${stockItemId}`);
-    return response.data;
-  },
+  getStockItemById: (stockItemId: number): Promise<StockItem> =>
+    promisify<StockItem>(cb => generatedStockApi.getStockItemById(stockItemId, cb)),
 
   // Update stock item
-  updateStockItem: async (stockItemId: number, data: StockItemRequest): Promise<StockItem> => {
-    const response = await apiClient.put(`/api/v1/stock-item/${stockItemId}`, data);
-    return response.data;
-  },
+  updateStockItem: (stockItemId: number, data: StockItemRequest): Promise<StockItem> =>
+    promisify<StockItem>(cb => generatedStockApi.updateStockItem(stockItemId, data, cb)),
 
   // Delete stock item
-  deleteStockItem: async (stockItemId: number): Promise<void> => {
-    await apiClient.delete(`/api/v1/stock-item/${stockItemId}`);
-  },
+  deleteStockItem: (stockItemId: number): Promise<void> =>
+    promisify<void>(cb => generatedStockApi.deleteStockItem(stockItemId, cb)),
 
   // Update stock item status
-  updateStockItemStatus: async (
+  updateStockItemStatus: (
     stockItemId: number,
     data: StockItemStatusRequest
-  ): Promise<StockItem> => {
-    const response = await apiClient.patch(`/api/v1/stock-item/${stockItemId}/status`, data);
-    return response.data;
-  },
+  ): Promise<StockItem> =>
+    promisify<StockItem>(cb =>
+      generatedStockApi.updateStockItemStatus(stockItemId, data, cb)
+    ),
 };
 
 // Raw Item API
 export const rawItemApi = {
   // Create raw item
-  createRawItem: async (data: RawItemRequest): Promise<RawItem> => {
-    const response = await apiClient.post('/api/v1/raw-item', data);
-    return response.data;
-  },
+  createRawItem: (data: RawItemRequest): Promise<RawItem> =>
+    promisify<RawItem>(cb => generatedRawApi.addRawItem(data, cb)),
 
   // Get all raw items with pagination
-  getRawItems: async (
+  getRawItems: (
     page: number = 0,
     size: number = 10,
     status?: InventoryStatus,
     search?: string
-  ): Promise<PaginatedResult<RawItem>> => {
-    const response = await apiClient.get('/api/v1/raw-item', {
-      params: {
-        page,
-        size,
-        status: status || undefined,
-        search: search || undefined,
-      },
-    });
-    return response.data;
-  },
+  ): Promise<PaginatedResult<RawItem>> =>
+    promisify<PaginatedResult<RawItem>>(cb =>
+      generatedRawApi.getRawItemList({ page, size, status, search }, cb)
+    ),
 
   // Get raw item by ID
-  getRawItemById: async (rawItemId: number): Promise<RawItem> => {
-    const response = await apiClient.get(`/api/v1/raw-item/${rawItemId}`);
-    return response.data;
-  },
+  getRawItemById: (rawItemId: number): Promise<RawItem> =>
+    promisify<RawItem>(cb => generatedRawApi.getRawItemById(rawItemId, cb)),
 
   // Update raw item
-  updateRawItem: async (rawItemId: number, data: RawItemRequest): Promise<RawItem> => {
-    const response = await apiClient.put(`/api/v1/raw-item/${rawItemId}`, data);
-    return response.data;
-  },
+  updateRawItem: (rawItemId: number, data: RawItemRequest): Promise<RawItem> =>
+    promisify<RawItem>(cb => generatedRawApi.updateRawItem(rawItemId, data, cb)),
 
   // Delete raw item
-  deleteRawItem: async (rawItemId: number): Promise<void> => {
-    await apiClient.delete(`/api/v1/raw-item/${rawItemId}`);
-  },
+  deleteRawItem: (rawItemId: number): Promise<void> =>
+    promisify<void>(cb => generatedRawApi.deleteRawItem(rawItemId, cb)),
 
   // Update raw item status
-  updateRawItemStatus: async (rawItemId: number, data: RawItemStatusRequest): Promise<RawItem> => {
-    const response = await apiClient.patch(`/api/v1/raw-item/${rawItemId}/status`, data);
-    return response.data;
-  },
+  updateRawItemStatus: (rawItemId: number, data: RawItemStatusRequest): Promise<RawItem> =>
+    promisify<RawItem>(cb => generatedRawApi.updateRawItemStatus(rawItemId, data, cb)),
 };
 
 // Product API
 export const productApi = {
   // Create product
-  createProduct: async (data: ProductRequest): Promise<Product> => {
-    const response = await apiClient.post('/api/v1/product', data);
-    return response.data;
-  },
+  createProduct: (data: ProductRequest): Promise<Product> =>
+    promisify<Product>(cb => generatedProductApi.addProduct(data, cb)),
 
   // Get all products
-  getProducts: async (): Promise<Product[]> => {
-    const response = await apiClient.get('/api/v1/product');
-    return response.data;
-  },
+  getProducts: (): Promise<Product[]> =>
+    promisify<Product[]>(cb => generatedProductApi.getProductList(cb)),
 
   // Get product by ID
-  getProductById: async (productId: number): Promise<Product> => {
-    const response = await apiClient.get(`/api/v1/product/${productId}`);
-    return response.data;
-  },
+  getProductById: (productId: number): Promise<Product> =>
+    promisify<Product>(cb => generatedProductApi.getProductById(productId, cb)),
 };
 
 // Category API
 export const categoryApi = {
   // Create category
-  createCategory: async (data: CategoryRequest): Promise<Category> => {
-    const response = await apiClient.post('/api/v1/category', data);
-    return response.data;
-  },
+  createCategory: (data: CategoryRequest): Promise<Category> =>
+    promisify<Category>(cb => generatedCategoryApi.addCategory(data, cb)),
 
   // Get all categories
-  getCategories: async (): Promise<Category[]> => {
-    const response = await apiClient.get('/api/v1/category');
-    return response.data;
-  },
+  getCategories: (): Promise<Category[]> =>
+    promisify<Category[]>(cb => generatedCategoryApi.getCategoryList(cb)),
 
   // Get category by ID
-  getCategoryById: async (categoryId: number): Promise<Category> => {
-    const response = await apiClient.get(`/api/v1/category/${categoryId}`);
-    return response.data;
-  },
+  getCategoryById: (categoryId: number): Promise<Category> =>
+    promisify<Category>(cb => generatedCategoryApi.getCategoryById(categoryId, cb)),
 };

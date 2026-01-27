@@ -491,6 +491,7 @@ components:
       enum:
         - PENDING
         - COMPLETED
+        - DISPATCHED
     OrderFloor:
       type: string
       enum:

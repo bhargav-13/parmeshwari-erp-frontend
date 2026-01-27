@@ -87,9 +87,20 @@ export const ReturnType = {
 
 export type ReturnType = typeof ReturnType[keyof typeof ReturnType];
 
+// Contractor and SubItem Types
+export interface Contractor {
+  contractorId: number;
+  name: string;
+}
+
+export interface SubItem {
+  subItemId: number;
+  name: string;
+}
+
 export interface SubOrderRequest {
-  contractorName: string;
-  itemName: string;
+  contractorId: number;
+  itemId: number;
   orderDate: string; // ISO date format
   sentStock: number;
   jobWorkPay: number;
@@ -99,12 +110,11 @@ export interface SubOrderRequest {
 }
 
 export interface SubReturnRequest {
-  returnItemName: string;
   returnDate: string; // ISO date format
-  returnStock: number;
-  returnElement?: number | null;
+  returnStock: number; // Gross return stock
   packagingType: PackagingType;
-  returnType: ReturnType;
+  packagingWeight: number; // Weight per packaging unit in KG
+  packagingCount: number; // Number of packaging units
   returnRemark?: string | null;
 }
 
@@ -120,8 +130,8 @@ export interface SubReturn {
 
 export interface Subcontracting {
   subcontractingId: number;
-  contractorName: string;
-  itemName: string;
+  contractor: Contractor;
+  item: SubItem;
   orderDate: string;
   sentStock: number;
   jobWorkPay: number;
@@ -132,6 +142,9 @@ export interface Subcontracting {
   unit: Unit;
   status: SubcontractingStatus;
   remark?: string;
+  cromeCount?: number;
+  availableStockForCrome?: number;
+  canCreateCrome?: boolean;
 }
 
 export interface SubcontractingStats {
@@ -432,3 +445,90 @@ export interface SubcontractingBySubcontractList {
   totalReturnStock: number;
   totalUsed: number;
 }
+
+// Party Types
+export interface Party {
+  partyId: number;
+  name: string;
+}
+
+export interface PartyRequest {
+  name: string;
+}
+
+// Crome Types
+export interface CromeRequest {
+  subcontractingId: number;
+  partyId: number;
+  cromeDate: string;
+  sentStock: number;
+  packagingType: PackagingType;
+  packagingWeight: number;
+  packagingCount: number;
+  remark?: string | null;
+}
+
+export interface CromeReturn {
+  cromeReturnId: number;
+  returnDate: string;
+  returnStock: number;
+  netReturnStock: number;
+  packagingType: PackagingType;
+  packagingWeight: number;
+  packagingCount: number;
+  returnRemark?: string | null;
+}
+
+export interface Crome {
+  cromeId: number;
+  subcontractingId: number;
+  contractorName: string;
+  partyName: string;
+  cromeDate: string;
+  itemName: string;
+  sentStock: number;
+  grossWeight: number;
+  unit: Unit;
+  packagingType: PackagingType;
+  packagingWeight: number;
+  packagingCount: number;
+  status: SubcontractingStatus;
+  remark?: string | null;
+  cromeReturn?: CromeReturn | null;
+}
+
+export interface SubcontractingCromeInfo {
+  subcontractingId: number;
+  contractorId: number;
+  contractorName: string;
+  itemId: number;
+  itemName: string;
+  orderDate: string;
+  originalSentStock: number;
+  returnedStock: number;
+  returnPackagingType?: PackagingType;
+  returnPackagingWeight?: number;
+  returnPackagingCount?: number;
+  netReturnedStock: number;
+  stockAlreadyInCrome: number;
+  availableStockForCrome: number;
+  unit: Unit;
+  price: number;
+  jobWorkPay: number;
+  status: SubcontractingStatus;
+}
+
+export interface CromeReturnRequest {
+  returnDate: string;
+  returnStock: number;
+  packagingType: PackagingType;
+  packagingWeight: number;
+  packagingCount: number;
+  returnRemark?: string | null;
+  addToInventory?: boolean;
+  inventoryItemName?: string;
+  inventoryFloor?: InventoryFloor;
+  inventoryPricePerKg?: number;
+  inventoryQuantityPc?: number;
+}
+

@@ -14,6 +14,11 @@ import OrdersApi from '../api-client/order-management/src/api/OrdersApi';
 
 // Subcontracting API
 import SubcontractApi from '../api-client/subcontracting/src/api/SubcontractApi';
+import SubcontractingApi from '../api-client/subcontracting/src/api/SubcontractingApi';
+
+// Invoice & Payment API
+import InvoicesApi from '../api-client/invoice-payment/src/api/InvoicesApi';
+import PaymentsApi from '../api-client/invoice-payment/src/api/PaymentsApi';
 
 // Image Management API
 import ImageManagementApi from '../api-client/image-management/src/api/ImageManagementApi';
@@ -25,6 +30,9 @@ const BASE_URL =
 const apiClient = ApiClient.instance;
 apiClient.basePath = BASE_URL;
 apiClient.enableCookies = false;
+
+// Remove User-Agent header as browsers don't allow setting it
+delete apiClient.defaultHeaders['User-Agent'];
 
 // Add authentication interceptor
 const originalCallApi = apiClient.callApi.bind(apiClient);
@@ -129,6 +137,9 @@ export const categoryApi = new CategoryApi(apiClient);
 export const productApi = new ProductApi(apiClient);
 export const ordersApi = new OrdersApi(apiClient);
 export const subcontractApi = new SubcontractApi(apiClient);
+export const subcontractingApi = new SubcontractingApi(apiClient);
+export const invoicesApi = new InvoicesApi(apiClient);
+export const paymentsApi = new PaymentsApi(apiClient);
 export const imageApi = new ImageManagementApi(apiClient);
 
 // Helper function to convert callback-based API to Promise

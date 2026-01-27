@@ -1,50 +1,39 @@
-import { apiClient } from './client';
+import { ordersApi as generatedOrdersApi, promisify } from '../lib/apiConfig';
 import type { Order, OrderRequest, OrderStatus, OrderFloor, PaginatedResult, DispatchRequest } from '../types';
 
 export const ordersApi = {
-  createOrder: async (payload: OrderRequest): Promise<Order> => {
-    const response = await apiClient.post<Order>('/api/v1/orders', payload);
-    return response.data;
-  },
+  createOrder: (payload: OrderRequest): Promise<Order> =>
+    promisify<Order>(cb => generatedOrdersApi.createOrder(payload, cb)),
 
-  getOrderList: async (params: {
+  getOrderList: (params: {
     floor: OrderFloor;
     page?: number;
     size?: number;
     status?: OrderStatus | '';
     search?: string;
   }): Promise<PaginatedResult<Order>> => {
-    const { floor, ...queryParams } = params;
-    const response = await apiClient.get<PaginatedResult<Order>>(`/api/v1/orders/floor/${floor}`, {
-      params: {
-        ...queryParams,
-        status: queryParams.status || undefined,
-        search: queryParams.search || undefined,
-      },
-    });
-    return response.data;
+    const { floor, page, size, status, search } = params;
+    return promisify<PaginatedResult<Order>>(cb =>
+      generatedOrdersApi.getOrderList(
+        floor,
+        { page, size, status: status || undefined, search },
+        cb
+      )
+    );
   },
 
-  getOrderById: async (orderId: number): Promise<Order> => {
-    const response = await apiClient.get<Order>(`/api/v1/orders/${orderId}`);
-    return response.data;
-  },
+  getOrderById: (orderId: number): Promise<Order> =>
+    promisify<Order>(cb => generatedOrdersApi.getOrderById(orderId, cb)),
 
-  updateOrder: async (orderId: number, payload: OrderRequest): Promise<Order> => {
-    const response = await apiClient.put<Order>(`/api/v1/orders/${orderId}`, payload);
-    return response.data;
-  },
+  updateOrder: (orderId: number, payload: OrderRequest): Promise<Order> =>
+    promisify<Order>(cb => generatedOrdersApi.updateOrder(orderId, payload, cb)),
 
-  deleteOrder: async (orderId: number): Promise<void> => {
-    await apiClient.delete(`/api/v1/orders/${orderId}`);
-  },
+  deleteOrder: (orderId: number): Promise<void> =>
+    promisify<void>(cb => generatedOrdersApi.deleteOrder(orderId, cb)),
 
-  updateOrderStatus: async (orderId: number, status: OrderStatus): Promise<void> => {
-    await apiClient.patch(`/api/v1/orders/${orderId}/status`, { orderStatus: status });
-  },
+  updateOrderStatus: (orderId: number, status: OrderStatus): Promise<void> =>
+    promisify<void>(cb => generatedOrdersApi.updateOrderStatus(orderId, { orderStatus: status }, cb)),
 
-  dispatchOrder: async (orderId: number, payload: DispatchRequest): Promise<Order> => {
-    const response = await apiClient.put<Order>(`/api/v1/orders/${orderId}/dispatch`, payload);
-    return response.data;
-  },
+  dispatchOrder: (orderId: number, payload: DispatchRequest): Promise<Order> =>
+    promisify<Order>(cb => generatedOrdersApi.dispatchOrder(orderId, payload, cb)),
 };

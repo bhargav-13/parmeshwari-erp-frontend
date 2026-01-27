@@ -1,14 +1,10 @@
-import { apiClient } from './client';
+import { authApi as generatedAuthApi, promisify } from '../lib/apiConfig';
 import type { SignInRequest, AuthResponse, RefreshTokenRequest } from '../types';
 
 export const authApi = {
-  signIn: async (data: SignInRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/api/v1/auth/signin', data);
-    return response.data;
-  },
+  signIn: (data: SignInRequest): Promise<AuthResponse> =>
+    promisify<AuthResponse>(cb => generatedAuthApi.signIn(data, cb)),
 
-  refreshToken: async (data: RefreshTokenRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/api/v1/auth/refresh', data);
-    return response.data;
-  },
+  refreshToken: (data: RefreshTokenRequest): Promise<AuthResponse> =>
+    promisify<AuthResponse>(cb => generatedAuthApi.refreshToken(data, cb)),
 };

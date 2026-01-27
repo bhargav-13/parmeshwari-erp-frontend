@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { paymentsApi as generatedPaymentsApi, promisify } from '../lib/apiConfig';
 import type {
   Payment,
   PaginatedResult,
@@ -9,7 +9,7 @@ import { PaymentStatus, PaymentFloor } from '../types';
 
 export const paymentApi = {
   // Get all payments by floor with pagination
-  getPaymentList: async (params: {
+  getPaymentList: (params: {
     floor: PaymentFloor;
     mode: BillingType;
     page?: number;
@@ -17,38 +17,34 @@ export const paymentApi = {
     status?: PaymentStatus;
     search?: string;
   }): Promise<PaginatedResult<Payment>> => {
-    const { floor, mode, ...restParams } = params;
-    const response = await apiClient.get<PaginatedResult<Payment>>(`/api/v1/payments/floor/${floor}/mode/${mode}`, {
-      params: { mode, ...restParams },
-    });
-    return response.data;
+    const { floor, mode, page, size, status, search } = params;
+    return promisify<PaginatedResult<Payment>>(cb =>
+      generatedPaymentsApi.getPaymentsByFloor(
+        floor,
+        mode,
+        { page, size, status, search },
+        cb
+      )
+    );
   },
 
   // Get payment by ID
-  getPaymentById: async (id: number): Promise<Payment> => {
-    const response = await apiClient.get<Payment>(`/api/v1/payments/${id}`);
-    return response.data;
-  },
+  getPaymentById: (id: number): Promise<Payment> =>
+    promisify<Payment>(cb => generatedPaymentsApi.getPaymentById(id, cb)),
 
   // Delete payment
-  deletePayment: async (id: number): Promise<void> => {
-    await apiClient.delete(`/api/v1/payments/${id}`);
-  },
+  deletePayment: (id: number): Promise<void> =>
+    promisify<void>(cb => generatedPaymentsApi.deletePayment(id, cb)),
 
   // Update payment status
-  updatePaymentStatus: async (id: number, paymentStatus: PaymentStatus): Promise<Payment> => {
-    const response = await apiClient.patch<Payment>(`/api/v1/payments/${id}/status`, { paymentStatus });
-    return response.data;
-  },
+  updatePaymentStatus: (id: number, paymentStatus: PaymentStatus): Promise<Payment> =>
+    promisify<Payment>(cb => generatedPaymentsApi.updatePaymentStatus(id, { paymentStatus }, cb)),
 
   // Receive payment (record new payment)
-  receivePayment: async (id: number, data: PaymentReceiveRequest): Promise<Payment> => {
-    const response = await apiClient.post<Payment>(`/api/v1/payments/${id}/receive`, data);
-    return response.data;
-  },
+  receivePayment: (id: number, data: PaymentReceiveRequest): Promise<Payment> =>
+    promisify<Payment>(cb => generatedPaymentsApi.receivePayment(id, data, cb)),
 
   // Send manual reminder
-  sendReminder: async (id: number): Promise<void> => {
-    await apiClient.post(`/api/v1/payments/${id}/reminder`);
-  },
+  sendReminder: (id: number): Promise<void> =>
+    promisify<void>(cb => generatedPaymentsApi.sendManualReminder(id, cb)),
 };

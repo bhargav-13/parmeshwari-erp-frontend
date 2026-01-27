@@ -59,6 +59,26 @@
   color: #17344D;
 }
 
+.report-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: #D1EEFF;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: #17344D;
+}
+
+.report-btn:hover {
+  background: #b8dfff;
+}
+
 .add-text {
   font-family: 'Jost', sans-serif;
   font-weight: 400;
