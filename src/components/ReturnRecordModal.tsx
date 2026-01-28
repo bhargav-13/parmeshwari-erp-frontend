@@ -11,7 +11,7 @@ interface ReturnRecordModalProps {
 
 // Packaging weight values in grams
 const PACKAGING_WEIGHTS: Record<PackagingType, number | null> = {
-  [PackagingType.BAG]: 0.075, // 0.075 gm
+  [PackagingType.BAG]: 75, // 75 gm (0.075 KG)
   [PackagingType.FOAM]: 150, // 150 gm
   [PackagingType.PETI]: 1200, // 1200 gm
   [PackagingType.DRUM]: null, // Manual input
@@ -331,7 +331,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
                 onChange={handleChange}
                 className="form-input element-type"
               >
-                <option value={PackagingType.BAG}>Bag (0.075 gm)</option>
+                <option value={PackagingType.BAG}>Bag (75 gm)</option>
                 <option value={PackagingType.FOAM}>Foam (150 gm)</option>
                 <option value={PackagingType.PETI}>Peti (1200 gm)</option>
                 <option value={PackagingType.DRUM}>Drum (Manual)</option>

@@ -5,6 +5,14 @@ import { cromeApi } from '../api/crome';
 import './AddSubcontractingModal.css';
 import './CromeModal.css';
 
+// Packaging weights in KG
+const PACKAGING_WEIGHTS_KG: Record<PackagingType, number | null> = {
+  [PackagingType.BAG]: 0.075,
+  [PackagingType.FOAM]: 0.150,
+  [PackagingType.PETI]: 1.200,
+  [PackagingType.DRUM]: null,
+};
+
 interface CromeModalProps {
   subcontractingId: number;
   onClose: () => void;
@@ -19,7 +27,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
     cromeDate: new Date().toISOString().split('T')[0],
     sentStock: '',
     packagingType: PackagingType.PETI,
-    packagingWeight: '',
+    packagingWeight: '1.2',
     packagingCount: '',
     remark: '',
   });
@@ -68,6 +76,18 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
+    if (name === 'packagingType') {
+      const type = value as PackagingType;
+      const weight = PACKAGING_WEIGHTS_KG[type];
+      setFormData(prev => ({
+        ...prev,
+        packagingType: type,
+        packagingWeight: weight !== null ? weight.toString() : prev.packagingWeight,
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -309,6 +329,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
                   step="0.001"
                   min="0"
                   required
+                  disabled={formData.packagingType !== PackagingType.DRUM}
                 />
                 {getFieldError('packagingWeight') && <span className="field-error-text">{getFieldError('packagingWeight')}</span>}
               </div>

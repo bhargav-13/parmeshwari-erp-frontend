@@ -3,6 +3,14 @@ import type { CromeReturnRequest, Crome } from '../types';
 import { PackagingType, InventoryFloor, SubcontractingStatus } from '../types';
 import './CromeReturnModal.css';
 
+// Packaging weights in KG
+const PACKAGING_WEIGHTS_KG: Record<PackagingType, number | null> = {
+    [PackagingType.BAG]: 0.075,
+    [PackagingType.FOAM]: 0.150,
+    [PackagingType.PETI]: 1.200,
+    [PackagingType.DRUM]: null,
+};
+
 interface CromeReturnModalProps {
     cromeId: number;
     itemName: string;
@@ -139,6 +147,19 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
 
         if (type === 'checkbox') {
             processedValue = (e.target as HTMLInputElement).checked;
+        }
+
+        if (name === 'packagingType') {
+            const type = value as PackagingType;
+            const weight = PACKAGING_WEIGHTS_KG[type];
+            setFormData(prev => ({
+                ...prev,
+                packagingType: type,
+                packagingWeight: weight !== null ? weight.toString() : prev.packagingWeight,
+            }));
+            // Clear warnings when type changes
+            setWarnings([]);
+            return;
         }
 
         setFormData((prev) => ({
@@ -378,6 +399,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                     placeholder="Kg"
                                     className={`form-input ${getFieldError('packagingWeight') ? 'invalid' : ''}`}
                                     required
+                                    disabled={formData.packagingType !== PackagingType.DRUM}
                                 />
                                 {getFieldError('packagingWeight') && <span className="field-error-text">{getFieldError('packagingWeight')}</span>}
                             </div>
