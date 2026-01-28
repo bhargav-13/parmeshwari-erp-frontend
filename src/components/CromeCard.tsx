@@ -8,6 +8,7 @@ import DeleteIcon from '../assets/delete.svg';
 import ReturnIcon from '../assets/return.svg';
 import './SubcontractingCard.css'; // Reusing the same styles
 import '../styles/StatusDropdown.css';
+import './CromeCard.css';
 
 interface CromeCardProps {
     crome: Crome;
@@ -75,10 +76,7 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
         }
     };
 
-    // Calculate net return stock if there's a return
-    const netReturnStock = crome.cromeReturn
-        ? crome.cromeReturn.netReturnStock
-        : 0;
+
 
     return (
         <div className="subcontracting-card">
@@ -135,48 +133,61 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                         Contractor: {crome.contractorName}
                     </p>
 
-                    <div className="stock-info">
-                        <div className="stock-item">
-                            <span className="stock-label">Sent Stock</span>
-                            <div className="stock-values">
-                                <span className="stock-value">
-                                    {crome.sentStock.toFixed(3)} {crome.unit}
-                                </span>
+                    <div className="crome-details-container">
+                        {/* SENT Details */}
+                        <div className="crome-detail-block">
+                            <div className="block-header">SENT DETAILS</div>
+                            <div className="detail-row">
+                                <span className="detail-label">Net Stock</span>
+                                <span className="detail-value">{crome.sentStock.toFixed(3)} {crome.unit}</span>
                             </div>
-                        </div>
-
-                        <div className="stock-item">
-                            <span className="stock-label">Packaging</span>
-                            <div className="stock-values">
-                                <span className="stock-value">
+                            <div className="detail-row">
+                                <span className="detail-label">Packaging</span>
+                                <div className="detail-value">
                                     {(crome.packagingWeight * crome.packagingCount).toFixed(3)} {crome.unit}
-                                </span>
-                                <span className="stock-pieces">
-                                    {crome.packagingCount} x {crome.packagingWeight} {crome.unit} ({crome.packagingType})
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="stock-item">
-                            <span className="stock-label">Gross Weight</span>
-                            <div className="stock-values">
-                                <span className="stock-value">
-                                    {crome.grossWeight.toFixed(3)} {crome.unit}
-                                </span>
-                            </div>
-                        </div>
-
-                        {crome.cromeReturn && (
-                            <div className="stock-item">
-                                <span className="stock-label">Net Return</span>
-                                <div className="stock-values">
-                                    <span className="stock-value">
-                                        {netReturnStock.toFixed(3)} {crome.unit}
-                                    </span>
-                                    <span className="stock-pieces">
-                                        Return: {crome.cromeReturn.returnStock.toFixed(3)} {crome.unit}
+                                    <span className="detail-sub-value">
+                                        ({crome.packagingCount} x {crome.packagingWeight} {crome.packagingType})
                                     </span>
                                 </div>
+                            </div>
+                            <div className="detail-row total-row">
+                                <span className="detail-label">Gross Weight</span>
+                                <span className="detail-value">{crome.grossWeight.toFixed(3)} {crome.unit}</span>
+                            </div>
+                        </div>
+
+                        {/* RETURN Details (if exists) */}
+                        {crome.cromeReturn ? (
+                            <div className="crome-detail-block return-block">
+                                <div className="block-header">RETURN DETAILS</div>
+                                <div className="detail-row">
+                                    <span className="detail-label">Gross Return</span>
+                                    <span className="detail-value">{crome.cromeReturn.returnStock.toFixed(3)} {crome.unit}</span>
+                                </div>
+                                <div className="detail-row">
+                                    <span className="detail-label">Packaging</span>
+                                    <div className="detail-value">
+                                        {(crome.cromeReturn.packagingWeight * crome.cromeReturn.packagingCount).toFixed(3)} {crome.unit}
+                                        <span className="detail-sub-value">
+                                            ({crome.cromeReturn.packagingCount} x {crome.cromeReturn.packagingWeight} {crome.cromeReturn.packagingType})
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="detail-row total-row">
+                                    <span className="detail-label">Net Return</span>
+                                    <span className="detail-value">{crome.cromeReturn.netReturnStock.toFixed(3)} {crome.unit}</span>
+                                </div>
+                                <div className="diff-section">
+                                    <span className="diff-label">DIFFERENCE</span>
+                                    <span className={`diff-value ${(crome.cromeReturn.netReturnStock - crome.sentStock) < -0.001 ? 'negative' : (crome.cromeReturn.netReturnStock - crome.sentStock) > 0.001 ? 'positive' : 'neutral'}`}>
+                                        {(crome.cromeReturn.netReturnStock - crome.sentStock) > 0 ? '+' : ''}
+                                        {(crome.cromeReturn.netReturnStock - crome.sentStock).toFixed(3)} {crome.unit}
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="crome-detail-block" style={{ justifyContent: 'center', alignItems: 'center', background: '#f8fafc', opacity: 0.6 }}>
+                                <span style={{ color: '#94a3b8', fontSize: '13px', fontStyle: 'italic' }}>Pending Return</span>
                             </div>
                         )}
                     </div>

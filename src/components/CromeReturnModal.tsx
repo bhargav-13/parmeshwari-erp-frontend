@@ -20,7 +20,19 @@ interface CromeReturnModalProps {
 }
 
 const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, onClose, onSubmit }) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        returnDate: string;
+        returnStock: string;
+        packagingType: PackagingType;
+        packagingWeight: string;
+        packagingCount: string;
+        returnRemark: string;
+        addToInventory: boolean;
+        inventoryItemName: string;
+        inventoryFloor: InventoryFloor;
+        inventoryPricePerKg: string;
+        inventoryQuantityPc: string;
+    }>({
         returnDate: new Date().toISOString().split('T')[0],
         returnStock: '',
         packagingType: PackagingType.PETI,
@@ -64,10 +76,15 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
             case 'returnStock': {
                 const valueNum = parseNum(value);
                 if (!value || valueNum <= 0) return 'Gross return must be > 0';
+
+                // Calculate Net Return for validation
+                const packagingDeduction = parseNum(allData.packagingWeight) * parseNum(allData.packagingCount);
+                const netReturn = valueNum - packagingDeduction;
+
                 // Over-return prevention: Cannot return more than sent
                 const sentStock = crome.sentStock || 0;
-                if (valueNum > sentStock) {
-                    return `Cannot return more than sent stock (${sentStock.toFixed(3)} Kg)`;
+                if (netReturn > sentStock) {
+                    return `Net return (${netReturn.toFixed(3)}) cannot exceed sent stock (${sentStock.toFixed(3)} Kg)`;
                 }
                 return null;
             }
@@ -208,9 +225,10 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         }
 
         // Balance check: Auto-suggest completion when all stock returned
-        const grossReturnNum = parseNum(formData.returnStock);
+        const netReturnNum = calculateNetReturn();
         const sentStock = crome.sentStock || 0;
-        if (grossReturnNum === sentStock && crome.status === SubcontractingStatus.IN_PROCESS) {
+        // Floating point comparison buffer
+        if (Math.abs(netReturnNum - sentStock) < 0.001 && crome.status === SubcontractingStatus.IN_PROCESS) {
             newWarnings.push('This return completes the order. Consider marking it as "Completed".');
         }
 

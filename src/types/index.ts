@@ -123,9 +123,12 @@ export interface SubReturn {
   returnDate: string;
   returnStock: number;
   returnElement?: number | null;
+  packagingCount?: number;
+  packagingWeight?: number;
   packagingType: PackagingType;
   returnType: ReturnType;
   returnRemark?: string | null;
+  netReturnStock?: number;
 }
 
 export interface Subcontracting {

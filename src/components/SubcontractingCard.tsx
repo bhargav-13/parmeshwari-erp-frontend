@@ -26,9 +26,27 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Use backend-calculated values directly, rounded to 3 decimal places
-  const returnStock = Math.round((subcontract.subReturn?.returnStock || 0) * 1000) / 1000;
-  const usedStock = Math.round((subcontract.usedStock || (subcontract.sentStock - returnStock)) * 1000) / 1000;
+  // Calculate Sent, Return, and Used values
+  const subReturn = subcontract.subReturn;
+  const grossReturn = subReturn?.returnStock || 0;
+
+  // Calculate packaging deduction
+  // Use packagingCount if available, fallback to returnElement, or 0
+  const packagingCount = subReturn?.packagingCount || subReturn?.returnElement || 0;
+  const packagingWeight = subReturn?.packagingWeight || 0;
+  const packagingDeduction = packagingWeight * packagingCount;
+
+  // Calculate Net Return
+  // Use netReturnStock from backend if available, otherwise calculate
+  const netReturn = subReturn?.netReturnStock ?? (grossReturn - packagingDeduction);
+
+  // Round to 3 decimal places for consistent display/used calculation
+  const netReturnRounded = Math.round(netReturn * 1000) / 1000;
+
+  // Used Stock = Sent - Net Return
+  // Use backend usedStock if available, otherwise calculate
+  const usedStock = Math.round((subcontract.usedStock || (subcontract.sentStock - netReturnRounded)) * 1000) / 1000;
+
   const totalAmount = subcontract.totalAmount || 0;
 
   const formatDate = (dateString: string) => {
@@ -157,59 +175,70 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
         <div className="material-section">
           <h4 className="section-title">{subcontract.item.name}</h4>
 
-          <div className="stock-info">
-            <div className="stock-item">
-              <span className="stock-label">Sent</span>
-              <div className="stock-values">
-                <span className="stock-value">
-                  {subcontract.sentStock} {subcontract.unit}
-                </span>
-                <span className="stock-pieces">
-                  {(subcontract.sentStock * 25).toLocaleString('en-IN')} Pc.
-                </span>
+          <div className="crome-details-container">
+            {/* SENT Details */}
+            <div className="crome-detail-block">
+              <div className="block-header">SENT DETAILS</div>
+              <div className="detail-row">
+                <span className="detail-label">Sent Stock</span>
+                <span className="detail-value">{subcontract.sentStock.toFixed(3)} {subcontract.unit}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Total Pieces</span>
+                <span className="detail-value">{(subcontract.sentStock * 25).toLocaleString('en-IN')} Pc</span>
+              </div>
+              <div className="detail-row total-row" style={{ marginTop: 'auto' }}>
+                <span className="detail-label">Total Value</span>
+                <div className="detail-value" style={{ textAlign: 'right' }}>
+                  ₹{totalAmount.toLocaleString('en-IN')}
+                  <span className="detail-sub-value">
+                    (₹{subcontract.price}/unit + ₹{subcontract.jobWorkPay}/job)
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="stock-item">
-              <span className="stock-label">Returned</span>
-              <div className="stock-values">
-                <span className="stock-value">
-                  {returnStock.toFixed(3)} {subcontract.unit}
-                </span>
-                <span className="stock-pieces">
-                  {(returnStock * 25).toFixed(2)} Pc.
-                </span>
+            {/* RETURN Details (if exists) */}
+            {subcontract.subReturn ? (
+              <div className="crome-detail-block return-block">
+                <div className="block-header">RETURN DETAILS</div>
+                <div className="detail-row">
+                  <span className="detail-label">Gross Return</span>
+                  <span className="detail-value">{grossReturn.toFixed(3)} {subcontract.unit}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Packaging</span>
+                  <div className="detail-value">
+                    {/* Calculate deduction using explicit weight calculation */}
+                    {packagingDeduction.toFixed(3)} {subcontract.unit}
+                    <span className="detail-sub-value">
+                      ({packagingCount} x {packagingWeight} {subcontract.subReturn.packagingType})
+                    </span>
+                  </div>
+                </div>
+                <div className="detail-row total-row">
+                  <span className="detail-label">Net Return</span>
+                  <span className="detail-value">{netReturnRounded.toFixed(3)} {subcontract.unit}</span>
+                </div>
+                <div className="diff-section">
+                  <span className="diff-label">USED STOCK</span>
+                  <span className="diff-value neutral">
+                    {usedStock.toFixed(3)} {subcontract.unit}
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="crome-detail-block" style={{ justifyContent: 'center', alignItems: 'center', background: '#f8fafc', opacity: 0.6 }}>
+                <span style={{ color: '#94a3b8', fontSize: '13px', fontStyle: 'italic' }}>Pending Return</span>
+              </div>
+            )}
+          </div>
 
-            <div className="stock-item">
-              <span className="stock-label">Used</span>
-              <div className="stock-values">
-                <span className="stock-value">
-                  {usedStock.toFixed(3)} {subcontract.unit}
-                </span>
-              </div>
-            </div>
-
-            <div className="stock-item">
-              <span className="stock-label">Pricing</span>
-              <div className="stock-values">
-                <span className="stock-value">Price: ₹{subcontract.price}</span>
-                <span className="stock-pieces">Job Work: ₹{subcontract.jobWorkPay}</span>
-                <span className="stock-total">Total: ₹{totalAmount.toLocaleString('en-IN')}</span>
-              </div>
-            </div>
-
-            <div className="stock-item">
-              <span className="stock-label">Crome Available</span>
-              <div className="stock-values">
-                <span className="stock-value">
-                  {subcontract.availableStockForCrome?.toFixed(3) || '0.000'} {subcontract.unit}
-                </span>
-                <span className="stock-pieces">
-                  Sent Orders: {subcontract.cromeCount || 0}
-                </span>
-              </div>
+          {/* Crome Status Section */}
+          <div style={{ padding: '0 4px 12px 4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', color: '#64748B' }}>
+              <span>Crome Available: <strong style={{ color: '#0F172A' }}>{subcontract.availableStockForCrome?.toFixed(3) || '0.000'} {subcontract.unit}</strong></span>
+              <span>Sent to Crome: <strong>{subcontract.cromeCount || 0}</strong></span>
             </div>
           </div>
 
@@ -231,14 +260,16 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <option value={SubcontractingStatus.REJECTED}>Rejected</option>
               </select>
 
-              <button
-                type="button"
-                className="return-record-button"
-                onClick={() => setIsReturnModalOpen(true)}
-              >
-                <img src={ReturnIcon} alt="Return" className="return-icon" />
-                <span>Return Record</span>
-              </button>
+              {!subcontract.subReturn && (
+                <button
+                  type="button"
+                  className="return-record-button"
+                  onClick={() => setIsReturnModalOpen(true)}
+                >
+                  <img src={ReturnIcon} alt="Return" className="return-icon" />
+                  <span>Return Record</span>
+                </button>
+              )}
 
               <button
                 type="button"
