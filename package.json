@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "bash generate-api-clients.sh",
+    "prebuild": "node generate-api-clients.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate:api": "bash generate-api-clients.sh"
+    "generate:api": "node generate-api-clients.js"
   },
   "dependencies": {
     "@types/d3-shape": "^3.1.7",
