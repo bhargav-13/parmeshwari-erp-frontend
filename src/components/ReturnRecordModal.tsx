@@ -104,10 +104,35 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
       case 'grossReturn': {
         const valueNum = parseNum(value);
         if (!value || valueNum <= 0) return 'Gross return must be > 0';
-        // Over-return prevention: Cannot return more than sent
+
+        // Over-return prevention: Check NET return against remaining stock
         const sentStock = subcontract.sentStock || 0;
-        if (valueNum > sentStock) {
-          return `Cannot return more than sent stock (${sentStock.toFixed(3)} Kg)`;
+        const previousReturns = subcontract.subReturns || [];
+        // Calculate previous NET returns to find remaining stock
+        const previouslyReturnedStock = previousReturns.reduce((sum, r) => {
+          const deduction = (r.packagingWeight || 0) * (r.packagingCount || 0);
+          return sum + (r.netReturnStock ?? (r.returnStock - deduction));
+        }, 0);
+
+        const remainingStock = sentStock - previouslyReturnedStock;
+
+        // Calculate current deduction to find Net
+        const returnElementNum = parseNum(allData.returnElement);
+        const drumWeightNum = parseNum(allData.drumWeight);
+
+        let packagingWeightGm: number;
+        if (allData.packagingType === PackagingType.DRUM) {
+          packagingWeightGm = drumWeightNum;
+        } else {
+          packagingWeightGm = PACKAGING_WEIGHTS[allData.packagingType] || 0;
+        }
+
+        const currentDeduction = (returnElementNum * packagingWeightGm) / 1000;
+        const currentNetReturn = valueNum - currentDeduction;
+
+        // Add a small buffer for float precision
+        if (currentNetReturn > remainingStock + 0.001) {
+          return `Net return (${currentNetReturn.toFixed(3)}) cannot exceed remaining stock (${remainingStock.toFixed(3)} Kg)`;
         }
         return null;
       }
@@ -241,7 +266,10 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
     // Balance check: Auto-suggest completion
     const grossReturnNum = parseNum(formData.grossReturn);
     const sentStock = subcontract.sentStock || 0;
-    if (grossReturnNum === sentStock && subcontract.status === 'IN_PROCESS') {
+    const previousReturns = subcontract.subReturns || [];
+    const previouslyReturnedStock = previousReturns.reduce((sum, r) => sum + r.returnStock, 0);
+
+    if (Math.abs((grossReturnNum + previouslyReturnedStock) - sentStock) < 0.001 && subcontract.status === 'IN_PROCESS') {
       newWarnings.push('This return completes the order. Consider marking it as "Completed".');
     }
 

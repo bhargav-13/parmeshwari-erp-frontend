@@ -21,6 +21,7 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const formatDate = (dateString: string) => {
         return format(new Date(dateString), 'dd-MM-yyyy');
@@ -159,20 +160,39 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                         {/* RETURN Details (if exists) */}
                         {crome.cromeReturn ? (
                             <div className="crome-detail-block return-block">
-                                <div className="block-header">RETURN DETAILS</div>
-                                <div className="detail-row">
-                                    <span className="detail-label">Gross Return</span>
-                                    <span className="detail-value">{crome.cromeReturn.returnStock.toFixed(3)} {crome.unit}</span>
-                                </div>
-                                <div className="detail-row">
-                                    <span className="detail-label">Packaging</span>
-                                    <div className="detail-value">
-                                        {(crome.cromeReturn.packagingWeight * crome.cromeReturn.packagingCount).toFixed(3)} {crome.unit}
-                                        <span className="detail-sub-value">
-                                            ({crome.cromeReturn.packagingCount} x {crome.cromeReturn.packagingWeight} {crome.cromeReturn.packagingType})
+                                <div
+                                    className="block-header clickable-header"
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    title="Click to expand/collapse return details"
+                                    style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                >
+                                    <span>RETURN DETAILS</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal', textTransform: 'uppercase' }}>
+                                            {isExpanded ? 'Collapse' : 'Expand'}
                                         </span>
+                                        <span style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
                                     </div>
                                 </div>
+
+                                {isExpanded && (
+                                    <>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Gross Return</span>
+                                            <span className="detail-value">{crome.cromeReturn.returnStock.toFixed(3)} {crome.unit}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Packaging</span>
+                                            <div className="detail-value">
+                                                {(crome.cromeReturn.packagingWeight * crome.cromeReturn.packagingCount).toFixed(3)} {crome.unit}
+                                                <span className="detail-sub-value">
+                                                    ({crome.cromeReturn.packagingCount} x {crome.cromeReturn.packagingWeight} {crome.cromeReturn.packagingType})
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
                                 <div className="detail-row total-row">
                                     <span className="detail-label">Net Return</span>
                                     <span className="detail-value">{crome.cromeReturn.netReturnStock.toFixed(3)} {crome.unit}</span>

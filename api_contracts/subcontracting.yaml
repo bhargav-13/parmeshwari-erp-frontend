@@ -1522,6 +1522,9 @@ components:
     SubReturn:
       type: object
       properties:
+        returnId:
+          type: integer
+          description: Unique identifier for this return entry
         returnDate:
           type: string
           format: date
@@ -1566,8 +1569,19 @@ components:
         price:
           type: number
           format: double
-        subReturn:
-          $ref: "#/components/schemas/SubReturn"
+        subReturns:
+          type: array
+          description: List of return entries (contractor can return stock in multiple batches)
+          items:
+            $ref: "#/components/schemas/SubReturn"
+        totalReturnStock:
+          type: number
+          format: double
+          description: Total gross stock returned (sum of all returns)
+        totalNetReturnStock:
+          type: number
+          format: double
+          description: Total net stock after deducting packaging from all returns
         usedStock:
           type: number
           format: double
@@ -1645,8 +1659,6 @@ components:
         returnDate:
           type: string
           format: date
-        returnItemName:
-          type: string
         returnStock:
           type: number
           format: double

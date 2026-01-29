@@ -25,27 +25,23 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [status, setStatus] = useState(subcontract.status);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Calculate Sent, Return, and Used values
-  const subReturn = subcontract.subReturn;
-  const grossReturn = subReturn?.returnStock || 0;
+  const subReturns = subcontract.subReturns || [];
 
-  // Calculate packaging deduction
-  // Use packagingCount if available, fallback to returnElement, or 0
-  const packagingCount = subReturn?.packagingCount || subReturn?.returnElement || 0;
-  const packagingWeight = subReturn?.packagingWeight || 0;
-  const packagingDeduction = packagingWeight * packagingCount;
+  // Calculate Total Net Return
+  // Use backend totalNetReturnStock OR sum of netReturnStock from items OR calculate
+  const totalNetReturn = subcontract.totalNetReturnStock ?? subReturns.reduce((sum, r) => {
+    return sum + (r.netReturnStock ?? (r.returnStock - ((r.packagingWeight || 0) * (r.packagingCount || 0))));
+  }, 0);
 
-  // Calculate Net Return
-  // Use netReturnStock from backend if available, otherwise calculate
-  const netReturn = subReturn?.netReturnStock ?? (grossReturn - packagingDeduction);
+  // Round to 3 decimal places
+  const totalNetReturnRounded = Math.round(totalNetReturn * 1000) / 1000;
 
-  // Round to 3 decimal places for consistent display/used calculation
-  const netReturnRounded = Math.round(netReturn * 1000) / 1000;
-
-  // Used Stock = Sent - Net Return
-  // Use backend usedStock if available, otherwise calculate
-  const usedStock = Math.round((subcontract.usedStock || (subcontract.sentStock - netReturnRounded)) * 1000) / 1000;
+  // Used Stock = Sent - Total Net Return
+  // User requested to force frontend calculation to ensure match with displayed Net Return
+  const usedStock = Math.round((subcontract.sentStock - totalNetReturnRounded) * 1000) / 1000;
 
   const totalAmount = subcontract.totalAmount || 0;
 
@@ -165,8 +161,8 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
         <div className="card-dates">
           <span className="card-date">Order Date : {formatDate(subcontract.orderDate)}</span>
-          {subcontract.subReturn?.returnDate && (
-            <span className="card-date">Return Date : {formatDate(subcontract.subReturn.returnDate)}</span>
+          {subReturns.length > 0 && (
+            <span className="card-date">Last Return : {formatDate(subReturns[subReturns.length - 1].returnDate)}</span>
           )}
         </div>
       </div>
@@ -198,27 +194,44 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
               </div>
             </div>
 
-            {/* RETURN Details (if exists) */}
-            {subcontract.subReturn ? (
+            {/* RETURN Details (List) */}
+            {subReturns.length > 0 ? (
               <div className="crome-detail-block return-block">
-                <div className="block-header">RETURN DETAILS</div>
-                <div className="detail-row">
-                  <span className="detail-label">Gross Return</span>
-                  <span className="detail-value">{grossReturn.toFixed(3)} {subcontract.unit}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Packaging</span>
-                  <div className="detail-value">
-                    {/* Calculate deduction using explicit weight calculation */}
-                    {packagingDeduction.toFixed(3)} {subcontract.unit}
-                    <span className="detail-sub-value">
-                      ({packagingCount} x {packagingWeight} {subcontract.subReturn.packagingType})
+                <div
+                  className="block-header clickable-header"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  title="Click to expand/collapse return details"
+                  style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
+                  <span>RETURN DETAILS ({subReturns.length})</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal', textTransform: 'uppercase' }}>
+                      {isExpanded ? 'Collapse' : 'Expand'}
                     </span>
+                    <span style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
                   </div>
                 </div>
-                <div className="detail-row total-row">
-                  <span className="detail-label">Net Return</span>
-                  <span className="detail-value">{netReturnRounded.toFixed(3)} {subcontract.unit}</span>
+
+                {isExpanded && subReturns.map((ret, index) => {
+                  const retDeduction = (ret.packagingWeight || 0) * (ret.packagingCount || 0);
+                  const retNet = ret.netReturnStock ?? (ret.returnStock - retDeduction);
+                  return (
+                    <div key={index} className="return-item-summary" style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: index < subReturns.length - 1 ? '1px dashed #e2e8f0' : 'none' }}>
+                      <div className="detail-row" style={{ marginBottom: '2px' }}>
+                        <span className="detail-label" style={{ fontSize: '11px' }}>{formatDate(ret.returnDate)}</span>
+                        <span className="detail-value" style={{ fontSize: '13px' }}>{ret.returnStock.toFixed(3)} {subcontract.unit} (Gr)</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="detail-label">Pkg: {ret.packagingCount || 0} x {ret.packagingWeight || 0}</span>
+                        <span className="detail-value">Net: {retNet.toFixed(3)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div className="detail-row total-row" style={{ paddingTop: '8px', borderTop: '1px solid #e2e8f0' }}>
+                  <span className="detail-label">Total Net Return</span>
+                  <span className="detail-value">{totalNetReturnRounded.toFixed(3)} {subcontract.unit}</span>
                 </div>
                 <div className="diff-section">
                   <span className="diff-label">USED STOCK</span>
@@ -260,7 +273,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <option value={SubcontractingStatus.REJECTED}>Rejected</option>
               </select>
 
-              {!subcontract.subReturn && (
+              {subcontract.status === SubcontractingStatus.IN_PROCESS && (
                 <button
                   type="button"
                   className="return-record-button"

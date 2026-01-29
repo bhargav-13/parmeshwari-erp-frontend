@@ -139,7 +139,9 @@ export interface Subcontracting {
   sentStock: number;
   jobWorkPay: number;
   price: number;
-  subReturn?: SubReturn | null;
+  subReturns?: SubReturn[];
+  totalReturnStock?: number;
+  totalNetReturnStock?: number;
   usedStock?: number;
   totalAmount?: number;
   unit: Unit;
