@@ -3,6 +3,7 @@ import { cromeApi } from '../api/crome';
 import type { Crome } from '../types';
 import { SubcontractingStatus } from '../types';
 import CromeCard from '../components/CromeCard';
+import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
@@ -21,7 +22,9 @@ const CromePage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<SubcontractingStatus | ''>('');
     const [loading, setLoading] = useState(true);
-    const [page] = useState(0);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
 
     useEffect(() => {
         fetchCromes();
@@ -39,6 +42,8 @@ const CromePage: React.FC = () => {
             });
 
             setCromes(response.data);
+            setTotalPages(response.totalPages);
+            setTotalElements(response.totalElements);
             calculateStats(response.data);
         } catch (error) {
             console.error('Error fetching cromes:', error);
@@ -151,6 +156,14 @@ const CromePage: React.FC = () => {
                     ))
                 )}
             </div>
+
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                totalElements={totalElements}
+                size={10}
+            />
 
             {isReportModalOpen && (
                 <CromeReportModal onClose={() => setIsReportModalOpen(false)} />

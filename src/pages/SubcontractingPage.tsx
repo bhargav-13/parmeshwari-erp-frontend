@@ -4,6 +4,7 @@ import type { Subcontracting, SubOrderRequest, SubcontractingStats } from '../ty
 import { SubcontractingStatus } from '../types';
 import AddSubcontractingModal from '../components/AddSubcontractingModal';
 import SubcontractingCard from '../components/SubcontractingCard';
+import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
@@ -21,7 +22,9 @@ const SubcontractingPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<SubcontractingStatus | ''>('');
   const [loading, setLoading] = useState(true);
-  const [page] = useState(0);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   useEffect(() => {
     fetchSubcontracts();
@@ -39,8 +42,14 @@ const SubcontractingPage: React.FC = () => {
       });
 
       setSubcontracts(response.data);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
 
       // Calculate stats
+      // Note: This calculateStats only uses the current page data, which might be incorrect for "Total Orders" stats.
+      // But typically stats should come from a separate endpoint or the backend should return them.
+      // For now, we keep it as is or accept it only reflects current page (or maybe we should fetch all for stats? No, too heavy).
+      // The previous code was calculating stats on `response.data`.
       calculateStats(response.data);
     } catch (error) {
       console.error('Error fetching subcontracts:', error);
@@ -169,6 +178,14 @@ const SubcontractingPage: React.FC = () => {
           ))
         )}
       </div>
+
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        totalElements={totalElements}
+        size={10}
+      />
 
       {isModalOpen && (
         <AddSubcontractingModal
