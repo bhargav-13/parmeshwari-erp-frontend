@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest } from '../api/scrap';
+import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest, type KevinScrapRequest } from '../api/scrap';
 import ScrapEntryModal from '../components/ScrapEntryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
@@ -68,12 +68,14 @@ const JayeshScrapPage: React.FC = () => {
         });
     };
 
-    const handleAddScrap = async (data: JayeshScrapRequest) => {
+    const handleAddScrap = async (data: KevinScrapRequest | JayeshScrapRequest) => {
         try {
+            // Type guard to ensure we have JayeshScrapRequest
+            const jayeshData = data as JayeshScrapRequest;
             if (editingScrap) {
-                await jayeshScrapApi.updateScrap(editingScrap.scrapId, data);
+                await jayeshScrapApi.updateScrap(editingScrap.scrapId, jayeshData);
             } else {
-                await jayeshScrapApi.addScrap(data);
+                await jayeshScrapApi.addScrap(jayeshData);
             }
             setIsModalOpen(false);
             setEditingScrap(null);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { kevinScrapApi, type KevinScrap, type KevinScrapRequest } from '../api/scrap';
+import { kevinScrapApi, type KevinScrap, type KevinScrapRequest, type JayeshScrapRequest } from '../api/scrap';
 import ScrapEntryModal from '../components/ScrapEntryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
@@ -64,12 +64,14 @@ const KevinScrapPage: React.FC = () => {
         });
     };
 
-    const handleAddScrap = async (data: KevinScrapRequest) => {
+    const handleAddScrap = async (data: KevinScrapRequest | JayeshScrapRequest) => {
         try {
+            // Type assertion since we know this is Kevin's page
+            const kevinData = data as KevinScrapRequest;
             if (editingScrap) {
-                await kevinScrapApi.updateScrap(editingScrap.scrapId, data);
+                await kevinScrapApi.updateScrap(editingScrap.scrapId, kevinData);
             } else {
-                await kevinScrapApi.addScrap(data);
+                await kevinScrapApi.addScrap(kevinData);
             }
             setIsModalOpen(false);
             setEditingScrap(null);
