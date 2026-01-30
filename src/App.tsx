@@ -17,6 +17,8 @@ import InvoiceGroundFloorPage from './pages/InvoiceGroundFloorPage';
 import InvoiceFirstFloorPage from './pages/InvoiceFirstFloorPage';
 import PaymentReminderGroundFloorPage from './pages/PaymentReminderGroundFloorPage';
 import PaymentReminderFirstFloorPage from './pages/PaymentReminderFirstFloorPage';
+import KevinScrapPage from './pages/KevinScrapPage';
+import JayeshScrapPage from './pages/JayeshScrapPage';
 import './App.css';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -60,6 +62,8 @@ function App() {
             <Route path="invoices/first-floor" element={<InvoiceFirstFloorPage />} />
             <Route path="payment-reminder/ground-floor" element={<PaymentReminderGroundFloorPage />} />
             <Route path="payment-reminder/first-floor" element={<PaymentReminderFirstFloorPage />} />
+            <Route path="scrap/kevin" element={<KevinScrapPage />} />
+            <Route path="scrap/jayesh" element={<JayeshScrapPage />} />
             <Route path="settings" element={<div className="placeholder">Settings Coming Soon</div>} />
           </Route>
         </Routes>

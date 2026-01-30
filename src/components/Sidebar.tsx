@@ -34,12 +34,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [paymentReminderExpanded, setPaymentReminderExpanded] = useState(
     location.pathname.startsWith('/payment-reminder')
   );
+  const [scrapExpanded, setScrapExpanded] = useState(
+    location.pathname.startsWith('/scrap')
+  );
 
   const isInventoryActive = location.pathname.startsWith('/inventory');
   const isOrdersActive = location.pathname.startsWith('/orders');
   const isSubcontractingActive = location.pathname.startsWith('/subcontracting') || location.pathname.startsWith('/subcontractor') || location.pathname.startsWith('/crome');
   const isInvoicesActive = location.pathname.startsWith('/invoices');
   const isPaymentReminderActive = location.pathname.startsWith('/payment-reminder');
+  const isScrapActive = location.pathname.startsWith('/scrap');
 
   const menuItems = [
     { path: '/dashboard', icon: <img src={DashboardSVG} alt='dashboard' />, label: 'Dashboard' },
@@ -65,6 +69,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const paymentReminderSubItems = [
     { path: '/payment-reminder/ground-floor', label: 'Ground Floor' },
     { path: '/payment-reminder/first-floor', label: 'First Floor' },
+  ];
+
+  const scrapSubItems = [
+    { path: '/scrap/jayesh', label: 'Jayesh' },
+    { path: '/scrap/kevin', label: 'Kevin' },
   ];
 
   const subcontractingSubItems = [
@@ -246,6 +255,37 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {paymentReminderExpanded && (
             <div className="sidebar-subsection">
               {paymentReminderSubItems.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                  onClick={onClose}
+                >
+                  <span className="sidebar-sublabel">{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Scrap Section with Subsections */}
+        <div className="sidebar-section">
+          <div
+            className={`sidebar-item ${isScrapActive ? 'active' : ''}`}
+            onClick={() => setScrapExpanded(!scrapExpanded)}
+          >
+            <span className="sidebar-icon">
+              <img src={SettingIcon} alt='Scrap' />
+            </span>
+            <span className="sidebar-label">Scrap</span>
+            <span className={`expand-icon ${scrapExpanded ? 'expanded' : ''}`}>
+              ▼
+            </span>
+          </div>
+
+          {scrapExpanded && (
+            <div className="sidebar-subsection">
+              {scrapSubItems.map((subItem) => (
                 <Link
                   key={subItem.path}
                   to={subItem.path}
