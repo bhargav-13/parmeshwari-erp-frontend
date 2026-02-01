@@ -112,15 +112,13 @@ const InventoryFirstFloorPage: React.FC = () => {
   const totalAmount = stockItems.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
 
   const filteredItems = stockItems.filter((item) => {
-    // Safety check: ensure item and nested objects exist
-    if (!item || !item.product || !item.category) {
-      return false;
-    }
+    if (!item) return false;
 
     const searchLower = searchQuery.toLowerCase();
     const matchesSearch =
-      item.product.productName.toLowerCase().includes(searchLower) ||
-      item.category.categoryName.toLowerCase().includes(searchLower);
+      item.product?.productName?.toLowerCase().includes(searchLower) ||
+      item.category?.categoryName?.toLowerCase().includes(searchLower) ||
+      false;
 
     const itemStatus = getActualStatus(item.quantityInPc, item.lowStockAlert);
     const matchesStatus = !statusFilter || itemStatus === statusFilter;
@@ -250,8 +248,8 @@ const InventoryFirstFloorPage: React.FC = () => {
             {filteredItems.map((item, index) => (
               <tr key={item.stockItemId}>
                 <td>{String(index + 1).padStart(2, '0')}</td>
-                <td>{item.product.productName}</td>
-                <td>{item.category.categoryName}</td>
+                <td>{item.product?.productName || 'N/A'}</td>
+                <td>{item.category?.categoryName || 'N/A'}</td>
                 <td>{item.quantityInKg} Kg</td>
                 <td>{item.quantityInPc?.toLocaleString('en-IN') || '—'}</td>
                 <td>₹{item.pricePerKg}/KG</td>

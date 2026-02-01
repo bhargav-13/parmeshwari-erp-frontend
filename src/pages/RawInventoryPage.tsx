@@ -111,12 +111,9 @@ const RawInventoryPage: React.FC = () => {
   ).length;
 
   const filteredRawItems = rawItems.filter((item) => {
-    // Safety check: ensure item and product exist
-    if (!item || !item.product) {
-      return false;
-    }
+    if (!item) return false;
 
-    const matchesSearch = item.product.productName.toLowerCase().includes(rawSearchQuery.toLowerCase());
+    const matchesSearch = item.product?.productName?.toLowerCase().includes(rawSearchQuery.toLowerCase()) || false;
 
     const itemStatus = getActualStatusForRaw(item.quantityInKg, item.lowStockAlert);
     const matchesStatus = !rawStatusFilter || itemStatus === rawStatusFilter;
@@ -209,7 +206,7 @@ const RawInventoryPage: React.FC = () => {
             {filteredRawItems.map((item, index) => (
               <tr key={item.rawItemId}>
                 <td>{String(index + 1).padStart(2, '0')}</td>
-                <td>{item.product.productName}</td>
+                <td>{item.product?.productName || 'N/A'}</td>
                 <td>{item.quantityInKg} Kg</td>
                 <td>{formatLastUpdated(item.lastUpdatedAt)}</td>
                 <td>
