@@ -111,6 +111,11 @@ const RawInventoryPage: React.FC = () => {
   ).length;
 
   const filteredRawItems = rawItems.filter((item) => {
+    // Safety check: ensure item and product exist
+    if (!item || !item.product) {
+      return false;
+    }
+
     const matchesSearch = item.product.productName.toLowerCase().includes(rawSearchQuery.toLowerCase());
 
     const itemStatus = getActualStatusForRaw(item.quantityInKg, item.lowStockAlert);
@@ -209,9 +214,8 @@ const RawInventoryPage: React.FC = () => {
                 <td>{formatLastUpdated(item.lastUpdatedAt)}</td>
                 <td>
                   <span
-                    className={`status-badge ${
-                      getActualStatusForRaw(item.quantityInKg, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'in-stock' : 'low-stock'
-                    }`}
+                    className={`status-badge ${getActualStatusForRaw(item.quantityInKg, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'in-stock' : 'low-stock'
+                      }`}
                   >
                     {getActualStatusForRaw(item.quantityInKg, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'In Stock' : 'Low Stock'}
                   </span>

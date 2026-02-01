@@ -112,6 +112,11 @@ const InventoryGroundFloorPage: React.FC = () => {
   const totalAmount = stockItems.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
 
   const filteredItems = stockItems.filter((item) => {
+    // Safety check: ensure item and nested objects exist
+    if (!item || !item.product || !item.category) {
+      return false;
+    }
+
     const searchLower = searchQuery.toLowerCase();
     const matchesSearch =
       item.product.productName.toLowerCase().includes(searchLower) ||
@@ -252,9 +257,8 @@ const InventoryGroundFloorPage: React.FC = () => {
                 <td>₹{item.pricePerKg}/KG</td>
                 <td>
                   <span
-                    className={`status-badge ${
-                      getActualStatus(item.quantityInPc, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'in-stock' : 'low-stock'
-                    }`}
+                    className={`status-badge ${getActualStatus(item.quantityInPc, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'in-stock' : 'low-stock'
+                      }`}
                   >
                     {getActualStatus(item.quantityInPc, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'In Stock' : 'Low Stock'}
                   </span>
