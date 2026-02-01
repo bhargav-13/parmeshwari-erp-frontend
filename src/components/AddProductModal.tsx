@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { productApi } from '../api/inventory';
-import type { ProductRequest } from '../types';
+import type { ProductRequest, Product } from '../types';
 import './AddProductModal.css';
 
 interface AddProductModalProps {
   onClose: () => void;
   onSuccess: () => void;
+  initialData?: Product;
 }
 
-const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess }) => {
+const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess, initialData }) => {
   const [productName, setProductName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setProductName(initialData.productName);
+    }
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,11 +32,17 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess })
     try {
       setLoading(true);
       const data: ProductRequest = { productName: productName.trim() };
-      await productApi.createProduct(data);
+
+      if (initialData) {
+        await productApi.updateProduct(initialData.productId, data);
+      } else {
+        await productApi.createProduct(data);
+      }
+
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create product');
+      setError(err.response?.data?.message || `Failed to ${initialData ? 'update' : 'create'} product`);
     } finally {
       setLoading(false);
     }
@@ -38,7 +51,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess })
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Add New Product Name</h2>
+        <h2 className="modal-title">{initialData ? 'Edit Product Name' : 'Add New Product Name'}</h2>
 
         {error && <div className="error-message">{error}</div>}
 
@@ -49,7 +62,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess })
               type="text"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
-              placeholder="Enter New Product"
+              placeholder="Enter Product Name"
               className="form-input"
               required
               autoFocus

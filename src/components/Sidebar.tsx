@@ -22,6 +22,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [inventoryExpanded, setInventoryExpanded] = useState(
     location.pathname.startsWith('/inventory')
   );
+  const [itemMasterExpanded, setItemMasterExpanded] = useState(
+    location.pathname.startsWith('/item-master')
+  );
   const [ordersExpanded, setOrdersExpanded] = useState(
     location.pathname.startsWith('/orders')
   );
@@ -39,6 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   );
 
   const isInventoryActive = location.pathname.startsWith('/inventory');
+  const isItemMasterActive = location.pathname.startsWith('/item-master');
   const isOrdersActive = location.pathname.startsWith('/orders');
   const isSubcontractingActive = location.pathname.startsWith('/subcontracting') || location.pathname.startsWith('/subcontractor') || location.pathname.startsWith('/crome');
   const isInvoicesActive = location.pathname.startsWith('/invoices');
@@ -54,6 +58,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { path: '/inventory/ground-floor', label: 'Ground Floor' },
     { path: '/inventory/first-floor', label: 'First Floor' },
     { path: '/inventory/raw-materials', label: 'Raw Materials' },
+  ];
+
+  const itemMasterSubItems = [
+    { path: '/item-master/products', label: 'Inventory Products' },
+    { path: '/item-master/categories', label: 'Category' },
   ];
 
   const ordersSubItems = [
@@ -131,6 +140,37 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {inventoryExpanded && (
             <div className="sidebar-subsection">
               {inventorySubItems.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                  onClick={onClose}
+                >
+                  <span className="sidebar-sublabel">{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Item Master Section with Subsections */}
+        <div className="sidebar-section">
+          <div
+            className={`sidebar-item ${isItemMasterActive ? 'active' : ''}`}
+            onClick={() => setItemMasterExpanded(!itemMasterExpanded)}
+          >
+            <span className="sidebar-icon">
+              <img src={InventorySVG} alt='Item Master' />
+            </span>
+            <span className="sidebar-label">Item Master</span>
+            <span className={`expand-icon ${itemMasterExpanded ? 'expanded' : ''}`}>
+              ▼
+            </span>
+          </div>
+
+          {itemMasterExpanded && (
+            <div className="sidebar-subsection">
+              {itemMasterSubItems.map((subItem) => (
                 <Link
                   key={subItem.path}
                   to={subItem.path}

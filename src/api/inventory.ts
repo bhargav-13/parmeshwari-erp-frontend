@@ -116,6 +116,14 @@ export const productApi = {
   // Get product by ID
   getProductById: (productId: number): Promise<Product> =>
     promisify<Product>(cb => generatedProductApi.getProductById(productId, cb)),
+
+  // Update product
+  updateProduct: (productId: number, data: ProductRequest): Promise<Product> =>
+    promisify<Product>(cb => generatedProductApi.updateProduct(productId, data, cb)),
+
+  // Delete product
+  deleteProduct: (productId: number): Promise<void> =>
+    promisify<void>(cb => generatedProductApi.deleteProduct(productId, cb)),
 };
 
 // Category API
@@ -131,4 +139,12 @@ export const categoryApi = {
   // Get category by ID
   getCategoryById: (categoryId: number): Promise<Category> =>
     promisify<Category>(cb => generatedCategoryApi.getCategoryById(categoryId, cb)),
+
+  // Update category
+  updateCategory: (categoryId: number, data: CategoryRequest): Promise<Category> =>
+    promisify<Category>(cb => generatedCategoryApi.updateCategory(categoryId, data, cb)),
+
+  // Delete category
+  deleteCategory: (categoryId: number): Promise<void> =>
+    promisify<void>(cb => generatedCategoryApi.deleteCategory(categoryId, cb)),
 };

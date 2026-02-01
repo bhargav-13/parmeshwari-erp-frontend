@@ -10,6 +10,8 @@ import CromePage from './pages/CromePage';
 import InventoryGroundFloorPage from './pages/InventoryGroundFloorPage';
 import InventoryFirstFloorPage from './pages/InventoryFirstFloorPage';
 import RawInventoryPage from './pages/RawInventoryPage';
+import InventoryProductsPage from './pages/InventoryProductsPage';
+import CategoryPage from './pages/CategoryPage';
 import OrderGroundFloorPage from './pages/OrderGroundFloorPage';
 import OrderFirstFloorPage from './pages/OrderFirstFloorPage';
 import ProductCatalogPage from './pages/ProductCatalogPage';
@@ -53,6 +55,8 @@ function App() {
             <Route path="inventory/ground-floor" element={<InventoryGroundFloorPage />} />
             <Route path="inventory/first-floor" element={<InventoryFirstFloorPage />} />
             <Route path="inventory/raw-materials" element={<RawInventoryPage />} />
+            <Route path="item-master/products" element={<InventoryProductsPage />} />
+            <Route path="item-master/categories" element={<CategoryPage />} />
             <Route path="orders/ground-floor" element={<OrderGroundFloorPage />} />
             <Route path="orders/first-floor" element={<OrderFirstFloorPage />} />
             <Route path="subcontracting" element={<SubcontractingPage />} />
