@@ -66,7 +66,8 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
             <thead>
               <tr>
                 <th>Product Name</th>
-                <th>Quantity (KG)</th>
+                <th>Unit</th>
+                <th>Quantity</th>
                 <th>Market Rate</th>
                 <th>Rate Diff</th>
                 <th>Total Rate</th>
@@ -74,18 +75,26 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
             </thead>
             <tbody>
               {order.products?.length ? (
-                order.products.map((product) => (
-                  <tr key={product.id || product.productName}>
-                    <td>{product.productName}</td>
-                    <td>{Number(product.quantityKg).toLocaleString('en-IN')}</td>
-                    <td>{currency(product.marketRate)}</td>
-                    <td>{Number(product.rateDifference).toLocaleString('en-IN')}</td>
-                    <td>{currency(product.totalAmount)}</td>
-                  </tr>
-                ))
+                order.products.map((product) => {
+                  const isPc = product.quantityUnit === 'pc';
+                  return (
+                    <tr key={product.id || product.productName}>
+                      <td>{product.productName}</td>
+                      <td>{isPc ? 'Pc' : 'Kg'}</td>
+                      <td>
+                        {isPc
+                          ? Number(product.quantityPc || 0).toLocaleString('en-IN')
+                          : Number(product.quantityKg || 0).toLocaleString('en-IN')}
+                      </td>
+                      <td>{isPc ? '—' : currency(product.marketRate)}</td>
+                      <td>{isPc ? '—' : Number(product.rateDifference).toLocaleString('en-IN')}</td>
+                      <td>{currency(product.totalAmount)}</td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td colSpan={5} className="order-details-empty">
+                  <td colSpan={6} className="order-details-empty">
                     No products available for this order.
                   </td>
                 </tr>

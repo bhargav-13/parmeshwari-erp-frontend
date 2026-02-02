@@ -191,7 +191,7 @@
 .line-item-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 2fr repeat(4, minmax(90px, 1fr));
+  grid-template-columns: 2fr repeat(5, minmax(80px, 1fr));
   gap: 10px;
 }
 
@@ -201,8 +201,37 @@
   gap: 4px;
 }
 
-.line-item-field--lg {
+.line-item-field--product {
   grid-column: span 2;
+}
+
+.unit-toggle {
+  display: flex;
+  border: 1px solid rgba(23, 52, 77, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+  height: 35px;
+}
+
+.unit-toggle-btn {
+  flex: 1;
+  border: none;
+  background: #f5f7fa;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: #5a738b;
+  cursor: pointer;
+  padding: 0 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.unit-toggle-btn.active {
+  background: #17344d;
+  color: #ffffff;
+}
+
+.unit-toggle-btn:hover:not(.active) {
+  background: #e4ecf4;
 }
 
 .line-item-field label {

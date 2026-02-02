@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { Order, OrderProductRequest, OrderRequest, StockItem } from '../types';
+import type { Order, OrderProductRequest, OrderRequest, StockItem, OrderQuantityUnit } from '../types';
 import { OrderFloor } from '../types';
 import { stockItemApi } from '../api/inventory';
 import './AddOrderModal.css';
@@ -17,7 +17,9 @@ type ActiveTab = 'order' | 'lineItems';
 const createEmptyProduct = (): OrderProductRequest => ({
   itemId: 0,
   productName: '',
+  quantityUnit: 'kg',
   quantityKg: 0,
+  quantityPc: 0,
   marketRate: 0,
   rateDifference: 0,
   totalAmount: 0,
@@ -122,11 +124,30 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
           [field]: value,
         };
 
-        if (field === 'quantityKg' || field === 'marketRate' || field === 'rateDifference') {
-          const qty = Number(field === 'quantityKg' ? value : updated.quantityKg) || 0;
-          const market = Number(field === 'marketRate' ? value : updated.marketRate) || 0;
-          const diff = Number(field === 'rateDifference' ? value : updated.rateDifference) || 0;
-          updated.totalAmount = Number(((market + diff) * qty).toFixed(2));
+        // When switching unit, reset the quantity fields and rate fields appropriately
+        if (field === 'quantityUnit') {
+          const unit = value as OrderQuantityUnit;
+          if (unit === 'pc') {
+            updated.quantityKg = 0;
+            updated.marketRate = 0;
+            updated.rateDifference = 0;
+            // For pc: total = quantityPc (direct entry of totalAmount)
+            updated.totalAmount = 0;
+          } else {
+            updated.quantityPc = 0;
+            updated.totalAmount = 0;
+          }
+        }
+
+        const unit = updated.quantityUnit || 'kg';
+
+        if (unit === 'kg') {
+          if (field === 'quantityKg' || field === 'marketRate' || field === 'rateDifference') {
+            const qty = Number(field === 'quantityKg' ? value : updated.quantityKg) || 0;
+            const market = Number(field === 'marketRate' ? value : updated.marketRate) || 0;
+            const diff = Number(field === 'rateDifference' ? value : updated.rateDifference) || 0;
+            updated.totalAmount = Number(((market + diff) * qty).toFixed(2));
+          }
         }
 
         if (field === 'totalAmount') {
@@ -185,15 +206,21 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
       return false;
     }
 
-    const invalidProduct = formData.products.find(
-      (product) =>
-        !product.itemId ||
-        Number(product.quantityKg) <= 0 ||
-        Number(product.marketRate) <= 0
-    );
+    const invalidProduct = formData.products.find((product) => {
+      if (!product.itemId) return true;
+      const unit = product.quantityUnit || 'kg';
+      if (unit === 'pc') {
+        return Number(product.quantityPc) <= 0 || Number(product.totalAmount) <= 0;
+      }
+      return Number(product.quantityKg) <= 0 || Number(product.marketRate) <= 0;
+    });
 
     if (invalidProduct) {
-      setError('Each product requires a selected item, quantity, and market rate.');
+      const unit = invalidProduct.quantityUnit || 'kg';
+      const msg = unit === 'pc'
+        ? 'Each product requires a selected item, quantity (Pc), and total amount.'
+        : 'Each product requires a selected item, quantity (Kg), and market rate.';
+      setError(msg);
       setActiveTab('lineItems');
       return false;
     }
@@ -346,7 +373,10 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                 </button>
               </div>
 
-              {formData.products.map((product, index) => (
+              {formData.products.map((product, index) => {
+                const unit = product.quantityUnit || 'kg';
+                const isPc = unit === 'pc';
+                return (
                 <div className="line-item-card" key={`product-${index}`}>
                   <div className="line-item-card-header">
                     <div className="line-item-pill">Item {String(index + 1).padStart(2, '0')}</div>
@@ -363,7 +393,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                     </button>
                   </div>
                   <div className="line-item-grid">
-                    <div className="line-item-field line-item-field--lg">
+                    <div className="line-item-field line-item-field--product">
                       <label>Product*</label>
                       <select
                         value={product.itemId || ''}
@@ -388,52 +418,101 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                       </select>
                     </div>
                     <div className="line-item-field">
-                      <label>Qty (Kg)*</label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={product.quantityKg || ''}
-                        onChange={(e) => handleProductChange(index, 'quantityKg', Number(e.target.value))}
-                        placeholder="0"
-                      />
+                      <label>Unit*</label>
+                      <div className="unit-toggle">
+                        <button
+                          type="button"
+                          className={`unit-toggle-btn ${!isPc ? 'active' : ''}`}
+                          onClick={() => handleProductChange(index, 'quantityUnit', 'kg')}
+                        >
+                          Kg
+                        </button>
+                        <button
+                          type="button"
+                          className={`unit-toggle-btn ${isPc ? 'active' : ''}`}
+                          onClick={() => handleProductChange(index, 'quantityUnit', 'pc')}
+                        >
+                          Pc
+                        </button>
+                      </div>
                     </div>
-                    <div className="line-item-field">
-                      <label>Market Rate*</label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={product.marketRate || ''}
-                        onChange={(e) => handleProductChange(index, 'marketRate', Number(e.target.value))}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div className="line-item-field">
-                      <label>Rate Diff*</label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={product.rateDifference || ''}
-                        onChange={(e) => handleProductChange(index, 'rateDifference', Number(e.target.value))}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div className="line-item-field">
-                      <label>Total ₹*</label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={product.totalAmount || ''}
-                        onChange={(e) => handleProductChange(index, 'totalAmount', Number(e.target.value))}
-                        placeholder="0"
-                      />
-                    </div>
+                    {isPc ? (
+                      <>
+                        <div className="line-item-field">
+                          <label>Qty (Pc)*</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={product.quantityPc || ''}
+                            onChange={(e) => handleProductChange(index, 'quantityPc', Number(e.target.value))}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="line-item-field">
+                          <label>Total ₹*</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={product.totalAmount || ''}
+                            onChange={(e) => handleProductChange(index, 'totalAmount', Number(e.target.value))}
+                            placeholder="0"
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="line-item-field">
+                          <label>Qty (Kg)*</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={product.quantityKg || ''}
+                            onChange={(e) => handleProductChange(index, 'quantityKg', Number(e.target.value))}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="line-item-field">
+                          <label>Market Rate*</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={product.marketRate || ''}
+                            onChange={(e) => handleProductChange(index, 'marketRate', Number(e.target.value))}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="line-item-field">
+                          <label>Rate Diff*</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={product.rateDifference || ''}
+                            onChange={(e) => handleProductChange(index, 'rateDifference', Number(e.target.value))}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="line-item-field">
+                          <label>Total ₹*</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={product.totalAmount || ''}
+                            onChange={(e) => handleProductChange(index, 'totalAmount', Number(e.target.value))}
+                            placeholder="0"
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               <div className="line-item-total">
                 <label>Items Total*</label>

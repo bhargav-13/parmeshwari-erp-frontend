@@ -277,9 +277,12 @@ export const OrderFloor = {
 
 export type OrderFloor = typeof OrderFloor[keyof typeof OrderFloor];
 
+export type OrderQuantityUnit = 'kg' | 'pc';
+
 export interface OrderProductRequest {
   itemId: number;
   productName?: string;
+  quantityUnit?: OrderQuantityUnit;
   quantityKg?: number;
   quantityPc?: number;
   marketRate: number;
@@ -318,6 +321,7 @@ export interface OrderProduct {
   id: number;
   itemId: number;
   productName: string;
+  quantityUnit?: OrderQuantityUnit;
   quantityKg?: number;
   quantityPc?: number;
   marketRate: number;
