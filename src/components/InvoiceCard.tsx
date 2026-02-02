@@ -69,6 +69,12 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelet
     try {
       setIsDownloadingPdf(true);
       const blob = await invoiceApi.downloadInvoicePdf(invoice.id);
+
+      // Verify we got a valid blob
+      if (!blob || blob.size === 0) {
+        throw new Error('Received empty PDF file');
+      }
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -79,6 +85,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelet
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading PDF:', error);
+      alert('Failed to download invoice PDF. Please try again or contact support.');
     } finally {
       setIsDownloadingPdf(false);
     }
@@ -113,7 +120,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelet
               <button
                 type="button"
                 className="icon-button edit-button"
-                onClick={() => {}}
+                onClick={() => { }}
                 title="Edit"
               >
                 <img src={EditIcon} alt="Edit" className="icon-img" />

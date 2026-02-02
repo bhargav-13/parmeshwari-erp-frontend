@@ -41,8 +41,22 @@ export const invoiceApi = {
 
   // Download invoice PDF
   downloadInvoicePdf: async (id: number): Promise<Blob> => {
-    // Note: PDF download might need special handling - keeping as-is for now
-    // This may need to be implemented differently depending on the generated API
-    return promisify<Blob>(cb => generatedInvoicesApi.downloadInvoicePdf(id, cb));
+    // Use direct fetch to bypass generated client issues with binary data
+    const basePath = generatedInvoicesApi.apiClient.basePath;
+    const token = localStorage.getItem('accessToken');
+
+    const response = await fetch(`${basePath}/api/invoices/${id}/pdf`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/pdf',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Download failed with status: ${response.status}`);
+    }
+
+    return await response.blob();
   },
 };
