@@ -53,8 +53,8 @@ const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloo
     products:
       products && products.length
         ? products.map(({ id: productId, ...item }) => ({
-            ...item,
-          }))
+          ...item,
+        }))
         : [createEmptyProduct()],
   };
 };
@@ -129,13 +129,17 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
           const unit = value as OrderQuantityUnit;
           if (unit === 'pc') {
             updated.quantityKg = 0;
-            updated.marketRate = 0;
+            // For pc: we now use marketRate as "Price Per Pc"
+            // Reset rateDifference as it doesn't apply to Pc usually, or user didn't ask for it
             updated.rateDifference = 0;
-            // For pc: total = quantityPc (direct entry of totalAmount)
-            updated.totalAmount = 0;
+            updated.totalAmount = (updated.quantityPc || 0) * (updated.marketRate || 0);
           } else {
             updated.quantityPc = 0;
-            updated.totalAmount = 0;
+            // For kg: recalculate based on existing kg fields
+            const qty = updated.quantityKg || 0;
+            const market = updated.marketRate || 0;
+            const diff = updated.rateDifference || 0;
+            updated.totalAmount = Number(((market + diff) * qty).toFixed(2));
           }
         }
 
@@ -148,8 +152,17 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
             const diff = Number(field === 'rateDifference' ? value : updated.rateDifference) || 0;
             updated.totalAmount = Number(((market + diff) * qty).toFixed(2));
           }
+        } else if (unit === 'pc') {
+          // Logic for Pc: Total = Quantity * Price Per Pc (stored in marketRate)
+          if (field === 'quantityPc' || field === 'marketRate') {
+            const qty = Number(field === 'quantityPc' ? value : updated.quantityPc) || 0;
+            const pricePerPc = Number(field === 'marketRate' ? value : updated.marketRate) || 0;
+            updated.totalAmount = Number((pricePerPc * qty).toFixed(2));
+          }
         }
 
+        // Allow manual override of totalAmount if needed? 
+        // Usually if it's calculated, we might disable manual edit or update it if user types.
         if (field === 'totalAmount') {
           updated.totalAmount = Number(value) || 0;
         }
@@ -210,7 +223,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
       if (!product.itemId) return true;
       const unit = product.quantityUnit || 'kg';
       if (unit === 'pc') {
-        return Number(product.quantityPc) <= 0 || Number(product.totalAmount) <= 0;
+        return Number(product.quantityPc) <= 0 || Number(product.marketRate) <= 0;
       }
       return Number(product.quantityKg) <= 0 || Number(product.marketRate) <= 0;
     });
@@ -218,7 +231,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
     if (invalidProduct) {
       const unit = invalidProduct.quantityUnit || 'kg';
       const msg = unit === 'pc'
-        ? 'Each product requires a selected item, quantity (Pc), and total amount.'
+        ? 'Each product requires a selected item, quantity (Pc), and price per pc.'
         : 'Each product requires a selected item, quantity (Kg), and market rate.';
       setError(msg);
       setActiveTab('lineItems');
@@ -377,140 +390,150 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                 const unit = product.quantityUnit || 'kg';
                 const isPc = unit === 'pc';
                 return (
-                <div className="line-item-card" key={`product-${index}`}>
-                  <div className="line-item-card-header">
-                    <div className="line-item-pill">Item {String(index + 1).padStart(2, '0')}</div>
-                    <button
-                      type="button"
-                      className="order-btn"
-                      data-variant="danger"
-                      data-shape="icon"
-                      onClick={() => handleRemoveProduct(index)}
-                      disabled={formData.products.length === 1}
-                      aria-label="Remove product"
-                    >
-                      <img src={DeleteIcon} alt="Remove" />
-                    </button>
-                  </div>
-                  <div className="line-item-grid">
-                    <div className="line-item-field line-item-field--product">
-                      <label>Product*</label>
-                      <select
-                        value={product.itemId || ''}
-                        onChange={(e) => {
-                          const selectedItemId = Number(e.target.value);
-                          const selectedItem = stockItems.find((item) => item.stockItemId === selectedItemId);
-                          handleProductChange(index, 'itemId', selectedItemId);
-                          if (selectedItem) {
-                            handleProductChange(index, 'productName', selectedItem.product.productName);
-                          }
-                        }}
-                        required
-                        disabled={stockItemsLoading}
-                        title="Select a product"
+                  <div className="line-item-card" key={`product-${index}`}>
+                    <div className="line-item-card-header">
+                      <div className="line-item-pill">Item {String(index + 1).padStart(2, '0')}</div>
+                      <button
+                        type="button"
+                        className="order-btn"
+                        data-variant="danger"
+                        data-shape="icon"
+                        onClick={() => handleRemoveProduct(index)}
+                        disabled={formData.products.length === 1}
+                        aria-label="Remove product"
                       >
-                        <option value="">Select Product</option>
-                        {stockItems.map((item) => (
-                          <option key={item.stockItemId} value={item.stockItemId}>
-                            {item.product.productName}
-                          </option>
-                        ))}
-                      </select>
+                        <img src={DeleteIcon} alt="Remove" />
+                      </button>
                     </div>
-                    <div className="line-item-field">
-                      <label>Unit*</label>
-                      <div className="unit-toggle">
-                        <button
-                          type="button"
-                          className={`unit-toggle-btn ${!isPc ? 'active' : ''}`}
-                          onClick={() => handleProductChange(index, 'quantityUnit', 'kg')}
+                    <div className="line-item-grid">
+                      <div className="line-item-field line-item-field--product">
+                        <label>Product*</label>
+                        <select
+                          value={product.itemId || ''}
+                          onChange={(e) => {
+                            const selectedItemId = Number(e.target.value);
+                            const selectedItem = stockItems.find((item) => item.stockItemId === selectedItemId);
+                            handleProductChange(index, 'itemId', selectedItemId);
+                            if (selectedItem) {
+                              handleProductChange(index, 'productName', selectedItem.product.productName);
+                            }
+                          }}
+                          required
+                          disabled={stockItemsLoading}
+                          title="Select a product"
                         >
-                          Kg
-                        </button>
-                        <button
-                          type="button"
-                          className={`unit-toggle-btn ${isPc ? 'active' : ''}`}
-                          onClick={() => handleProductChange(index, 'quantityUnit', 'pc')}
-                        >
-                          Pc
-                        </button>
+                          <option value="">Select Product</option>
+                          {stockItems.map((item) => (
+                            <option key={item.stockItemId} value={item.stockItemId}>
+                              {item.product.productName}
+                            </option>
+                          ))}
+                        </select>
                       </div>
+                      <div className="line-item-field">
+                        <label>Unit*</label>
+                        <div className="unit-toggle">
+                          <button
+                            type="button"
+                            className={`unit-toggle-btn ${!isPc ? 'active' : ''}`}
+                            onClick={() => handleProductChange(index, 'quantityUnit', 'kg')}
+                          >
+                            Kg
+                          </button>
+                          <button
+                            type="button"
+                            className={`unit-toggle-btn ${isPc ? 'active' : ''}`}
+                            onClick={() => handleProductChange(index, 'quantityUnit', 'pc')}
+                          >
+                            Pc
+                          </button>
+                        </div>
+                      </div>
+                      {isPc ? (
+                        <>
+                          <div className="line-item-field">
+                            <label>Qty (Pc)*</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              value={product.quantityPc || ''}
+                              onChange={(e) => handleProductChange(index, 'quantityPc', Number(e.target.value))}
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="line-item-field">
+                            <label>Price/Pc*</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={product.marketRate || ''}
+                              onChange={(e) => handleProductChange(index, 'marketRate', Number(e.target.value))}
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="line-item-field">
+                            <label>Total ₹</label>
+                            <input
+                              type="number"
+                              value={product.totalAmount || ''}
+                              readOnly
+                              placeholder="0"
+                              className="bg-gray-100 cursor-not-allowed"
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="line-item-field">
+                            <label>Qty (Kg)*</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={product.quantityKg || ''}
+                              onChange={(e) => handleProductChange(index, 'quantityKg', Number(e.target.value))}
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="line-item-field">
+                            <label>Market Rate*</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={product.marketRate || ''}
+                              onChange={(e) => handleProductChange(index, 'marketRate', Number(e.target.value))}
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="line-item-field">
+                            <label>Rate Diff*</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={product.rateDifference || ''}
+                              onChange={(e) => handleProductChange(index, 'rateDifference', Number(e.target.value))}
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="line-item-field">
+                            <label>Total ₹*</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={product.totalAmount || ''}
+                              onChange={(e) => handleProductChange(index, 'totalAmount', Number(e.target.value))}
+                              placeholder="0"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
-                    {isPc ? (
-                      <>
-                        <div className="line-item-field">
-                          <label>Qty (Pc)*</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="1"
-                            value={product.quantityPc || ''}
-                            onChange={(e) => handleProductChange(index, 'quantityPc', Number(e.target.value))}
-                            placeholder="0"
-                          />
-                        </div>
-                        <div className="line-item-field">
-                          <label>Total ₹*</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={product.totalAmount || ''}
-                            onChange={(e) => handleProductChange(index, 'totalAmount', Number(e.target.value))}
-                            placeholder="0"
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="line-item-field">
-                          <label>Qty (Kg)*</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={product.quantityKg || ''}
-                            onChange={(e) => handleProductChange(index, 'quantityKg', Number(e.target.value))}
-                            placeholder="0"
-                          />
-                        </div>
-                        <div className="line-item-field">
-                          <label>Market Rate*</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={product.marketRate || ''}
-                            onChange={(e) => handleProductChange(index, 'marketRate', Number(e.target.value))}
-                            placeholder="0"
-                          />
-                        </div>
-                        <div className="line-item-field">
-                          <label>Rate Diff*</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={product.rateDifference || ''}
-                            onChange={(e) => handleProductChange(index, 'rateDifference', Number(e.target.value))}
-                            placeholder="0"
-                          />
-                        </div>
-                        <div className="line-item-field">
-                          <label>Total ₹*</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={product.totalAmount || ''}
-                            onChange={(e) => handleProductChange(index, 'totalAmount', Number(e.target.value))}
-                            placeholder="0"
-                          />
-                        </div>
-                      </>
-                    )}
                   </div>
-                </div>
                 );
               })}
 

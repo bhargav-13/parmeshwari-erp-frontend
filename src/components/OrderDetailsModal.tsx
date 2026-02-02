@@ -68,7 +68,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
                 <th>Product Name</th>
                 <th>Unit</th>
                 <th>Quantity</th>
-                <th>Market Rate</th>
+                <th>Market Rate / Price/Pc</th>
                 <th>Rate Diff</th>
                 <th>Total Rate</th>
               </tr>
@@ -76,7 +76,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
             <tbody>
               {order.products?.length ? (
                 order.products.map((product) => {
-                  const isPc = product.quantityUnit === 'pc';
+                  const isPc = product.quantityUnit === 'pc' || (product.quantityPc && product.quantityPc > 0);
                   return (
                     <tr key={product.id || product.productName}>
                       <td>{product.productName}</td>
@@ -86,7 +86,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
                           ? Number(product.quantityPc || 0).toLocaleString('en-IN')
                           : Number(product.quantityKg || 0).toLocaleString('en-IN')}
                       </td>
-                      <td>{isPc ? '—' : currency(product.marketRate)}</td>
+                      <td>{currency(product.marketRate)}</td>
                       <td>{isPc ? '—' : Number(product.rateDifference).toLocaleString('en-IN')}</td>
                       <td>{currency(product.totalAmount)}</td>
                     </tr>
