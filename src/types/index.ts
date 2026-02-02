@@ -292,7 +292,8 @@ export interface OrderProductRequest {
 
 export interface DispatchItem {
   itemId: number;
-  quantity: number;
+  quantityKg?: number;
+  quantityPc?: number;
 }
 
 export interface DispatchRequest {

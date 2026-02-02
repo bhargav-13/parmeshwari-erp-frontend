@@ -461,16 +461,19 @@ components:
       type: object
       required:
         - itemId
-        - quantity
       properties:
         itemId:
           type: integer
           format: int64
           description: Reference to stock_item.item_id from inventory
-        quantity:
+        quantityKg:
           type: number
           format: double
           description: Quantity to deduct from inventory (in kg)
+        quantityPc:
+          type: number
+          format: double
+          description: Quantity to deduct from inventory (in pieces)
 
     OrderFloor:
       type: string

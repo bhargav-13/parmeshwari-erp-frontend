@@ -48,14 +48,16 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
         const initialSelectedItems: { [key: number]: boolean } = {};
 
         stockItems.forEach((item) => {
-          initialSelectedQuantities[item.stockItemId] = product.quantityKg || 0;
+          // Initialize with the quantity from the order product (KG or PC)
+          const defaultQty = product.quantityKg || product.quantityPc || 0;
+          initialSelectedQuantities[item.stockItemId] = defaultQty;
           initialSelectedItems[item.stockItemId] = false;
         });
 
         return {
           itemId: product.itemId,
           productName: product.productName,
-          orderQuantity: product.quantityKg || 0,
+          orderQuantity: product.quantityKg || product.quantityPc || 0,
           selectedQuantities: initialSelectedQuantities,
           selectedItems: initialSelectedItems,
           isDropdownOpen: true,
@@ -112,16 +114,28 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
   const handleSubmit = async () => {
     const dispatchRequestItems: DispatchItem[] = [];
 
-    dispatchItems.forEach((item) => {
+    dispatchItems.forEach((item, itemIndex) => {
+      // Get the corresponding order product to determine quantity type
+      const orderProduct = order.products[itemIndex];
+
       Object.entries(item.selectedItems).forEach(([stockItemIdStr, isSelected]) => {
         if (isSelected) {
           const stockItemId = Number(stockItemIdStr);
           const quantity = item.selectedQuantities[stockItemId] || 0;
           if (quantity > 0) {
-            dispatchRequestItems.push({
+            const dispatchItem: DispatchItem = {
               itemId: stockItemId,
-              quantity,
-            });
+            };
+
+            // Auto-detect quantity type from order product
+            if (orderProduct.quantityKg && orderProduct.quantityKg > 0) {
+              dispatchItem.quantityKg = quantity;
+            }
+            if (orderProduct.quantityPc && orderProduct.quantityPc > 0) {
+              dispatchItem.quantityPc = quantity;
+            }
+
+            dispatchRequestItems.push(dispatchItem);
           }
         }
       });
@@ -163,64 +177,71 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
             <div className="dispatch-loading">Loading stock items...</div>
           ) : (
             <>
-              {dispatchItems.map((item, index) => (
-                <div className="dispatch-item-row" key={`dispatch-item-${index}`}>
-                  <div className="dispatch-item-field">
-                    <label>Item {index + 1}</label>
-                    <div className="dispatch-item-input-box">
-                      <span>{item.productName}</span>
-                    </div>
-                  </div>
-                  <div className="dispatch-item-field">
-                    <label>Used Items</label>
-                    <div className="dispatch-items-list">
-                      <div
-                        className={`dispatch-items-header ${!item.isDropdownOpen ? 'collapsed' : ''}`}
-                        onClick={() => toggleDropdown(index)}
-                      >
-                        <span>Select</span>
-                        <span className={`dropdown-icon ${!item.isDropdownOpen ? 'collapsed' : ''}`}>&#9662;</span>
+              {dispatchItems.map((item, index) => {
+                const orderProduct = order.products[index];
+                const hasKg = orderProduct?.quantityKg && orderProduct.quantityKg > 0;
+                const hasPc = orderProduct?.quantityPc && orderProduct.quantityPc > 0;
+                const unitLabel = hasKg && hasPc ? 'KG + PC' : hasKg ? 'KG' : hasPc ? 'PC' : '';
+
+                return (
+                  <div className="dispatch-item-row" key={`dispatch-item-${index}`}>
+                    <div className="dispatch-item-field">
+                      <label>Item {index + 1} {unitLabel && `(${unitLabel})`}</label>
+                      <div className="dispatch-item-input-box">
+                        <span>{item.productName}</span>
                       </div>
-                      {item.isDropdownOpen && stockItems.map((stockItem, stockIndex) => (
+                    </div>
+                    <div className="dispatch-item-field">
+                      <label>Used Items</label>
+                      <div className="dispatch-items-list">
                         <div
-                          className={`dispatch-items-row ${stockIndex === 0 ? 'first-row' : ''} ${stockIndex === stockItems.length - 1 ? 'last-row' : ''}`}
-                          key={stockItem.stockItemId}
+                          className={`dispatch-items-header ${!item.isDropdownOpen ? 'collapsed' : ''}`}
+                          onClick={() => toggleDropdown(index)}
                         >
-                          <span className="item-name">{stockItem.product.productName}</span>
-                          <div className="item-controls">
-                            <button
-                              type="button"
-                              className="qty-control-btn"
-                              onClick={() => handleQuantityChange(index, stockItem.stockItemId, -1)}
-                            >
-                              &minus;
-                            </button>
-                            <span className="qty-display">
-                              {item.selectedQuantities[stockItem.stockItemId] || 0}
-                            </span>
-                            <button
-                              type="button"
-                              className="qty-control-btn"
-                              onClick={() => handleQuantityChange(index, stockItem.stockItemId, 1)}
-                            >
-                              +
-                            </button>
-                            <label className="checkbox-container">
-                              <input
-                                type="checkbox"
-                                checked={item.selectedItems[stockItem.stockItemId] || false}
-                                onChange={() => handleCheckboxChange(index, stockItem.stockItemId)}
-                                title="Select item for dispatch"
-                              />
-                              <span className="checkmark"></span>
-                            </label>
-                          </div>
+                          <span>Select</span>
+                          <span className={`dropdown-icon ${!item.isDropdownOpen ? 'collapsed' : ''}`}>&#9662;</span>
                         </div>
-                      ))}
+                        {item.isDropdownOpen && stockItems.map((stockItem, stockIndex) => (
+                          <div
+                            className={`dispatch-items-row ${stockIndex === 0 ? 'first-row' : ''} ${stockIndex === stockItems.length - 1 ? 'last-row' : ''}`}
+                            key={stockItem.stockItemId}
+                          >
+                            <span className="item-name">{stockItem.product.productName}</span>
+                            <div className="item-controls">
+                              <button
+                                type="button"
+                                className="qty-control-btn"
+                                onClick={() => handleQuantityChange(index, stockItem.stockItemId, -1)}
+                              >
+                                &minus;
+                              </button>
+                              <span className="qty-display">
+                                {item.selectedQuantities[stockItem.stockItemId] || 0}
+                              </span>
+                              <button
+                                type="button"
+                                className="qty-control-btn"
+                                onClick={() => handleQuantityChange(index, stockItem.stockItemId, 1)}
+                              >
+                                +
+                              </button>
+                              <label className="checkbox-container">
+                                <input
+                                  type="checkbox"
+                                  checked={item.selectedItems[stockItem.stockItemId] || false}
+                                  onChange={() => handleCheckboxChange(index, stockItem.stockItemId)}
+                                  title="Select item for dispatch"
+                                />
+                                <span className="checkmark"></span>
+                              </label>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </>
           )}
 
