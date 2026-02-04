@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { Order, OrderProductRequest, OrderRequest, StockItem, OrderQuantityUnit } from '../types';
-import { OrderFloor } from '../types';
-import { stockItemApi } from '../api/inventory';
+import type { Order, OrderProductRequest, OrderRequest, StockItem, OrderQuantityUnit, Product, StockItemRequest } from '../types';
+import { OrderFloor, QuantityUnit, InventoryFloor } from '../types';
+import { stockItemApi, productApi } from '../api/inventory';
 import './AddOrderModal.css';
 import DeleteIcon from '../assets/delete.svg';
 
@@ -84,23 +84,30 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
-  const [stockItemsLoading, setStockItemsLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [creatingStockItemForIndex, setCreatingStockItemForIndex] = useState<number | null>(null);
 
   const isEditMode = Boolean(initialData);
 
   useEffect(() => {
-    const fetchStockItems = async () => {
+    const fetchData = async () => {
       try {
-        setStockItemsLoading(true);
-        const items = await stockItemApi.getAllStockItems();
+        setIsLoadingData(true);
+        const [items, productList] = await Promise.all([
+          stockItemApi.getAllStockItems(),
+          productApi.getProducts()
+        ]);
         setStockItems(items);
+        setProducts(productList);
       } catch (err) {
-        console.error('Failed to fetch stock items', err);
+        console.error('Failed to fetch data', err);
+        setError('Failed to load products and stock items.');
       } finally {
-        setStockItemsLoading(false);
+        setIsLoadingData(false);
       }
     };
-    fetchStockItems();
+    fetchData();
   }, []);
 
   const updateFormData = (updater: (prev: OrderRequest) => OrderRequest) => {
@@ -175,6 +182,52 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
         products,
       };
     });
+  };
+
+  const handleProductSelection = async (index: number, productId: number) => {
+    // Check if stock item exists for this product
+    const existingStockItem = stockItems.find(item => item.product.productId === productId);
+
+    if (existingStockItem) {
+      handleProductChange(index, 'itemId', existingStockItem.stockItemId);
+      handleProductChange(index, 'productName', existingStockItem.product.productName);
+
+      // Auto-populate relevant fields if needed, e.g. price
+      // handleProductChange(index, 'marketRate', existingStockItem.pricePerKg); 
+    } else {
+      // Create new stock item automatically
+      try {
+        setCreatingStockItemForIndex(index);
+
+        // Create new stock item with default/zero values
+        const newStockPayload: StockItemRequest = {
+          productId: productId,
+          categoryId: 1, // Fallback to 1. Ideally user would set this but requirement is auto-create.
+          quantityInKg: 0,
+          quantityInPc: 0,
+          weightPerPc: 0,
+          pricePerKg: 0,
+          quantityUnit: QuantityUnit.KG,
+          inventoryFloor: InventoryFloor.GROUND_FLOOR,
+          lowStockAlert: 0
+        };
+
+        const newStockItem = await stockItemApi.createStockItem(newStockPayload);
+
+        // Update local stock items list
+        setStockItems(prev => [...prev, newStockItem]);
+
+        // Select this new item
+        handleProductChange(index, 'itemId', newStockItem.stockItemId);
+        handleProductChange(index, 'productName', newStockItem.product.productName);
+
+      } catch (err: any) {
+        console.error('Failed to auto-create stock item', err);
+        setError('Selected product is not in inventory and failed to auto-create stock entry. Please add it to inventory manually.');
+      } finally {
+        setCreatingStockItemForIndex(null);
+      }
+    }
   };
 
   const handleAddProduct = () => {
@@ -389,6 +442,12 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
               {formData.products.map((product, index) => {
                 const unit = product.quantityUnit || 'kg';
                 const isPc = unit === 'pc';
+                const isCreating = creatingStockItemForIndex === index;
+
+                // Find selected product ID based on current stockItemId
+                const currentStockItem = stockItems.find(item => item.stockItemId === product.itemId);
+                const currentProductId = currentStockItem?.product.productId || '';
+
                 return (
                   <div className="line-item-card" key={`product-${index}`}>
                     <div className="line-item-card-header">
@@ -409,23 +468,19 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                       <div className="line-item-field line-item-field--product">
                         <label>Product*</label>
                         <select
-                          value={product.itemId || ''}
+                          value={currentProductId}
                           onChange={(e) => {
-                            const selectedItemId = Number(e.target.value);
-                            const selectedItem = stockItems.find((item) => item.stockItemId === selectedItemId);
-                            handleProductChange(index, 'itemId', selectedItemId);
-                            if (selectedItem) {
-                              handleProductChange(index, 'productName', selectedItem.product.productName);
-                            }
+                            const selectedProductId = Number(e.target.value);
+                            handleProductSelection(index, selectedProductId);
                           }}
                           required
-                          disabled={stockItemsLoading}
+                          disabled={isLoadingData || isCreating}
                           title="Select a product"
                         >
-                          <option value="">Select Product</option>
-                          {stockItems.map((item) => (
-                            <option key={item.stockItemId} value={item.stockItemId}>
-                              {item.product.productName}
+                          <option value="">{isCreating ? 'Creating Item...' : 'Select Product'}</option>
+                          {products.map((prod) => (
+                            <option key={prod.productId} value={prod.productId}>
+                              {prod.productName}
                             </option>
                           ))}
                         </select>
