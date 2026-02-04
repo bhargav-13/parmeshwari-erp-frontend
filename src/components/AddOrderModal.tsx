@@ -547,17 +547,15 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                 <div className="amount-grid">
                   <div className="order-form-group">
                     <label>Offline Bill %*</label>
-                    <select
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
                       value={formData.offlineBillPercent || ''}
-                      onChange={(e) => handleFieldChange('offlineBillPercent', Number(e.target.value) || 0)}
-                    >
-                      <option value="">Select %</option>
-                      {[0, 10, 15, 20, 25, 30, 40, 50].map((percent) => (
-                        <option value={percent} key={percent}>
-                          {percent}%
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(e) => handleFieldChange('offlineBillPercent', Number(e.target.value))}
+                      placeholder="0"
+                    />
                   </div>
                   <div className="order-form-group">
                     <label>Items Total*</label>
