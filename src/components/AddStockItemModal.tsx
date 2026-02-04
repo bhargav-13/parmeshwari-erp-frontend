@@ -314,12 +314,7 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
       // Use initialData or isSwitchedToEdit to determine if we are editing.
       // If we are editing (isEditMode or isSwitchedToEdit), we only care if the conflict id is DIFFERENT from current id.
       // Current editing ID: 
-      const currentEditingId = isSwitchedToEdit
-        ? duplicateItem?.stockItemId  // Actually we cleared duplicateItem, so we need to track it differently or just rely on 'isSwitchedToEdit' and 'initialData'?
-        // Wait, 'isSwitchedToEdit' implies we are now effectively 'isEditMode' but 'initialData' prop is unchanged.
-        // But we don't have the ID stored in a convenient place unless we add it to state.
-        // Actually `handleSubmit` uses `initialData.stockItemId`. If we switch, we need to know which ID to update.
-        : initialData?.stockItemId;
+
 
       // But wait, if we switch to edit, we should probably set some ID state.
       // Let's modify handleSubmit to handle this too.
