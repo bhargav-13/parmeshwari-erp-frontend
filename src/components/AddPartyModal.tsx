@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import type { Party } from '../types';
 import './AddProductModal.css'; // Reuse existing styles
+import { partyApi } from '../api/party';
 
 interface AddPartyModalProps {
   onClose: () => void;
-  onSuccess: (party: Party) => void;
+  onSuccess: () => void;
   initialData?: Party;
 }
 
 const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initialData }) => {
   const [name, setName] = useState('');
-  const [openingBalance, setOpeningBalance] = useState<number | ''>('');
+  const [amount, setAmount] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
-      setOpeningBalance(initialData.openingBalance);
+      setAmount(initialData.amount);
     }
   }, [initialData]);
 
@@ -34,16 +35,19 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
 
     try {
       setLoading(true);
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
 
-      const newParty: Party = {
-        partyId: initialData ? initialData.partyId : Math.floor(Math.random() * 1000) + 200, // Mock ID
+      const partyData = {
         name: name.trim(),
-        openingBalance: Number(openingBalance) || 0,
+        amount: Number(amount) || 0,
       };
 
-      onSuccess(newParty);
+      if (initialData) {
+        await partyApi.updateParty(initialData.partyId, partyData);
+      } else {
+        await partyApi.createParty(partyData);
+      }
+
+      onSuccess();
       onClose();
     } catch (err: any) {
       console.error("Error saving party:", err);
@@ -75,12 +79,12 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
           </div>
 
           <div className="form-group">
-            <label className="form-label">Opening Balance</label>
+            <label className="form-label">Amount</label>
             <input
               type="number"
-              value={openingBalance}
-              onChange={(e) => setOpeningBalance(e.target.value === '' ? '' : Number(e.target.value))}
-              placeholder="Enter Opening Balance"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="Enter Amount"
               className="form-input"
             />
           </div>

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import type { Party } from '../types';
 import Loading from '../components/Loading';
 import AddPartyModal from '../components/AddPartyModal';
+import PartyOrdersModal from '../components/PartyOrdersModal';
 import './InventoryPage.css'; // Reuse existing styles
 import SearchIcon from '../assets/search.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
+import ViewIcon from '../assets/view.svg';
 
-import { MOCK_PARTIES } from '../data/mockParties';
+import { partyApi } from '../api/party';
 
 const PartyMasterPage: React.FC = () => {
     const [parties, setParties] = useState<Party[]>([]);
@@ -15,40 +17,56 @@ const PartyMasterPage: React.FC = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [editingParty, setEditingParty] = useState<Party | undefined>(undefined);
+    const [viewingParty, setViewingParty] = useState<Party | null>(null);
 
     useEffect(() => {
-        // Simulate API call
-        const fetchParties = async () => {
-            setLoading(true);
-            setTimeout(() => {
-                setParties(MOCK_PARTIES);
-                setLoading(false);
-            }, 800);
-        };
         fetchParties();
-    }, []);
+    }, [searchQuery]);
+
+    const fetchParties = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            // Only pass search if it has a value to avoid backend null pointer
+            const data = await partyApi.getAllParties(searchQuery.trim() || undefined);
+            setParties(data);
+        } catch (err: any) {
+            console.error('Error fetching parties:', err);
+            setError('Failed to load parties. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleDelete = async (partyId: number) => {
         if (!window.confirm('Are you sure you want to delete this party?')) return;
         setDeletingId(partyId);
-        // Simulate delete
-        setTimeout(() => {
+        try {
+            await partyApi.deleteParty(partyId);
             setParties(parties.filter(p => p.partyId !== partyId));
+        } catch (err: any) {
+            console.error('Error deleting party:', err);
+            alert('Failed to delete party. Please try again.');
+        } finally {
             setDeletingId(null);
-        }, 500);
-        console.log('Deleted party:', partyId);
+        }
     };
 
-    const handleSuccess = (newParty: Party) => {
-        setParties([...parties, newParty]);
+    const handleSuccess = async () => {
+        await fetchParties();
+        setIsAddModalOpen(false);
+        setEditingParty(undefined);
     };
 
     const handleEdit = (party: Party) => {
-        // console.log('Edit party:', party);
-        // setIsAddModalOpen(true);
+        setEditingParty(party);
+        setIsAddModalOpen(true);
     };
 
     const handleAddParty = () => {
+        setEditingParty(undefined);
         setIsAddModalOpen(true);
     };
 
@@ -80,6 +98,12 @@ const PartyMasterPage: React.FC = () => {
                 </div>
             </div>
 
+            {error && (
+                <div style={{ padding: '1rem', backgroundColor: '#fee', color: '#c33', borderRadius: '4px', marginBottom: '1rem' }}>
+                    {error}
+                </div>
+            )}
+
             <div className="stats-grid">
                 <div className="stat-card">
                     <span className="stat-label">Total Parties</span>
@@ -110,7 +134,7 @@ const PartyMasterPage: React.FC = () => {
                             <th>Sr. No</th>
                             <th>Party ID</th>
                             <th>Party Name</th>
-                            <th>Opening Balance</th>
+                            <th>Amount</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -120,9 +144,17 @@ const PartyMasterPage: React.FC = () => {
                                 <td>{String(index + 1).padStart(2, '0')}</td>
                                 <td>{party.partyId}</td>
                                 <td>{party.name}</td>
-                                <td>₹{party.openingBalance.toLocaleString('en-IN')}</td>
+                                <td>₹{party.amount.toLocaleString('en-IN')}</td>
                                 <td>
                                     <div className="action-buttons">
+                                        <button
+                                            type="button"
+                                            className="icon-button"
+                                            onClick={() => setViewingParty(party)}
+                                            title="View Orders"
+                                        >
+                                            <img src={ViewIcon} alt="View" className="icon-img" />
+                                        </button>
                                         <button
                                             type="button"
                                             className="icon-button"
@@ -161,8 +193,19 @@ const PartyMasterPage: React.FC = () => {
 
             {isAddModalOpen && (
                 <AddPartyModal
-                    onClose={() => setIsAddModalOpen(false)}
+                    onClose={() => {
+                        setIsAddModalOpen(false);
+                        setEditingParty(undefined);
+                    }}
                     onSuccess={handleSuccess}
+                    initialData={editingParty}
+                />
+            )}
+
+            {viewingParty && (
+                <PartyOrdersModal
+                    partyName={viewingParty.name}
+                    onClose={() => setViewingParty(null)}
                 />
             )}
         </div>

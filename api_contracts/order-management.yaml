@@ -12,6 +12,8 @@ servers:
 tags:
   - name: Orders
     description: All operations for managing customer orders.
+  - name: Party
+    description: All operations for managing party.
 
 paths:
   # ------------------------------------------------------------
@@ -225,6 +227,222 @@ paths:
           description: Order not found
       security:
         - oauth2: [ ]
+  /api/v1/parties:
+    get:
+      operationId: getAllParties
+      tags:
+        - Party
+      summary: Get all parties
+      parameters:
+        - $ref: '#/components/parameters/searchParam'
+      responses:
+        '200':
+          description: Party list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderParty'
+      security:
+        - oauth2: [ ]
+    post:
+      operationId: createParty
+      tags:
+        - Party
+      summary: Create party
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrderParty'
+      responses:
+        '201':
+          description: Party created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderParty'
+      security:
+        - oauth2: [ ]
+  /api/v1/parties/{id}:
+    get:
+      operationId: getPartyById
+      tags:
+        - Party
+      summary: Get party by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Party details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderParty'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+      security:
+        - oauth2: [ ]
+    put:
+      operationId: updateParty
+      tags:
+        - Party
+      summary: Update party
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrderParty'
+      responses:
+        '200':
+          description: Party updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderParty'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+      security:
+        - oauth2: [ ]
+    delete:
+      operationId: deleteParty
+      tags:
+        - Party
+      summary: Delete party
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Party deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+      security:
+        - oauth2: [ ]
+  /api/v1/order/getByParty:
+    get:
+      tags:
+        - Party
+      operationId: getOrderListByParty
+      summary: Get all  orders By party
+      description: Returns list of all orders.
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: list of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderByPartyResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+  /api/v1/order/getByParty/{partyName}:
+    get:
+      tags:
+        - Party
+      operationId: getOrderByPartyName
+      summary: Get orders by party name
+      description: Returns list of all orders.
+      parameters:
+        - name: partyName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: orders by party
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderByPartyResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+  /api/v1/order/getByParty/{partyName}/pdf:
+    get:
+      tags:
+        - Party
+      operationId: getOrderByPartyNamePdf
+      summary: Get order by party name as pdf
+      description: Returns list of all orders.
+      parameters:
+        - name: partyName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PDF generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
 
 # ------------------------------------------------------------
 # COMPONENTS
@@ -269,6 +487,13 @@ components:
         type: string
         enum: [ lastUpdatedAt , createdAt , orderDate , expectedDeliveryDate , orderStatus ]
 
+    searchParam:
+      name: search
+      in: query
+      description: Search text to filter results by name or relevant fields
+      schema:
+        type: string
+
   schemas:
 
     # ------------------------------------------------------------
@@ -277,12 +502,13 @@ components:
     OrderRequest:
       type: object
       required:
+        - partyId
         - customerName
         - orderDate
         - expectedDeliveryDate
       properties:
-        customerName:
-          type: string
+        partyId:
+          type: integer
         customerMobileNo:
           type: string
           nullable: true
@@ -368,8 +594,8 @@ components:
       properties:
         id:
           type: integer
-        customerName:
-          type: string
+        party:
+          $ref: '#/components/schemas/OrderParty'
         customerMobileNo:
           type: string
           nullable: true
@@ -469,11 +695,11 @@ components:
         quantityKg:
           type: number
           format: double
-          description: Quantity to deduct from inventory (in kg)
+          description: Quantity to deduct from inventory in KG
         quantityPc:
           type: number
           format: double
-          description: Quantity to deduct from inventory (in pieces)
+          description: Quantity to deduct from inventory in pieces
 
     OrderFloor:
       type: string
@@ -510,3 +736,79 @@ components:
           type: integer
         size:
           type: integer
+    NewOrderParty:
+      required:
+        - name
+        - amount
+      type: object
+      properties:
+        name:
+          type: string
+        amount:
+          type: number
+          format: double
+    OrderParty:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        amount:
+          type: number
+          format: double
+    OrderByPartyResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderByParty'
+    OrderByParty:
+      type: object
+      properties:
+        orderDate:
+          type: string
+          format: date
+        officialInvoiceId:
+          type: integer
+        offlineInvoiceId:
+          type: integer
+        officialTotalAmount:
+          type: number
+          format: double
+        offlineTotalAmount:
+          type: number
+          format: double
+  
+  responses:
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
