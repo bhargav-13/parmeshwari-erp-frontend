@@ -301,6 +301,7 @@ export interface DispatchRequest {
 }
 
 export interface OrderRequest {
+  partyId: number;
   customerName: string;
   customerMobileNo?: string | null;
   customerEmail?: string | null;
@@ -460,10 +461,25 @@ export interface SubcontractingBySubcontractList {
 export interface Party {
   partyId: number;
   name: string;
+  amount: number;
 }
 
 export interface PartyRequest {
   name: string;
+  amount: number;
+}
+
+export interface OrderByParty {
+  orderDate: string;
+  officialInvoiceId: number;
+  offlineInvoiceId: number;
+  officialTotalAmount: number;
+  offlineTotalAmount: number;
+}
+
+export interface OrderByPartyResponse {
+  name: string;
+  orders: OrderByParty[];
 }
 
 // Crome Types

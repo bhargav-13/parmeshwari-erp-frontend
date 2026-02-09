@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { Order, OrderProductRequest, OrderRequest, StockItem, OrderQuantityUnit, Product, StockItemRequest } from '../types';
+import type { Order, OrderProductRequest, OrderRequest, StockItem, OrderQuantityUnit, Product, StockItemRequest, Party } from '../types';
 import { OrderFloor, QuantityUnit, InventoryFloor } from '../types';
 import { stockItemApi, productApi } from '../api/inventory';
+import { partyApi } from '../api/party';
 import './AddOrderModal.css';
 import DeleteIcon from '../assets/delete.svg';
 
@@ -28,6 +29,7 @@ const createEmptyProduct = (): OrderProductRequest => ({
 const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloor): OrderRequest => {
   if (!initialData) {
     return {
+      partyId: 0,
       customerName: '',
       customerMobileNo: '',
       customerEmail: '',
@@ -85,6 +87,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
   const [isSaving, setIsSaving] = useState(false);
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [parties, setParties] = useState<Party[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [creatingStockItemForIndex, setCreatingStockItemForIndex] = useState<number | null>(null);
 
@@ -94,15 +97,17 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
     const fetchData = async () => {
       try {
         setIsLoadingData(true);
-        const [items, productList] = await Promise.all([
+        const [items, productList, partyList] = await Promise.all([
           stockItemApi.getAllStockItems(),
-          productApi.getProducts()
+          productApi.getProducts(),
+          partyApi.getAllParties()
         ]);
         setStockItems(items);
         setProducts(productList);
+        setParties(partyList);
       } catch (err) {
         console.error('Failed to fetch data', err);
-        setError('Failed to load products and stock items.');
+        setError('Failed to load products, stock items, and parties.');
       } finally {
         setIsLoadingData(false);
       }
@@ -248,8 +253,8 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
   };
 
   const validateForm = () => {
-    if (!formData.customerName.trim()) {
-      setError('Customer name is required.');
+    if (!formData.partyId || formData.partyId === 0) {
+      setError('Please select a party.');
       setActiveTab('order');
       return false;
     }
@@ -350,14 +355,27 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
           {activeTab === 'order' && (
             <div className="order-details-grid">
               <div className="order-form-group">
-                <label>Customer Name*</label>
-                <input
-                  type="text"
-                  value={formData.customerName}
-                  onChange={(e) => handleFieldChange('customerName', e.target.value)}
-                  placeholder="Acme Corp"
+                <label>Party*</label>
+                <select
+                  value={formData.partyId}
+                  onChange={(e) => {
+                    const selectedPartyId = Number(e.target.value);
+                    const selectedParty = parties.find(p => p.partyId === selectedPartyId);
+                    handleFieldChange('partyId', selectedPartyId);
+                    if (selectedParty) {
+                      handleFieldChange('customerName', selectedParty.name);
+                    }
+                  }}
                   required
-                />
+                  disabled={isLoadingData}
+                >
+                  <option value="0">Select Party</option>
+                  {parties.map((party) => (
+                    <option key={party.partyId} value={party.partyId}>
+                      {party.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="order-form-group">
                 <label>Order Date*</label>
