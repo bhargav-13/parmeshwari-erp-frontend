@@ -1,6 +1,6 @@
-import React from 'react';
+// import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -21,17 +21,18 @@ import PaymentReminderGroundFloorPage from './pages/PaymentReminderGroundFloorPa
 import PaymentReminderFirstFloorPage from './pages/PaymentReminderFirstFloorPage';
 import KevinScrapPage from './pages/KevinScrapPage';
 import JayeshScrapPage from './pages/JayeshScrapPage';
+import PartyMasterPage from './pages/PartyMasterPage';
 import './App.css';
 
-const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <div className="loading-screen">Loading...</div>;
-  }
-
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-};
+// const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+//   const { isAuthenticated, isLoading } = useAuth();
+// 
+//   if (isLoading) {
+//     return <div className="loading-screen">Loading...</div>;
+//   }
+// 
+//   return isAuthenticated ? children : <Navigate to="/login" replace />;
+// };
 
 function App() {
   return (
@@ -43,11 +44,7 @@ function App() {
 
           <Route
             path="/"
-            element={
-              <PrivateRoute>
-                <Layout />
-              </PrivateRoute>
-            }
+            element={<Layout />}
           >
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
@@ -68,6 +65,7 @@ function App() {
             <Route path="payment-reminder/first-floor" element={<PaymentReminderFirstFloorPage />} />
             <Route path="scrap/kevin" element={<KevinScrapPage />} />
             <Route path="scrap/jayesh" element={<JayeshScrapPage />} />
+            <Route path="party-master" element={<PartyMasterPage />} />
             <Route path="settings" element={<div className="placeholder">Settings Coming Soon</div>} />
           </Route>
         </Routes>

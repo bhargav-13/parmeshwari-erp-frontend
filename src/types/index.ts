@@ -460,6 +460,7 @@ export interface SubcontractingBySubcontractList {
 export interface Party {
   partyId: number;
   name: string;
+  openingBalance: number;
 }
 
 export interface PartyRequest {

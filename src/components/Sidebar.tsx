@@ -52,6 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const menuItems = [
     { path: '/dashboard', icon: <img src={DashboardSVG} alt='dashboard' />, label: 'Dashboard' },
     { path: '/crm', icon: <img src={CRMSSVG} alt='CRM' />, label: 'CRM & Sales' },
+    { path: '/party-master', icon: <img src={ProfileSVG} alt='Party Master' />, label: 'Party Master' },
   ];
 
   const inventorySubItems = [
@@ -110,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <div className="sidebar-divider"></div>
 
       <nav className="sidebar-nav">
-        {menuItems.slice(0, 2).map((item) => (
+        {menuItems.slice(0, 3).map((item) => (
           <Link
             key={item.path}
             to={item.path}

@@ -1,19 +1,30 @@
-import React, { useState } from 'react';
-import type { PartyRequest } from '../types';
-import './AddPartyModal.css';
+import React, { useState, useEffect } from 'react';
+import type { Party } from '../types';
+import './AddProductModal.css'; // Reuse existing styles
 
 interface AddPartyModalProps {
   onClose: () => void;
-  onSubmit: (data: PartyRequest) => Promise<void>;
+  onSuccess: (party: Party) => void;
+  initialData?: Party;
 }
 
-const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSubmit }) => {
+const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initialData }) => {
   const [name, setName] = useState('');
+  const [openingBalance, setOpeningBalance] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setOpeningBalance(initialData.openingBalance);
+    }
+  }, [initialData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
+    e.stopPropagation(); // Stop event propagation
+
     setError(null);
 
     if (!name.trim()) {
@@ -23,9 +34,20 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSubmit }) => {
 
     try {
       setLoading(true);
-      await onSubmit({ name: name.trim() });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const newParty: Party = {
+        partyId: initialData ? initialData.partyId : Math.floor(Math.random() * 1000) + 200, // Mock ID
+        name: name.trim(),
+        openingBalance: Number(openingBalance) || 0,
+      };
+
+      onSuccess(newParty);
+      onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to add party');
+      console.error("Error saving party:", err);
+      setError('Failed to save party');
     } finally {
       setLoading(false);
     }
@@ -33,24 +55,35 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSubmit }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content party-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Add Party</h2>
+      <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
+        <h2 className="modal-title">{initialData ? 'Edit Party' : 'Add New Party'}</h2>
+
+        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group">
-            <label className="form-label" htmlFor="partyName">Party Name*</label>
+            <label className="form-label">Party Name*</label>
             <input
               type="text"
-              id="partyName"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              placeholder="Enter Party Name"
               className="form-input"
-              placeholder="Enter party name"
               required
+              autoFocus
             />
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          <div className="form-group">
+            <label className="form-label">Opening Balance</label>
+            <input
+              type="number"
+              value={openingBalance}
+              onChange={(e) => setOpeningBalance(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="Enter Opening Balance"
+              className="form-input"
+            />
+          </div>
 
           <div className="modal-actions">
             <button type="submit" className="save-button" disabled={loading}>

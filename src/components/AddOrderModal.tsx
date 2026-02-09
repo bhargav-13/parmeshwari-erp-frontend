@@ -4,6 +4,7 @@ import { OrderFloor, QuantityUnit, InventoryFloor } from '../types';
 import { stockItemApi, productApi } from '../api/inventory';
 import './AddOrderModal.css';
 import DeleteIcon from '../assets/delete.svg';
+import { MOCK_PARTIES } from '../data/mockParties';
 
 interface AddOrderModalProps {
   onClose: () => void;
@@ -351,13 +352,18 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
             <div className="order-details-grid">
               <div className="order-form-group">
                 <label>Customer Name*</label>
-                <input
-                  type="text"
+                <select
                   value={formData.customerName}
                   onChange={(e) => handleFieldChange('customerName', e.target.value)}
-                  placeholder="Acme Corp"
                   required
-                />
+                >
+                  <option value="">Select Customer</option>
+                  {MOCK_PARTIES.map((party) => (
+                    <option key={party.partyId} value={party.name}>
+                      {party.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="order-form-group">
                 <label>Order Date*</label>
