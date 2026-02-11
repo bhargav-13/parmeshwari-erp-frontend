@@ -462,12 +462,14 @@ export interface SubcontractingBySubcontractList {
 export interface Party {
   partyId: number;
   name: string;
-  amount: number;
+  officialAmount: number;
+  offlineAmount: number;
 }
 
 export interface PartyRequest {
   name: string;
-  amount: number;
+  officialAmount: number;
+  offlineAmount: number;
 }
 
 export interface OrderByParty {

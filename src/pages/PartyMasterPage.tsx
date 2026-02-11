@@ -134,7 +134,8 @@ const PartyMasterPage: React.FC = () => {
                             <th>Sr. No</th>
                             <th>Party ID</th>
                             <th>Party Name</th>
-                            <th>Amount</th>
+                            <th>Official Amount</th>
+                            <th>Offline Amount</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -144,7 +145,8 @@ const PartyMasterPage: React.FC = () => {
                                 <td>{String(index + 1).padStart(2, '0')}</td>
                                 <td>{party.partyId}</td>
                                 <td>{party.name}</td>
-                                <td>₹{party.amount.toLocaleString('en-IN')}</td>
+                                <td>₹{party.officialAmount.toLocaleString('en-IN')}</td>
+                                <td>₹{party.offlineAmount.toLocaleString('en-IN')}</td>
                                 <td>
                                     <div className="action-buttons">
                                         <button
@@ -182,7 +184,7 @@ const PartyMasterPage: React.FC = () => {
                         ))}
                         {filteredParties.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="no-data">
+                                <td colSpan={6} className="no-data">
                                     No parties found
                                 </td>
                             </tr>

@@ -11,12 +11,14 @@ const generatedPartyApi = new PartyApi(apiClient);
 const convertToParty = (orderParty: any): Party => ({
     partyId: orderParty.id || 0,
     name: orderParty.name || '',
-    amount: orderParty.amount || 0,
+    officialAmount: orderParty.officialAmount || 0,
+    offlineAmount: orderParty.offlineAmount || 0,
 });
 
-const convertToNewOrderParty = (data: { name: string; amount: number }): any => ({
+const convertToNewOrderParty = (data: { name: string; officialAmount: number; offlineAmount: number }): any => ({
     name: data.name,
-    amount: data.amount,
+    officialAmount: data.officialAmount,
+    offlineAmount: data.offlineAmount,
 });
 
 const convertToOrderByPartyResponse = (response: any): OrderByPartyResponse => ({
@@ -45,13 +47,13 @@ export const partyApi = {
         ).then(convertToParty),
 
     // Create new party
-    createParty: (data: { name: string; amount: number }): Promise<Party> =>
+    createParty: (data: { name: string; officialAmount: number; offlineAmount: number }): Promise<Party> =>
         promisify<any>(cb =>
             generatedPartyApi.createParty(convertToNewOrderParty(data), cb)
         ).then(convertToParty),
 
     // Update existing party
-    updateParty: (id: number, data: { name: string; amount: number }): Promise<Party> =>
+    updateParty: (id: number, data: { name: string; officialAmount: number; offlineAmount: number }): Promise<Party> =>
         promisify<any>(cb =>
             generatedPartyApi.updateParty(id, convertToNewOrderParty(data), cb)
         ).then(convertToParty),
@@ -70,7 +72,12 @@ export const partyApi = {
     getOrdersByPartyName: (partyName: string): Promise<OrderByPartyResponse> =>
         promisify<any>(cb =>
             generatedPartyApi.getOrderByPartyName(partyName, cb)
-        ).then(convertToOrderByPartyResponse),
+        ).then(response => {
+            if (!response || typeof response !== 'object') {
+                return { name: partyName, orders: [] };
+            }
+            return convertToOrderByPartyResponse(response);
+        }).catch(() => ({ name: partyName, orders: [] })),
 
     // Download PDF for specific party
     downloadPartyPdf: async (partyName: string): Promise<Blob> => {
