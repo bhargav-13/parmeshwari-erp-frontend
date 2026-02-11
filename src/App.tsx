@@ -24,6 +24,7 @@ import JayeshScrapPage from './pages/JayeshScrapPage';
 import PartyMasterPage from './pages/PartyMasterPage';
 import ElectricPage from './pages/ElectricPage';
 import CastingPage from './pages/CastingPage';
+import ForginPage from './pages/ForginPage';
 import './App.css';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -74,6 +75,7 @@ function App() {
             <Route path="party-master" element={<PartyMasterPage />} />
             <Route path="electric" element={<ElectricPage />} />
             <Route path="casting" element={<CastingPage />} />
+            <Route path="forging" element={<ForginPage />} />
             <Route path="settings" element={<div className="placeholder">Settings Coming Soon</div>} />
           </Route>
         </Routes>
