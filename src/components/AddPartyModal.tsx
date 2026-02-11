@@ -11,14 +11,16 @@ interface AddPartyModalProps {
 
 const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initialData }) => {
   const [name, setName] = useState('');
-  const [amount, setAmount] = useState<number | ''>('');
+  const [officialAmount, setOfficialAmount] = useState<number | ''>('');
+  const [offlineAmount, setOfflineAmount] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
-      setAmount(initialData.amount);
+      setOfficialAmount(initialData.officialAmount);
+      setOfflineAmount(initialData.offlineAmount);
     }
   }, [initialData]);
 
@@ -38,7 +40,8 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
 
       const partyData = {
         name: name.trim(),
-        amount: Number(amount) || 0,
+        officialAmount: Number(officialAmount) || 0,
+        offlineAmount: Number(offlineAmount) || 0,
       };
 
       if (initialData) {
@@ -79,12 +82,23 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
           </div>
 
           <div className="form-group">
-            <label className="form-label">Amount</label>
+            <label className="form-label">Official Amount</label>
             <input
               type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
-              placeholder="Enter Amount"
+              value={officialAmount}
+              onChange={(e) => setOfficialAmount(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="Enter Official Amount"
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Offline Amount</label>
+            <input
+              type="number"
+              value={offlineAmount}
+              onChange={(e) => setOfflineAmount(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="Enter Offline Amount"
               className="form-input"
             />
           </div>

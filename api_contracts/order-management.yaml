@@ -739,12 +739,14 @@ components:
     NewOrderParty:
       required:
         - name
-        - amount
       type: object
       properties:
         name:
           type: string
-        amount:
+        officialAmount:
+          type: number
+          format: double
+        offlineAmount:
           type: number
           format: double
     OrderParty:
@@ -755,7 +757,10 @@ components:
           format: int64
         name:
           type: string
-        amount:
+        officialAmount:
+          type: number
+          format: double
+        offlineAmount:
           type: number
           format: double
     OrderByPartyResponse:

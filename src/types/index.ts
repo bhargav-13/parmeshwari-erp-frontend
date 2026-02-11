@@ -300,6 +300,7 @@ export interface DispatchRequest {
   items: DispatchItem[];
 }
 
+//orderrequest
 export interface OrderRequest {
   partyId: number;
   customerName: string;
@@ -461,12 +462,14 @@ export interface SubcontractingBySubcontractList {
 export interface Party {
   partyId: number;
   name: string;
-  amount: number;
+  officialAmount: number;
+  offlineAmount: number;
 }
 
 export interface PartyRequest {
   name: string;
-  amount: number;
+  officialAmount: number;
+  offlineAmount: number;
 }
 
 export interface OrderByParty {
