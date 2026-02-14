@@ -580,3 +580,32 @@ export interface CastingSale {
   lokhandAmount: number | null;
   totalAmount?: number;
 }
+
+// Forging Types
+export const WeightUnit = {
+  CHHOL: 'CHHOL',
+  KG: 'KG',
+  WIRE: 'WIRE',
+} as const;
+
+export type WeightUnit = typeof WeightUnit[keyof typeof WeightUnit];
+
+export interface ForgingInward {
+  id?: number;
+  partyName: string;
+  challanNo: string;
+  date: string; // DD/MM/YYYY format for UI
+  weight: number;
+  weightUnit: WeightUnit;
+  image?: string;
+}
+
+export interface ForgingOutward {
+  id?: number;
+  partyName: string;
+  challanNo: string;
+  date: string; // DD/MM/YYYY format for UI
+  weight: number;
+  weightUnit: WeightUnit;
+  image?: string;
+}
