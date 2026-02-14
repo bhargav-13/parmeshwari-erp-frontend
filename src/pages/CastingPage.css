@@ -167,55 +167,63 @@
 .casting-page .order-filters {
     display: flex;
     gap: 16px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+    margin-bottom: 24px;
 }
 
-.casting-page .order-search,
-.casting-page .filter-group-btn {
+.casting-page .order-search {
     flex: 1;
-    min-width: 220px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border: 1px solid rgba(23, 52, 77, 0.1);
-    /* Lighter border */
-    border-radius: 14px;
+    gap: 12px;
+    padding: 10px 16px;
     background: #FFFFFF;
-    /* White background as requested/implied */
-    padding: 6px 12px;
+    border: 1px solid rgba(125, 153, 169, 0.2);
+    border-radius: 8px;
 }
 
-.casting-page .filter-group-btn {
-    flex: 0 0 auto;
-    /* Don't grow too much if strictly buttons */
-    min-width: unset;
-    cursor: pointer;
-    font-family: 'Jost', sans-serif;
-    font-size: 14px;
-    color: #17344d;
+.casting-page .order-search img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
 }
 
-.casting-page .order-search img,
-.casting-page .filter-group-btn img {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-}
-
-.search-input {
+.casting-page .order-search input {
+    flex: 1;
     border: none;
-    background: transparent;
     outline: none;
     font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #17344d;
-    flex: 1;
-    width: 100%;
+    color: #17344D;
+    background: transparent;
 }
 
-.search-input::placeholder {
-    color: #8E8E8E;
+.casting-page .order-search input::placeholder {
+    color: #A7A7A7;
+}
+
+.casting-page .filter-group-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #FFFFFF;
+    border: 1px solid rgba(125, 153, 169, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: #17344D;
+    transition: background-color 0.2s ease;
+}
+
+.casting-page .filter-group-btn:hover {
+    background: #F5F5F5;
+}
+
+.casting-page .filter-group-btn img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
 }
 
 /* Table */

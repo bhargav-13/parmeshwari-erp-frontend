@@ -2,21 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './AddProductModal.css'; // Reuse existing modal styles
 // We might need specific styles, but let's try to reuse generic ones and add inline or new classes if needed.
 import './AddCastingSellModal.css';
-
-interface SellEntry {
-    date: string;
-    kadi: number | null;
-    kadiRate: number | null;
-    kadiAmount: number | null;
-    lokhand: number | null;
-    lokhandRate: number | null;
-    lokhandAmount: number | null;
-    ok: boolean;
-}
+import type { CastingSale } from '../types';
 
 interface AddCastingSellModalProps {
     onClose: () => void;
-    onSuccess: (entry: SellEntry) => void;
+    onSuccess: (entry: Omit<CastingSale, 'id' | 'totalAmount'>) => void;
 }
 
 const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSuccess }) => {
@@ -59,7 +49,7 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
             setLoading(true);
             await new Promise(resolve => setTimeout(resolve, 300));
 
-            const newEntry: SellEntry = {
+            const newEntry: Omit<CastingSale, 'id' | 'totalAmount'> = {
                 date: date.split('-').reverse().join('/'), // Format YYYY-MM-DD to DD/MM/YYYY
                 kadi: kadi === '' ? null : Number(kadi),
                 kadiRate: kadiRate === '' ? null : Number(kadiRate),
@@ -67,7 +57,6 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
                 lokhand: lokhand === '' ? null : Number(lokhand),
                 lokhandRate: lokhandRate === '' ? null : Number(lokhandRate),
                 lokhandAmount: lokhandAmount === '' ? null : Number(lokhandAmount),
-                ok: false // Default to false? Reference didn't show this field input.
             };
 
             onSuccess(newEntry);

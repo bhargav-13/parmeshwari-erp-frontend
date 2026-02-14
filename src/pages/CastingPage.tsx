@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import './CastingPage.css';
+import React, { useState, useEffect } from 'react';
+import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
 import AddCastingEntryModal from '../components/AddCastingEntryModal';
 import AddCastingSellModal from '../components/AddCastingSellModal';
+import { castingApi, castingSaleApi } from '../api/casting';
+import type { CastingEntry, CastingSale } from '../types';
+import Loading from '../components/Loading';
 
 // Inline Download Icon for now
 const DownloadIcon = () => (
@@ -16,53 +19,94 @@ const DownloadIcon = () => (
 
 type Tab = 'coming' | 'sell';
 
-interface CastingEntry {
-    date: string;
-    mell: number;
-    brass: number;
-}
-
-interface SellEntry {
-    date: string;
-    kadi: number | null;
-    kadiRate: number | null;
-    kadiAmount: number | null;
-    lokhand: number | null;
-    lokhandRate: number | null;
-    lokhandAmount: number | null;
-    ok: boolean;
-}
-
-const INITIAL_MOCK_DATA: CastingEntry[] = [
-    { date: '01/01/2026', mell: 87.0, brass: 0.0 },
-    { date: '01/01/2026', mell: 112.0, brass: 0.0 },
-    { date: '01/01/2026', mell: 617.0, brass: 25.0 },
-    { date: '01/01/2026', mell: 112.0, brass: 116.5 },
-    { date: '01/01/2026', mell: 112.0, brass: 87.5 },
-];
-
-const INITIAL_SELL_MOCK_DATA: SellEntry[] = [
-    { date: '10/01/2026', kadi: null, kadiRate: null, kadiAmount: null, lokhand: 259.000, lokhandRate: 60, lokhandAmount: 17612, ok: false },
-    { date: '10/01/2026', kadi: 617.000, kadiRate: 60.000, kadiAmount: 37062.00, lokhand: null, lokhandRate: null, lokhandAmount: null, ok: false },
-    { date: '10/01/2026', kadi: null, kadiRate: null, kadiAmount: null, lokhand: 259.000, lokhandRate: 60, lokhandAmount: 17612, ok: false },
-    { date: '10/01/2026', kadi: 617.000, kadiRate: 60.000, kadiAmount: 37062.00, lokhand: null, lokhandRate: null, lokhandAmount: null, ok: false },
-    { date: '10/01/2026', kadi: 617.000, kadiRate: 60.000, kadiAmount: 37062.00, lokhand: 617.000, lokhandRate: 60.000, lokhandAmount: 37062.00, ok: false },
-];
-
 const CastingPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<Tab>('coming');
     const [searchQuery, setSearchQuery] = useState('');
-    const [entries, setEntries] = useState<CastingEntry[]>(INITIAL_MOCK_DATA);
-    const [sellEntries, setSellEntries] = useState<SellEntry[]>(INITIAL_SELL_MOCK_DATA);
+    const [entries, setEntries] = useState<CastingEntry[]>([]);
+    const [sellEntries, setSellEntries] = useState<CastingSale[]>([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isSellModalOpen, setIsSellModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleAddEntry = (newEntry: CastingEntry) => {
-        setEntries(prev => [...prev, newEntry]);
+    // Fetch casting entries
+    useEffect(() => {
+        if (activeTab === 'coming') {
+            fetchCastingEntries();
+        } else {
+            fetchCastingSales();
+        }
+    }, [activeTab]);
+
+    const fetchCastingEntries = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await castingApi.getAllCastings();
+            setEntries(data);
+        } catch (err: any) {
+            console.error('Error fetching casting entries:', err);
+            setError('Failed to load casting entries. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleAddSellEntry = (newEntry: SellEntry) => {
-        setSellEntries(prev => [...prev, newEntry]);
+    const fetchCastingSales = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await castingSaleApi.getAllCastingSales();
+            setSellEntries(data);
+        } catch (err: any) {
+            console.error('Error fetching casting sales:', err);
+            setError('Failed to load casting sales. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAddEntry = async (newEntry: Omit<CastingEntry, 'id'>) => {
+        try {
+            await castingApi.createCasting(newEntry);
+            await fetchCastingEntries();
+            setIsAddModalOpen(false);
+        } catch (err: any) {
+            console.error('Error creating casting entry:', err);
+            alert('Failed to create casting entry. Please try again.');
+        }
+    };
+
+    const handleAddSellEntry = async (newEntry: Omit<CastingSale, 'id' | 'totalAmount'>) => {
+        try {
+            await castingSaleApi.createCastingSale(newEntry);
+            await fetchCastingSales();
+            setIsSellModalOpen(false);
+        } catch (err: any) {
+            console.error('Error creating casting sale:', err);
+            alert('Failed to create casting sale. Please try again.');
+        }
+    };
+
+    const handleDownloadPdf = async () => {
+        try {
+            const blob = activeTab === 'coming'
+                ? await castingApi.downloadCastingPdf()
+                : await castingSaleApi.downloadCastingSalePdf();
+
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `casting-${activeTab}-${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (err: any) {
+            console.error('Error downloading PDF:', err);
+            alert('Failed to download PDF. Please try again.');
+        }
     };
 
     // Calculate dynamic stats for Coming Tab
@@ -75,8 +119,12 @@ const CastingPage: React.FC = () => {
     const totalLokhand = sellEntries.reduce((sum, entry) => sum + (entry.lokhand || 0), 0);
     const totalLokhandAmount = sellEntries.reduce((sum, entry) => sum + (entry.lokhandAmount || 0), 0);
 
+    if (loading) {
+        return <Loading message="Loading casting data..." />;
+    }
+
     return (
-        <div className="casting-page">
+        <div className="inventory-page">
             <div className="page-header">
                 <div className="page-title-section">
                     <h1 className="page-title">Casting Management</h1>
@@ -104,6 +152,12 @@ const CastingPage: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            {error && (
+                <div style={{ padding: '1rem', backgroundColor: '#fee', color: '#c33', borderRadius: '4px', marginBottom: '1rem' }}>
+                    {error}
+                </div>
+            )}
 
             <div className="casting-toggle-container">
                 <button
@@ -140,16 +194,15 @@ const CastingPage: React.FC = () => {
                                 <input
                                     type="text"
                                     placeholder="Search"
-                                    className="search-input"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
-                            <button className="filter-group-btn">
+                            <button className="order-status-filter" onClick={handleDownloadPdf}>
                                 <span className="button-text">Download</span>
                                 <DownloadIcon />
                             </button>
-                            <button className="filter-group-btn">
+                            <button className="order-status-filter">
                                 <img src={FilterIcon} alt="Filter" />
                                 <span className="button-text">Filter</span>
                             </button>
@@ -204,16 +257,15 @@ const CastingPage: React.FC = () => {
                                 <input
                                     type="text"
                                     placeholder="Search"
-                                    className="search-input"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
-                            <button className="filter-group-btn">
+                            <button className="order-status-filter" onClick={handleDownloadPdf}>
                                 <span className="button-text">Download</span>
                                 <DownloadIcon />
                             </button>
-                            <button className="filter-group-btn">
+                            <button className="order-status-filter">
                                 <img src={FilterIcon} alt="Filter" />
                                 <span className="button-text">Filter</span>
                             </button>
@@ -230,7 +282,6 @@ const CastingPage: React.FC = () => {
                                         <th>Lokhand</th>
                                         <th>Rate</th>
                                         <th>Amount</th>
-                                        <th>Ok</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -243,7 +294,6 @@ const CastingPage: React.FC = () => {
                                             <td>{row.lokhand ? row.lokhand.toFixed(3) : ''}</td>
                                             <td>{row.lokhandRate ? row.lokhandRate : ''}</td>
                                             <td>{row.lokhandAmount ? row.lokhandAmount.toLocaleString('en-IN') : ''}</td>
-                                            <td>{row.ok ? 'Yes' : ''}</td>
                                         </tr>
                                     ))}
                                 </tbody>

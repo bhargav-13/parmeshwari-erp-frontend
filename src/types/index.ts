@@ -561,3 +561,22 @@ export interface CromeReturnRequest {
   inventoryQuantityPc?: number;
 }
 
+// Casting Types
+export interface CastingEntry {
+  id?: number;
+  date: string; // DD/MM/YYYY format for UI
+  mell: number;
+  brass: number;
+}
+
+export interface CastingSale {
+  id?: number;
+  date: string; // DD/MM/YYYY format for UI
+  kadi: number | null;
+  kadiRate: number | null;
+  kadiAmount: number | null;
+  lokhand: number | null;
+  lokhandRate: number | null;
+  lokhandAmount: number | null;
+  totalAmount?: number;
+}

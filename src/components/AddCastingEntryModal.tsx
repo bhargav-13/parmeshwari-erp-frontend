@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import './AddProductModal.css'; // Reuse existing modal styles
-
-interface CastingEntry {
-    date: string;
-    mell: number;
-    brass: number;
-}
+import type { CastingEntry } from '../types';
 
 interface AddCastingEntryModalProps {
     onClose: () => void;
-    onSuccess: (entry: CastingEntry) => void;
+    onSuccess: (entry: Omit<CastingEntry, 'id'>) => void;
 }
 
 const AddCastingEntryModal: React.FC<AddCastingEntryModalProps> = ({ onClose, onSuccess }) => {
