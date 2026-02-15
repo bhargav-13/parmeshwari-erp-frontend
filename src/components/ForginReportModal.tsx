@@ -6,12 +6,8 @@ interface InwardEntry {
     date: string;
     challanNo: string;
     price: number;
-    weight: number; // Chhol seems to be derived/related to weight or is the weight itself? Based on context, using 'weight' for now.
-    // The image shows 'Chhol' and 'Tayarmaal'.
-    // If 'Chhol' is raw weight and 'Tayarmaal' is finished weight, we might need to clarify.
-    // For now I will strictly follow the provided image columns.
-    // The image has: Date, Challan No., Chhol, Tayarmaal
-    chhol?: number;
+    weight: number;
+    chhol?: string;
     tayarmaal?: number;
 }
 
@@ -47,7 +43,7 @@ const ForginReportModal: React.FC<ForginReportModalProps> = ({
     };
 
     // Calculate totals
-    const totalChhol = inwardData.reduce((sum, item) => sum + (item.chhol || 0), 0);
+    const totalChhol = inwardData.reduce((sum, item) => sum + (Number(item.chhol) || 0), 0);
     const totalTayarmaal = inwardData.reduce((sum, item) => sum + (item.tayarmaal || 0), 0);
     const totalWire = outwardData.reduce((sum, item) => sum + (item.wire || 0), 0);
     const totalOutward = totalWire; // Based on image "Total Outward" seems to be sum of wire or specific outward field? Assuming Total Wire for now.
@@ -131,7 +127,7 @@ const ForginReportModal: React.FC<ForginReportModalProps> = ({
                                 {row.inward ? row.inward.challanNo : ''}
                             </div>
                             <div style={{ flex: 1, padding: '12px', borderRight: '1px solid #e0e0e0', textAlign: 'center', fontSize: '14px', color: '#444' }}>
-                                {row.inward?.chhol?.toFixed(3) ?? '-'}
+                                {row.inward?.chhol || '-'}
                             </div>
                             <div style={{ flex: 1, padding: '12px', borderRight: '1px solid #e0e0e0', textAlign: 'center', fontSize: '14px', color: '#444' }}>
                                 {row.inward?.tayarmaal?.toFixed(3) ?? '-'}

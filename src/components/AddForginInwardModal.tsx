@@ -8,6 +8,7 @@ export interface ForginInwardEntry {
     price: number;
     weight: number;
     unit: string;
+    chhol: string;
 }
 
 interface AddForginInwardModalProps {
@@ -16,12 +17,11 @@ interface AddForginInwardModalProps {
 }
 
 const AddForginInwardModal: React.FC<AddForginInwardModalProps> = ({ onClose, onSuccess }) => {
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [partyName, setPartyName] = useState('');
     const [challanNo, setChallanNo] = useState('');
-    const [price, setPrice] = useState<number | ''>('');
+    const [date, setDate] = useState('');
     const [weight, setWeight] = useState<number | ''>('');
-    const [unit, setUnit] = useState('Kg');
+    const [chhol, setChhol] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -38,8 +38,8 @@ const AddForginInwardModal: React.FC<AddForginInwardModalProps> = ({ onClose, on
             setError('Challan No. is required');
             return;
         }
-        if (!price || Number(price) <= 0) {
-            setError('Valid Price is required');
+        if (!date) {
+            setError('Date is required');
             return;
         }
         if (!weight || Number(weight) <= 0) {
@@ -55,9 +55,10 @@ const AddForginInwardModal: React.FC<AddForginInwardModalProps> = ({ onClose, on
                 date,
                 partyName: partyName.trim(),
                 challanNo: challanNo.trim(),
-                price: Number(price),
+                price: 0,
                 weight: Number(weight),
-                unit,
+                unit: 'Kg',
+                chhol,
             };
 
             onSuccess(newEntry);
@@ -73,58 +74,62 @@ const AddForginInwardModal: React.FC<AddForginInwardModalProps> = ({ onClose, on
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">Add Forging Inward Entry</h2>
+                <h2 className="modal-title">Forging Order add</h2>
 
                 {error && <div className="error-message">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="modal-form">
-                    <div className="form-group">
-                        <label className="form-label">Date</label>
-                        <input
-                            type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            className="form-input"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Party Name</label>
-                        <input
-                            type="text"
-                            value={partyName}
-                            onChange={(e) => setPartyName(e.target.value)}
-                            placeholder="Enter Party Name"
-                            className="form-input"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Challan No.</label>
-                        <input
-                            type="text"
-                            value={challanNo}
-                            onChange={(e) => setChallanNo(e.target.value)}
-                            placeholder="Enter Challan No."
-                            className="form-input"
-                            required
-                        />
-                    </div>
-
+                    {/* Row 1: Party Name, Challan No., Date */}
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <div className="form-group" style={{ flex: 1 }}>
-                            <label className="form-label">Price</label>
-                            <input
-                                type="number"
-                                value={price}
-                                onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                                placeholder="Enter Price"
+                            <label className="form-label">Party Name</label>
+                            <select
+                                value={partyName}
+                                onChange={(e) => setPartyName(e.target.value)}
                                 className="form-input"
-                                min="0"
-                                step="0.01"
                                 required
+                            >
+                                <option value="">Select Party</option>
+                                <option value="Bipin Bhai">Bipin Bhai</option>
+                                <option value="Akshar">Akshar</option>
+                                <option value="Bansi">Bansi</option>
+                                <option value="Jayesh">Jayesh</option>
+                                <option value="Kevin">Kevin</option>
+                            </select>
+                        </div>
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label className="form-label">Challan No.</label>
+                            <input
+                                type="text"
+                                value={challanNo}
+                                onChange={(e) => setChallanNo(e.target.value)}
+                                placeholder="25260007"
+                                className="form-input"
+                                required
+                            />
+                        </div>
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label className="form-label">Date</label>
+                            <input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="form-input"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    {/* Row 2: Process (read-only), Weight, Chhol dropdown */}
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                        <div className="form-group" style={{ flex: 1.5 }}>
+                            <label className="form-label">Process</label>
+                            <input
+                                type="text"
+                                value="Inward"
+                                className="form-input"
+                                readOnly
+                                style={{ backgroundColor: '#f0f4f8', color: '#6c757d' }}
                             />
                         </div>
                         <div className="form-group" style={{ flex: 1 }}>
@@ -133,26 +138,27 @@ const AddForginInwardModal: React.FC<AddForginInwardModalProps> = ({ onClose, on
                                 type="number"
                                 value={weight}
                                 onChange={(e) => setWeight(e.target.value === '' ? '' : Number(e.target.value))}
-                                placeholder="Enter Weight"
+                                placeholder="120.400"
                                 className="form-input"
                                 min="0"
-                                step="0.01"
+                                step="0.001"
                                 required
                             />
                         </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Unit</label>
-                        <select
-                            value={unit}
-                            onChange={(e) => setUnit(e.target.value)}
-                            className="form-input"
-                        >
-                            <option value="Kg">Kg</option>
-                            <option value="Pcs">Pcs</option>
-                            <option value="Box">Box</option>
-                        </select>
+                        <div className="form-group" style={{ flex: 0.8 }}>
+                            <label className="form-label">&nbsp;</label>
+                            <select
+                                value={chhol}
+                                onChange={(e) => setChhol(e.target.value)}
+                                className="form-input"
+                            >
+                                <option value="">Chhol</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className="modal-actions">
