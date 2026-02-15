@@ -2,68 +2,81 @@ import React, { useState } from 'react';
 import './SubcontractingPage.css';
 import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
-import AddElectricCreditModal, { type ElectricCreditEntry } from '../components/AddElectricCreditModal';
-import AddElectricOutwardModal, { type ElectricOutwardEntry } from '../components/AddElectricOutwardModal';
+import AddForginInwardModal, { type ForginInwardEntry } from '../components/AddForginInwardModal';
+import AddForginOutwardModal, { type ForginOutwardEntry } from '../components/AddForginOutwardModal';
+import ForginDownloadOptionsModal from '../components/ForginDownloadOptionsModal';
+import ForginReportModal from '../components/ForginReportModal';
 
-type ElectricTab = 'OUTWARDS' | 'CREDIT';
+type ForginTab = 'INWARD' | 'OUTWARD';
 
-interface CreditEntryWithId extends ElectricCreditEntry {
+interface InwardEntryWithId extends ForginInwardEntry {
     id: number;
 }
 
-interface OutwardEntryWithId extends ElectricOutwardEntry {
+interface OutwardEntryWithId extends ForginOutwardEntry {
     id: number;
 }
 
-const MOCK_CREDIT_ENTRIES: CreditEntryWithId[] = [
-    { id: 1, date: '01/01/2026', challanNo: 'CH-1001', kg: 50 },
-    { id: 2, date: '01/01/2026', challanNo: 'CH-1002', kg: 30 },
-    { id: 3, date: '01/01/2026', challanNo: 'CH-1003', kg: 75 },
+const MOCK_INWARD_ENTRIES: InwardEntryWithId[] = [
+    { id: 1, date: '01/01/2026', partyName: 'Bipin Bhai', challanNo: '25', price: 239.400, weight: 0, unit: 'Kg', chhol: '' },
+    { id: 2, date: '01/01/2026', partyName: 'Akshar', challanNo: '25', price: 239.400, weight: 0, unit: 'Kg', chhol: '' },
+    { id: 3, date: '01/01/2026', partyName: 'Bansi', challanNo: '25', price: 239.400, weight: 0, unit: 'Kg', chhol: '' },
+    { id: 4, date: '01/01/2026', partyName: 'Bipin Bhai', challanNo: '25', price: 239.400, weight: 0, unit: 'Kg', chhol: '' },
+    { id: 5, date: '01/01/2026', partyName: 'Bipin Bhai', challanNo: '25', price: 239.400, weight: 0, unit: 'Kg', chhol: '' },
 ];
 
 const MOCK_OUTWARD_ENTRIES: OutwardEntryWithId[] = [
-    { id: 1, date: '01/01/2026', challanNo: 'OUT-2001', unitKg: 50, unitPrice: 120, kgPrice: 6000 },
+    { id: 1, date: '01/01/2026', partyName: 'Client X', challanNo: '25', price: 239.400, weight: 0, unit: 'Kg', wire: 0 },
 ];
 
-const ElectricPage: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<ElectricTab>('OUTWARDS');
+const ForginPage: React.FC = () => {
+    const [activeTab, setActiveTab] = useState<ForginTab>('INWARD');
     const [searchQuery, setSearchQuery] = useState('');
-    const [isAddCreditModalOpen, setIsAddCreditModalOpen] = useState(false);
-    const [isAddOutwardModalOpen, setIsAddOutwardModalOpen] = useState(false);
+    const [isInwardModalOpen, setIsInwardModalOpen] = useState(false);
+    const [isOutwardModalOpen, setIsOutwardModalOpen] = useState(false);
 
-    const [creditEntries, setCreditEntries] = useState<CreditEntryWithId[]>(MOCK_CREDIT_ENTRIES);
+    // Download Flow State
+    const [isDownloadOptionsOpen, setIsDownloadOptionsOpen] = useState(false);
+    const [isReportOpen, setIsReportOpen] = useState(false);
+    const [reportOptions, setReportOptions] = useState<{ party: string; start: string; end: string } | null>(null);
+
+    const [inwardEntries, setInwardEntries] = useState<InwardEntryWithId[]>(MOCK_INWARD_ENTRIES);
     const [outwardEntries, setOutwardEntries] = useState<OutwardEntryWithId[]>(MOCK_OUTWARD_ENTRIES);
 
-    const handleTabChange = (tab: ElectricTab) => {
+    const handleTabChange = (tab: ForginTab) => {
         setActiveTab(tab);
         setSearchQuery('');
     };
 
     const handleAdd = () => {
-        if (activeTab === 'CREDIT') {
-            setIsAddCreditModalOpen(true);
+        if (activeTab === 'INWARD') {
+            setIsInwardModalOpen(true);
         } else {
-            setIsAddOutwardModalOpen(true);
+            setIsOutwardModalOpen(true);
         }
     };
 
-    const handleAddCreditSuccess = (entry: ElectricCreditEntry) => {
-        const newId = Math.max(...creditEntries.map(e => e.id), 0) + 1;
-        setCreditEntries([...creditEntries, { id: newId, ...entry }]);
+    const handleAddInwardSuccess = (entry: ForginInwardEntry) => {
+        const newId = Math.max(...inwardEntries.map(e => e.id), 0) + 1;
+        setInwardEntries([...inwardEntries, { id: newId, ...entry }]);
     };
 
-    const handleAddOutwardSuccess = (entry: ElectricOutwardEntry) => {
+    const handleAddOutwardSuccess = (entry: ForginOutwardEntry) => {
         const newId = Math.max(...outwardEntries.map(e => e.id), 0) + 1;
         setOutwardEntries([...outwardEntries, { id: newId, ...entry }]);
     };
 
-    const filteredCreditEntries = creditEntries.filter(entry =>
-        entry.challanNo.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredInwardEntries = inwardEntries.filter(entry =>
+        entry.challanNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        entry.partyName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const filteredOutwardEntries = outwardEntries.filter(entry =>
-        entry.challanNo.toLowerCase().includes(searchQuery.toLowerCase())
+        entry.challanNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        entry.partyName.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const currentEntries = activeTab === 'INWARD' ? filteredInwardEntries : filteredOutwardEntries;
 
     // Stats
     const stats = {
@@ -75,7 +88,7 @@ const ElectricPage: React.FC = () => {
 
     return (
         <div className="subcontracting-page">
-            {/* Outwards / Credit Tab Toggle */}
+            {/* Inward / Outward Tab Toggle */}
             <div style={{
                 display: 'flex',
                 width: '100%',
@@ -87,7 +100,7 @@ const ElectricPage: React.FC = () => {
             }}>
                 <button
                     type="button"
-                    onClick={() => handleTabChange('OUTWARDS')}
+                    onClick={() => handleTabChange('INWARD')}
                     style={{
                         flex: 1,
                         padding: '14px 0',
@@ -96,18 +109,18 @@ const ElectricPage: React.FC = () => {
                         cursor: 'pointer',
                         fontFamily: "'Jost', sans-serif",
                         fontSize: '16px',
-                        fontWeight: activeTab === 'OUTWARDS' ? 600 : 500,
-                        color: activeTab === 'OUTWARDS' ? '#fff' : '#17344D',
-                        backgroundColor: activeTab === 'OUTWARDS' ? '#5b9bd5' : '#fff',
+                        fontWeight: activeTab === 'INWARD' ? 600 : 500,
+                        color: activeTab === 'INWARD' ? '#fff' : '#17344D',
+                        backgroundColor: activeTab === 'INWARD' ? '#5b9bd5' : '#fff',
                         transition: 'all 0.25s ease',
                         letterSpacing: '0.3px',
                     }}
                 >
-                    Outwards
+                    Inward
                 </button>
                 <button
                     type="button"
-                    onClick={() => handleTabChange('CREDIT')}
+                    onClick={() => handleTabChange('OUTWARD')}
                     style={{
                         flex: 1,
                         padding: '14px 0',
@@ -116,22 +129,22 @@ const ElectricPage: React.FC = () => {
                         cursor: 'pointer',
                         fontFamily: "'Jost', sans-serif",
                         fontSize: '16px',
-                        fontWeight: activeTab === 'CREDIT' ? 600 : 500,
-                        color: activeTab === 'CREDIT' ? '#fff' : '#17344D',
-                        backgroundColor: activeTab === 'CREDIT' ? '#5b9bd5' : '#fff',
+                        fontWeight: activeTab === 'OUTWARD' ? 600 : 500,
+                        color: activeTab === 'OUTWARD' ? '#fff' : '#17344D',
+                        backgroundColor: activeTab === 'OUTWARD' ? '#5b9bd5' : '#fff',
                         transition: 'all 0.25s ease',
                         letterSpacing: '0.3px',
                     }}
                 >
-                    Credit
+                    Outward
                 </button>
             </div>
 
             {/* Page Header - Title + Add Entry */}
             <div className="page-header">
                 <div className="page-title-section">
-                    <h1 className="page-title">Electric Management</h1>
-                    <p className="page-subtitle">Track materials, processes, and billing for electric work.</p>
+                    <h1 className="page-title">Bhatti Subcontracting Management</h1>
+                    <p className="page-subtitle">Track materials, processes, and billing for subcontracting work.</p>
                 </div>
                 <button type="button" className="add-button" onClick={handleAdd}>
                     <span className="add-icon">+</span>
@@ -192,6 +205,7 @@ const ElectricPage: React.FC = () => {
                     type="button"
                     className="action-button secondary-button"
                     style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                    onClick={() => setIsDownloadOptionsOpen(true)}
                 >
                     <span className="button-text">Download</span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -217,77 +231,90 @@ const ElectricPage: React.FC = () => {
                 <table className="inventory-table" style={{ minWidth: '600px' }}>
                     <thead>
                         <tr>
-                            {activeTab === 'OUTWARDS' ? (
+                            <th style={{ textAlign: 'center' }}>Date</th>
+                            <th style={{ textAlign: 'center' }}>Name</th>
+                            <th style={{ textAlign: 'center' }}>Challan No.</th>
+                            {activeTab === 'INWARD' ? (
                                 <>
-                                    <th style={{ textAlign: 'center' }}>Date</th>
-                                    <th style={{ textAlign: 'center' }}>Challan No.</th>
-                                    <th style={{ textAlign: 'center' }}>Unit Kg</th>
-                                    <th style={{ textAlign: 'center' }}>Unit Price</th>
-                                    <th style={{ textAlign: 'center' }}>Kg Price</th>
+                                    <th style={{ textAlign: 'center' }}>Chol</th>
+                                    <th style={{ textAlign: 'center' }}>Tayarmaal</th>
                                 </>
                             ) : (
-                                <>
-                                    <th style={{ textAlign: 'center' }}>Date</th>
-                                    <th style={{ textAlign: 'center' }}>Challan No.</th>
-                                    <th style={{ textAlign: 'center' }}>Kg</th>
-                                </>
+                                <th style={{ textAlign: 'center' }}>Wire</th>
                             )}
                         </tr>
                     </thead>
                     <tbody>
-                        {activeTab === 'OUTWARDS' ? (
-                            <>
-                                {filteredOutwardEntries.map((entry) => (
-                                    <tr key={entry.id}>
-                                        <td style={{ textAlign: 'center' }}>{entry.date}</td>
-                                        <td style={{ textAlign: 'center' }}>{entry.challanNo}</td>
-                                        <td style={{ textAlign: 'center' }}>{entry.unitKg}</td>
-                                        <td style={{ textAlign: 'center' }}>{entry.unitPrice}</td>
-                                        <td style={{ textAlign: 'center' }}>{entry.kgPrice}</td>
-                                    </tr>
-                                ))}
-                                {filteredOutwardEntries.length === 0 && (
-                                    <tr>
-                                        <td colSpan={5} className="no-data">No entries found</td>
-                                    </tr>
+                        {currentEntries.map((entry) => (
+                            <tr key={entry.id}>
+                                <td style={{ textAlign: 'center' }}>{entry.date}</td>
+                                <td style={{ textAlign: 'center' }}>{entry.partyName}</td>
+                                <td style={{ textAlign: 'center' }}>{entry.challanNo}</td>
+                                {activeTab === 'INWARD' ? (
+                                    <>
+                                        <td style={{ textAlign: 'center' }}>–</td>
+                                        <td style={{ textAlign: 'center' }}>{entry.price.toFixed(3)}</td>
+                                    </>
+                                ) : (
+                                    <td style={{ textAlign: 'center' }}>{entry.weight}</td>
                                 )}
-                            </>
-                        ) : (
-                            <>
-                                {filteredCreditEntries.map((entry) => (
-                                    <tr key={entry.id}>
-                                        <td style={{ textAlign: 'center' }}>{entry.date}</td>
-                                        <td style={{ textAlign: 'center' }}>{entry.challanNo}</td>
-                                        <td style={{ textAlign: 'center' }}>{entry.kg}</td>
-                                    </tr>
-                                ))}
-                                {filteredCreditEntries.length === 0 && (
-                                    <tr>
-                                        <td colSpan={3} className="no-data">No entries found</td>
-                                    </tr>
-                                )}
-                            </>
+                            </tr>
+                        ))}
+                        {currentEntries.length === 0 && (
+                            <tr>
+                                <td colSpan={activeTab === 'INWARD' ? 5 : 4} className="no-data">No entries found</td>
+                            </tr>
                         )}
                     </tbody>
                 </table>
             </div>
 
             {/* Modals */}
-            {isAddCreditModalOpen && (
-                <AddElectricCreditModal
-                    onClose={() => setIsAddCreditModalOpen(false)}
-                    onSuccess={handleAddCreditSuccess}
+            {isInwardModalOpen && (
+                <AddForginInwardModal
+                    onClose={() => setIsInwardModalOpen(false)}
+                    onSuccess={handleAddInwardSuccess}
                 />
             )}
 
-            {isAddOutwardModalOpen && (
-                <AddElectricOutwardModal
-                    onClose={() => setIsAddOutwardModalOpen(false)}
+            {isOutwardModalOpen && (
+                <AddForginOutwardModal
+                    onClose={() => setIsOutwardModalOpen(false)}
                     onSuccess={handleAddOutwardSuccess}
+                />
+            )}
+
+            {isDownloadOptionsOpen && (
+                <ForginDownloadOptionsModal
+                    onClose={() => setIsDownloadOptionsOpen(false)}
+                    onNext={(partyName, startDate, endDate) => {
+                        setReportOptions({ party: partyName, start: startDate, end: endDate });
+                        setIsDownloadOptionsOpen(false);
+                        setIsReportOpen(true);
+                    }}
+                />
+            )}
+
+            {isReportOpen && reportOptions && (
+                <ForginReportModal
+                    onClose={() => setIsReportOpen(false)}
+                    partyName={reportOptions.party}
+                    startDate={reportOptions.start}
+                    endDate={reportOptions.end}
+                    inwardData={inwardEntries.filter(e =>
+                        e.partyName === reportOptions.party &&
+                        e.date >= reportOptions.start &&
+                        e.date <= reportOptions.end
+                    )}
+                    outwardData={outwardEntries.filter(e =>
+                        e.partyName === reportOptions.party &&
+                        e.date >= reportOptions.start &&
+                        e.date <= reportOptions.end
+                    )}
                 />
             )}
         </div>
     );
 };
 
-export default ElectricPage;
+export default ForginPage;
