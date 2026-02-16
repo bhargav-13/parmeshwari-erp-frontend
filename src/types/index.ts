@@ -609,3 +609,21 @@ export interface ForgingOutward {
   weightUnit: WeightUnit;
   image?: string;
 }
+
+// Electric Types
+export interface ElectricOutwardEntry {
+  id?: number;
+  date: string;
+  challanNo: string;
+  unit: string;
+  kg: number;
+  unitPrice: number;
+  kgPrice: number;
+}
+
+export interface ElectricCreditEntry {
+  id?: number;
+  date: string;
+  challanNo: string;
+  kg: number;
+}

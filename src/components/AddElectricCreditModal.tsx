@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import './AddProductModal.css';
 
-export interface ElectricCreditEntry {
-    date: string;
-    challanNo: string;
-    kg: number;
-}
+import { type ElectricCreditEntry } from '../types';
 
 interface AddElectricCreditModalProps {
     onClose: () => void;

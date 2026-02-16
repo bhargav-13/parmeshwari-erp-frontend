@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import './SubcontractingPage.css';
 import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
-import AddElectricCreditModal, { type ElectricCreditEntry } from '../components/AddElectricCreditModal';
-import AddElectricOutwardModal, { type ElectricOutwardEntry } from '../components/AddElectricOutwardModal';
+import AddElectricCreditModal from '../components/AddElectricCreditModal';
+import AddElectricOutwardModal from '../components/AddElectricOutwardModal';
+import { type ElectricOutwardEntry, type ElectricCreditEntry } from '../types';
+import { electricApi } from '../api/electric';
 
 type ElectricTab = 'OUTWARDS' | 'CREDIT';
 
@@ -22,7 +24,7 @@ const MOCK_CREDIT_ENTRIES: CreditEntryWithId[] = [
 ];
 
 const MOCK_OUTWARD_ENTRIES: OutwardEntryWithId[] = [
-    { id: 1, date: '01/01/2026', challanNo: 'OUT-2001', unitKg: 50, unitPrice: 120, kgPrice: 6000 },
+    { id: 1, date: '01/01/2026', challanNo: 'OUT-2001', unit: 'Kg', kg: 50, unitPrice: 120, kgPrice: 6000 },
 ];
 
 const ElectricPage: React.FC = () => {
@@ -64,6 +66,23 @@ const ElectricPage: React.FC = () => {
     const filteredOutwardEntries = outwardEntries.filter(entry =>
         entry.challanNo.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const handleDownload = async () => {
+        try {
+            const blob = await electricApi.downloadElectricPdf(activeTab, searchQuery);
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `electric-${activeTab.toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Error downloading PDF:', err);
+            alert('Failed to download PDF. Please try again.');
+        }
+    };
 
     // Stats
     const stats = {
@@ -192,6 +211,7 @@ const ElectricPage: React.FC = () => {
                     type="button"
                     className="action-button secondary-button"
                     style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                    onClick={handleDownload}
                 >
                     <span className="button-text">Download</span>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -221,7 +241,8 @@ const ElectricPage: React.FC = () => {
                                 <>
                                     <th style={{ textAlign: 'center' }}>Date</th>
                                     <th style={{ textAlign: 'center' }}>Challan No.</th>
-                                    <th style={{ textAlign: 'center' }}>Unit Kg</th>
+                                    <th style={{ textAlign: 'center' }}>Unit</th>
+                                    <th style={{ textAlign: 'center' }}>Kg</th>
                                     <th style={{ textAlign: 'center' }}>Unit Price</th>
                                     <th style={{ textAlign: 'center' }}>Kg Price</th>
                                 </>
@@ -241,14 +262,15 @@ const ElectricPage: React.FC = () => {
                                     <tr key={entry.id}>
                                         <td style={{ textAlign: 'center' }}>{entry.date}</td>
                                         <td style={{ textAlign: 'center' }}>{entry.challanNo}</td>
-                                        <td style={{ textAlign: 'center' }}>{entry.unitKg}</td>
+                                        <td style={{ textAlign: 'center' }}>{entry.unit}</td>
+                                        <td style={{ textAlign: 'center' }}>{entry.kg}</td>
                                         <td style={{ textAlign: 'center' }}>{entry.unitPrice}</td>
                                         <td style={{ textAlign: 'center' }}>{entry.kgPrice}</td>
                                     </tr>
                                 ))}
                                 {filteredOutwardEntries.length === 0 && (
                                     <tr>
-                                        <td colSpan={5} className="no-data">No entries found</td>
+                                        <td colSpan={6} className="no-data">No entries found</td>
                                     </tr>
                                 )}
                             </>

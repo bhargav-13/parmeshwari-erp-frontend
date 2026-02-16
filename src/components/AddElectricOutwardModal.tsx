@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import './AddProductModal.css';
 
-export interface ElectricOutwardEntry {
-    date: string;
-    challanNo: string;
-    unitKg: number;
-    unitPrice: number;
-    kgPrice: number;
-}
+import { type ElectricOutwardEntry } from '../types';
 
 interface AddElectricOutwardModalProps {
     onClose: () => void;
@@ -17,7 +11,8 @@ interface AddElectricOutwardModalProps {
 const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({ onClose, onSuccess }) => {
     const [date, setDate] = useState('');
     const [challanNo, setChallanNo] = useState('');
-    const [unitKg, setUnitKg] = useState<number | ''>('');
+    const [unit, setUnit] = useState('Kg');
+    const [kg, setKg] = useState<number | ''>('');
     const [unitPrice, setUnitPrice] = useState<number | ''>('');
     const [kgPrice, setKgPrice] = useState<number | ''>('');
     const [loading, setLoading] = useState(false);
@@ -44,7 +39,8 @@ const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({ onClo
             const newEntry: ElectricOutwardEntry = {
                 date,
                 challanNo: challanNo.trim(),
-                unitKg: Number(unitKg) || 0,
+                unit,
+                kg: Number(kg) || 0,
                 unitPrice: Number(unitPrice) || 0,
                 kgPrice: Number(kgPrice) || 0,
             };
@@ -92,21 +88,34 @@ const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({ onClo
                         </div>
                     </div>
 
-                    {/* Row 2: Unit Kg, Unit Price, Kg Price */}
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                        <div className="form-group" style={{ flex: 1 }}>
-                            <label className="form-label">Unit Kg</label>
+                    {/* Row 2: Unit, Kg, Unit Price, Kg Price */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+                        <div className="form-group" style={{ flex: '1 1 140px' }}>
+                            <label className="form-label">Unit</label>
+                            <select
+                                value={unit}
+                                onChange={(e) => setUnit(e.target.value)}
+                                className="form-input"
+                            >
+                                <option value="Kg">Kg</option>
+                                <option value="Nos">Nos</option>
+                                <option value="Pcs">Pcs</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div className="form-group" style={{ flex: '1 1 140px' }}>
+                            <label className="form-label">Kg</label>
                             <input
                                 type="number"
-                                value={unitKg}
-                                onChange={(e) => setUnitKg(e.target.value === '' ? '' : Number(e.target.value))}
-                                placeholder="Enter Unit Kg"
+                                value={kg}
+                                onChange={(e) => setKg(e.target.value === '' ? '' : Number(e.target.value))}
+                                placeholder="Enter Kg"
                                 className="form-input"
                                 min="0"
                                 step="0.01"
                             />
                         </div>
-                        <div className="form-group" style={{ flex: 1 }}>
+                        <div className="form-group" style={{ flex: '1 1 140px' }}>
                             <label className="form-label">Unit Price</label>
                             <input
                                 type="number"
@@ -118,7 +127,7 @@ const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({ onClo
                                 step="0.01"
                             />
                         </div>
-                        <div className="form-group" style={{ flex: 1 }}>
+                        <div className="form-group" style={{ flex: '1 1 140px' }}>
                             <label className="form-label">Kg Price</label>
                             <input
                                 type="number"
