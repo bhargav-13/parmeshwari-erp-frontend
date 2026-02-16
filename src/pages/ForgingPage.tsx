@@ -5,7 +5,7 @@ import FilterIcon from '../assets/filter.svg';
 import AddForgingInwardModal from '../components/AddForgingInwardModal';
 import AddForgingOutwardModal from '../components/AddForgingOutwardModal';
 import { forgingInwardApi, forgingOutwardApi } from '../api/forging';
-import type { ForgingInward, ForgingOutward, WeightUnit } from '../types';
+import type { ForgingInward, ForgingOutward } from '../types';
 import Loading from '../components/Loading';
 
 // Download Icon
