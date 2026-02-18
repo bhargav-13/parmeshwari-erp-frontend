@@ -3,6 +3,7 @@ import { paymentApi } from '../api/payment';
 import type { Payment, PaymentStats } from '../types';
 import { PaymentStatus, PaymentFloor, BillingType } from '../types';
 import PaymentReceivedModal from '../components/PaymentReceivedModal';
+import PaymentDownloadOptionsModal from '../components/PaymentDownloadOptionsModal';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
@@ -26,9 +27,9 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | ''>('');
   const [loading, setLoading] = useState(true);
   const [page] = useState(0);
-  const [sendingReminderId, setSendingReminderId] = useState<number | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isDownloadOptionsOpen, setIsDownloadOptionsOpen] = useState(false);
 
   useEffect(() => {
     fetchPayments();
@@ -70,18 +71,6 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
     });
   };
 
-  const handleSendReminder = async (paymentId: number) => {
-    try {
-      setSendingReminderId(paymentId);
-      await paymentApi.sendReminder(paymentId);
-      fetchPayments();
-    } catch (error) {
-      console.error('Error sending reminder:', error);
-      alert('Failed to send reminder. Please try again.');
-    } finally {
-      setSendingReminderId(null);
-    }
-  };
 
   const handleRowClick = (payment: Payment) => {
     setSelectedPayment(payment);
@@ -113,31 +102,6 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
     return `₹ ${amount.toLocaleString('en-IN')}`;
   };
 
-  const getStatusBadgeClass = (status: PaymentStatus): string => {
-    switch (status) {
-      case PaymentStatus.OVERDUE:
-        return 'status-overdue';
-      case PaymentStatus.DUE_SOON:
-        return 'status-due-soon';
-      case PaymentStatus.UPCOMING:
-        return 'status-upcoming';
-      default:
-        return '';
-    }
-  };
-
-  const getStatusLabel = (status: PaymentStatus): string => {
-    switch (status) {
-      case PaymentStatus.OVERDUE:
-        return 'Overdue';
-      case PaymentStatus.DUE_SOON:
-        return 'Due soon';
-      case PaymentStatus.UPCOMING:
-        return 'Upcoming';
-      default:
-        return status;
-    }
-  };
 
   const formatInvoiceId = (orderId: number): string => {
     return `PBI - ${String(orderId).padStart(5, '0')}`;
@@ -211,6 +175,29 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+        <button
+          type="button"
+          className="action-button secondary-button"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            backgroundColor: '#fff',
+            border: '1.5px solid #b4d5ef',
+            borderRadius: '10px',
+            padding: '10px 20px',
+            cursor: 'pointer',
+            height: '45px'
+          }}
+          onClick={() => setIsDownloadOptionsOpen(true)}
+        >
+          <span className="button-text" style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', fontWeight: 500, color: '#17344d' }}>Download</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17344d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
         <div className="order-status-filter">
           <img src={FilterIcon} alt="Filter" />
           <select
@@ -229,62 +216,71 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
       <div className="payment-table-container">
         {loading ? (
           <Loading message="Loading payments..." size="large" />
-        ) : payments.length === 0 ? (
-          <div className="no-data">No payment records found.</div>
         ) : (
           <table className="payment-table">
             <thead>
               <tr>
-                <th>Invoice ID</th>
-                <th>Customer</th>
-                <th>Received Payment</th>
+                <th>Date</th>
+                <th>Item Name</th>
+                <th>Quality</th>
+                <th>Price</th>
                 <th>Total Amount</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th>Last Reminder</th>
-                <th>Actions</th>
+                <th>Bill</th>
+                <th>GST</th>
+                <th>Total Online</th>
+                <th>Total Offline</th>
+                <th>Receive Offline</th>
               </tr>
             </thead>
             <tbody>
-              {payments.map((payment) => (
-                <tr
-                  key={payment.id}
-                  onClick={() => handleRowClick(payment)}
-                  className="payment-row"
-                >
-                  <td>{formatInvoiceId(payment.orderId)}</td>
-                  <td>{payment.orderId || '—'}</td>
-                  <td>{formatCurrency(payment.receivedAmount)}</td>
-                  <td>{formatCurrency(payment.totalAmount)}</td>
-                  <td>{formatDate(payment.dueDate)}</td>
-                  <td>
-                    <span className={`status-badge ${getStatusBadgeClass(payment.paymentStatus)}`}>
-                      {getStatusLabel(payment.paymentStatus)}
-                    </span>
-                  </td>
-                  <td>{formatDate(payment.lastReminder)}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className="send-reminder-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSendReminder(payment.id);
-                      }}
-                      disabled={sendingReminderId === payment.id}
-                    >
-                      {sendingReminderId === payment.id ? (
-                        <span className="loading-spinner"></span>
-                      ) : (
-                        <>
-                          <img src={SendIcon} alt="Send" className="send-icon-small" />
-                          <span>Send Reminder</span>
-                        </>
-                      )}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {payments.length === 0 ? (
+                // Adding a few mock rows for visibility if API is empty
+                <>
+                  <tr className="payment-row">
+                    <td>01/01/2026</td>
+                    <td>Copper Wire</td>
+                    <td>Premium</td>
+                    <td>₹ 250</td>
+                    <td>₹ 12,500</td>
+                    <td>INV-001</td>
+                    <td>₹ 2,250</td>
+                    <td>₹ 5,000</td>
+                    <td>₹ 9,750</td>
+                    <td>₹ 9,750</td>
+                  </tr>
+                  <tr className="payment-row">
+                    <td>15/02/2026</td>
+                    <td>Aluminum Rod</td>
+                    <td>Standard</td>
+                    <td>₹ 150</td>
+                    <td>₹ 7,500</td>
+                    <td>INV-002</td>
+                    <td>₹ 1,350</td>
+                    <td>₹ 3,000</td>
+                    <td>₹ 5,850</td>
+                    <td>₹ 5,850</td>
+                  </tr>
+                </>
+              ) : (
+                payments.map((payment) => (
+                  <tr
+                    key={payment.id}
+                    onClick={() => handleRowClick(payment)}
+                    className="payment-row"
+                  >
+                    <td>{formatDate(payment.dueDate)}</td>
+                    <td>{payment.customerName || '—'}</td>
+                    <td>{/* Quality placeholder */ '—'}</td>
+                    <td>{/* Price placeholder */ '—'}</td>
+                    <td>{formatCurrency(payment.totalAmount)}</td>
+                    <td>{formatInvoiceId(payment.orderId)}</td>
+                    <td>{/* GST placeholder */ '₹ 0'}</td>
+                    <td>{/* Total Online placeholder */ '₹ 0'}</td>
+                    <td>{formatCurrency(payment.receivedAmount)}</td>
+                    <td>{formatCurrency(payment.receivedAmount)}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         )}
@@ -295,6 +291,16 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
           payment={selectedPayment}
           onClose={handlePaymentModalClose}
           onSuccess={handlePaymentSuccess}
+        />
+      )}
+
+      {isDownloadOptionsOpen && (
+        <PaymentDownloadOptionsModal
+          onClose={() => setIsDownloadOptionsOpen(false)}
+          onNext={(partyName, startDate, endDate) => {
+            console.log('Downloading for:', partyName, startDate, endDate);
+            setIsDownloadOptionsOpen(false);
+          }}
         />
       )}
     </div>
