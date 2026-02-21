@@ -611,19 +611,25 @@ export interface ForgingOutward {
 }
 
 // Electric Types
-export interface ElectricOutwardEntry {
-  id?: number;
-  date: string;
+export interface ElectricOutward {
+  id: number;
+  date: string;             // DD/MM/YYYY format for UI
   challanNo: string;
-  unit: string;
-  kg: number;
-  unitPrice: number;
-  kgPrice: number;
+  weight: number;           // in kg
+  perKgWeight: number;
+  unit: number;             // units consumed
+  unitRate: number;
+  totalUnitAmount: number;  // computed by server
+  totalWeightAmount: number; // computed by server
 }
 
-export interface ElectricCreditEntry {
-  id?: number;
-  date: string;
+export interface ElectricCredit {
+  id: number;
+  date: string;             // DD/MM/YYYY format for UI
   challanNo: string;
-  kg: number;
+  rate: number;
 }
+
+// Legacy aliases kept for any other references
+export type ElectricOutwardEntry = ElectricOutward;
+export type ElectricCreditEntry = ElectricCredit;

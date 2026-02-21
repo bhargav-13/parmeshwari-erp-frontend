@@ -1,17 +1,32 @@
 import React, { useState } from 'react';
 import './AddProductModal.css';
-
-import { type ElectricCreditEntry } from '../types';
+import type { ElectricCredit } from '../types';
 
 interface AddElectricCreditModalProps {
     onClose: () => void;
-    onSuccess: (entry: ElectricCreditEntry) => void;
+    onSuccess: () => void;
+    onSubmit: (data: Omit<ElectricCredit, 'id'>) => Promise<void>;
+    initialData?: ElectricCredit | null;
 }
 
-const AddElectricCreditModal: React.FC<AddElectricCreditModalProps> = ({ onClose, onSuccess }) => {
-    const [date, setDate] = useState('');
-    const [challanNo, setChallanNo] = useState('');
-    const [kg, setKg] = useState<number | ''>('');
+const AddElectricCreditModal: React.FC<AddElectricCreditModalProps> = ({
+    onClose,
+    onSuccess,
+    onSubmit,
+    initialData,
+}) => {
+    const [date, setDate] = useState(
+        initialData?.date
+            ? (() => {
+                const parts = initialData.date.split('/');
+                return parts.length === 3
+                    ? `${parts[2]}-${parts[1]}-${parts[0]}`
+                    : initialData.date;
+            })()
+            : ''
+    );
+    const [challanNo, setChallanNo] = useState(initialData?.challanNo ?? '');
+    const [rate, setRate] = useState<number | ''>(initialData?.rate ?? '');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -20,34 +35,26 @@ const AddElectricCreditModal: React.FC<AddElectricCreditModalProps> = ({ onClose
         e.stopPropagation();
         setError(null);
 
-        if (!date) {
-            setError('Date is required');
-            return;
-        }
-        if (!challanNo.trim()) {
-            setError('Challan No. is required');
-            return;
-        }
-        if (!kg || Number(kg) <= 0) {
-            setError('Valid Kg is required');
-            return;
-        }
+        if (!date) { setError('Date is required'); return; }
+        if (!challanNo.trim()) { setError('Challan No. is required'); return; }
+        if (rate === '' || Number(rate) <= 0) { setError('Valid Rate is required'); return; }
+
+        // Convert YYYY-MM-DD → DD/MM/YYYY for service layer
+        const parts = date.split('-');
+        const uiDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : date;
 
         try {
             setLoading(true);
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            const newEntry: ElectricCreditEntry = {
-                date,
+            await onSubmit({
+                date: uiDate,
                 challanNo: challanNo.trim(),
-                kg: Number(kg),
-            };
-
-            onSuccess(newEntry);
+                rate: Number(rate),
+            });
+            onSuccess();
             onClose();
-        } catch (err) {
-            console.error("Error saving credit entry:", err);
-            setError('Failed to save entry');
+        } catch (err: any) {
+            console.error('Error saving credit entry:', err);
+            setError(err?.message || 'Failed to save entry');
         } finally {
             setLoading(false);
         }
@@ -56,12 +63,13 @@ const AddElectricCreditModal: React.FC<AddElectricCreditModalProps> = ({ onClose
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">Electric Order add</h2>
+                <h2 className="modal-title">
+                    {initialData ? 'Edit Electric Credit' : 'Add Electric Credit'}
+                </h2>
 
                 {error && <div className="error-message">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="modal-form">
-                    {/* Row 1: Date, Challan No., Kg */}
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">Date</label>
@@ -79,38 +87,25 @@ const AddElectricCreditModal: React.FC<AddElectricCreditModalProps> = ({ onClose
                                 type="text"
                                 value={challanNo}
                                 onChange={(e) => setChallanNo(e.target.value)}
-                                placeholder="Enter Challan No."
+                                placeholder="e.g. CH-1001"
                                 className="form-input"
-                                required
-                            />
-                        </div>
-                        <div className="form-group" style={{ flex: 1 }}>
-                            <label className="form-label">Kg</label>
-                            <input
-                                type="number"
-                                value={kg}
-                                onChange={(e) => setKg(e.target.value === '' ? '' : Number(e.target.value))}
-                                placeholder="Enter Kg"
-                                className="form-input"
-                                min="0"
-                                step="0.01"
                                 required
                             />
                         </div>
                     </div>
 
-                    {/* Row 2: Process (read-only) */}
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                        <div className="form-group" style={{ flex: 1 }}>
-                            <label className="form-label">Process</label>
-                            <input
-                                type="text"
-                                value="Credit"
-                                className="form-input"
-                                readOnly
-                                style={{ backgroundColor: '#f0f4f8', color: '#6c757d' }}
-                            />
-                        </div>
+                    <div className="form-group">
+                        <label className="form-label">Rate (₹)</label>
+                        <input
+                            type="number"
+                            value={rate}
+                            onChange={(e) => setRate(e.target.value === '' ? '' : Number(e.target.value))}
+                            placeholder="0.00"
+                            className="form-input"
+                            min="0"
+                            step="0.01"
+                            required
+                        />
                     </div>
 
                     <div className="modal-actions">

@@ -1,55 +1,67 @@
 import React, { useState } from 'react';
 import './AddProductModal.css';
-
-import { type ElectricOutwardEntry } from '../types';
+import type { ElectricOutward } from '../types';
 
 interface AddElectricOutwardModalProps {
     onClose: () => void;
-    onSuccess: (entry: ElectricOutwardEntry) => void;
+    onSuccess: () => void;
+    onSubmit: (data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount'>) => Promise<void>;
+    initialData?: ElectricOutward | null;
 }
 
-const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({ onClose, onSuccess }) => {
-    const [date, setDate] = useState('');
-    const [challanNo, setChallanNo] = useState('');
-    const [unit, setUnit] = useState('Kg');
-    const [kg, setKg] = useState<number | ''>('');
-    const [unitPrice, setUnitPrice] = useState<number | ''>('');
-    const [kgPrice, setKgPrice] = useState<number | ''>('');
+const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({
+    onClose,
+    onSuccess,
+    onSubmit,
+    initialData,
+}) => {
+    const [date, setDate] = useState(
+        initialData?.date
+            ? (() => {
+                const parts = initialData.date.split('/');
+                return parts.length === 3
+                    ? `${parts[2]}-${parts[1]}-${parts[0]}`
+                    : initialData.date;
+            })()
+            : ''
+    );
+    const [challanNo, setChallanNo] = useState(initialData?.challanNo ?? '');
+    const [weight, setWeight] = useState<number | ''>(initialData?.weight ?? '');
+    const [perKgWeight, setPerKgWeight] = useState<number | ''>(initialData?.perKgWeight ?? '');
+    const [unit, setUnit] = useState<number | ''>(initialData?.unit ?? '');
+    const [unitRate, setUnitRate] = useState<number | ''>(initialData?.unitRate ?? '');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const num = (v: number | '') => (v === '' ? 0 : Number(v));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setError(null);
 
-        if (!date) {
-            setError('Date is required');
-            return;
-        }
-        if (!challanNo.trim()) {
-            setError('Challan No. is required');
-            return;
-        }
+        if (!date) { setError('Date is required'); return; }
+        if (!challanNo.trim()) { setError('Challan No. is required'); return; }
+
+        // Convert YYYY-MM-DD → DD/MM/YYYY for service layer
+        const parts = date.split('-');
+        const uiDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : date;
 
         try {
             setLoading(true);
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            const newEntry: ElectricOutwardEntry = {
-                date,
+            await onSubmit({
+                date: uiDate,
                 challanNo: challanNo.trim(),
-                unit,
-                kg: Number(kg) || 0,
-                unitPrice: Number(unitPrice) || 0,
-                kgPrice: Number(kgPrice) || 0,
-            };
-
-            onSuccess(newEntry);
+                weight: num(weight),
+                perKgWeight: num(perKgWeight),
+                unit: num(unit),
+                unitRate: num(unitRate),
+            });
+            onSuccess();
             onClose();
-        } catch (err) {
-            console.error("Error saving outward entry:", err);
-            setError('Failed to save entry');
+        } catch (err: any) {
+            console.error('Error saving outward entry:', err);
+            setError(err?.message || 'Failed to save entry');
         } finally {
             setLoading(false);
         }
@@ -58,12 +70,14 @@ const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({ onClo
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">Electric Order add</h2>
+                <h2 className="modal-title">
+                    {initialData ? 'Edit Electric Outward' : 'Add Electric Outward'}
+                </h2>
 
                 {error && <div className="error-message">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="modal-form">
-                    {/* Row 1: Date, Challan No. */}
+                    {/* Row 1: Date + Challan No */}
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">Date</label>
@@ -81,76 +95,65 @@ const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({ onClo
                                 type="text"
                                 value={challanNo}
                                 onChange={(e) => setChallanNo(e.target.value)}
-                                placeholder="Enter Challan No."
+                                placeholder="e.g. CH-1001"
                                 className="form-input"
                                 required
                             />
                         </div>
                     </div>
 
-                    {/* Row 2: Unit, Kg, Unit Price, Kg Price */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                        <div className="form-group" style={{ flex: '1 1 140px' }}>
-                            <label className="form-label">Unit</label>
-                            <select
-                                value={unit}
-                                onChange={(e) => setUnit(e.target.value)}
-                                className="form-input"
-                            >
-                                <option value="Kg">Kg</option>
-                                <option value="Nos">Nos</option>
-                                <option value="Pcs">Pcs</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div className="form-group" style={{ flex: '1 1 140px' }}>
-                            <label className="form-label">Kg</label>
+                    {/* Row 2: Weight + Per Kg Weight */}
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label className="form-label">Weight (Kg)</label>
                             <input
                                 type="number"
-                                value={kg}
-                                onChange={(e) => setKg(e.target.value === '' ? '' : Number(e.target.value))}
-                                placeholder="Enter Kg"
+                                value={weight}
+                                onChange={(e) => setWeight(e.target.value === '' ? '' : Number(e.target.value))}
+                                placeholder="0.00"
                                 className="form-input"
                                 min="0"
-                                step="0.01"
+                                step="0.001"
                             />
                         </div>
-                        <div className="form-group" style={{ flex: '1 1 140px' }}>
-                            <label className="form-label">Unit Price</label>
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label className="form-label">Per Kg Weight</label>
                             <input
                                 type="number"
-                                value={unitPrice}
-                                onChange={(e) => setUnitPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                                placeholder="Enter Unit Price"
+                                value={perKgWeight}
+                                onChange={(e) => setPerKgWeight(e.target.value === '' ? '' : Number(e.target.value))}
+                                placeholder="0.00"
                                 className="form-input"
                                 min="0"
-                                step="0.01"
-                            />
-                        </div>
-                        <div className="form-group" style={{ flex: '1 1 140px' }}>
-                            <label className="form-label">Kg Price</label>
-                            <input
-                                type="number"
-                                value={kgPrice}
-                                onChange={(e) => setKgPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                                placeholder="Enter Kg Price"
-                                className="form-input"
-                                min="0"
-                                step="0.01"
+                                step="0.001"
                             />
                         </div>
                     </div>
 
-                    {/* Row 3: Process (read-only) */}
+                    {/* Row 3: Unit + Unit Rate */}
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <div className="form-group" style={{ flex: 1 }}>
-                            <label className="form-label">Process</label>
+                            <label className="form-label">Unit</label>
                             <input
-                                type="text"
-                                value="Outward"
+                                type="number"
+                                value={unit}
+                                onChange={(e) => setUnit(e.target.value === '' ? '' : Number(e.target.value))}
+                                placeholder="0.00"
                                 className="form-input"
-                                readOnly
-                                style={{ backgroundColor: '#f0f4f8', color: '#6c757d' }}
+                                min="0"
+                                step="0.01"
+                            />
+                        </div>
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label className="form-label">Unit Rate (₹)</label>
+                            <input
+                                type="number"
+                                value={unitRate}
+                                onChange={(e) => setUnitRate(e.target.value === '' ? '' : Number(e.target.value))}
+                                placeholder="0.00"
+                                className="form-input"
+                                min="0"
+                                step="0.01"
                             />
                         </div>
                     </div>
