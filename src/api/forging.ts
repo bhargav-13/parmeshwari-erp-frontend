@@ -3,6 +3,40 @@ import ForgingOutwardApi from '../api-client/forging/src/api/ForgingOutwardApi';
 import { promisify } from '../lib/apiConfig';
 import type { ForgingInward, ForgingOutward } from '../types';
 
+const BASE_URL =
+    (import.meta as any).env?.VITE_API_BASE_URL?.trim() || 'http://localhost:8080';
+
+// Helper to download a PDF from a URL with auth
+const downloadPdfBlob = async (endpoint: string, filename: string, queryParams?: Record<string, string>): Promise<void> => {
+    const token = localStorage.getItem('accessToken');
+    const url = new URL(`${BASE_URL}${endpoint}`);
+    if (queryParams) {
+        Object.entries(queryParams).forEach(([key, value]) => {
+            if (value) url.searchParams.append(key, value);
+        });
+    }
+    const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to download PDF: ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+    const objectUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(objectUrl);
+};
+
 // Import shared API client (configured with auth interceptor)
 import ApiClient from '../api-client/inventory/src/ApiClient';
 const apiClient = ApiClient.instance;
@@ -109,6 +143,15 @@ export const forgingInwardApi = {
     // Delete forging inward record
     delete: (id: number): Promise<void> =>
         promisify<void>(cb => generatedForgingInwardApi.deleteForgingInward(id, cb)),
+
+    // Download PDF report for forging inward
+    // Note: fromDate/toDate should be YYYY-MM-DD (native HTML date input format)
+    downloadPdf: (partyName?: string, fromDate?: string, toDate?: string): Promise<void> =>
+        downloadPdfBlob('/api/v1/forging-inward/pdf', 'forging-inward-report.pdf', {
+            ...(partyName ? { partyName } : {}),
+            ...(fromDate ? { fromDate } : {}),
+            ...(toDate ? { toDate } : {}),
+        }),
 };
 
 // Forging Outward API
@@ -139,4 +182,13 @@ export const forgingOutwardApi = {
     // Delete forging outward record
     delete: (id: number): Promise<void> =>
         promisify<void>(cb => generatedForgingOutwardApi.deleteForgingOutward(id, cb)),
+
+    // Download PDF report for forging outward
+    // Note: fromDate/toDate should be YYYY-MM-DD (native HTML date input format)
+    downloadPdf: (partyName?: string, fromDate?: string, toDate?: string): Promise<void> =>
+        downloadPdfBlob('/api/v1/forging-outward/pdf', 'forging-outward-report.pdf', {
+            ...(partyName ? { partyName } : {}),
+            ...(fromDate ? { fromDate } : {}),
+            ...(toDate ? { toDate } : {}),
+        }),
 };

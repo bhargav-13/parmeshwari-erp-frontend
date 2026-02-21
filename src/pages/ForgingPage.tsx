@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './CastingPage.css';
+import '../components/AddProductModal.css';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
 import AddForgingInwardModal from '../components/AddForgingInwardModal';
@@ -28,6 +29,11 @@ const ForgingPage: React.FC = () => {
     const [isOutwardModalOpen, setIsOutwardModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isDownloadPopupOpen, setIsDownloadPopupOpen] = useState(false);
+    const [downloadPartyName, setDownloadPartyName] = useState('');
+    const [downloadFromDate, setDownloadFromDate] = useState('');
+    const [downloadToDate, setDownloadToDate] = useState('');
 
     // Fetch forging entries
     useEffect(() => {
@@ -77,6 +83,27 @@ const ForgingPage: React.FC = () => {
         } catch (err: any) {
             console.error('Error creating forging outward entry:', err);
             alert('Failed to create forging outward entry. Please try again.');
+        }
+    };
+
+    const handleDownload = async () => {
+        try {
+            setIsDownloading(true);
+            // Convert YYYY-MM-DD (HTML date input) to DD/MM/YYYY for formatDateForAPI inside the service
+            const fromDate = downloadFromDate || undefined;
+            const toDate = downloadToDate || undefined;
+            const partyName = downloadPartyName.trim() || undefined;
+            if (activeTab === 'inward') {
+                await forgingInwardApi.downloadPdf(partyName, fromDate, toDate);
+            } else {
+                await forgingOutwardApi.downloadPdf(partyName, fromDate, toDate);
+            }
+            setIsDownloadPopupOpen(false);
+        } catch (err: any) {
+            console.error('Error downloading PDF:', err);
+            alert('Failed to download PDF report. Please try again.');
+        } finally {
+            setIsDownloading(false);
         }
     };
 
@@ -179,7 +206,11 @@ const ForgingPage: React.FC = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <button className="order-status-filter">
+                <button
+                    className="order-status-filter"
+                    onClick={() => setIsDownloadPopupOpen(true)}
+                    title={`Download ${activeTab === 'inward' ? 'Inward' : 'Outward'} PDF Report`}
+                >
                     <span className="button-text">Download</span>
                     <DownloadIcon />
                 </button>
@@ -258,6 +289,73 @@ const ForgingPage: React.FC = () => {
                     onClose={() => setIsOutwardModalOpen(false)}
                     onSuccess={handleAddOutward}
                 />
+            )}
+
+            {/* Download Filter Popup */}
+            {isDownloadPopupOpen && (
+                <div className="modal-overlay" onClick={() => setIsDownloadPopupOpen(false)}>
+                    <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="modal-title">
+                            Download {activeTab === 'inward' ? 'Inward' : 'Outward'} PDF
+                        </h2>
+
+                        <p className="form-label" style={{ marginBottom: '1rem', fontWeight: 400 }}>
+                            All fields are optional — leave blank to download the full report.
+                        </p>
+
+                        <div className="modal-form">
+                            <div className="form-group">
+                                <label className="form-label">Party Name <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="e.g. Ravi Enterprises"
+                                    value={downloadPartyName}
+                                    onChange={e => setDownloadPartyName(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">From Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={downloadFromDate}
+                                    onChange={e => setDownloadFromDate(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">To Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={downloadToDate}
+                                    onChange={e => setDownloadToDate(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="modal-actions">
+                                <button
+                                    type="button"
+                                    className="save-button"
+                                    onClick={handleDownload}
+                                    disabled={isDownloading}
+                                >
+                                    {isDownloading ? 'Downloading...' : 'Download PDF'}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="cancel-button"
+                                    onClick={() => setIsDownloadPopupOpen(false)}
+                                    disabled={isDownloading}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

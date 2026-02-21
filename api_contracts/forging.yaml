@@ -69,6 +69,42 @@ paths:
       security:
         - oauth2: [ ]
 
+  /api/v1/forging-inward/pdf:
+    get:
+      tags:
+        - ForgingInward
+      operationId: downloadForgingInwardPdf
+      summary: Download Forging Inward PDF report
+      description: Generates a PDF report of forging inward records with optional party name and date range filtering
+      parameters:
+        - name: partyName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: PDF generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+      security:
+        - oauth2: [ ]
+
   /api/v1/forging-inward/{id}:
     get:
       tags:
@@ -186,6 +222,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedForgingOutwardResponse'
+      security:
+        - oauth2: [ ]
+
+  /api/v1/forging-outward/pdf:
+    get:
+      tags:
+        - ForgingOutward
+      operationId: downloadForgingOutwardPdf
+      summary: Download Forging Outward PDF report
+      description: Generates a PDF report of forging outward records with optional party name and date range filtering
+      parameters:
+        - name: partyName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: PDF generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
       security:
         - oauth2: [ ]
 
