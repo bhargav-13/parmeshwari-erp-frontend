@@ -49,47 +49,74 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
   const [recordingPayment, setRecordingPayment] = useState<Payment | null>(null);
   const [paymentFetchError, setPaymentFetchError] = useState<string | null>(null);
 
-  // Pre-fetch all payments for this floor on open, keyed by "orderId-mode".
-  // We avoid the `search` query param entirely because the backend has a bug:
-  // searching by a numeric order ID crashes with InvalidDataAccessApiUsageException
-  // because it also tries to filter by `customerName` which doesn't exist on OrderReplica.
-  const paymentsMap = useRef<Map<string, Payment>>(new Map());
+  // Pre-fetch all payments for this floor, keyed by "customername-mode" -> Payment[]
+  const paymentsMap = useRef<Map<string, Payment[]>>(new Map());
   const [paymentsLoaded, setPaymentsLoaded] = useState(false);
 
+  const buildPaymentsMap = useCallback(async () => {
+    try {
+      // Fetch all pages for a specific floor and mode
+      const fetchAllPages = async (f: PaymentFloor, m: BillingType) => {
+        let all: Payment[] = [];
+        let page = 0;
+        let totalPages = 1;
+        while (page < totalPages) {
+          const res = await paymentApi.getPaymentList({ floor: f, mode: m, page, size: 500 });
+          all = all.concat(res.data);
+          totalPages = res.totalPages || 1;
+          page++;
+          if (page > 3) break; // Safety limit: max 2000 records per mode/floor
+        }
+        return all;
+      };
+
+      // Fetch from both floors because party orders can be spread across them
+      const [gOfficial, gOffline, fOfficial, fOffline] = await Promise.all([
+        fetchAllPages('GROUND_FLOOR' as PaymentFloor, BillingType.OFFICIAL),
+        fetchAllPages('GROUND_FLOOR' as PaymentFloor, BillingType.OFFLINE),
+        fetchAllPages('FIRST_FLOOR' as PaymentFloor, BillingType.OFFICIAL),
+        fetchAllPages('FIRST_FLOOR' as PaymentFloor, BillingType.OFFLINE),
+      ]);
+
+      const map = new Map<string, Payment[]>();
+
+      const processResults = (payments: Payment[]) => {
+        payments.forEach((p) => {
+          const m = p.mode || 'OFFICIAL';
+          const name = (p.customerName || '').trim().toLowerCase();
+
+          if (name) {
+            const nameKey = `${name}-${m}`;
+            if (!map.has(nameKey)) map.set(nameKey, []);
+            map.get(nameKey)!.push(p);
+          }
+
+          if (p.orderId) {
+            const orderKey = `${p.orderId}-${m}`;
+            if (!map.has(orderKey)) map.set(orderKey, []);
+            map.get(orderKey)!.push(p);
+          }
+        });
+      };
+
+      processResults(gOfficial);
+      processResults(gOffline);
+      processResults(fOfficial);
+      processResults(fOffline);
+
+      paymentsMap.current = map;
+    } catch (err) {
+      console.error('Failed to pre-fetch payments', err);
+    } finally {
+      setPaymentsLoaded(true);
+    }
+  }, []);
+
   useEffect(() => {
-    if (!floor) return;
     let cancelled = false;
-
-    const loadPayments = async () => {
-      try {
-        // Fetch for both modes since the API now requires the mode parameter
-        const [officialResult, offlineResult] = await Promise.all([
-          paymentApi.getPaymentList({ floor, mode: BillingType.OFFICIAL, size: 500 }),
-          paymentApi.getPaymentList({ floor, mode: BillingType.OFFLINE, size: 500 })
-        ]);
-
-        if (cancelled) return;
-
-        const map = new Map<string, Payment>();
-        officialResult.data.forEach((p) => {
-          map.set(`${p.orderId}-OFFICIAL`, p);
-        });
-        offlineResult.data.forEach((p) => {
-          map.set(`${p.orderId}-OFFLINE`, p);
-        });
-
-        paymentsMap.current = map;
-        setPaymentsLoaded(true);
-      } catch (err) {
-        // Non-fatal — buttons will show an error if user clicks before load
-        console.error('Failed to pre-fetch payments', err);
-        setPaymentsLoaded(true); // still mark loaded so buttons become active
-      }
-    };
-
-    loadPayments();
+    buildPaymentsMap().then(() => { if (cancelled) return; });
     return () => { cancelled = true; };
-  }, [floor]);
+  }, [buildPaymentsMap]);
 
   const fetchLedger = useCallback(async (start: string, end: string) => {
     try {
@@ -130,9 +157,8 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
     }
   };
 
-  const handleRecordPayment = (orderId: number, mode: BillingType) => {
+  const handleRecordPayment = (orderId: number, mode: BillingType, orderTotal: number) => {
     if (!floor) return;
-    const key = `${orderId}-${mode}`;
     setPaymentFetchError(null);
 
     if (!paymentsLoaded) {
@@ -140,7 +166,22 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
       return;
     }
 
-    const match = paymentsMap.current.get(key);
+    // Try matching by orderId first (most precise)
+    const orderKey = `${orderId}-${mode}`;
+    const orderCandidates = paymentsMap.current.get(orderKey) ?? [];
+    let match = orderCandidates[0];
+
+    if (!match) {
+      // Fallback to customerName + totalAmount match
+      const nameKey = `${(ledger.partyName ?? '').toLowerCase()}-${mode}`;
+      const nameCandidates = paymentsMap.current.get(nameKey) ?? [];
+
+      // Try exact totalAmount match first
+      match = nameCandidates.find((p) =>
+        p.totalAmount !== null && Math.abs(p.totalAmount - orderTotal) < 0.01
+      ) || nameCandidates[0];
+    }
+
     if (match) {
       setRecordingPayment(match);
     } else {
@@ -150,28 +191,13 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
     }
   };
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async () => {
     setRecordingPayment(null);
-    // Reload cached payments so updated amounts are reflected on next click
-    if (floor) {
-      Promise.all([
-        paymentApi.getPaymentList({ floor, mode: BillingType.OFFICIAL, size: 500 }),
-        paymentApi.getPaymentList({ floor, mode: BillingType.OFFLINE, size: 500 })
-      ]).then(([officialResult, offlineResult]) => {
-        const map = new Map<string, Payment>();
-        officialResult.data.forEach((p) => {
-          map.set(`${p.orderId}-OFFICIAL`, p);
-        });
-        offlineResult.data.forEach((p) => {
-          map.set(`${p.orderId}-OFFLINE`, p);
-        });
-        paymentsMap.current = map;
-      }).catch((err) => {
-        console.error('Failed to refresh payments map after success', err);
-      });
-    }
-    // Refresh the ledger to show updated amounts
-    fetchLedger(startDate, endDate);
+    // Reload cached payments and refresh ledger to show updated amounts
+    await Promise.all([
+      buildPaymentsMap(),
+      fetchLedger(startDate, endDate),
+    ]);
   };
 
   const anyError = fetchError || downloadError || paymentFetchError;
@@ -308,7 +334,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
                                 type="button"
                                 className="ledger-record-btn ledger-record-btn--official"
                                 disabled={!paymentsLoaded}
-                                onClick={() => handleRecordPayment(order.orderId, 'OFFICIAL')}
+                                onClick={() => handleRecordPayment(order.orderId, BillingType.OFFICIAL, order.paymentSummary?.official?.totalAmount ?? 0)}
                                 title={`Record official payment (Due: ${currency(officialDue)})`}
                               >
                                 {!paymentsLoaded ? (
@@ -328,7 +354,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
                                 type="button"
                                 className="ledger-record-btn ledger-record-btn--offline"
                                 disabled={!paymentsLoaded}
-                                onClick={() => handleRecordPayment(order.orderId, 'OFFLINE')}
+                                onClick={() => handleRecordPayment(order.orderId, BillingType.OFFLINE, order.paymentSummary?.offline?.totalAmount ?? 0)}
                                 title={`Record offline payment (Due: ${currency(offlineDue)})`}
                               >
                                 {!paymentsLoaded ? (

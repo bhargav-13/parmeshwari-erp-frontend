@@ -40,14 +40,18 @@ const PaymentReceivedModal: React.FC<PaymentReceivedModalProps> = ({
     e.preventDefault();
     setError(null);
 
+    const receivedAmount = payment.receivedAmount || 0;
+    const totalAmount = payment.totalAmount || 0;
+    const remainingAmount = totalAmount - receivedAmount;
+
     if (formData.newReceivedAmount <= 0) {
-      setError('New received amount must be greater than 0');
+      setError('Received amount must be greater than 0');
       return;
     }
 
-    const remainingAmount = (payment.totalAmount || 0) - (payment.receivedAmount || 0);
-    if (formData.newReceivedAmount > remainingAmount) {
-      setError(`New received amount cannot exceed outstanding amount (₹${remainingAmount.toLocaleString('en-IN')})`);
+    // Use a small epsilon for float comparison
+    if (formData.newReceivedAmount > (remainingAmount + 0.01)) {
+      setError(`Received amount exceeds remaining due amount of ₹${remainingAmount.toLocaleString('en-IN')}`);
       return;
     }
 
@@ -62,9 +66,9 @@ const PaymentReceivedModal: React.FC<PaymentReceivedModalProps> = ({
     }
   };
 
-  const formatCurrency = (amount: number | null | undefined): string => {
-    if (amount === null || amount === undefined) return '₹ 0';
-    return `₹ ${amount.toLocaleString('en-IN')}`;
+  const formatCurrencyValue = (amount: number | null | undefined): string => {
+    if (amount === null || amount === undefined) return '0';
+    return amount.toLocaleString('en-IN');
   };
 
   const formatDate = (dateStr: string | null): string => {
@@ -77,52 +81,57 @@ const PaymentReceivedModal: React.FC<PaymentReceivedModalProps> = ({
     });
   };
 
+  const remaining = (payment.totalAmount || 0) - (payment.receivedAmount || 0);
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay payment-received-modal-overlay" onClick={onClose}>
       <div className="modal-content payment-received-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Payment Received</h2>
+        <div className="payment-modal-header">
+          <h2 className="modal-title">Record Payment</h2>
+          <p className="modal-subtitle">Order #{payment.orderId} • {payment.customerName}</p>
+        </div>
+
+        {/* Payment Summary Section */}
+        <div className="payment-summary-box">
+          <div className="summary-item">
+            <span className="summary-label">Total Amount</span>
+            <span className="summary-value">₹ {formatCurrencyValue(payment.totalAmount)}</span>
+          </div>
+          <div className="summary-item">
+            <span className="summary-label">Already Received</span>
+            <span className="summary-value highlight-green">₹ {formatCurrencyValue(payment.receivedAmount)}</span>
+          </div>
+          <div className="summary-divider"></div>
+          <div className="summary-item total">
+            <span className="summary-label">Remaining Balance</span>
+            <span className="summary-value highlight-red">₹ {formatCurrencyValue(remaining)}</span>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Received Amount*</label>
-              <input
-                type="text"
-                value={formatCurrency(payment.receivedAmount)}
-                className="form-input readonly-input"
-                readOnly
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Last Received Date*</label>
-              <input
-                type="text"
-                value={formatDate(payment.lastReceivedDate)}
-                className="form-input readonly-input"
-                readOnly
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
               <label className="form-label">New Received Amount</label>
-              <input
-                type="number"
-                name="newReceivedAmount"
-                value={formData.newReceivedAmount || ''}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="₹ 1,20,000"
-                step="0.01"
-                min="0"
-                required
-              />
+              <div className="input-with-icon">
+                <span className="currency-prefix">₹</span>
+                <input
+                  type="number"
+                  name="newReceivedAmount"
+                  value={formData.newReceivedAmount || ''}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0.01"
+                  max={remaining}
+                  required
+                  autoFocus
+                />
+              </div>
             </div>
 
             <div className="form-group">
-              <label className="form-label">New Received Date</label>
+              <label className="form-label">Date of Receipt</label>
               <input
                 type="date"
                 name="newReceivedDate"
@@ -134,11 +143,18 @@ const PaymentReceivedModal: React.FC<PaymentReceivedModalProps> = ({
             </div>
           </div>
 
+          <div className="last-recorded">
+            Last payment recorded on: <strong>{formatDate(payment.lastReceivedDate)}</strong>
+          </div>
+
           {error && <div className="error-message">{error}</div>}
 
           <div className="modal-actions">
+            <button type="button" className="cancel-button" onClick={onClose} disabled={loading}>
+              Cancel
+            </button>
             <button type="submit" className="save-button" disabled={loading}>
-              {loading ? 'Saving...' : 'Save & Continue'}
+              {loading ? 'Processing...' : 'Record Payment'}
             </button>
           </div>
         </form>

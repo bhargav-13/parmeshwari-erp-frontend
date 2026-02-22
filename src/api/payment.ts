@@ -21,8 +21,7 @@ export const paymentApi = {
     return promisify<PaginatedResult<Payment>>(cb =>
       generatedPaymentsApi.getPaymentsByFloor(
         floor,
-        mode ?? null,
-        { page, size, status, search },
+        { mode, page, size, status, search },
         cb
       )
     );

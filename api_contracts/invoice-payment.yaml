@@ -271,7 +271,7 @@ paths:
             $ref: '#/components/schemas/FloorEnum'
         - name: mode
           in: query
-          required: true
+          required: false
           schema:
             $ref: '#/components/schemas/BillingType'
         - name: status
