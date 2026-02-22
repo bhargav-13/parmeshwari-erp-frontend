@@ -341,11 +341,15 @@ components:
         default: 10
 
   schemas:
-    WeightUnit:
+    InwardWeightUnit:
       type: string
       enum:
         - CHHOL
         - KG
+        - TAIYAR MAAL
+    OutwardWeightUnit:
+      type: string
+      enum:
         - WIRE
 
     ForgingInward:
@@ -354,8 +358,8 @@ components:
         id:
           type: integer
           format: int64
-        partyName:
-          type: string
+        party:
+          $ref: '#/components/schemas/Party'
         challanNo:
           type: string
         date:
@@ -365,15 +369,16 @@ components:
           type: number
           format: double
         weightUnit:
-          $ref: '#/components/schemas/WeightUnit'
+          $ref: '#/components/schemas/InwardWeightUnit'
         image:
           type: string
 
     ForgingInwardRequest:
       type: object
       properties:
-        partyName:
-          type: string
+        partyId:
+          type: number
+          format: double
         challanNo:
           type: string
         date:
@@ -383,7 +388,7 @@ components:
           type: number
           format: double
         weightUnit:
-          $ref: '#/components/schemas/WeightUnit'
+          $ref: '#/components/schemas/InwardWeightUnit'
         image:
           type: string
 
@@ -393,8 +398,8 @@ components:
         id:
           type: integer
           format: int64
-        partyName:
-          type: string
+        party:
+          $ref: '#/components/schemas/Party'
         challanNo:
           type: string
         date:
@@ -404,15 +409,16 @@ components:
           type: number
           format: double
         weightUnit:
-          $ref: '#/components/schemas/WeightUnit'
+          $ref: '#/components/schemas/OutwardWeightUnit'
         image:
           type: string
 
     ForgingOutwardRequest:
       type: object
       properties:
-        partyName:
-          type: string
+        partyId:
+          type: number
+          format: double
         challanNo:
           type: string
         date:
@@ -422,7 +428,7 @@ components:
           type: number
           format: double
         weightUnit:
-          $ref: '#/components/schemas/WeightUnit'
+          $ref: '#/components/schemas/OutwardWeightUnit'
         image:
           type: string
 
@@ -459,7 +465,14 @@ components:
           type: integer
         pageSize:
           type: integer
-
+    Party:
+      type: object
+      properties:
+        partyId:
+          type: number
+          format: double
+        partyName:
+          type: string
     ErrorResponse:
       type: object
       properties:

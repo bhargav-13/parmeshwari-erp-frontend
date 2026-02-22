@@ -63,9 +63,13 @@ const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloo
 
 const recalculateTotals = (data: OrderRequest): OrderRequest => {
   const productsTotal = data.products.reduce((sum, product) => sum + (Number(product.totalAmount) || 0), 0);
+  // offlineBillPercent stores the OFFLINE portion; onlineBillPercent = 100 - offline
+  // But we now accept online% from the user, so offlineBillPercent = 100 - onlineBillPercent.
+  // We read it back as onlinePercent = 100 - offlineBillPercent for display.
   const offlineBillPercent = Number(data.offlineBillPercent) || 0;
-  const offlineTotal = (offlineBillPercent / 100) * productsTotal;
-  const officialBillAmount = Math.max(productsTotal - offlineTotal, 0);
+  const onlinePercent = Math.min(Math.max(100 - offlineBillPercent, 0), 100);
+  const officialBillAmount = (onlinePercent / 100) * productsTotal;
+  const offlineTotal = Math.max(productsTotal - officialBillAmount, 0);
   const gst = officialBillAmount * 0.18;
   const grandTotal = offlineTotal + officialBillAmount + gst;
 
@@ -619,14 +623,21 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                 <h3>Amount Total</h3>
                 <div className="amount-grid">
                   <div className="order-form-group">
-                    <label>Offline Bill %*</label>
+                    <label>Online Bill %*</label>
                     <input
                       type="number"
                       min="0"
                       max="100"
                       step="0.01"
-                      value={formData.offlineBillPercent || ''}
-                      onChange={(e) => handleFieldChange('offlineBillPercent', Number(e.target.value))}
+                      value={formData.offlineBillPercent !== undefined && formData.offlineBillPercent !== null
+                        ? Math.round((100 - formData.offlineBillPercent) * 100) / 100
+                        : ''
+                      }
+                      onChange={(e) => {
+                        const onlinePercent = Number(e.target.value);
+                        // store as offlineBillPercent = 100 - online
+                        handleFieldChange('offlineBillPercent', Math.min(Math.max(100 - onlinePercent, 0), 100));
+                      }}
                       placeholder="0"
                     />
                   </div>

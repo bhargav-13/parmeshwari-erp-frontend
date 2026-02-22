@@ -5,8 +5,8 @@ import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
 import AddForgingInwardModal from '../components/AddForgingInwardModal';
 import AddForgingOutwardModal from '../components/AddForgingOutwardModal';
-import { forgingInwardApi, forgingOutwardApi } from '../api/forging';
-import type { ForgingInward, ForgingOutward } from '../types';
+import { forgingInwardApi, forgingOutwardApi, forgingPartyApi } from '../api/forging';
+import type { ForgingInward, ForgingOutward, ForgingParty } from '../types';
 import Loading from '../components/Loading';
 
 // Download Icon
@@ -34,11 +34,17 @@ const ForgingPage: React.FC = () => {
     const [downloadPartyName, setDownloadPartyName] = useState('');
     const [downloadFromDate, setDownloadFromDate] = useState('');
     const [downloadToDate, setDownloadToDate] = useState('');
+    const [downloadParties, setDownloadParties] = useState<ForgingParty[]>([]);
+    const [downloadPartiesLoading, setDownloadPartiesLoading] = useState(true);
 
-    // Fetch forging entries
+    // Fetch forging entries and parties for PDF filter dropdown
     useEffect(() => {
         fetchInwardEntries();
         fetchOutwardEntries();
+        forgingPartyApi.getAll()
+            .then(setDownloadParties)
+            .catch(() => setDownloadParties([]))
+            .finally(() => setDownloadPartiesLoading(false));
     }, []);
 
     const fetchInwardEntries = async () => {
@@ -305,14 +311,22 @@ const ForgingPage: React.FC = () => {
 
                         <div className="modal-form">
                             <div className="form-group">
-                                <label className="form-label">Party Name <span style={{ opacity: 0.5 }}>(optional)</span></label>
-                                <input
-                                    type="text"
+                                <label className="form-label">Party <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <select
                                     className="form-input"
-                                    placeholder="e.g. Ravi Enterprises"
                                     value={downloadPartyName}
                                     onChange={e => setDownloadPartyName(e.target.value)}
-                                />
+                                    disabled={downloadPartiesLoading}
+                                >
+                                    <option value="">
+                                        {downloadPartiesLoading ? 'Loading parties...' : '— All Parties —'}
+                                    </option>
+                                    {downloadParties.map(p => (
+                                        <option key={p.partyId} value={p.partyName}>
+                                            {p.partyName}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="form-group">

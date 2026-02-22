@@ -255,7 +255,7 @@ paths:
           description: Internal Server Error
       security:
         - oauth2: [ ]
-  /api/v1/payments/floor/{floor}/mode/{mode}:
+  /api/v1/payments/floor/{floor}:
     get:
       tags:
         - Payments
@@ -361,6 +361,84 @@ paths:
       security:
         - oauth2: [ ]
 
+  /api/v1/payments/party-ledger/{partyId}:
+    get:
+      tags:
+        - Payments
+      operationId: getPartyLedger
+      summary: Get comprehensive party ledger with order details
+      parameters:
+        - name: partyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Party ledger details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartyLedgerResponse'
+        '404':
+          description: Party not found
+        '500':
+          description: Internal Server Error
+      security:
+        - oauth2: [ ]
+  /api/v1/payments/party-ledger/{partyId}/pdf:
+    get:
+      tags:
+        - Payments
+      operationId: getPartyLedgerPdf
+      summary: Get comprehensive party ledger with order details
+      parameters:
+        - name: partyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: PDF generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Party not found
+        '500':
+          description: Internal Server Error
+      security:
+        - oauth2: [ ]
+
 
 components:
   securitySchemes:
@@ -394,6 +472,21 @@ components:
         type: string
         enum: [ ASC, DESC ]
 
+    SortByFields:
+      name: sortByFields
+      in: query
+      description: Field to sort by
+      schema:
+        type: string
+        enum: [ lastUpdatedAt , createdAt ]
+
+    searchParam:
+      name: search
+      in: query
+      description: Search text to filter results by name or relevant fields
+      schema:
+        type: string
+
     SortByInvoiceFields:
       name: sortByFields
       in: query
@@ -410,6 +503,91 @@ components:
         type: string
         enum: [ lastUpdatedAt , createdAt , orderId , lastReminder , dueDate , paymentStatus , mode ]
   schemas:
+    PartyLedgerResponse:
+      type: object
+      properties:
+        partyId:
+          type: integer
+          format: int64
+        partyName:
+          type: string
+        totalOfficialAmount:
+          type: number
+          format: double
+        totalOfflineAmount:
+          type: number
+          format: double
+        totalReceivedAmount:
+          type: number
+          format: double
+        totalRemainingAmount:
+          type: number
+          format: double
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartyLedgerOrder'
+
+    PartyLedgerOrder:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          format: int64
+        orderDate:
+          type: string
+          format: date
+        officialGrandTotal:
+          type: number
+          format: double
+        offlineGrandTotal:
+          type: number
+          format: double
+        billSummary:
+          $ref: '#/components/schemas/BillSummary'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderProductReplica'
+        paymentSummary:
+          $ref: '#/components/schemas/PaymentSummary'
+    BillSummary:
+      type: object
+      properties:
+        billPercentage:
+          type: number
+          format: double
+        gstAmount:
+          type: number
+          format: double
+        amountWithoutGst:
+          type: number
+          format: double
+        billTotalAmount:
+          type: number
+          format: double
+    PaymentSummary:
+      type: object
+      properties:
+        official:
+          $ref: '#/components/schemas/PaymentSide'
+        offline:
+          $ref: '#/components/schemas/PaymentSide'
+    PaymentSide:
+      type: object
+      properties:
+        totalAmount:
+          type: number
+          format: double
+        receivedAmount:
+          type: number
+          format: double
+        receivedDate:
+          type: string
+          format: date
+        dueAmount:
+          type: number
+          format: double
     OrderReplica:
       type: object
       properties:
@@ -572,40 +750,22 @@ components:
         id:
           type: integer
           format: int64
-          example: 1
-        orderId:
-          type: integer
-          format: int64
-          example: 101
+        customerName:
+          type: string
         receivedAmount:
           type: number
-          format: double
-          example: 780000
         lastReceivedDate:
           type: string
           format: date
-          example: 2025-12-05
-        newReceivedAmount:
-          type: number
-          format: double
-          example: 120000
-        newReceivedDate:
-          type: string
-          format: date
-          example: 2025-12-05
         totalAmount:
           type: number
-          format: double
-          example: 900000
         lastReminder:
           type: string
           format: date
           nullable: true
-          example: 2025-12-01
         dueDate:
           type: string
           format: date
-          example: 2025-12-31
         paymentStatus:
           $ref: '#/components/schemas/PaymentStatus'
         floor:

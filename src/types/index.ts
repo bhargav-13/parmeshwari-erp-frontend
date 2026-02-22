@@ -303,7 +303,7 @@ export interface DispatchRequest {
 //orderrequest
 export interface OrderRequest {
   partyId: number;
-  customerName: string;
+  customerName?: string;
   customerMobileNo?: string | null;
   customerEmail?: string | null;
   orderDate: string;
@@ -332,8 +332,17 @@ export interface OrderProduct {
   totalAmount: number;
 }
 
-export interface Order extends Omit<OrderRequest, 'products'> {
+export interface OrderParty {
   id: number;
+  name: string;
+  officialAmount?: number;
+  offlineAmount?: number;
+}
+
+export interface Order extends Omit<OrderRequest, 'products' | 'customerName'> {
+  id: number;
+  party?: OrderParty;
+  customerName?: string; // kept for backwards compat with old data
   orderStatus: OrderStatus;
   orderFloor?: OrderFloor;
   products: OrderProduct[];
@@ -393,6 +402,7 @@ export type PaymentFloor = typeof PaymentFloor[keyof typeof PaymentFloor];
 export interface Payment {
   id: number;
   orderId: number;
+  partyId?: number;
   customerName?: string; // May be included by backend
   receivedAmount: number | null;
   lastReceivedDate: string | null;
@@ -403,6 +413,7 @@ export interface Payment {
   dueDate: string;
   paymentStatus: PaymentStatus;
   floor: PaymentFloor;
+  mode?: BillingType;
 }
 
 export interface PaymentReceiveRequest {
@@ -582,31 +593,47 @@ export interface CastingSale {
 }
 
 // Forging Types
-export const WeightUnit = {
+export const InwardWeightUnit = {
   CHHOL: 'CHHOL',
   KG: 'KG',
+  TAIYAR_MAAL: 'TAIYAR MAAL',
+} as const;
+export type InwardWeightUnit = typeof InwardWeightUnit[keyof typeof InwardWeightUnit];
+
+export const OutwardWeightUnit = {
   WIRE: 'WIRE',
 } as const;
+export type OutwardWeightUnit = typeof OutwardWeightUnit[keyof typeof OutwardWeightUnit];
 
-export type WeightUnit = typeof WeightUnit[keyof typeof WeightUnit];
+// Keep WeightUnit as union for backward compat
+export type WeightUnit = InwardWeightUnit | OutwardWeightUnit;
+
+export interface ForgingParty {
+  partyId: number;
+  partyName: string;
+}
 
 export interface ForgingInward {
   id?: number;
-  partyName: string;
+  partyId?: number;
+  partyName: string; // resolved from party object for display
+  party?: ForgingParty;
   challanNo: string;
   date: string; // DD/MM/YYYY format for UI
   weight: number;
-  weightUnit: WeightUnit;
+  weightUnit: InwardWeightUnit;
   image?: string;
 }
 
 export interface ForgingOutward {
   id?: number;
-  partyName: string;
+  partyId?: number;
+  partyName: string; // resolved from party object for display
+  party?: ForgingParty;
   challanNo: string;
   date: string; // DD/MM/YYYY format for UI
   weight: number;
-  weightUnit: WeightUnit;
+  weightUnit: OutwardWeightUnit;
   image?: string;
 }
 
@@ -633,3 +660,53 @@ export interface ElectricCredit {
 // Legacy aliases kept for any other references
 export type ElectricOutwardEntry = ElectricOutward;
 export type ElectricCreditEntry = ElectricCredit;
+
+// Party Ledger Types
+export interface PaymentSide {
+  totalAmount: number;
+  receivedAmount: number;
+  receivedDate: string | null;
+  dueAmount: number;
+}
+
+export interface PaymentSummary {
+  official: PaymentSide;
+  offline: PaymentSide;
+}
+
+export interface BillSummary {
+  billPercentage: number;
+  gstAmount: number;
+  amountWithoutGst: number;
+  billTotalAmount: number;
+}
+
+export interface PartyLedgerProduct {
+  id: number;
+  productName: string;
+  quantityKg?: number;
+  quantityPc?: number;
+  marketRate: number;
+  rateDifference: number;
+  totalAmount: number;
+}
+
+export interface PartyLedgerOrder {
+  orderId: number;
+  orderDate: string;
+  officialGrandTotal: number;
+  offlineGrandTotal: number;
+  billSummary: BillSummary;
+  products: PartyLedgerProduct[];
+  paymentSummary: PaymentSummary;
+}
+
+export interface PartyLedgerResponse {
+  partyId: number;
+  partyName: string;
+  totalOfficialAmount: number;
+  totalOfflineAmount: number;
+  totalReceivedAmount: number;
+  totalRemainingAmount: number;
+  orders: PartyLedgerOrder[];
+}

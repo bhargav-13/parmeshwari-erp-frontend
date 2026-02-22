@@ -105,8 +105,8 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
 
         <div className="order-amount-summary">
           <div className="amount-card">
-            <p className="summary-label">Offline Bill %</p>
-            <p className="summary-value">{order.offlineBillPercent ?? 0}%</p>
+            <p className="summary-label">Online Bill %</p>
+            <p className="summary-value">{Math.round((100 - (order.offlineBillPercent ?? 0)) * 100) / 100}%</p>
           </div>
           <div className="amount-card">
             <p className="summary-label">Offline Total</p>

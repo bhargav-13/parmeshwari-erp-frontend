@@ -134,6 +134,9 @@ export interface FullDashboardData {
 export const dashboardApi = {
   // Fetch all data for both floors and both billing modes
   fetchAllData: async () => {
+    // Use safe fetch — returns [] on error so one failing endpoint doesn't break the whole dashboard
+    const safeArray = <T>(p: Promise<T[]>): Promise<T[]> => p.catch(() => [] as T[]);
+
     const [
       groundFloorOrders,
       firstFloorOrders,
@@ -149,19 +152,19 @@ export const dashboardApi = {
       allRawItems,
       allSubcontracts,
     ] = await Promise.all([
-      fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.GROUND_FLOOR, page, size: 100 })),
-      fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.FIRST_FLOOR, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
-      stockItemApi.getAllStockItems(),
-      rawItemApi.getRawItems(0, 1000).then(res => res.data),
-      fetchAll<Subcontracting>(page => subcontractingApi.getSubcontractingList({ page, size: 100 })),
+      safeArray(fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.GROUND_FLOOR, page, size: 100 }))),
+      safeArray(fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.FIRST_FLOOR, page, size: 100 }))),
+      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      stockItemApi.getAllStockItems().catch(() => [] as StockItem[]),
+      rawItemApi.getRawItems(0, 1000).then(res => res.data).catch(() => [] as RawItem[]),
+      safeArray(fetchAll<Subcontracting>(page => subcontractingApi.getSubcontractingList({ page, size: 100 }))),
     ]);
 
     const groundFloorInvoices = [...groundFloorInvoicesOfficial, ...groundFloorInvoicesOffline];
@@ -211,7 +214,7 @@ export const dashboardApi = {
     const overduePayments = allPayments.filter(p => p.paymentStatus === PaymentStatus.OVERDUE).length;
     const totalInventoryValue = allStockItems.reduce((sum, item) => sum + item.totalPrice, 0);
     const lowStockCount = allStockItems.filter(item => item.status === InventoryStatus.LOW_STOCK).length +
-                          allRawItems.filter(item => item.status === InventoryStatus.LOW_STOCK).length;
+      allRawItems.filter(item => item.status === InventoryStatus.LOW_STOCK).length;
     const activeSubcontracts = allSubcontracts.filter(s => s.status === SubcontractingStatus.IN_PROCESS).length;
     const totalOutstanding = allPayments.reduce((sum, p) => {
       const outstanding = (p.totalAmount || 0) - (p.receivedAmount || 0);
@@ -374,11 +377,12 @@ export const dashboardApi = {
     // Top Customers
     const customerData: { [name: string]: { orders: number; totalAmount: number } } = {};
     for (const order of allOrders) {
-      if (!customerData[order.customerName]) {
-        customerData[order.customerName] = { orders: 0, totalAmount: 0 };
+      const customerName = order.party?.name || order.customerName || 'Unknown';
+      if (!customerData[customerName]) {
+        customerData[customerName] = { orders: 0, totalAmount: 0 };
       }
-      customerData[order.customerName].orders += 1;
-      customerData[order.customerName].totalAmount += order.grandTotal;
+      customerData[customerName].orders += 1;
+      customerData[customerName].totalAmount += order.grandTotal;
     }
 
     const topCustomers: TopCustomer[] = Object.entries(customerData)
@@ -429,16 +433,17 @@ export const dashboardApi = {
     const firstFloorOrders = await fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.FIRST_FLOOR, page, size: 100 }));
     const allOrders = [...groundFloorOrders, ...firstFloorOrders];
 
+    const safeArray = <T>(p: Promise<T[]>): Promise<T[]> => p.catch(() => [] as T[]);
     const [
       groundFloorInvoicesOfficial,
       groundFloorInvoicesOffline,
       firstFloorInvoicesOfficial,
       firstFloorInvoicesOffline,
     ] = await Promise.all([
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
-      fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
     ]);
     const allInvoices = [...groundFloorInvoicesOfficial, ...groundFloorInvoicesOffline, ...firstFloorInvoicesOfficial, ...firstFloorInvoicesOffline];
 
@@ -448,10 +453,10 @@ export const dashboardApi = {
       firstFloorPaymentsOfficial,
       firstFloorPaymentsOffline,
     ] = await Promise.all([
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 })),
-      fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 })),
+      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
     ]);
     const allPayments = [...groundFloorPaymentsOfficial, ...groundFloorPaymentsOffline, ...firstFloorPaymentsOfficial, ...firstFloorPaymentsOffline];
 

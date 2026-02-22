@@ -1,306 +1,294 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { paymentApi } from '../api/payment';
-import type { Payment, PaymentStats } from '../types';
-import { PaymentStatus, PaymentFloor, BillingType } from '../types';
-import PaymentReceivedModal from '../components/PaymentReceivedModal';
-import PaymentDownloadOptionsModal from '../components/PaymentDownloadOptionsModal';
+import { partyApi } from '../api/party';
+import type { Party, PartyLedgerResponse, PaymentFloor } from '../types';
+import PartyLedgerModal from '../components/PartyLedgerModal';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
-import FilterIcon from '../assets/filter.svg';
-import SendIcon from '../assets/send.svg';
+import ViewIcon from '../assets/view.svg';
 import './PaymentReminderPage.css';
 
 interface PaymentReminderPageProps {
   floor: PaymentFloor;
 }
 
-const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [selectedMode, setSelectedMode] = useState<BillingType>(BillingType.OFFICIAL);
-  const [stats, setStats] = useState<PaymentStats>({
-    overduePayments: 0,
-    overdueAmount: 0,
-    dueSoonCount: 0,
-    totalOutstanding: 0,
+const formatCurrency = (amount: number | null | undefined): string => {
+  if (amount === null || amount === undefined) return '₹ 0';
+  return `₹ ${amount.toLocaleString('en-IN')}`;
+};
+
+const formatDate = (dateStr: string | null | undefined): string => {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
   });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<PaymentStatus | ''>('');
+};
+
+interface PartyLedgerRow {
+  party: Party;
+  ledger: PartyLedgerResponse | null;
+  loading: boolean;
+  error: boolean;
+}
+
+const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
+  const [partyRows, setPartyRows] = useState<PartyLedgerRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page] = useState(0);
-  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isDownloadOptionsOpen, setIsDownloadOptionsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedPartyId, setExpandedPartyId] = useState<number | null>(null);
+  const [detailLedger, setDetailLedger] = useState<PartyLedgerResponse | null>(null);
 
-  useEffect(() => {
-    fetchPayments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery, statusFilter, floor, selectedMode]);
+  // Default date range: last 1 year
+  const today = new Date();
+  const oneYearAgo = new Date(today);
+  oneYearAgo.setFullYear(today.getFullYear() - 1);
+  const startDate = oneYearAgo.toISOString().split('T')[0];
+  const endDate = today.toISOString().split('T')[0];
 
-  const fetchPayments = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await paymentApi.getPaymentList({
-        floor,
-        mode: selectedMode,
-        page,
-        size: 50,
-        search: searchQuery || undefined,
-        status: statusFilter || undefined,
+      const parties = await partyApi.getAllParties();
+
+      // Initialize rows with loading state
+      const initialRows: PartyLedgerRow[] = parties.map((p) => ({
+        party: p,
+        ledger: null,
+        loading: true,
+        error: false,
+      }));
+      setPartyRows(initialRows);
+
+      // Fetch ledger for each party in parallel
+      const ledgerPromises = parties.map(async (p) => {
+        try {
+          const ledger = await paymentApi.getPartyLedger(p.partyId, startDate, endDate);
+          return { partyId: p.partyId, ledger, error: false };
+        } catch {
+          return { partyId: p.partyId, ledger: null, error: true };
+        }
       });
 
-      setPayments(response.data);
-      calculateStats(response.data);
+      const results = await Promise.all(ledgerPromises);
+
+      setPartyRows((prev) =>
+        prev.map((row) => {
+          const result = results.find((r) => r.partyId === row.party.partyId);
+          if (result) {
+            return { ...row, ledger: result.ledger, loading: false, error: result.error };
+          }
+          return { ...row, loading: false };
+        })
+      );
     } catch (error) {
-      console.error('Error fetching payments:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
+  }, [startDate, endDate]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const toggleExpand = (partyId: number) => {
+    setExpandedPartyId((prev) => (prev === partyId ? null : partyId));
   };
 
-  const calculateStats = (data: Payment[]) => {
-    const overduePayments = data.filter(p => p.paymentStatus === PaymentStatus.OVERDUE);
-    const overdueAmount = overduePayments.reduce((sum, p) => sum + ((p.totalAmount || 0) - (p.receivedAmount || 0)), 0);
-    const dueSoonCount = data.filter(p => p.paymentStatus === PaymentStatus.DUE_SOON).length;
-    const totalOutstanding = data.reduce((sum, p) => sum + ((p.totalAmount || 0) - (p.receivedAmount || 0)), 0);
+  // Filter by search
+  const filteredRows = partyRows.filter((row) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return row.party.name.toLowerCase().includes(q);
+  });
 
-    setStats({
-      overduePayments: overduePayments.length,
-      overdueAmount,
-      dueSoonCount,
-      totalOutstanding,
-    });
-  };
-
-
-  const handleRowClick = (payment: Payment) => {
-    setSelectedPayment(payment);
-    setIsPaymentModalOpen(true);
-  };
-
-  const handlePaymentModalClose = () => {
-    setIsPaymentModalOpen(false);
-    setSelectedPayment(null);
-  };
-
-  const handlePaymentSuccess = () => {
-    fetchPayments();
-    handlePaymentModalClose();
-  };
-
-  const formatDate = (dateStr: string | null): string => {
-    if (!dateStr) return '—';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
-  const formatCurrency = (amount: number | null | undefined): string => {
-    if (amount === null || amount === undefined) return '₹ 0';
-    return `₹ ${amount.toLocaleString('en-IN')}`;
-  };
-
-
-  const formatInvoiceId = (orderId: number): string => {
-    return `PBI - ${String(orderId).padStart(5, '0')}`;
-  };
+  // Compute summary stats from all ledgers
+  const totalOfficial = partyRows.reduce((sum, r) => sum + (r.ledger?.totalOfficialAmount || 0), 0);
+  const totalOffline = partyRows.reduce((sum, r) => sum + (r.ledger?.totalOfflineAmount || 0), 0);
+  const totalReceived = partyRows.reduce((sum, r) => sum + (r.ledger?.totalReceivedAmount || 0), 0);
+  const totalRemaining = partyRows.reduce((sum, r) => sum + (r.ledger?.totalRemainingAmount || 0), 0);
 
   return (
     <div className="payment-reminder-page">
       <div className="page-header">
         <div className="page-title-section">
           <h1 className="page-title">Payment Reminder</h1>
-          <p className="page-subtitle">Track and send payment reminder to customers</p>
-        </div>
-
-        <div className="page-header-actions">
-          <div className="mode-toggle">
-            <button
-              type="button"
-              className={`mode-btn ${selectedMode === BillingType.OFFICIAL ? 'active' : ''}`}
-              onClick={() => setSelectedMode(BillingType.OFFICIAL)}
-            >
-              Official
-            </button>
-            <button
-              type="button"
-              className={`mode-btn ${selectedMode === BillingType.OFFLINE ? 'active' : ''}`}
-              onClick={() => setSelectedMode(BillingType.OFFLINE)}
-            >
-              Offline
-            </button>
-          </div>
-
-          <button type="button" className="bulk-reminder-button">
-            <img src={SendIcon} alt="Send" className="send-icon" />
-            <span>Send Bulk Reminder</span>
-          </button>
+          <p className="page-subtitle">Track party ledgers and payment details</p>
         </div>
       </div>
 
+      {/* Stats */}
       <div className="stats-cards">
         <div className="stat-card">
           <div className="stat-content">
-            <span className="stat-label">Overdue Payments</span>
-            <span className="stat-value">
-              {formatCurrency(stats.overdueAmount)} ({stats.overduePayments} Invoices)
-            </span>
+            <span className="stat-label">Total Official</span>
+            <span className="stat-value">{formatCurrency(totalOfficial)}</span>
           </div>
         </div>
-
         <div className="stat-card">
           <div className="stat-content">
-            <span className="stat-label">Due Soon</span>
-            <span className="stat-value">{stats.dueSoonCount} Invoices</span>
+            <span className="stat-label">Total Offline</span>
+            <span className="stat-value">{formatCurrency(totalOffline)}</span>
           </div>
         </div>
-
         <div className="stat-card">
           <div className="stat-content">
-            <span className="stat-label">Total Outstanding</span>
-            <span className="stat-value">{formatCurrency(stats.totalOutstanding)}</span>
+            <span className="stat-label">Total Received</span>
+            <span className="stat-value">{formatCurrency(totalReceived)}</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-content">
+            <span className="stat-label">Total Remaining</span>
+            <span className="stat-value">{formatCurrency(totalRemaining)}</span>
           </div>
         </div>
       </div>
 
+      {/* Search */}
       <div className="order-filters">
         <div className="order-search">
           <img src={SearchIcon} alt="Search" />
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search by party name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <button
-          type="button"
-          className="action-button secondary-button"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: '#fff',
-            border: '1.5px solid #b4d5ef',
-            borderRadius: '10px',
-            padding: '10px 20px',
-            cursor: 'pointer',
-            height: '45px'
-          }}
-          onClick={() => setIsDownloadOptionsOpen(true)}
-        >
-          <span className="button-text" style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', fontWeight: 500, color: '#17344d' }}>Download</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17344d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-        </button>
-        <div className="order-status-filter">
-          <img src={FilterIcon} alt="Filter" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as PaymentStatus | '')}
-            title="Filter by status"
-          >
-            <option value="">All Status</option>
-            <option value={PaymentStatus.OVERDUE}>Overdue</option>
-            <option value={PaymentStatus.DUE_SOON}>Due Soon</option>
-            <option value={PaymentStatus.UPCOMING}>Upcoming</option>
-          </select>
-        </div>
       </div>
 
+      {/* Table */}
       <div className="payment-table-container">
         {loading ? (
-          <Loading message="Loading payments..." size="large" />
+          <Loading message="Loading party ledgers..." size="large" />
         ) : (
           <table className="payment-table">
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Item Name</th>
-                <th>Quality</th>
-                <th>Price</th>
-                <th>Total Amount</th>
-                <th>Bill</th>
-                <th>GST</th>
-                <th>Total Online</th>
-                <th>Total Offline</th>
-                <th>Receive Offline</th>
+                <th>Party Name</th>
+                <th>Official Amount</th>
+                <th>Offline Amount</th>
+                <th>Received</th>
+                <th>Remaining</th>
+                <th>Orders</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {payments.length === 0 ? (
-                // Adding a few mock rows for visibility if API is empty
-                <>
-                  <tr className="payment-row">
-                    <td>01/01/2026</td>
-                    <td>Copper Wire</td>
-                    <td>Premium</td>
-                    <td>₹ 250</td>
-                    <td>₹ 12,500</td>
-                    <td>INV-001</td>
-                    <td>₹ 2,250</td>
-                    <td>₹ 5,000</td>
-                    <td>₹ 9,750</td>
-                    <td>₹ 9,750</td>
-                  </tr>
-                  <tr className="payment-row">
-                    <td>15/02/2026</td>
-                    <td>Aluminum Rod</td>
-                    <td>Standard</td>
-                    <td>₹ 150</td>
-                    <td>₹ 7,500</td>
-                    <td>INV-002</td>
-                    <td>₹ 1,350</td>
-                    <td>₹ 3,000</td>
-                    <td>₹ 5,850</td>
-                    <td>₹ 5,850</td>
-                  </tr>
-                </>
+              {filteredRows.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="no-data">No parties found.</td>
+                </tr>
               ) : (
-                payments.map((payment) => (
-                  <tr
-                    key={payment.id}
-                    onClick={() => handleRowClick(payment)}
-                    className="payment-row"
-                  >
-                    <td>{formatDate(payment.dueDate)}</td>
-                    <td>{payment.customerName || '—'}</td>
-                    <td>{/* Quality placeholder */ '—'}</td>
-                    <td>{/* Price placeholder */ '—'}</td>
-                    <td>{formatCurrency(payment.totalAmount)}</td>
-                    <td>{formatInvoiceId(payment.orderId)}</td>
-                    <td>{/* GST placeholder */ '₹ 0'}</td>
-                    <td>{/* Total Online placeholder */ '₹ 0'}</td>
-                    <td>{formatCurrency(payment.receivedAmount)}</td>
-                    <td>{formatCurrency(payment.receivedAmount)}</td>
-                  </tr>
-                ))
+                filteredRows.map((row) => {
+                  const isExpanded = expandedPartyId === row.party.partyId;
+                  const orderCount = row.ledger?.orders?.length || 0;
+
+                  return (
+                    <React.Fragment key={row.party.partyId}>
+                      {/* Party summary row */}
+                      <tr
+                        className={`payment-row ${orderCount > 0 ? 'clickable' : ''}`}
+                        onClick={() => orderCount > 0 && toggleExpand(row.party.partyId)}
+                      >
+                        <td className="party-name-cell">
+                          <div className="party-name-inner">
+                            <span>{row.party.name}</span>
+                            {orderCount > 0 && (
+                              <span className={`collapse-chevron ${isExpanded ? 'expanded' : ''}`}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalOfficialAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalOfflineAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalReceivedAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalRemainingAmount)}</td>
+                        <td>{row.loading ? '...' : orderCount}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="view-ledger-btn"
+                            title="View Full Ledger"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (row.ledger) {
+                                setDetailLedger(row.ledger);
+                              }
+                            }}
+                            disabled={!row.ledger}
+                          >
+                            <img src={ViewIcon} alt="View" className="view-icon" />
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Expanded orders */}
+                      {isExpanded && row.ledger?.orders && row.ledger.orders.map((order) => (
+                        <React.Fragment key={order.orderId}>
+                          {/* Order row */}
+                          <tr className="expanded-order-row">
+                            <td colSpan={7}>
+                              <div className="expanded-order-summary">
+                                <span className="expanded-order-id">Order #{order.orderId}</span>
+                                <span className="expanded-order-detail">Date: {formatDate(order.orderDate)}</span>
+                                <span className="expanded-order-detail">Official: {formatCurrency(order.officialGrandTotal)}</span>
+                                <span className="expanded-order-detail">Offline: {formatCurrency(order.offlineGrandTotal)}</span>
+                                <span className="expanded-order-detail">Products: {order.products?.length || 0}</span>
+                              </div>
+
+                              {/* Products sub-table */}
+                              {order.products && order.products.length > 0 && (
+                                <table className="expanded-products-table">
+                                  <thead>
+                                    <tr>
+                                      <th>Product</th>
+                                      <th>Qty (Kg)</th>
+                                      <th>Qty (Pc)</th>
+                                      <th>Market Rate</th>
+                                      <th>Rate Diff</th>
+                                      <th>Total</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {order.products.map((p) => (
+                                      <tr key={p.id}>
+                                        <td>{p.productName}</td>
+                                        <td>{p.quantityKg || '—'}</td>
+                                        <td>{p.quantityPc || '—'}</td>
+                                        <td>{formatCurrency(p.marketRate)}</td>
+                                        <td>{formatCurrency(p.rateDifference)}</td>
+                                        <td>{formatCurrency(p.totalAmount)}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              )}
+                            </td>
+                          </tr>
+                        </React.Fragment>
+                      ))}
+                    </React.Fragment>
+                  );
+                })
               )}
             </tbody>
           </table>
         )}
       </div>
 
-      {isPaymentModalOpen && selectedPayment && (
-        <PaymentReceivedModal
-          payment={selectedPayment}
-          onClose={handlePaymentModalClose}
-          onSuccess={handlePaymentSuccess}
-        />
-      )}
-
-      {isDownloadOptionsOpen && (
-        <PaymentDownloadOptionsModal
-          onClose={() => setIsDownloadOptionsOpen(false)}
-          onNext={(partyName, startDate, endDate) => {
-            console.log('Downloading for:', partyName, startDate, endDate);
-            setIsDownloadOptionsOpen(false);
-          }}
+      {/* Full detail modal (eye icon click) */}
+      {detailLedger && (
+        <PartyLedgerModal
+          ledger={detailLedger}
+          floor={floor}
+          onClose={() => setDetailLedger(null)}
         />
       )}
     </div>

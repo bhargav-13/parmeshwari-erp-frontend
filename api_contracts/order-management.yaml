@@ -739,6 +739,7 @@ components:
     NewOrderParty:
       required:
         - name
+        - amount
       type: object
       properties:
         name:

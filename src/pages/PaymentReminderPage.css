@@ -262,8 +262,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .payment-reminder-page .loading,
@@ -273,6 +278,138 @@
   font-family: 'Jost', sans-serif;
   font-size: 16px;
   color: #8E8E8E;
+}
+
+/* Toggle column - removed, chevron is now inline */
+
+/* Party name cell */
+.party-name-cell {
+  font-weight: 500;
+  color: #17344D;
+  text-align: left !important;
+}
+
+.party-name-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Collapse chevron (inline, next to party name) */
+.collapse-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7d99a9;
+  flex-shrink: 0;
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.collapse-chevron.expanded {
+  transform: rotate(180deg);
+  color: #17344D;
+}
+
+/* Clickable row */
+.payment-row.clickable {
+  cursor: pointer;
+}
+
+.payment-row:not(.clickable) {
+  cursor: default;
+}
+
+/* Expanded order row */
+.expanded-order-row {
+  background: #fafcfe;
+}
+
+.expanded-order-row>td {
+  padding: 0 16px 12px !important;
+  text-align: left !important;
+}
+
+.expanded-order-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 0 8px;
+  flex-wrap: wrap;
+}
+
+.expanded-order-id {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #17344D;
+}
+
+.expanded-order-detail {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  color: #8ea3b5;
+}
+
+/* Products sub-table inside expanded row */
+.expanded-products-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid rgba(23, 52, 77, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.expanded-products-table th {
+  padding: 6px 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #8ea3b5;
+  text-align: left;
+  background: #edf6ff;
+  border-bottom: 1px solid rgba(23, 52, 77, 0.06);
+}
+
+.expanded-products-table td {
+  padding: 6px 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  color: #17344D;
+  border-bottom: 1px solid rgba(23, 52, 77, 0.04);
+  text-align: left;
+}
+
+.expanded-products-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* View ledger button */
+.view-ledger-btn {
+  background: rgba(209, 238, 255, 0.5);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.view-ledger-btn:hover:not(:disabled) {
+  background: #c2e5ff;
+}
+
+.view-ledger-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.view-ledger-btn .view-icon {
+  width: 18px;
+  height: 18px;
 }
 
 /* Mobile Responsive Styles */

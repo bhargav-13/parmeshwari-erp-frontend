@@ -295,8 +295,8 @@ function DataTable<T>({
                       {col.render
                         ? col.render(item)
                         : String(
-                            (item as Record<string, unknown>)[col.key] ?? ""
-                          )}
+                          (item as Record<string, unknown>)[col.key] ?? ""
+                        )}
                     </td>
                   ))}
                 </tr>
@@ -432,9 +432,8 @@ const DashboardPage: React.FC = () => {
       {/* Tab Navigation */}
       <div className="dashboard-tabs">
         <button
-          className={`dashboard-tab ${
-            activeTab === "overview" ? "active" : ""
-          }`}
+          className={`dashboard-tab ${activeTab === "overview" ? "active" : ""
+            }`}
           onClick={() => setActiveTab("overview")}
         >
           Overview
@@ -446,17 +445,15 @@ const DashboardPage: React.FC = () => {
           Orders & Sales
         </button>
         <button
-          className={`dashboard-tab ${
-            activeTab === "inventory" ? "active" : ""
-          }`}
+          className={`dashboard-tab ${activeTab === "inventory" ? "active" : ""
+            }`}
           onClick={() => setActiveTab("inventory")}
         >
           Inventory
         </button>
         <button
-          className={`dashboard-tab ${
-            activeTab === "payments" ? "active" : ""
-          }`}
+          className={`dashboard-tab ${activeTab === "payments" ? "active" : ""
+            }`}
           onClick={() => setActiveTab("payments")}
         >
           Payments
@@ -713,7 +710,7 @@ const DashboardPage: React.FC = () => {
               data={dashboardData.recentOrders}
               columns={[
                 { key: "id", label: "ID" },
-                { key: "customerName", label: "Customer" },
+                { key: "customerName", label: "Customer", render: (o: Order) => o.party?.name || o.customerName || '—' },
                 {
                   key: "orderDate",
                   label: "Date",

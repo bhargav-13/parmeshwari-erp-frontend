@@ -3,7 +3,7 @@ import type {
   Payment,
   PaginatedResult,
   PaymentReceiveRequest,
-  BillingType,
+  PartyLedgerResponse,
 } from '../types';
 import { PaymentStatus, PaymentFloor } from '../types';
 
@@ -11,17 +11,15 @@ export const paymentApi = {
   // Get all payments by floor with pagination
   getPaymentList: (params: {
     floor: PaymentFloor;
-    mode: BillingType;
     page?: number;
     size?: number;
     status?: PaymentStatus;
     search?: string;
   }): Promise<PaginatedResult<Payment>> => {
-    const { floor, mode, page, size, status, search } = params;
+    const { floor, page, size, status, search } = params;
     return promisify<PaginatedResult<Payment>>(cb =>
       generatedPaymentsApi.getPaymentsByFloor(
         floor,
-        mode,
         { page, size, status, search },
         cb
       )
@@ -47,4 +45,33 @@ export const paymentApi = {
   // Send manual reminder
   sendReminder: (id: number): Promise<void> =>
     promisify<void>(cb => generatedPaymentsApi.sendManualReminder(id, cb)),
+
+  // Get party ledger
+  getPartyLedger: (partyId: number, startDate: string, endDate: string): Promise<PartyLedgerResponse> =>
+    promisify<PartyLedgerResponse>(cb =>
+      generatedPaymentsApi.getPartyLedger(partyId, startDate as any, endDate as any, cb)
+    ),
+
+  // Download party ledger PDF — use native fetch for a clean binary blob.
+  // The superagent-based generated client can corrupt binary responses in browsers.
+  getPartyLedgerPdf: async (partyId: number, startDate: string, endDate: string): Promise<Blob> => {
+    const BASE_URL =
+      (import.meta as any).env?.VITE_API_BASE_URL?.trim() || 'http://localhost:8080';
+    const token = localStorage.getItem('accessToken');
+    const url = `${BASE_URL}/api/v1/payments/party-ledger/${partyId}/pdf?startDate=${startDate}&endDate=${endDate}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/pdf',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`PDF download failed: ${response.status} ${response.statusText}`);
+    }
+
+    return response.blob();
+  },
 };

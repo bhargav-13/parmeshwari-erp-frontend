@@ -1,7 +1,9 @@
 import ForgingInwardApi from '../api-client/forging/src/api/ForgingInwardApi';
 import ForgingOutwardApi from '../api-client/forging/src/api/ForgingOutwardApi';
+import PartyApi from '../api-client/order-management/src/api/PartyApi';
+import ApiClient from '../api-client/inventory/src/ApiClient';
 import { promisify } from '../lib/apiConfig';
-import type { ForgingInward, ForgingOutward } from '../types';
+import type { ForgingInward, ForgingOutward, ForgingParty } from '../types';
 
 const BASE_URL =
     (import.meta as any).env?.VITE_API_BASE_URL?.trim() || 'http://localhost:8080';
@@ -38,10 +40,10 @@ const downloadPdfBlob = async (endpoint: string, filename: string, queryParams?:
 };
 
 // Import shared API client (configured with auth interceptor)
-import ApiClient from '../api-client/inventory/src/ApiClient';
 const apiClient = ApiClient.instance;
 const generatedForgingInwardApi = new ForgingInwardApi(apiClient);
 const generatedForgingOutwardApi = new ForgingOutwardApi(apiClient);
+const generatedPartyApi = new PartyApi(apiClient);
 
 // Date conversion utilities
 const formatDateForAPI = (dateStr: string): string => {
@@ -78,7 +80,9 @@ const formatDateForUI = (date: string | Date): string => {
 // Type conversion helpers for ForgingInward
 const convertToForgingInward = (inward: any): ForgingInward => ({
     id: inward.id,
-    partyName: inward.partyName || '',
+    partyId: inward.party?.partyId,
+    partyName: inward.party?.partyName || inward.partyName || '',
+    party: inward.party,
     challanNo: inward.challanNo || '',
     date: formatDateForUI(inward.date),
     weight: inward.weight || 0,
@@ -87,7 +91,7 @@ const convertToForgingInward = (inward: any): ForgingInward => ({
 });
 
 const convertToForgingInwardRequest = (data: Omit<ForgingInward, 'id'>): any => ({
-    partyName: data.partyName,
+    partyId: data.partyId,
     challanNo: data.challanNo,
     date: formatDateForAPI(data.date),
     weight: data.weight,
@@ -98,7 +102,9 @@ const convertToForgingInwardRequest = (data: Omit<ForgingInward, 'id'>): any => 
 // Type conversion helpers for ForgingOutward
 const convertToForgingOutward = (outward: any): ForgingOutward => ({
     id: outward.id,
-    partyName: outward.partyName || '',
+    partyId: outward.party?.partyId,
+    partyName: outward.party?.partyName || outward.partyName || '',
+    party: outward.party,
     challanNo: outward.challanNo || '',
     date: formatDateForUI(outward.date),
     weight: outward.weight || 0,
@@ -107,7 +113,7 @@ const convertToForgingOutward = (outward: any): ForgingOutward => ({
 });
 
 const convertToForgingOutwardRequest = (data: Omit<ForgingOutward, 'id'>): any => ({
-    partyName: data.partyName,
+    partyId: data.partyId,
     challanNo: data.challanNo,
     date: formatDateForAPI(data.date),
     weight: data.weight,
@@ -191,4 +197,15 @@ export const forgingOutwardApi = {
             ...(fromDate ? { fromDate } : {}),
             ...(toDate ? { toDate } : {}),
         }),
+};
+// Party API for forging — reuses order-management /api/v1/parties
+export const forgingPartyApi = {
+    getAll: (): Promise<ForgingParty[]> =>
+        promisify<any[]>(cb => generatedPartyApi.getAllParties({}, cb))
+            .then(parties =>
+                (parties || []).map((p: any) => ({
+                    partyId: p.id,
+                    partyName: p.name,
+                }))
+            ),
 };
