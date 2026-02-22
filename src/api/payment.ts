@@ -5,21 +5,23 @@ import type {
   PaymentReceiveRequest,
   PartyLedgerResponse,
 } from '../types';
-import { PaymentStatus, PaymentFloor } from '../types';
+import { PaymentStatus, PaymentFloor, BillingType } from '../types';
 
 export const paymentApi = {
   // Get all payments by floor with pagination
   getPaymentList: (params: {
     floor: PaymentFloor;
+    mode?: BillingType;
     page?: number;
     size?: number;
     status?: PaymentStatus;
     search?: string;
   }): Promise<PaginatedResult<Payment>> => {
-    const { floor, page, size, status, search } = params;
+    const { floor, mode, page, size, status, search } = params;
     return promisify<PaginatedResult<Payment>>(cb =>
       generatedPaymentsApi.getPaymentsByFloor(
         floor,
+        mode ?? null,
         { page, size, status, search },
         cb
       )

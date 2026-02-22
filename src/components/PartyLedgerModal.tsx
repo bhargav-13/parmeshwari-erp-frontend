@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { paymentApi } from '../api/payment';
-import type { PartyLedgerResponse, Payment, PaymentFloor, BillingType } from '../types';
+import type { PartyLedgerResponse, Payment, PaymentFloor } from '../types';
+import { BillingType } from '../types';
 import PaymentReceivedModal from './PaymentReceivedModal';
 import './PartyLedgerModal.css';
 
@@ -61,15 +62,22 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
 
     const loadPayments = async () => {
       try {
-        // Fetch a large page to cover all payments for this floor.
-        // No search param — avoids the backend bug.
-        const result = await paymentApi.getPaymentList({ floor, size: 500 });
+        // Fetch for both modes since the API now requires the mode parameter
+        const [officialResult, offlineResult] = await Promise.all([
+          paymentApi.getPaymentList({ floor, mode: BillingType.OFFICIAL, size: 500 }),
+          paymentApi.getPaymentList({ floor, mode: BillingType.OFFLINE, size: 500 })
+        ]);
+
         if (cancelled) return;
+
         const map = new Map<string, Payment>();
-        result.data.forEach((p) => {
-          const mode = p.mode ?? 'OFFICIAL';
-          map.set(`${p.orderId}-${mode}`, p);
+        officialResult.data.forEach((p) => {
+          map.set(`${p.orderId}-OFFICIAL`, p);
         });
+        offlineResult.data.forEach((p) => {
+          map.set(`${p.orderId}-OFFLINE`, p);
+        });
+
         paymentsMap.current = map;
         setPaymentsLoaded(true);
       } catch (err) {
@@ -146,14 +154,21 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
     setRecordingPayment(null);
     // Reload cached payments so updated amounts are reflected on next click
     if (floor) {
-      paymentApi.getPaymentList({ floor, size: 500 }).then((result) => {
+      Promise.all([
+        paymentApi.getPaymentList({ floor, mode: BillingType.OFFICIAL, size: 500 }),
+        paymentApi.getPaymentList({ floor, mode: BillingType.OFFLINE, size: 500 })
+      ]).then(([officialResult, offlineResult]) => {
         const map = new Map<string, Payment>();
-        result.data.forEach((p) => {
-          const mode = p.mode ?? 'OFFICIAL';
-          map.set(`${p.orderId}-${mode}`, p);
+        officialResult.data.forEach((p) => {
+          map.set(`${p.orderId}-OFFICIAL`, p);
+        });
+        offlineResult.data.forEach((p) => {
+          map.set(`${p.orderId}-OFFLINE`, p);
         });
         paymentsMap.current = map;
-      }).catch(() => { });
+      }).catch((err) => {
+        console.error('Failed to refresh payments map after success', err);
+      });
     }
     // Refresh the ledger to show updated amounts
     fetchLedger(startDate, endDate);
