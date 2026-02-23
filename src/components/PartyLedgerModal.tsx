@@ -239,6 +239,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
                       <div className="ledger-order-header">
                         <div className="ledger-order-header-left">
                           <span className="ledger-order-id">Order #{order.orderId}</span>
+                          <span className="ledger-order-customer">{ledger.partyName}</span>
                           <span className="ledger-order-date">{formatDate(order.orderDate)}</span>
                         </div>
 

@@ -320,6 +320,13 @@
   color: #17344d;
 }
 
+.ledger-order-customer {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3a6d8c;
+}
+
 .ledger-order-date {
   font-family: 'Jost', sans-serif;
   font-size: 13px;

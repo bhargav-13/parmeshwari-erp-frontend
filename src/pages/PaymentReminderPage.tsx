@@ -237,6 +237,7 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                             <td colSpan={7}>
                               <div className="expanded-order-summary">
                                 <span className="expanded-order-id">Order #{order.orderId}</span>
+                                <span className="expanded-order-detail">{row.party.name}</span>
                                 <span className="expanded-order-detail">Date: {formatDate(order.orderDate)}</span>
                                 <span className="expanded-order-detail">Official: {formatCurrency(order.officialGrandTotal)}</span>
                                 <span className="expanded-order-detail">Offline: {formatCurrency(order.offlineGrandTotal)}</span>
