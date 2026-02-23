@@ -27,6 +27,10 @@ export const paymentApi = {
     );
   },
 
+  // Get payment by order ID and billing mode
+  getPaymentByOrderAndMode: (orderId: number, mode: BillingType): Promise<Payment> =>
+    promisify<Payment>(cb => generatedPaymentsApi.getPaymentByOrderAndMode(orderId, mode, cb)),
+
   // Get payment by ID
   getPaymentById: (id: number): Promise<Payment> =>
     promisify<Payment>(cb => generatedPaymentsApi.getPaymentById(id, cb)),

@@ -173,6 +173,36 @@ paths:
   # ------------------------------------------------------------
   # PAYMENT CRUD
   # ------------------------------------------------------------
+  /api/v1/payments/order/{orderId}/mode/{mode}:
+    get:
+      tags:
+        - Payments
+      operationId: getPaymentByOrderAndMode
+      summary: Get payment by main order ID and billing mode
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: mode
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingType'
+      responses:
+        '200':
+          description: Payment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Payment not found
+      security:
+        - oauth2: [ ]
+
   /api/v1/payments/{paymentId}/receive:
     post:
       tags:
@@ -269,11 +299,6 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/FloorEnum'
-        - name: mode
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/BillingType'
         - name: status
           in: query
           required: false
@@ -403,7 +428,7 @@ paths:
     get:
       tags:
         - Payments
-      operationId: getPartyLedgerPdf
+      operationId: getPartyLedger
       summary: Get comprehensive party ledger with order details
       parameters:
         - name: partyId
@@ -727,14 +752,6 @@ components:
         - newReceivedAmount
         - newReceivedDate
       properties:
-        receivedAmount:
-          type: number
-          format: double
-          example: 120000
-        lastReceivedDate:
-          type: string
-          format: date
-          example: 2025-12-05
         newReceivedAmount:
           type: number
           format: double
@@ -750,28 +767,33 @@ components:
         id:
           type: integer
           format: int64
+        orderId:
+          type: integer
+          format: int64
         customerName:
           type: string
+        floor:
+          $ref: '#/components/schemas/FloorEnum'
+        mode:
+          $ref: '#/components/schemas/BillingType'
+        totalAmount:
+          type: number
+          format: double
         receivedAmount:
           type: number
+          format: double
         lastReceivedDate:
           type: string
           format: date
-        totalAmount:
-          type: number
-        lastReminder:
-          type: string
-          format: date
-          nullable: true
         dueDate:
           type: string
           format: date
         paymentStatus:
           $ref: '#/components/schemas/PaymentStatus'
-        floor:
-          $ref: '#/components/schemas/FloorEnum'
-        mode:
-          $ref: '#/components/schemas/BillingType'
+        lastReminder:
+          type: string
+          format: date
+          nullable: true
     PaymentStatus:
       type: string
       enum:
