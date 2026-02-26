@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AddProductModal.css';
 import type { ForgingInward, ForgingParty, InwardWeightUnit } from '../types';
-import { forgingInwardApi, forgingPartyApi } from '../api/forging';
+import { forgingPartyApi } from '../api/forging';
 import { partyApi } from '../api/party';
 
 const INWARD_WEIGHT_UNITS: { value: InwardWeightUnit; label: string }[] = [
