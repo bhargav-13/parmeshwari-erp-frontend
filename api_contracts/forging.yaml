@@ -324,6 +324,115 @@ paths:
           description: Deleted
       security:
         - oauth2: [ ]
+  /api/v1/forging-parties:
+    get:
+      operationId: getAllParties
+      tags:
+        - Party
+      summary: Get all parties
+      responses:
+        '200':
+          description: Party list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Party'
+      security:
+        - oauth2: [ ]
+    post:
+      operationId: createParty
+      tags:
+        - Party
+      summary: Create party
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewForgingParty'
+      responses:
+        '201':
+          description: Party created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Party'
+      security:
+        - oauth2: [ ]
+  /api/v1/forging-parties/{id}:
+    get:
+      operationId: getPartyById
+      tags:
+        - Party
+      summary: Get party by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Party details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Party'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+      security:
+        - oauth2: [ ]
+    put:
+      operationId: updateParty
+      tags:
+        - Party
+      summary: Update party
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewForgingParty'
+      responses:
+        '200':
+          description: Party updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Party'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+      security:
+        - oauth2: [ ]
+    delete:
+      operationId: deleteParty
+      tags:
+        - Party
+      summary: Delete party
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Party deleted
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+      security:
+        - oauth2: [ ]
 
 components:
   parameters:
@@ -465,6 +574,13 @@ components:
           type: integer
         pageSize:
           type: integer
+    NewForgingParty:
+      required:
+        - name
+      type: object
+      properties:
+        partyName:
+          type: string
     Party:
       type: object
       properties:
@@ -480,7 +596,34 @@ components:
           type: string
         message:
           type: string
+  responses:
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
 
+    ForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   securitySchemes:
     oauth2:
       type: http

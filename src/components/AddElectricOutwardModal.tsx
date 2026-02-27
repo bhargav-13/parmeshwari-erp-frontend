@@ -5,7 +5,7 @@ import type { ElectricOutward } from '../types';
 interface AddElectricOutwardModalProps {
     onClose: () => void;
     onSuccess: () => void;
-    onSubmit: (data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount'>) => Promise<void>;
+    onSubmit: (data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount' | 'totalAmount'>) => Promise<void>;
     initialData?: ElectricOutward | null;
 }
 

@@ -179,7 +179,35 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
-
+  /api/v1/kevin/scrap/export/pdf:
+    get:
+      tags:
+        - KevinScrap
+      operationId: exportKevinScrapPdf
+      summary: Export Kevin Scrap records to PDF
+      parameters:
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: PDF file generated
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+      security:
+        - oauth2: [ ]
   /api/v1/kevin/scrap/{scrapId}:
     get:
       tags:
@@ -451,7 +479,35 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
-
+  /api/v1/jayesh/scrap/export/pdf:
+    get:
+      tags:
+        - JayeshScrap
+      operationId: exportJayeshScrapPdf
+      summary: Export Jayesh Scrap records to PDF
+      parameters:
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: PDF file generated
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+      security:
+        - oauth2: [ ]
   /api/v1/jayesh/scrap/{scrapId}:
     get:
       tags:

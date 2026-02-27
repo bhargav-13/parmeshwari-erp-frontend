@@ -62,11 +62,19 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        const numericFields = ['scrapContractorId', 'elementValue', 'totalWeight', 'outWeight', 'netWeight', 'rate'];
-        setFormData((prev) => ({
-            ...prev,
-            [name]: numericFields.includes(name) ? parseFloat(value) || 0 : value,
-        }));
+        const numericFields = ['scrapContractorId', 'elementValue', 'totalWeight', 'outWeight', 'rate'];
+        setFormData((prev) => {
+            const updated = {
+                ...prev,
+                [name]: numericFields.includes(name) ? parseFloat(value) || 0 : value,
+            };
+            if (name === 'totalWeight' || name === 'outWeight') {
+                const total = name === 'totalWeight' ? (parseFloat(value) || 0) : prev.totalWeight;
+                const out = name === 'outWeight' ? (parseFloat(value) || 0) : prev.outWeight;
+                updated.netWeight = parseFloat((total - out).toFixed(3));
+            }
+            return updated;
+        });
     };
 
     const handleAddContractor = async () => {
@@ -277,12 +285,9 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
                                 type="number"
                                 name="netWeight"
                                 value={formData.netWeight}
-                                onChange={handleChange}
-                                placeholder="150kg"
                                 className="scrap-form-input"
-                                step="0.001"
-                                min="0"
-                                required
+                                readOnly
+                                style={{ background: 'var(--input-bg, #f5f5f5)', cursor: 'not-allowed', opacity: 0.7 }}
                             />
                         </div>
                     </div>

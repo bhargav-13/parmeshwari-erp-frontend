@@ -77,7 +77,7 @@ const ElectricPage: React.FC = () => {
     };
 
     const handleOutwardSubmit = async (
-        data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount'>
+        data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount' | 'totalAmount'>
     ) => {
         if (editingOutward) {
             await electricOutwardApi.update(editingOutward.id, data);
@@ -238,6 +238,7 @@ const ElectricPage: React.FC = () => {
                                     <th style={{ textAlign: 'center' }}>Unit Rate (₹)</th>
                                     <th style={{ textAlign: 'center' }}>Unit Amt (₹)</th>
                                     <th style={{ textAlign: 'center' }}>Wt Amt (₹)</th>
+                                    <th style={{ textAlign: 'center' }}>Total Amt (₹)</th>
                                     <th style={{ textAlign: 'center' }}>Actions</th>
                                 </>
                             ) : (
@@ -253,7 +254,7 @@ const ElectricPage: React.FC = () => {
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan={activeTab === 'OUTWARDS' ? 9 : 4} className="no-data">
+                                <td colSpan={activeTab === 'OUTWARDS' ? 10 : 4} className="no-data">
                                     Loading...
                                 </td>
                             </tr>
@@ -269,6 +270,7 @@ const ElectricPage: React.FC = () => {
                                         <td style={{ textAlign: 'center' }}>{fmt(entry.unitRate)}</td>
                                         <td style={{ textAlign: 'center' }}>{fmt(entry.totalUnitAmount)}</td>
                                         <td style={{ textAlign: 'center' }}>{fmt(entry.totalWeightAmount)}</td>
+                                        <td style={{ textAlign: 'center' }}>{fmt(entry.totalAmount)}</td>
                                         <td style={{ textAlign: 'center' }}>
                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                                                 <button
@@ -292,7 +294,7 @@ const ElectricPage: React.FC = () => {
                                 ))}
                                 {filteredOutward.length === 0 && (
                                     <tr>
-                                        <td colSpan={9} className="no-data">No entries found</td>
+                                        <td colSpan={10} className="no-data">No entries found</td>
                                     </tr>
                                 )}
                             </>

@@ -648,6 +648,7 @@ export interface ElectricOutward {
   unitRate: number;
   totalUnitAmount: number;  // computed by server
   totalWeightAmount: number; // computed by server
+  totalAmount: number;       // computed by server
 }
 
 export interface ElectricCredit {

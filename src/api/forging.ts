@@ -1,6 +1,6 @@
 import ForgingInwardApi from '../api-client/forging/src/api/ForgingInwardApi';
 import ForgingOutwardApi from '../api-client/forging/src/api/ForgingOutwardApi';
-import PartyApi from '../api-client/order-management/src/api/PartyApi';
+import ForgingPartyApi from '../api-client/forging/src/api/PartyApi';
 import ApiClient from '../api-client/inventory/src/ApiClient';
 import { promisify } from '../lib/apiConfig';
 import type { ForgingInward, ForgingOutward, ForgingParty } from '../types';
@@ -43,7 +43,7 @@ const downloadPdfBlob = async (endpoint: string, filename: string, queryParams?:
 const apiClient = ApiClient.instance;
 const generatedForgingInwardApi = new ForgingInwardApi(apiClient);
 const generatedForgingOutwardApi = new ForgingOutwardApi(apiClient);
-const generatedPartyApi = new PartyApi(apiClient);
+const generatedForgingPartyApi = new ForgingPartyApi(apiClient);
 
 // Date conversion utilities
 const formatDateForAPI = (dateStr: string): string => {
@@ -198,14 +198,22 @@ export const forgingOutwardApi = {
             ...(toDate ? { toDate } : {}),
         }),
 };
-// Party API for forging — reuses order-management /api/v1/parties
+// Party API for forging — uses /api/v1/forging-parties
 export const forgingPartyApi = {
     getAll: (): Promise<ForgingParty[]> =>
-        promisify<any[]>(cb => generatedPartyApi.getAllParties({}, cb))
+        promisify<any[]>(cb => generatedForgingPartyApi.getAllParties(cb))
             .then(parties =>
                 (parties || []).map((p: any) => ({
-                    partyId: p.id,
-                    partyName: p.name,
+                    partyId: p.partyId,
+                    partyName: p.partyName,
                 }))
             ),
+
+    createParty: (partyName: string): Promise<ForgingParty> =>
+        promisify<any>(cb =>
+            generatedForgingPartyApi.createParty({ partyName }, cb)
+        ).then((p: any) => ({
+            partyId: p.partyId,
+            partyName: p.partyName,
+        })),
 };

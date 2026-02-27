@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './AddProductModal.css';
 import type { ForgingInward, ForgingParty, InwardWeightUnit } from '../types';
 import { forgingPartyApi } from '../api/forging';
-import { partyApi } from '../api/party';
 
 const INWARD_WEIGHT_UNITS: { value: InwardWeightUnit; label: string }[] = [
     { value: 'KG', label: 'KG' },
@@ -55,11 +54,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
 
         try {
             setAddingParty(true);
-            const newParty = await partyApi.createParty({
-                name: newPartyName.trim(),
-                officialAmount: 0,
-                offlineAmount: 0
-            });
+            const newParty = await forgingPartyApi.createParty(newPartyName.trim());
 
             // Refresh parties list
             const data = await forgingPartyApi.getAll();

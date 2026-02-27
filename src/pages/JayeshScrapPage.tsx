@@ -29,6 +29,10 @@ const JayeshScrapPage: React.FC = () => {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
+    const [isDownloadPopupOpen, setIsDownloadPopupOpen] = useState(false);
+    const [downloadFromDate, setDownloadFromDate] = useState('');
+    const [downloadToDate, setDownloadToDate] = useState('');
+    const [isDownloading, setIsDownloading] = useState(false);
 
     useEffect(() => {
         fetchScraps();
@@ -107,6 +111,23 @@ const JayeshScrapPage: React.FC = () => {
         }
     };
 
+    const handleDownload = async () => {
+        try {
+            setIsDownloading(true);
+            await jayeshScrapApi.downloadPdf(
+                downloadFromDate || undefined,
+                downloadToDate || undefined
+            );
+            setIsDownloadPopupOpen(false);
+            setDownloadFromDate('');
+            setDownloadToDate('');
+        } catch (err: any) {
+            alert(err?.message || 'Failed to download PDF');
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     return (
         <div className="jayesh-scrap-page">
             <div className="page-header">
@@ -154,6 +175,19 @@ const JayeshScrapPage: React.FC = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
+                <button
+                    type="button"
+                    className="order-status-filter"
+                    onClick={() => setIsDownloadPopupOpen(true)}
+                    title="Download PDF Report"
+                >
+                    <span>Download</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
                 <div className="order-status-filter">
                     <img src={FilterIcon} alt="Filter" />
                     <span>Filter</span>
@@ -248,6 +282,55 @@ const JayeshScrapPage: React.FC = () => {
                         rate: editingScrap.rate,
                     } : undefined}
                 />
+            )}
+
+            {isDownloadPopupOpen && (
+                <div className="modal-overlay" onClick={() => setIsDownloadPopupOpen(false)}>
+                    <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="modal-title">Download Jayesh Scrap PDF</h2>
+                        <p className="form-label" style={{ marginBottom: '1rem', fontWeight: 400 }}>
+                            Filter by date range — leave blank to download the full report.
+                        </p>
+                        <div className="modal-form">
+                            <div className="form-group">
+                                <label className="form-label">From Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={downloadFromDate}
+                                    onChange={e => setDownloadFromDate(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">To Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={downloadToDate}
+                                    onChange={e => setDownloadToDate(e.target.value)}
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button
+                                    type="button"
+                                    className="save-button"
+                                    onClick={handleDownload}
+                                    disabled={isDownloading}
+                                >
+                                    {isDownloading ? 'Downloading...' : 'Download PDF'}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="cancel-button"
+                                    onClick={() => setIsDownloadPopupOpen(false)}
+                                    disabled={isDownloading}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

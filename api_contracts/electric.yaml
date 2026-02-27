@@ -330,6 +330,9 @@ components:
         totalWeightAmount:
           type: number
           format: double
+        totalAmount:
+          type: number
+          format: double
 
     ElectricOutwardRequest:
       type: object

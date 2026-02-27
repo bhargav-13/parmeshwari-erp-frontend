@@ -136,6 +136,25 @@ export const kevinScrapApi = {
     deleteScrap: async (id: number): Promise<void> => {
         await apiClient.delete(`/api/v1/kevin/scrap/${id}`);
     },
+
+    downloadPdf: async (fromDate?: string, toDate?: string): Promise<void> => {
+        const params: Record<string, string> = {};
+        if (fromDate) params.fromDate = fromDate;
+        if (toDate) params.toDate = toDate;
+        const response = await apiClient.get('/api/v1/kevin/scrap/export/pdf', {
+            params,
+            responseType: 'blob',
+        });
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'kevin-scrap-report.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    },
 };
 
 // Jayesh Scrap API
@@ -185,5 +204,24 @@ export const jayeshScrapApi = {
 
     deleteScrap: async (id: number): Promise<void> => {
         await apiClient.delete(`/api/v1/jayesh/scrap/${id}`);
+    },
+
+    downloadPdf: async (fromDate?: string, toDate?: string): Promise<void> => {
+        const params: Record<string, string> = {};
+        if (fromDate) params.fromDate = fromDate;
+        if (toDate) params.toDate = toDate;
+        const response = await apiClient.get('/api/v1/jayesh/scrap/export/pdf', {
+            params,
+            responseType: 'blob',
+        });
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'jayesh-scrap-report.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
     },
 };

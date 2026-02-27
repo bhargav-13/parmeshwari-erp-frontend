@@ -22,12 +22,49 @@ const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose
     const [parties, setParties] = useState<ForgingParty[]>([]);
     const [partiesLoading, setPartiesLoading] = useState(true);
 
+    // Add new party state
+    const [showAddParty, setShowAddParty] = useState(false);
+    const [newPartyName, setNewPartyName] = useState('');
+    const [addingParty, setAddingParty] = useState(false);
+
     useEffect(() => {
-        forgingPartyApi.getAll()
-            .then(setParties)
-            .catch(() => setParties([]))
-            .finally(() => setPartiesLoading(false));
+        fetchParties();
     }, []);
+
+    const fetchParties = async () => {
+        try {
+            setPartiesLoading(true);
+            const data = await forgingPartyApi.getAll();
+            setParties(data);
+        } catch (err) {
+            console.error('Failed to fetch parties:', err);
+        } finally {
+            setPartiesLoading(false);
+        }
+    };
+
+    const handleAddParty = async () => {
+        if (!newPartyName.trim()) return;
+
+        try {
+            setAddingParty(true);
+            const newParty = await forgingPartyApi.createParty(newPartyName.trim());
+
+            // Refresh parties list
+            const data = await forgingPartyApi.getAll();
+            setParties(data);
+
+            // Select the newly created party
+            setPartyId(newParty.partyId);
+            setNewPartyName('');
+            setShowAddParty(false);
+        } catch (err) {
+            console.error('Failed to add party:', err);
+            setError('Failed to add party');
+        } finally {
+            setAddingParty(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -86,22 +123,55 @@ const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose
 
                     <div className="form-group">
                         <label className="form-label">Party*</label>
-                        <select
-                            value={partyId}
-                            onChange={(e) => setPartyId(e.target.value === '' ? '' : Number(e.target.value))}
-                            className="form-input"
-                            required
-                            disabled={partiesLoading}
-                        >
-                            <option value="">
-                                {partiesLoading ? 'Loading parties...' : '— Select Party —'}
-                            </option>
-                            {parties.map(p => (
-                                <option key={p.partyId} value={p.partyId}>
-                                    {p.partyName}
+                        <div className="dropdown-with-add" style={{ display: 'flex', gap: '8px' }}>
+                            <select
+                                value={partyId}
+                                onChange={(e) => setPartyId(e.target.value === '' ? '' : Number(e.target.value))}
+                                className="form-input"
+                                required
+                                disabled={partiesLoading || showAddParty}
+                                style={{ flex: 1 }}
+                            >
+                                <option value="">
+                                    {partiesLoading ? 'Loading parties...' : '— Select Party —'}
                                 </option>
-                            ))}
-                        </select>
+                                {parties.map(p => (
+                                    <option key={p.partyId} value={p.partyId}>
+                                        {p.partyName}
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                type="button"
+                                className="add-new-btn"
+                                onClick={() => setShowAddParty(!showAddParty)}
+                                title="Add new party"
+                                style={{ padding: '0 12px', fontSize: '20px' }}
+                            >
+                                {showAddParty ? '×' : '+'}
+                            </button>
+                        </div>
+                        {showAddParty && (
+                            <div className="add-new-input-group" style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                <input
+                                    type="text"
+                                    value={newPartyName}
+                                    onChange={(e) => setNewPartyName(e.target.value)}
+                                    placeholder="Enter party name"
+                                    className="form-input"
+                                    style={{ flex: 1 }}
+                                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddParty())}
+                                />
+                                <button
+                                    type="button"
+                                    className="add-confirm-btn"
+                                    onClick={handleAddParty}
+                                    disabled={addingParty || !newPartyName.trim()}
+                                >
+                                    {addingParty ? '...' : 'Add'}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">
@@ -142,7 +212,7 @@ const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose
                     </div>
 
                     <div className="modal-actions">
-                        <button type="submit" className="save-button" disabled={loading || partiesLoading}>
+                        <button type="submit" className="save-button" disabled={loading || partiesLoading || addingParty}>
                             {loading ? 'Saving...' : 'Save'}
                         </button>
                         <button type="button" className="cancel-button" onClick={onClose}>

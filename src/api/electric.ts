@@ -44,9 +44,10 @@ const toElectricOutward = (o: any): ElectricOutward => ({
     unitRate: o.unitRate ?? 0,
     totalUnitAmount: o.totalUnitAmount ?? 0,
     totalWeightAmount: o.totalWeightAmount ?? 0,
+    totalAmount: o.totalAmount ?? 0,
 });
 
-const toElectricOutwardRequest = (data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount'>): any => ({
+const toElectricOutwardRequest = (data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount' | 'totalAmount'>): any => ({
     date: formatDateForAPI(data.date),
     challanNo: data.challanNo,
     weight: data.weight,
@@ -105,12 +106,12 @@ export const electricOutwardApi = {
             generatedOutwardApi.searchElectricOutwards({ page: 0, size: 1000 }, cb)
         ).then(res => (res.content || []).map(toElectricOutward)),
 
-    create: (data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount'>): Promise<ElectricOutward> =>
+    create: (data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount' | 'totalAmount'>): Promise<ElectricOutward> =>
         promisify<any>(cb =>
             generatedOutwardApi.createElectricOutward(toElectricOutwardRequest(data), cb)
         ).then(toElectricOutward),
 
-    update: (id: number, data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount'>): Promise<ElectricOutward> =>
+    update: (id: number, data: Omit<ElectricOutward, 'id' | 'totalUnitAmount' | 'totalWeightAmount' | 'totalAmount'>): Promise<ElectricOutward> =>
         promisify<any>(cb =>
             generatedOutwardApi.updateElectricOutward(id, toElectricOutwardRequest(data), cb)
         ).then(toElectricOutward),
