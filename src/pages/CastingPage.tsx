@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
+import EditIcon from '../assets/edit.svg';
+import DeleteIcon from '../assets/delete.svg';
 import AddCastingEntryModal from '../components/AddCastingEntryModal';
 import AddCastingSellModal from '../components/AddCastingSellModal';
 import { castingApi, castingSaleApi } from '../api/casting';
@@ -26,6 +28,8 @@ const CastingPage: React.FC = () => {
     const [sellEntries, setSellEntries] = useState<CastingSale[]>([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isSellModalOpen, setIsSellModalOpen] = useState(false);
+    const [editingEntry, setEditingEntry] = useState<CastingEntry | null>(null);
+    const [editingSale, setEditingSale] = useState<CastingSale | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -66,25 +70,47 @@ const CastingPage: React.FC = () => {
         }
     };
 
-    const handleAddEntry = async (newEntry: Omit<CastingEntry, 'id'>) => {
+    // ── Add / Edit handlers ───────────────────────────────────
+    const handleEntrySubmit = async (data: Omit<CastingEntry, 'id'>) => {
+        if (editingEntry) {
+            await castingApi.updateCasting(editingEntry.id!, data);
+        } else {
+            await castingApi.createCasting(data);
+        }
+        await fetchCastingEntries();
+        setIsAddModalOpen(false);
+        setEditingEntry(null);
+    };
+
+    const handleSaleSubmit = async (data: Omit<CastingSale, 'id' | 'totalAmount'>) => {
+        if (editingSale) {
+            await castingSaleApi.updateCastingSale(editingSale.id!, data);
+        } else {
+            await castingSaleApi.createCastingSale(data);
+        }
+        await fetchCastingSales();
+        setIsSellModalOpen(false);
+        setEditingSale(null);
+    };
+
+    // ── Delete handlers ───────────────────────────────────────
+    const handleDeleteEntry = async (id: number) => {
+        if (!window.confirm('Delete this casting entry?')) return;
         try {
-            await castingApi.createCasting(newEntry);
-            await fetchCastingEntries();
-            setIsAddModalOpen(false);
-        } catch (err: any) {
-            console.error('Error creating casting entry:', err);
-            alert('Failed to create casting entry. Please try again.');
+            await castingApi.deleteCasting(id);
+            setEntries(prev => prev.filter(e => e.id !== id));
+        } catch (err) {
+            alert('Failed to delete entry.');
         }
     };
 
-    const handleAddSellEntry = async (newEntry: Omit<CastingSale, 'id' | 'totalAmount'>) => {
+    const handleDeleteSale = async (id: number) => {
+        if (!window.confirm('Delete this casting sale?')) return;
         try {
-            await castingSaleApi.createCastingSale(newEntry);
-            await fetchCastingSales();
-            setIsSellModalOpen(false);
-        } catch (err: any) {
-            console.error('Error creating casting sale:', err);
-            alert('Failed to create casting sale. Please try again.');
+            await castingSaleApi.deleteCastingSale(id);
+            setSellEntries(prev => prev.filter(e => e.id !== id));
+        } catch (err) {
+            alert('Failed to delete sale.');
         }
     };
 
@@ -111,9 +137,9 @@ const CastingPage: React.FC = () => {
 
     // Calculate dynamic stats for Coming Tab
     const totalMell = entries.reduce((sum, entry) => sum + entry.mell, 0);
-    const totalBrass = entries.reduce((sum, entry) => sum + entry.brass, 0);
 
     // Calculate dynamic stats for Sell Tab
+    const totalBrass = sellEntries.reduce((sum, entry) => sum + (entry.brass || 0), 0);
     const totalKadi = sellEntries.reduce((sum, entry) => sum + (entry.kadi || 0), 0);
     const totalKadiAmount = sellEntries.reduce((sum, entry) => sum + (entry.kadiAmount || 0), 0);
     const totalLokhand = sellEntries.reduce((sum, entry) => sum + (entry.lokhand || 0), 0);
@@ -135,7 +161,7 @@ const CastingPage: React.FC = () => {
                         <button
                             type="button"
                             className="action-button primary-button"
-                            onClick={() => setIsAddModalOpen(true)}
+                            onClick={() => { setEditingEntry(null); setIsAddModalOpen(true); }}
                         >
                             <span className="button-icon">+</span>
                             <span className="button-text">Add casting Entry</span>
@@ -144,7 +170,7 @@ const CastingPage: React.FC = () => {
                         <button
                             type="button"
                             className="action-button primary-button"
-                            onClick={() => setIsSellModalOpen(true)}
+                            onClick={() => { setEditingSale(null); setIsSellModalOpen(true); }}
                         >
                             <span className="button-icon">+</span>
                             <span className="button-text">Add Sell Entry</span>
@@ -182,10 +208,6 @@ const CastingPage: React.FC = () => {
                                 <span className="stat-title">Total Mell</span>
                                 <span className="stat-value">{totalMell.toLocaleString('en-IN', { maximumFractionDigits: 3 })}</span>
                             </div>
-                            <div className="casting-stat-card">
-                                <span className="stat-title">Total Brass</span>
-                                <span className="stat-value">{totalBrass.toLocaleString('en-IN', { maximumFractionDigits: 3 })}</span>
-                            </div>
                         </div>
 
                         <div className="order-filters">
@@ -214,17 +236,42 @@ const CastingPage: React.FC = () => {
                                     <tr>
                                         <th>Date</th>
                                         <th>Mell</th>
-                                        <th>Brass</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {entries.map((row, index) => (
-                                        <tr key={index}>
+                                    {entries.map((row) => (
+                                        <tr key={row.id}>
                                             <td>{row.date}</td>
                                             <td>{row.mell.toFixed(3)}</td>
-                                            <td>{row.brass.toFixed(3)}</td>
+                                            <td>
+                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                    <button
+                                                        className="edit-btn"
+                                                        style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
+                                                        onClick={() => { setEditingEntry(row); setIsAddModalOpen(true); }}
+                                                        title="Edit"
+                                                    >
+                                                        <img src={EditIcon} alt="Edit" width={15} height={15} />
+                                                    </button>
+                                                    <button
+                                                        className="delete-btn"
+                                                        onClick={() => handleDeleteEntry(row.id!)}
+                                                        title="Delete"
+                                                    >
+                                                        <img src={DeleteIcon} alt="Delete" width={15} height={15} />
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
                                     ))}
+                                    {entries.length === 0 && (
+                                        <tr>
+                                            <td colSpan={3} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
+                                                No entries found
+                                            </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -233,6 +280,10 @@ const CastingPage: React.FC = () => {
                 {activeTab === 'sell' && (
                     <>
                         <div className="sell-stats-grid">
+                            <div className="casting-stat-card">
+                                <span className="stat-title">Total Brass</span>
+                                <span className="stat-value">{totalBrass.toLocaleString('en-IN', { maximumFractionDigits: 3 })}</span>
+                            </div>
                             <div className="casting-stat-card">
                                 <span className="stat-title">Total Kadi</span>
                                 <span className="stat-value">{totalKadi.toLocaleString('en-IN', { maximumFractionDigits: 3 })}</span>
@@ -276,26 +327,55 @@ const CastingPage: React.FC = () => {
                                 <thead>
                                     <tr>
                                         <th>Date</th>
+                                        <th>Brass</th>
                                         <th>Kadi</th>
                                         <th>Rate</th>
                                         <th>Amount</th>
                                         <th>Lokhand</th>
                                         <th>Rate</th>
                                         <th>Amount</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {sellEntries.map((row, index) => (
-                                        <tr key={index}>
+                                    {sellEntries.map((row) => (
+                                        <tr key={row.id}>
                                             <td>{row.date}</td>
+                                            <td>{row.brass != null ? row.brass.toFixed(3) : ''}</td>
                                             <td>{row.kadi ? row.kadi.toFixed(3) : ''}</td>
                                             <td>{row.kadiRate ? row.kadiRate : ''}</td>
                                             <td>{row.kadiAmount ? row.kadiAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 }) : ''}</td>
                                             <td>{row.lokhand ? row.lokhand.toFixed(3) : ''}</td>
                                             <td>{row.lokhandRate ? row.lokhandRate : ''}</td>
                                             <td>{row.lokhandAmount ? row.lokhandAmount.toLocaleString('en-IN') : ''}</td>
+                                            <td>
+                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                    <button
+                                                        className="edit-btn"
+                                                        style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
+                                                        onClick={() => { setEditingSale(row); setIsSellModalOpen(true); }}
+                                                        title="Edit"
+                                                    >
+                                                        <img src={EditIcon} alt="Edit" width={15} height={15} />
+                                                    </button>
+                                                    <button
+                                                        className="delete-btn"
+                                                        onClick={() => handleDeleteSale(row.id!)}
+                                                        title="Delete"
+                                                    >
+                                                        <img src={DeleteIcon} alt="Delete" width={15} height={15} />
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
                                     ))}
+                                    {sellEntries.length === 0 && (
+                                        <tr>
+                                            <td colSpan={9} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
+                                                No entries found
+                                            </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -305,15 +385,17 @@ const CastingPage: React.FC = () => {
 
             {isAddModalOpen && (
                 <AddCastingEntryModal
-                    onClose={() => setIsAddModalOpen(false)}
-                    onSuccess={handleAddEntry}
+                    onClose={() => { setIsAddModalOpen(false); setEditingEntry(null); }}
+                    onSubmit={handleEntrySubmit}
+                    initialData={editingEntry}
                 />
             )}
 
             {isSellModalOpen && (
                 <AddCastingSellModal
-                    onClose={() => setIsSellModalOpen(false)}
-                    onSuccess={handleAddSellEntry}
+                    onClose={() => { setIsSellModalOpen(false); setEditingSale(null); }}
+                    onSubmit={handleSaleSubmit}
+                    initialData={editingSale}
                 />
             )}
         </div>

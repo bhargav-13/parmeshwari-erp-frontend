@@ -6,6 +6,8 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
+  - url: https://parmeshwari-erp.duckdns.org
+    description: Production Server
 tags:
   - name: Casting
     description: Casting Process Management
@@ -325,9 +327,6 @@ components:
         mellWeight:
           type: number
           format: double
-        brassWeight:
-          type: number
-          format: double
 
     CastingRequest:
       type: object
@@ -340,9 +339,6 @@ components:
         mellWeight:
           type: number
           format: double
-        brassWeight:
-          type: number
-          format: double
 
     CastingSale:
       type: object
@@ -353,6 +349,9 @@ components:
         date:
           type: string
           format: date
+        brassWeight:
+          type: number
+          format: double
         kadiWeight:
           type: number
           format: double
@@ -383,6 +382,9 @@ components:
         date:
           type: string
           format: date
+        brassWeight:
+          type: number
+          format: double
         kadiWeight:
           type: number
           format: double

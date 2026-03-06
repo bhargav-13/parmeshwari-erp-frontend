@@ -11,16 +11,26 @@ const INWARD_WEIGHT_UNITS: { value: InwardWeightUnit; label: string }[] = [
 
 interface AddForgingInwardModalProps {
     onClose: () => void;
-    onSuccess: (entry: Omit<ForgingInward, 'id'>) => void;
+    onSubmit: (entry: Omit<ForgingInward, 'id'>) => Promise<void>;
+    initialData?: ForgingInward | null;
 }
 
-const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, onSuccess }) => {
+const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, onSubmit, initialData }) => {
+    // Convert DD/MM/YYYY to YYYY-MM-DD for the date input
+    const initDate = (() => {
+        if (initialData?.date) {
+            const parts = initialData.date.split('/');
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return new Date().toISOString().split('T')[0];
+    })();
+
     // Form state
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [partyId, setPartyId] = useState<number | ''>('');
-    const [challanNo, setChallanNo] = useState('');
-    const [weight, setWeight] = useState<number | ''>('');
-    const [weightUnit, setWeightUnit] = useState<InwardWeightUnit>('KG');
+    const [date, setDate] = useState(initDate);
+    const [partyId, setPartyId] = useState<number | ''>(initialData?.partyId ?? initialData?.party?.partyId ?? '');
+    const [challanNo, setChallanNo] = useState(initialData?.challanNo ?? '');
+    const [weight, setWeight] = useState<number | ''>(initialData?.weight ?? '');
+    const [weightUnit, setWeightUnit] = useState<InwardWeightUnit>(initialData?.weightUnit ?? 'KG');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -89,17 +99,14 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
 
             // Format date to DD/MM/YYYY for the UI/API consistency
             const [year, month, day] = date.split('-');
-            const formattedEntry: Omit<ForgingInward, 'id'> = {
+            await onSubmit({
                 partyId: Number(partyId),
                 partyName: selectedParty?.partyName || '',
                 challanNo,
                 date: `${day}/${month}/${year}`,
                 weight: Number(weight),
                 weightUnit,
-            };
-
-            onSuccess(formattedEntry);
-            onClose();
+            });
         } catch (err: any) {
             console.error('Error saving entry:', err);
             setError('Failed to save entry');
@@ -111,7 +118,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content small-modal" style={{ maxWidth: '800px' }} onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">Add Forging Inward Entry</h2>
+                <h2 className="modal-title">{initialData ? 'Edit Forging Inward Entry' : 'Add Forging Inward Entry'}</h2>
 
                 {error && <div className="error-message">{error}</div>}
 

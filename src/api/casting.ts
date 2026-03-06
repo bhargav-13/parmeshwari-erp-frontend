@@ -47,19 +47,18 @@ const convertToCastingEntry = (casting: any): CastingEntry => ({
     id: casting.id,
     date: formatDateForUI(casting.date),
     mell: casting.mellWeight || 0,
-    brass: casting.brassWeight || 0,
 });
 
 const convertToCastingRequest = (data: Omit<CastingEntry, 'id'>): any => ({
     date: formatDateForAPI(data.date),
     mellWeight: data.mell,
-    brassWeight: data.brass,
 });
 
 // Type conversion helpers for CastingSale
 const convertToCastingSale = (sale: any): CastingSale => ({
     id: sale.id,
     date: formatDateForUI(sale.date),
+    brass: sale.brassWeight,
     kadi: sale.kadiWeight,
     kadiRate: sale.kadiRate,
     kadiAmount: sale.kadiAmount,
@@ -71,6 +70,7 @@ const convertToCastingSale = (sale: any): CastingSale => ({
 
 const convertToCastingSaleRequest = (data: Omit<CastingSale, 'id' | 'totalAmount'>): any => ({
     date: formatDateForAPI(data.date),
+    brassWeight: data.brass,
     kadiWeight: data.kadi,
     kadiRate: data.kadiRate,
     kadiAmount: data.kadiAmount,

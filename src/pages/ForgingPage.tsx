@@ -3,6 +3,8 @@ import './CastingPage.css';
 import '../components/AddProductModal.css';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
+import EditIcon from '../assets/edit.svg';
+import DeleteIcon from '../assets/delete.svg';
 import AddForgingInwardModal from '../components/AddForgingInwardModal';
 import AddForgingOutwardModal from '../components/AddForgingOutwardModal';
 import { forgingInwardApi, forgingOutwardApi, forgingPartyApi } from '../api/forging';
@@ -27,6 +29,8 @@ const ForgingPage: React.FC = () => {
     const [outwardEntries, setOutwardEntries] = useState<ForgingOutward[]>([]);
     const [isInwardModalOpen, setIsInwardModalOpen] = useState(false);
     const [isOutwardModalOpen, setIsOutwardModalOpen] = useState(false);
+    const [editingInward, setEditingInward] = useState<ForgingInward | null>(null);
+    const [editingOutward, setEditingOutward] = useState<ForgingOutward | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isDownloading, setIsDownloading] = useState(false);
@@ -70,32 +74,53 @@ const ForgingPage: React.FC = () => {
         }
     };
 
-    const handleAddInward = async (newEntry: Omit<ForgingInward, 'id'>) => {
+    // ── Add / Edit handlers ───────────────────────────────────
+    const handleInwardSubmit = async (data: Omit<ForgingInward, 'id'>) => {
+        if (editingInward) {
+            await forgingInwardApi.update(editingInward.id!, data);
+        } else {
+            await forgingInwardApi.create(data);
+        }
+        await fetchInwardEntries();
+        setIsInwardModalOpen(false);
+        setEditingInward(null);
+    };
+
+    const handleOutwardSubmit = async (data: Omit<ForgingOutward, 'id'>) => {
+        if (editingOutward) {
+            await forgingOutwardApi.update(editingOutward.id!, data);
+        } else {
+            await forgingOutwardApi.create(data);
+        }
+        await fetchOutwardEntries();
+        setIsOutwardModalOpen(false);
+        setEditingOutward(null);
+    };
+
+    // ── Delete handlers ───────────────────────────────────────
+    const handleDeleteInward = async (id: number) => {
+        if (!window.confirm('Delete this inward entry?')) return;
         try {
-            await forgingInwardApi.create(newEntry);
-            await fetchInwardEntries();
-            setIsInwardModalOpen(false);
-        } catch (err: any) {
-            console.error('Error creating forging inward entry:', err);
-            alert('Failed to create forging inward entry. Please try again.');
+            await forgingInwardApi.delete(id);
+            setInwardEntries(prev => prev.filter(e => e.id !== id));
+        } catch (err) {
+            alert('Failed to delete entry.');
         }
     };
 
-    const handleAddOutward = async (newEntry: Omit<ForgingOutward, 'id'>) => {
+    const handleDeleteOutward = async (id: number) => {
+        if (!window.confirm('Delete this outward entry?')) return;
         try {
-            await forgingOutwardApi.create(newEntry);
-            await fetchOutwardEntries();
-            setIsOutwardModalOpen(false);
-        } catch (err: any) {
-            console.error('Error creating forging outward entry:', err);
-            alert('Failed to create forging outward entry. Please try again.');
+            await forgingOutwardApi.delete(id);
+            setOutwardEntries(prev => prev.filter(e => e.id !== id));
+        } catch (err) {
+            alert('Failed to delete entry.');
         }
     };
 
     const handleDownload = async () => {
         try {
             setIsDownloading(true);
-            // Convert YYYY-MM-DD (HTML date input) to DD/MM/YYYY for formatDateForAPI inside the service
             const fromDate = downloadFromDate || undefined;
             const toDate = downloadToDate || undefined;
             const partyName = downloadPartyName.trim() || undefined;
@@ -121,7 +146,7 @@ const ForgingPage: React.FC = () => {
     const totalInward = calculateTotalWeight(inwardEntries);
     const totalOutward = calculateTotalWeight(outwardEntries);
     const netStock = totalInward - totalOutward;
-    const pendingOrders = inwardEntries.length + outwardEntries.length; // Placeholder logic
+    const pendingOrders = inwardEntries.length + outwardEntries.length;
 
     // Filter entries based on search query
     const filterEntries = (entries: (ForgingInward | ForgingOutward)[]) => {
@@ -151,7 +176,15 @@ const ForgingPage: React.FC = () => {
                     <button
                         type="button"
                         className="action-button primary-button"
-                        onClick={() => activeTab === 'inward' ? setIsInwardModalOpen(true) : setIsOutwardModalOpen(true)}
+                        onClick={() => {
+                            if (activeTab === 'inward') {
+                                setEditingInward(null);
+                                setIsInwardModalOpen(true);
+                            } else {
+                                setEditingOutward(null);
+                                setIsOutwardModalOpen(true);
+                            }
+                        }}
                     >
                         <span className="button-icon">+</span>
                         <span className="button-text">Add {activeTab === 'inward' ? 'Inward' : 'Outward'}</span>
@@ -237,43 +270,86 @@ const ForgingPage: React.FC = () => {
                             <th>Weight</th>
                             <th>Unit</th>
                             <th>Price</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {activeTab === 'inward' ? (
                             filteredInwardEntries.length > 0 ? (
-                                filteredInwardEntries.map((row, index) => (
-                                    <tr key={row.id || index}>
+                                filteredInwardEntries.map((row) => (
+                                    <tr key={row.id}>
                                         <td>{row.date}</td>
                                         <td>{row.partyName}</td>
                                         <td>{row.challanNo}</td>
                                         <td>{row.weight}</td>
                                         <td>{row.weightUnit}</td>
                                         <td>-</td>
+                                        <td>
+                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                <button
+                                                    type="button"
+                                                    className="edit-btn"
+                                                    style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
+                                                    onClick={() => { setEditingInward(row); setIsInwardModalOpen(true); }}
+                                                    title="Edit"
+                                                >
+                                                    <img src={EditIcon} alt="Edit" width={15} height={15} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="delete-btn"
+                                                    onClick={() => handleDeleteInward(row.id!)}
+                                                    title="Delete"
+                                                >
+                                                    <img src={DeleteIcon} alt="Delete" width={15} height={15} />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
+                                    <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
                                         No inward entries found
                                     </td>
                                 </tr>
                             )
                         ) : (
                             filteredOutwardEntries.length > 0 ? (
-                                filteredOutwardEntries.map((row, index) => (
-                                    <tr key={row.id || index}>
+                                filteredOutwardEntries.map((row) => (
+                                    <tr key={row.id}>
                                         <td>{row.date}</td>
                                         <td>{row.partyName}</td>
                                         <td>{row.challanNo}</td>
                                         <td>{row.weight}</td>
                                         <td>{row.weightUnit}</td>
                                         <td>-</td>
+                                        <td>
+                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                <button
+                                                    type="button"
+                                                    className="edit-btn"
+                                                    style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
+                                                    onClick={() => { setEditingOutward(row); setIsOutwardModalOpen(true); }}
+                                                    title="Edit"
+                                                >
+                                                    <img src={EditIcon} alt="Edit" width={15} height={15} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="delete-btn"
+                                                    onClick={() => handleDeleteOutward(row.id!)}
+                                                    title="Delete"
+                                                >
+                                                    <img src={DeleteIcon} alt="Delete" width={15} height={15} />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
+                                    <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
                                         No outward entries found
                                     </td>
                                 </tr>
@@ -285,15 +361,17 @@ const ForgingPage: React.FC = () => {
 
             {isInwardModalOpen && (
                 <AddForgingInwardModal
-                    onClose={() => setIsInwardModalOpen(false)}
-                    onSuccess={handleAddInward}
+                    onClose={() => { setIsInwardModalOpen(false); setEditingInward(null); }}
+                    onSubmit={handleInwardSubmit}
+                    initialData={editingInward}
                 />
             )}
 
             {isOutwardModalOpen && (
                 <AddForgingOutwardModal
-                    onClose={() => setIsOutwardModalOpen(false)}
-                    onSuccess={handleAddOutward}
+                    onClose={() => { setIsOutwardModalOpen(false); setEditingOutward(null); }}
+                    onSubmit={handleOutwardSubmit}
+                    initialData={editingOutward}
                 />
             )}
 

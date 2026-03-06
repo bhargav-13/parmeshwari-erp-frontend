@@ -577,12 +577,12 @@ export interface CastingEntry {
   id?: number;
   date: string; // DD/MM/YYYY format for UI
   mell: number;
-  brass: number;
 }
 
 export interface CastingSale {
   id?: number;
   date: string; // DD/MM/YYYY format for UI
+  brass: number | null;
   kadi: number | null;
   kadiRate: number | null;
   kadiAmount: number | null;

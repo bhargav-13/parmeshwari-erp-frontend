@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
-import './AddProductModal.css'; // Reuse existing modal styles
+import './AddProductModal.css';
 import type { CastingEntry } from '../types';
 
 interface AddCastingEntryModalProps {
     onClose: () => void;
-    onSuccess: (entry: Omit<CastingEntry, 'id'>) => void;
+    onSubmit: (entry: Omit<CastingEntry, 'id'>) => Promise<void>;
+    initialData?: CastingEntry | null;
 }
 
-const AddCastingEntryModal: React.FC<AddCastingEntryModalProps> = ({ onClose, onSuccess }) => {
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
-    const [mell, setMell] = useState<number | ''>('');
-    const [brass, setBrass] = useState<number | ''>('');
+const AddCastingEntryModal: React.FC<AddCastingEntryModalProps> = ({ onClose, onSubmit, initialData }) => {
+    // Convert DD/MM/YYYY to YYYY-MM-DD for the date input
+    const initDate = (() => {
+        if (initialData?.date) {
+            const parts = initialData.date.split('/');
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return new Date().toISOString().split('T')[0];
+    })();
+
+    const [date, setDate] = useState(initDate);
+    const [mell, setMell] = useState<number | ''>(initialData?.mell ?? '');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -24,33 +33,18 @@ const AddCastingEntryModal: React.FC<AddCastingEntryModalProps> = ({ onClose, on
             return;
         }
 
-        // Allow 0 values, but require fields to be filled (not empty string)
-        if (mell === '' || brass === '') {
-            setError('Mell and Brass values are required');
+        if (mell === '') {
+            setError('Mell value is required');
             return;
         }
 
         try {
             setLoading(true);
-            // Simulate API delay needed? Maybe not for local state, but keeps UI consistent
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-            const newEntry: CastingEntry = {
-                date, // Keep YYYY-MM-DD format as is, or format it? The mock data was DD/MM/YYYY. Let's keep it simple or format it.
-                // Mock data used DD/MM/YYYY. Let's try to match that for consistency in display.
-                mell: Number(mell),
-                brass: Number(brass),
-            };
-
-            // Simple date formatting to DD/MM/YYYY for display match
             const [year, month, day] = date.split('-');
-            const formattedEntry = {
-                ...newEntry,
-                date: `${day}/${month}/${year}`
-            };
-
-            onSuccess(formattedEntry);
-            onClose();
+            await onSubmit({
+                date: `${day}/${month}/${year}`,
+                mell: Number(mell),
+            });
         } catch (err: any) {
             console.error("Error saving entry:", err);
             setError('Failed to save entry');
@@ -62,7 +56,7 @@ const AddCastingEntryModal: React.FC<AddCastingEntryModalProps> = ({ onClose, on
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">Add Casting Entry</h2>
+                <h2 className="modal-title">{initialData ? 'Edit Casting Entry' : 'Add Casting Entry'}</h2>
 
                 {error && <div className="error-message">{error}</div>}
 
@@ -85,19 +79,6 @@ const AddCastingEntryModal: React.FC<AddCastingEntryModalProps> = ({ onClose, on
                             value={mell}
                             onChange={(e) => setMell(e.target.value === '' ? '' : Number(e.target.value))}
                             placeholder="Enter Mell Value"
-                            className="form-input"
-                            required
-                            step="0.001"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Brass*</label>
-                        <input
-                            type="number"
-                            value={brass}
-                            onChange={(e) => setBrass(e.target.value === '' ? '' : Number(e.target.value))}
-                            placeholder="Enter Brass Value"
                             className="form-input"
                             required
                             step="0.001"

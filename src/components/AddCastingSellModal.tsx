@@ -1,26 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import './AddProductModal.css'; // Reuse existing modal styles
-// We might need specific styles, but let's try to reuse generic ones and add inline or new classes if needed.
+import './AddProductModal.css';
 import './AddCastingSellModal.css';
 import type { CastingSale } from '../types';
 
 interface AddCastingSellModalProps {
     onClose: () => void;
-    onSuccess: (entry: Omit<CastingSale, 'id' | 'totalAmount'>) => void;
+    onSubmit: (entry: Omit<CastingSale, 'id' | 'totalAmount'>) => Promise<void>;
+    initialData?: CastingSale | null;
 }
 
-const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSuccess }) => {
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSubmit, initialData }) => {
+    // Convert DD/MM/YYYY to YYYY-MM-DD for the date input
+    const initDate = (() => {
+        if (initialData?.date) {
+            const parts = initialData.date.split('/');
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return new Date().toISOString().split('T')[0];
+    })();
+
+    const [date, setDate] = useState(initDate);
+
+    // Brass State
+    const [brass, setBrass] = useState<number | ''>(initialData?.brass ?? '');
 
     // Kadi State
-    const [kadi, setKadi] = useState<number | ''>('');
-    const [kadiRate, setKadiRate] = useState<number | ''>('');
-    const [kadiAmount, setKadiAmount] = useState<number | ''>('');
+    const [kadi, setKadi] = useState<number | ''>(initialData?.kadi ?? '');
+    const [kadiRate, setKadiRate] = useState<number | ''>(initialData?.kadiRate ?? '');
+    const [kadiAmount, setKadiAmount] = useState<number | ''>(initialData?.kadiAmount ?? '');
 
     // Lokhand State
-    const [lokhand, setLokhand] = useState<number | ''>('');
-    const [lokhandRate, setLokhandRate] = useState<number | ''>('');
-    const [lokhandAmount, setLokhandAmount] = useState<number | ''>('');
+    const [lokhand, setLokhand] = useState<number | ''>(initialData?.lokhand ?? '');
+    const [lokhandRate, setLokhandRate] = useState<number | ''>(initialData?.lokhandRate ?? '');
+    const [lokhandAmount, setLokhandAmount] = useState<number | ''>(initialData?.lokhandAmount ?? '');
 
     const [loading, setLoading] = useState(false);
 
@@ -28,10 +40,6 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
     useEffect(() => {
         if (kadi !== '' && kadiRate !== '') {
             setKadiAmount(Number(kadi) * Number(kadiRate));
-        } else {
-            // Optional: clear amount if inputs cleared? Or keep manual override?
-            // Let's assume auto-calc for now, but user can override if we didn't disable it.
-            // For now, let's just calc on change.
         }
     }, [kadi, kadiRate]);
 
@@ -47,20 +55,16 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
 
         try {
             setLoading(true);
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-            const newEntry: Omit<CastingSale, 'id' | 'totalAmount'> = {
-                date: date.split('-').reverse().join('/'), // Format YYYY-MM-DD to DD/MM/YYYY
+            await onSubmit({
+                date: date.split('-').reverse().join('/'),
+                brass: brass === '' ? null : Number(brass),
                 kadi: kadi === '' ? null : Number(kadi),
                 kadiRate: kadiRate === '' ? null : Number(kadiRate),
                 kadiAmount: kadiAmount === '' ? null : Number(kadiAmount),
                 lokhand: lokhand === '' ? null : Number(lokhand),
                 lokhandRate: lokhandRate === '' ? null : Number(lokhandRate),
                 lokhandAmount: lokhandAmount === '' ? null : Number(lokhandAmount),
-            };
-
-            onSuccess(newEntry);
-            onClose();
+            });
         } catch (err) {
             console.error(err);
         } finally {
@@ -71,7 +75,7 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content medium-modal" onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">Casting Sell Add</h2>
+                <h2 className="modal-title">{initialData ? 'Edit Casting Sale' : 'Casting Sell Add'}</h2>
 
                 <form onSubmit={handleSubmit} className="modal-form">
                     <div className="form-row full-width">
@@ -83,6 +87,21 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
                                 onChange={(e) => setDate(e.target.value)}
                                 className="form-input"
                                 required
+                            />
+                        </div>
+                    </div>
+
+                    {/* Brass Row */}
+                    <div className="form-row full-width">
+                        <div className="form-group full-width">
+                            <label className="form-label">Brass Weight</label>
+                            <input
+                                type="number"
+                                value={brass}
+                                onChange={(e) => setBrass(e.target.value === '' ? '' : Number(e.target.value))}
+                                placeholder="Enter Brass Weight"
+                                className="form-input"
+                                step="0.001"
                             />
                         </div>
                     </div>
@@ -119,8 +138,7 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
                                 onChange={(e) => setKadiAmount(e.target.value === '' ? '' : Number(e.target.value))}
                                 placeholder="₹ 37,060"
                                 className="form-input bg-gray"
-                                readOnly // Assuming auto-calc usually implies readOnly, but user can override if we remove this.
-                            // Reference showed "₹ 37,060" placeholder, suggesting display.
+                                readOnly
                             />
                         </div>
                     </div>

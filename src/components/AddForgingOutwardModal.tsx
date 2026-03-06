@@ -5,14 +5,24 @@ import { forgingPartyApi } from '../api/forging';
 
 interface AddForgingOutwardModalProps {
     onClose: () => void;
-    onSuccess: (entry: Omit<ForgingOutward, 'id'>) => void;
+    onSubmit: (entry: Omit<ForgingOutward, 'id'>) => Promise<void>;
+    initialData?: ForgingOutward | null;
 }
 
-const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose, onSuccess }) => {
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [partyId, setPartyId] = useState<number | ''>('');
-    const [challanNo, setChallanNo] = useState('');
-    const [weight, setWeight] = useState<number | ''>('');
+const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose, onSubmit, initialData }) => {
+    // Convert DD/MM/YYYY to YYYY-MM-DD for the date input
+    const initDate = (() => {
+        if (initialData?.date) {
+            const parts = initialData.date.split('/');
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return new Date().toISOString().split('T')[0];
+    })();
+
+    const [date, setDate] = useState(initDate);
+    const [partyId, setPartyId] = useState<number | ''>(initialData?.partyId ?? initialData?.party?.partyId ?? '');
+    const [challanNo, setChallanNo] = useState(initialData?.challanNo ?? '');
+    const [weight, setWeight] = useState<number | ''>(initialData?.weight ?? '');
     // Outward only has WIRE as per YAML schema
     const weightUnit: OutwardWeightUnit = 'WIRE';
     const [loading, setLoading] = useState(false);
@@ -83,17 +93,14 @@ const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose
 
             // Format date to DD/MM/YYYY
             const [year, month, day] = date.split('-');
-            const formattedEntry: Omit<ForgingOutward, 'id'> = {
+            await onSubmit({
                 partyId: Number(partyId),
                 partyName: selectedParty?.partyName || '',
                 challanNo,
                 date: `${day}/${month}/${year}`,
                 weight: Number(weight),
                 weightUnit,
-            };
-
-            onSuccess(formattedEntry);
-            onClose();
+            });
         } catch (err: any) {
             console.error('Error saving entry:', err);
             setError('Failed to save entry');
@@ -105,7 +112,7 @@ const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">Add Forging Outward Entry</h2>
+                <h2 className="modal-title">{initialData ? 'Edit Forging Outward Entry' : 'Add Forging Outward Entry'}</h2>
 
                 {error && <div className="error-message">{error}</div>}
 
