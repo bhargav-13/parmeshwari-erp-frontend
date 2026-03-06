@@ -276,7 +276,7 @@ const ForgingPage: React.FC = () => {
                     <tbody>
                         {activeTab === 'inward' ? (
                             filteredInwardEntries.length > 0 ? (
-                                filteredInwardEntries.map((row) => (
+                                (filteredInwardEntries as ForgingInward[]).map((row) => (
                                     <tr key={row.id}>
                                         <td>{row.date}</td>
                                         <td>{row.partyName}</td>
@@ -316,7 +316,7 @@ const ForgingPage: React.FC = () => {
                             )
                         ) : (
                             filteredOutwardEntries.length > 0 ? (
-                                filteredOutwardEntries.map((row) => (
+                                (filteredOutwardEntries as ForgingOutward[]).map((row) => (
                                     <tr key={row.id}>
                                         <td>{row.date}</td>
                                         <td>{row.partyName}</td>
