@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import Logo from '../assets/parmeshwari-logo.svg';
+import Logo from '../assets/Codelix logo 1.png';
 import './LoginPage.css';
 
 const LoginPage: React.FC = () => {
@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
       <div className="login-container">
         <div className="login-header">
           <div className="login-logo">
-            <img src={Logo} alt="Parmeshwari Brass Industries" className="login-logo-img" />
+            <img src={Logo} alt="Codelix" className="login-logo-img" />
           </div>
           <h2 className="login-title">ERP System Login</h2>
         </div>

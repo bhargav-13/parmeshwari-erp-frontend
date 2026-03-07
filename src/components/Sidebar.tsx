@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
-import Logo from '../assets/parmeshwari-logo.svg';
+import Logo from '../assets/Codelix logo 1.png';
 import DashboardSVG from '../assets/icon/dashboard.svg'
 import CRMSSVG from '../assets/icon/crm.svg'
 import InventorySVG from '../assets/icon/inventory.svg'
@@ -99,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     <div className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-header">
         <div className="logo">
-          <img src={Logo} alt="Parmeshwari Brass Industries" className="logo-img" />
+          <img src={Logo} alt="Codelix" className="logo-img" />
         </div>
         <button
           type="button"
