@@ -6,6 +6,8 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
+  - url: https://parmeshwari-erp.duckdns.org
+    description: Production Server
 tags:
   - name: ElectricOutward
     description: Electric Outward Management
