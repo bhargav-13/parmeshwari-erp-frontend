@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
-  - url: http://ec2-65-1-248-131.ap-south-1.compute.amazonaws.com
+  - url: https://parmeshwari-erp.duckdns.org
     description: Production Server
 
 tags:
@@ -225,6 +225,43 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Order not found
+      security:
+        - oauth2: [ ]
+
+  /api/v1/orders/{orderId}/revoke-dispatch:
+    put:
+      tags:
+        - Orders
+      operationId: revokeDispatch
+      summary: Revoke a dispatched order — restores stock and deletes the order
+      description: Only valid when order is in DISPATCHED status. Restores deducted inventory quantities and permanently deletes the order.
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DispatchRequest'
+      responses:
+        '204':
+          description: Dispatch revoked and order deleted successfully
+        '400':
+          description: Order is not in DISPATCHED status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
   /api/v1/parties:
@@ -671,6 +708,7 @@ components:
         - PENDING
         - COMPLETED
         - DISPATCHED
+        - REVOKED
 
     # Dispatch request schemas
     DispatchRequest:

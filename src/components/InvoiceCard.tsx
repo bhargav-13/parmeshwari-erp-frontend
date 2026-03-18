@@ -140,7 +140,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelet
               </button>
             </div>
           </div>
-          <p className="invoice-card-customer">{order.customerName}</p>
+          <p className="invoice-card-customer">Party: {order.party?.name || order.customerName || '-'}</p>
           <span className="invoice-card-date">Date : {formatDate(order.orderDate)}</span>
         </div>
 

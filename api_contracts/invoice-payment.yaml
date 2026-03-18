@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
-  - url: http://ec2-65-1-248-131.ap-south-1.compute.amazonaws.com
+  - url: https://parmeshwari-erp.duckdns.org
     description: Production Server
 
 tags:
@@ -428,8 +428,8 @@ paths:
     get:
       tags:
         - Payments
-      operationId: getPartyLedgerPdf
-      summary: Download party ledger as PDF
+      operationId: getPartyLedger
+      summary: Get comprehensive party ledger with order details
       parameters:
         - name: partyId
           in: path

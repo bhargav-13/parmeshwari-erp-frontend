@@ -266,6 +266,7 @@ export const OrderStatus = {
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED',
   DISPATCHED: 'DISPATCHED',
+  REVOKED: 'REVOKED',
 } as const;
 
 export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];

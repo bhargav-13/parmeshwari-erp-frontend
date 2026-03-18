@@ -8,6 +8,7 @@ interface DispatchOrderModalProps {
   order: Order;
   onClose: () => void;
   onSuccess: () => void;
+  mode?: 'dispatch' | 'revoke';
 }
 
 interface DispatchItemState {
@@ -19,7 +20,8 @@ interface DispatchItemState {
   isDropdownOpen: boolean;
 }
 
-const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose, onSuccess }) => {
+const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose, onSuccess, mode = 'dispatch' }) => {
+  const isRevoke = mode === 'revoke';
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [stockItemsLoading, setStockItemsLoading] = useState(false);
   const [dispatchItems, setDispatchItems] = useState<DispatchItemState[]>([]);
@@ -51,7 +53,9 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
           // Initialize with the quantity from the order product (KG or PC)
           const defaultQty = product.quantityKg || product.quantityPc || 0;
           initialSelectedQuantities[item.stockItemId] = defaultQty;
-          initialSelectedItems[item.stockItemId] = false;
+          // In revoke mode, auto-select matching stock items
+          const isMatch = isRevoke && item.stockItemId === product.itemId;
+          initialSelectedItems[item.stockItemId] = isMatch;
         });
 
         return {
@@ -142,7 +146,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
     });
 
     if (dispatchRequestItems.length === 0) {
-      setError('Please select at least one item to dispatch.');
+      setError(`Please select at least one item to ${isRevoke ? 'revoke' : 'dispatch'}.`);
       return;
     }
 
@@ -153,10 +157,14 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
     try {
       setIsSaving(true);
       setError(null);
-      await ordersApi.dispatchOrder(order.id, payload);
+      if (isRevoke) {
+        await ordersApi.revokeDispatch(order.id, payload);
+      } else {
+        await ordersApi.dispatchOrder(order.id, payload);
+      }
       onSuccess();
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to dispatch order. Please try again.');
+      setError(err?.response?.data?.message || `Failed to ${isRevoke ? 'revoke' : 'dispatch'} order. Please try again.`);
     } finally {
       setIsSaving(false);
     }
@@ -166,7 +174,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
     <div className="dispatch-modal-overlay" onClick={onClose}>
       <div className="dispatch-modal" onClick={(e) => e.stopPropagation()}>
         <div className="dispatch-modal-header">
-          <h2 className="dispatch-modal-title">Dispatch Order</h2>
+          <h2 className="dispatch-modal-title">{isRevoke ? 'Revoke Dispatch' : 'Dispatch Order'}</h2>
           <button type="button" className="dispatch-modal-close" onClick={onClose} aria-label="Close">
             &times;
           </button>
@@ -255,7 +263,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
             onClick={handleSubmit}
             disabled={isSaving}
           >
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? (isRevoke ? 'Revoking...' : 'Saving...') : (isRevoke ? 'Revoke' : 'Save')}
           </button>
         </div>
       </div>

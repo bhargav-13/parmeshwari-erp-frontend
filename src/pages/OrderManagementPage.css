@@ -286,6 +286,31 @@
   cursor: not-allowed;
 }
 
+.revoke-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 24px;
+  gap: 15px;
+  border: 1px solid #dc2626;
+  border-radius: 39px;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #dc2626;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.revoke-btn:hover {
+  background: rgba(220, 38, 38, 0.05);
+  transform: translateY(-1px);
+}
+
 @media (max-width: 768px) {
   .order-page {
     padding: 16px;

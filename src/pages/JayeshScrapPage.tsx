@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest, type KevinScrapRequest } from '../api/scrap';
+import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest, type KevinScrapRequest, type JayeshScrapWithdrawRequest } from '../api/scrap';
 import ScrapEntryModal from '../components/ScrapEntryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
@@ -33,6 +33,10 @@ const JayeshScrapPage: React.FC = () => {
     const [downloadFromDate, setDownloadFromDate] = useState('');
     const [downloadToDate, setDownloadToDate] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
+    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+    const [withdrawScrap, setWithdrawScrap] = useState<JayeshScrap | null>(null);
+    const [withdrawAmountInput, setWithdrawAmountInput] = useState('');
+    const [isWithdrawing, setIsWithdrawing] = useState(false);
 
     useEffect(() => {
         fetchScraps();
@@ -128,6 +132,38 @@ const JayeshScrapPage: React.FC = () => {
         }
     };
 
+    const handleWithdrawOpen = (scrap: JayeshScrap) => {
+        setWithdrawScrap(scrap);
+        setWithdrawAmountInput('');
+        setIsWithdrawModalOpen(true);
+    };
+
+    const handleWithdrawSubmit = async () => {
+        if (!withdrawScrap) return;
+        const amount = parseFloat(withdrawAmountInput);
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid withdrawal amount.');
+            return;
+        }
+        const pending = withdrawScrap.pendingAmount ?? withdrawScrap.totalAmount ?? (withdrawScrap.netWeight * withdrawScrap.rate);
+        if (amount > pending) {
+            alert('Withdrawal amount cannot exceed pending amount.');
+            return;
+        }
+        try {
+            setIsWithdrawing(true);
+            const updated = await jayeshScrapApi.withdrawScrap(withdrawScrap.scrapId, { withdrawAmount: amount });
+            setScraps(prev => prev.map(s => s.scrapId === updated.scrapId ? updated : s));
+            setIsWithdrawModalOpen(false);
+            setWithdrawScrap(null);
+        } catch (error) {
+            console.error('Error withdrawing scrap:', error);
+            alert('Failed to process withdrawal.');
+        } finally {
+            setIsWithdrawing(false);
+        }
+    };
+
     return (
         <div className="jayesh-scrap-page">
             <div className="page-header">
@@ -213,6 +249,9 @@ const JayeshScrapPage: React.FC = () => {
                                 <th>Net Weight</th>
                                 <th>Rate</th>
                                 <th>Amount</th>
+                                <th>Withdrawn</th>
+                                <th>Pending</th>
+                                <th></th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -228,7 +267,24 @@ const JayeshScrapPage: React.FC = () => {
                                     <td>{scrap.outWeight.toFixed(3)}kg</td>
                                     <td>{scrap.netWeight.toFixed(3)}kg</td>
                                     <td>₹{scrap.rate.toFixed(2)}</td>
-                                    <td>₹{(scrap.netWeight * scrap.rate).toLocaleString('en-IN')}</td>
+                                    <td>₹{(scrap.totalAmount ?? scrap.netWeight * scrap.rate).toLocaleString('en-IN')}</td>
+                                    <td>₹{(scrap.withdrawAmount ?? 0).toLocaleString('en-IN')}</td>
+                                    <td>
+                                        <span className={`pending-amount ${(scrap.pendingAmount ?? scrap.totalAmount ?? (scrap.netWeight * scrap.rate)) > 0 ? 'has-pending' : 'no-pending'}`}>
+                                            ₹{(scrap.pendingAmount ?? scrap.totalAmount ?? (scrap.netWeight * scrap.rate)).toLocaleString('en-IN')}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            className="withdraw-button"
+                                            onClick={() => handleWithdrawOpen(scrap)}
+                                            title="Withdraw"
+                                            disabled={(scrap.pendingAmount ?? scrap.totalAmount ?? (scrap.netWeight * scrap.rate)) <= 0}
+                                        >
+                                            Withdraw
+                                        </button>
+                                    </td>
                                     <td>
                                         <div className="action-buttons">
                                             <button
@@ -324,6 +380,64 @@ const JayeshScrapPage: React.FC = () => {
                                     className="cancel-button"
                                     onClick={() => setIsDownloadPopupOpen(false)}
                                     disabled={isDownloading}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isWithdrawModalOpen && withdrawScrap && (
+                <div className="modal-overlay" onClick={() => setIsWithdrawModalOpen(false)}>
+                    <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="modal-title">Withdraw Amount</h2>
+                        <div className="withdraw-info">
+                            <div className="withdraw-info-row">
+                                <span className="withdraw-info-label">Challan No.</span>
+                                <span className="withdraw-info-value">{withdrawScrap.challanNo}</span>
+                            </div>
+                            <div className="withdraw-info-row">
+                                <span className="withdraw-info-label">Total Amount</span>
+                                <span className="withdraw-info-value">₹{(withdrawScrap.totalAmount ?? withdrawScrap.netWeight * withdrawScrap.rate).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div className="withdraw-info-row">
+                                <span className="withdraw-info-label">Already Withdrawn</span>
+                                <span className="withdraw-info-value">₹{(withdrawScrap.withdrawAmount ?? 0).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div className="withdraw-info-row">
+                                <span className="withdraw-info-label">Pending Amount</span>
+                                <span className="withdraw-info-value pending-highlight">₹{(withdrawScrap.pendingAmount ?? withdrawScrap.totalAmount ?? (withdrawScrap.netWeight * withdrawScrap.rate)).toLocaleString('en-IN')}</span>
+                            </div>
+                        </div>
+                        <div className="modal-form">
+                            <div className="form-group">
+                                <label className="form-label">Withdrawal Amount</label>
+                                <input
+                                    type="number"
+                                    className="form-input"
+                                    placeholder="Enter amount to withdraw"
+                                    value={withdrawAmountInput}
+                                    onChange={(e) => setWithdrawAmountInput(e.target.value)}
+                                    min="0"
+                                    max={withdrawScrap.pendingAmount ?? withdrawScrap.totalAmount ?? (withdrawScrap.netWeight * withdrawScrap.rate)}
+                                    step="0.01"
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button
+                                    type="button"
+                                    className="save-button"
+                                    onClick={handleWithdrawSubmit}
+                                    disabled={isWithdrawing}
+                                >
+                                    {isWithdrawing ? 'Processing...' : 'Withdraw'}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="cancel-button"
+                                    onClick={() => setIsWithdrawModalOpen(false)}
+                                    disabled={isWithdrawing}
                                 >
                                     Cancel
                                 </button>

@@ -32,6 +32,8 @@ const statusChip = (status: OrderStatus) => {
       return 'status-complete';
     case 'DISPATCHED':
       return 'status-dispatched';
+    case 'REVOKED':
+      return 'status-revoked';
     case 'PENDING':
     default:
       return 'status-pending';
@@ -53,6 +55,7 @@ const OrderManagementPage: React.FC = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState<number | null>(null);
   const [dispatchOrder, setDispatchOrder] = useState<Order | null>(null);
+  const [revokeTarget, setRevokeTarget] = useState<Order | null>(null);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -171,6 +174,15 @@ const OrderManagementPage: React.FC = () => {
     fetchOrders();
   };
 
+  const handleRevokeClose = () => {
+    setRevokeTarget(null);
+  };
+
+  const handleRevokeSuccess = () => {
+    setRevokeTarget(null);
+    fetchOrders();
+  };
+
   const tableRows = useMemo(() => {
     if (!orders.length) return [];
     return orders.map((order) => ({
@@ -275,23 +287,34 @@ const OrderManagementPage: React.FC = () => {
                       className={`status-select-modern ${statusChip(order.orderStatus)}`}
                       value={order.orderStatus}
                       onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
-                      disabled={statusUpdating === order.id || order.orderStatus === 'DISPATCHED'}
+                      disabled={statusUpdating === order.id || order.orderStatus === 'DISPATCHED' || order.orderStatus === 'REVOKED'}
                       title="Order status"
                     >
                       <option value="PENDING">Pending</option>
                       <option value="COMPLETED">Completed</option>
                       <option value="DISPATCHED">Dispatched</option>
+                      {order.orderStatus === 'REVOKED' && <option value="REVOKED">Revoked</option>}
                     </select>
                   </td>
                   <td>
-                    <button
-                      type="button"
-                      className="dispatch-btn"
-                      onClick={() => handleDispatchOrder(order)}
-                      disabled={order.orderStatus === 'DISPATCHED'}
-                    >
-                      Dispatch
-                    </button>
+                    {order.orderStatus === 'DISPATCHED' ? (
+                      <button
+                        type="button"
+                        className="revoke-btn"
+                        onClick={() => setRevokeTarget(order)}
+                      >
+                        Revoke
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="dispatch-btn"
+                        onClick={() => handleDispatchOrder(order)}
+                        disabled={order.orderStatus === 'DISPATCHED' || order.orderStatus === 'REVOKED'}
+                      >
+                        Dispatch
+                      </button>
+                    )}
                   </td>
                   <td>{order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toLocaleDateString('en-IN') : '—'}</td>
                   <td>
@@ -340,6 +363,15 @@ const OrderManagementPage: React.FC = () => {
           order={dispatchOrder}
           onClose={handleDispatchClose}
           onSuccess={handleDispatchSuccess}
+        />
+      )}
+
+      {revokeTarget && (
+        <DispatchOrderModal
+          order={revokeTarget}
+          onClose={handleRevokeClose}
+          onSuccess={handleRevokeSuccess}
+          mode="revoke"
         />
       )}
     </div>

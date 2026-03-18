@@ -62,6 +62,10 @@ export interface JayeshScrapRequest {
     rate: number;
 }
 
+export interface JayeshScrapWithdrawRequest {
+    withdrawAmount: number;
+}
+
 export interface JayeshScrap {
     scrapId: number;
     contractor: JayeshScrapContractor;
@@ -74,6 +78,9 @@ export interface JayeshScrap {
     outWeight: number;
     netWeight: number;
     rate: number;
+    totalAmount: number;
+    withdrawAmount: number;
+    pendingAmount: number;
     createdAt: string;
     lastUpdatedAt: string;
 }
@@ -204,6 +211,11 @@ export const jayeshScrapApi = {
 
     deleteScrap: async (id: number): Promise<void> => {
         await apiClient.delete(`/api/v1/jayesh/scrap/${id}`);
+    },
+
+    withdrawScrap: async (id: number, data: JayeshScrapWithdrawRequest): Promise<JayeshScrap> => {
+        const response = await apiClient.patch<JayeshScrap>(`/api/v1/jayesh/scrap/${id}/withdraw`, data);
+        return response.data;
     },
 
     downloadPdf: async (fromDate?: string, toDate?: string): Promise<void> => {

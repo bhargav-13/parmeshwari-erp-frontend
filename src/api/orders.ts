@@ -36,4 +36,7 @@ export const ordersApi = {
 
   dispatchOrder: (orderId: number, payload: DispatchRequest): Promise<Order> =>
     promisify<Order>(cb => generatedOrdersApi.dispatchOrder(orderId, payload, cb)),
+
+  revokeDispatch: (orderId: number, payload: DispatchRequest): Promise<void> =>
+    promisify<void>(cb => generatedOrdersApi.revokeDispatch(orderId, payload, cb)),
 };

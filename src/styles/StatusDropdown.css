@@ -111,6 +111,18 @@
   border-color: #a78bfa;
 }
 
+/* Revoked Status - Red */
+.status-select-modern.status-revoked {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.status-select-modern.status-revoked:hover:not(:disabled) {
+  background-color: #fee2e2;
+  border-color: #f87171;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .status-select-modern {

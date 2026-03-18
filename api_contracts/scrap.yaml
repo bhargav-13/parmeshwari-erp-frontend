@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local development server
-  - url: http://ec2-65-1-248-131.ap-south-1.compute.amazonaws.com
+  - url: https://parmeshwari-erp.duckdns.org
     description: Production Server
 
 tags:
@@ -140,7 +140,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
     get:
@@ -508,6 +507,46 @@ paths:
                 format: binary
       security:
         - oauth2: [ ]
+  /api/v1/jayesh/scrap/{scrapId}/withdraw:
+    patch:
+      tags:
+        - JayeshScrap
+      operationId: withdrawJayeshScrap
+      summary: Record a withdrawal amount and calculate pending amount (totalAmount - withdrawAmount)
+      parameters:
+        - name: scrapId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JayeshScrapWithdrawRequest'
+      responses:
+        '200':
+          description: Withdrawal calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JayeshScrap'
+        '404':
+          description: Scrap entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
   /api/v1/jayesh/scrap/{scrapId}:
     get:
       tags:
@@ -853,6 +892,16 @@ components:
           format: double
           description: Rate for the scrap item
 
+    JayeshScrapWithdrawRequest:
+      type: object
+      required:
+        - withdrawAmount
+      properties:
+        withdrawAmount:
+          type: number
+          format: double
+          description: Amount withdrawn; pendingAmount = totalAmount - withdrawAmount
+
     JayeshScrap:
       type: object
       properties:
@@ -884,6 +933,18 @@ components:
         rate:
           type: number
           format: double
+        totalAmount:
+          type: number
+          format: double
+          description: Calculated as netWeight * rate
+        withdrawAmount:
+          type: number
+          format: double
+          description: Amount withdrawn
+        pendingAmount:
+          type: number
+          format: double
+          description: Calculated as totalAmount - withdrawAmount
         createdAt:
           type: string
           format: date-time

@@ -178,11 +178,11 @@
 }
 
 .scrap-table th {
-    padding: 16px;
+    padding: 12px 10px;
     text-align: left;
     font-family: 'Jost', sans-serif;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 20px;
     color: #17344D;
     white-space: nowrap;
@@ -202,10 +202,10 @@
 }
 
 .scrap-table td {
-    padding: 16px;
+    padding: 12px 10px;
     font-family: 'Jost', sans-serif;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 20px;
     color: #17344D;
     white-space: nowrap;
@@ -256,6 +256,85 @@
     opacity: 1;
 }
 
+.pending-amount {
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.pending-amount.has-pending {
+    background: #FFF3E0;
+    color: #E65100;
+}
+
+.pending-amount.no-pending {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.withdraw-button {
+    padding: 5px 12px;
+    background: #D1EEFF;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: #17344D;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.withdraw-button:hover:not(:disabled) {
+    background: #b8dfff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.withdraw-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.withdraw-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #F8F9FA;
+    border-radius: 8px;
+    border: 1px solid rgba(125, 153, 169, 0.15);
+}
+
+.withdraw-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.withdraw-info-label {
+    font-family: 'Jost', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #7D99A9;
+}
+
+.withdraw-info-value {
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #17344D;
+}
+
+.pending-highlight {
+    color: #E65100;
+    font-weight: 600;
+}
+
 .no-data {
     padding: 48px 24px;
     text-align: center;
@@ -293,6 +372,6 @@
     }
 
     .scrap-table {
-        min-width: 900px;
+        min-width: 1100px;
     }
 }
