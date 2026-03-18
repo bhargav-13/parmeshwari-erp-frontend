@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest, type KevinScrapRequest, type JayeshScrapWithdrawRequest } from '../api/scrap';
+import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest, type KevinScrapRequest } from '../api/scrap';
 import ScrapEntryModal from '../components/ScrapEntryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';

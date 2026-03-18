@@ -428,8 +428,8 @@ paths:
     get:
       tags:
         - Payments
-      operationId: getPartyLedger
-      summary: Get comprehensive party ledger with order details
+      operationId: getPartyLedgerPdf
+      summary: Get comprehensive party ledger as PDF
       parameters:
         - name: partyId
           in: path

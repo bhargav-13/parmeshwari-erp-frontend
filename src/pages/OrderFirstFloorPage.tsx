@@ -300,7 +300,7 @@ const OrderFirstFloorPage: React.FC = () => {
                         type="button"
                         className="dispatch-btn"
                         onClick={() => handleDispatchOrder(order)}
-                        disabled={order.orderStatus === 'DISPATCHED' || order.orderStatus === 'REVOKED'}
+                        disabled={order.orderStatus === 'REVOKED'}
                       >
                         Dispatch
                       </button>

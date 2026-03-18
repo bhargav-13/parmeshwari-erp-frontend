@@ -140,6 +140,7 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
     get:
