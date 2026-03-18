@@ -28,9 +28,7 @@ const InventoryPage: React.FC = () => {
   const [editingItem, setEditingItem] = useState<StockItem | null>(null);
   const [editingRawItem, setEditingRawItem] = useState<RawItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [rawSearchQuery, setRawSearchQuery] = useState('');
-  const [debouncedRawSearch, setDebouncedRawSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<InventoryStatus | ''>('');
   const [rawStatusFilter, setRawStatusFilter] = useState<InventoryStatus | ''>('');
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -40,18 +38,8 @@ const InventoryPage: React.FC = () => {
   const [copyLinkSuccess, setCopyLinkSuccess] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedRawSearch(rawSearchQuery), 400);
-    return () => clearTimeout(timer);
-  }, [rawSearchQuery]);
-
-  useEffect(() => {
     fetchData();
-  }, [selectedFloor, debouncedSearch, statusFilter, debouncedRawSearch, rawStatusFilter]);
+  }, [selectedFloor, statusFilter, rawStatusFilter]);
 
   const fetchData = async () => {
     try {
@@ -61,16 +49,14 @@ const InventoryPage: React.FC = () => {
           selectedFloor,
           0,
           1000,
-          statusFilter || undefined,
-          debouncedSearch || undefined
+          statusFilter || undefined
         ),
         productApi.getProducts(),
         categoryApi.getCategories(),
         rawItemApi.getRawItems(
           0,
           1000,
-          rawStatusFilter || undefined,
-          debouncedRawSearch || undefined
+          rawStatusFilter || undefined
         ),
       ]);
       const stockData = (stockItemsResult as any)?.data ?? [];
