@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { stockItemApi, productApi, categoryApi } from '../api/inventory';
 import type { StockItem, Product, Category } from '../types';
 import { InventoryStatus, InventoryFloor } from '../types';
@@ -26,10 +26,11 @@ const InventoryGroundFloorPage: React.FC = () => {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [editingLoadingId, setEditingLoadingId] = useState<number | null>(null);
   const [copyLinkSuccess, setCopyLinkSuccess] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchData();
-  }, [searchQuery, statusFilter]);
+  }, [statusFilter]);
 
   const fetchData = async () => {
     try {
@@ -39,8 +40,7 @@ const InventoryGroundFloorPage: React.FC = () => {
           InventoryFloor.GROUND_FLOOR,
           0,
           1000,
-          statusFilter || undefined,
-          searchQuery || undefined
+          statusFilter || undefined
         ),
         productApi.getProducts(),
         categoryApi.getCategories(),
@@ -138,7 +138,7 @@ const InventoryGroundFloorPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading && stockItems.length === 0) {
     return <Loading message="Loading inventory..." />;
   }
 
@@ -210,10 +210,12 @@ const InventoryGroundFloorPage: React.FC = () => {
         <div className="order-search">
           <img src={SearchIcon} alt="Search" />
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Search by product name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            autoFocus
           />
         </div>
         <div className="order-status-filter">
