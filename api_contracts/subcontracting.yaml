@@ -1473,6 +1473,10 @@ components:
         packagingCount:
           type: integer
           description: Number of packaging units
+        rate:
+          type: number
+          format: double
+          description: Rate for the returned crome item
         returnRemark:
           type: string
           nullable: true
@@ -1516,6 +1520,12 @@ components:
           format: double
         packagingCount:
           type: integer
+        rate:
+          type: number
+          format: double
+        amount:
+          type: number
+          format: double
         returnRemark:
           type: string
           nullable: true
@@ -1830,6 +1840,12 @@ components:
           type: number
           format: double
         netReturnStock:
+          type: number
+          format: double
+        rate:
+          type: number
+          format: double
+        amount:
           type: number
           format: double
         remark:

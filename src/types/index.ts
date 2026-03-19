@@ -517,6 +517,8 @@ export interface CromeReturn {
   packagingType: PackagingType;
   packagingWeight: number;
   packagingCount: number;
+  rate: number;
+  amount: number;
   returnRemark?: string | null;
 }
 
@@ -565,6 +567,7 @@ export interface CromeReturnRequest {
   packagingType: PackagingType;
   packagingWeight: number;
   packagingCount: number;
+  rate: number;
   returnRemark?: string | null;
   addToInventory?: boolean;
   inventoryItemName?: string;

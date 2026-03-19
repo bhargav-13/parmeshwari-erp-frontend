@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { CromeReturnRequest, Crome } from '../types';
 import { PackagingType, InventoryFloor, SubcontractingStatus } from '../types';
+import { cromeApi } from '../api/crome';
 import './CromeReturnModal.css';
 
 // Packaging weights in KG
@@ -30,7 +31,6 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         addToInventory: boolean;
         inventoryItemName: string;
         inventoryFloor: InventoryFloor;
-        inventoryPricePerKg: string;
         inventoryQuantityPc: string;
     }>({
         returnDate: new Date().toISOString().split('T')[0],
@@ -40,16 +40,33 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         packagingCount: '',
         returnRemark: '',
         addToInventory: true,
-        inventoryItemName: `${itemName} from crome`,
+        inventoryItemName: itemName,
         inventoryFloor: InventoryFloor.GROUND_FLOOR,
-        inventoryPricePerKg: '',
         inventoryQuantityPc: '',
     });
 
+    const [pricePerKg, setPricePerKg] = useState<number>(0);
+    const [loadingPrice, setLoadingPrice] = useState(true);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [warnings, setWarnings] = useState<string[]>([]);
+
+    // Fetch price from parent subcontracting order
+    useEffect(() => {
+        const fetchPrice = async () => {
+            try {
+                setLoadingPrice(true);
+                const info = await cromeApi.getSubcontractingCromeInfo(crome.subcontractingId);
+                setPricePerKg(info.price);
+            } catch (err) {
+                console.error('Error fetching subcontracting price:', err);
+            } finally {
+                setLoadingPrice(false);
+            }
+        };
+        fetchPrice();
+    }, [crome.subcontractingId]);
 
     // Helper: Parse numeric string values
     const parseNum = (val: string | number): number => {
@@ -113,15 +130,6 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
 
             case 'inventoryItemName':
                 return allData.addToInventory && !value.trim() ? 'Item Name is required' : null;
-
-            case 'inventoryPricePerKg': {
-                const valueNum = parseNum(value);
-                if (allData.addToInventory) {
-                    if (valueNum < 0) return 'Price cannot be negative';
-                    if (valueNum === 0) return 'Price should be greater than 0 when adding to inventory';
-                }
-                return null;
-            }
 
             case 'inventoryQuantityPc': {
                 const valueNum = parseNum(value);
@@ -243,11 +251,12 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
             packagingType: formData.packagingType,
             packagingWeight: parseNum(formData.packagingWeight),
             packagingCount: parseNum(formData.packagingCount),
+            rate: pricePerKg,
             returnRemark: formData.returnRemark || null,
             addToInventory: formData.addToInventory,
             inventoryItemName: formData.addToInventory ? formData.inventoryItemName : undefined,
             inventoryFloor: formData.addToInventory ? formData.inventoryFloor : undefined,
-            inventoryPricePerKg: formData.addToInventory ? parseNum(formData.inventoryPricePerKg) : undefined,
+            inventoryPricePerKg: formData.addToInventory ? pricePerKg : undefined,
             inventoryQuantityPc: formData.addToInventory ? parseNum(formData.inventoryQuantityPc) : undefined,
         };
 
@@ -305,15 +314,12 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                         <label className="form-label">Price / Kg</label>
                                         <input
                                             type="text"
-                                            inputMode="numeric"
-                                            name="inventoryPricePerKg"
-                                            value={formData.inventoryPricePerKg}
-                                            onChange={handleNumericInput}
-                                            onBlur={handleBlur}
-                                            className={`form-input ${getFieldError('inventoryPricePerKg') ? 'invalid' : ''}`}
-                                            placeholder="₹ 0.00"
+                                            className="form-input"
+                                            value={loadingPrice ? 'Loading...' : `₹ ${pricePerKg}`}
+                                            readOnly
+                                            disabled
+                                            title="Auto-filled from subcontracting order price"
                                         />
-                                        {getFieldError('inventoryPricePerKg') && <span className="field-error-text">{getFieldError('inventoryPricePerKg')}</span>}
                                     </div>
 
                                     <div className="form-group">
@@ -451,6 +457,14 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                         <div className="calc-row total-row">
                             <span className="calc-label">Net Return:</span>
                             <span className="calc-value total">{calculateNetReturn().toFixed(3)} Kg</span>
+                        </div>
+                        <div className="calc-row pricing-separator">
+                            <span className="calc-label">Rate (Price/Kg):</span>
+                            <span className="calc-value">{loadingPrice ? '...' : `₹ ${pricePerKg}`}</span>
+                        </div>
+                        <div className="calc-row total-row">
+                            <span className="calc-label">Amount:</span>
+                            <span className="calc-value total">₹ {(calculateNetReturn() * pricePerKg).toFixed(2)}</span>
                         </div>
                     </div>
 

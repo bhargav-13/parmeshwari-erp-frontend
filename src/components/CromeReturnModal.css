@@ -225,6 +225,12 @@
     color: #059669;
 }
 
+.calc-row.pricing-separator {
+    margin-top: 8px;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 8px;
+}
+
 /* Actions */
 .modal-actions {
     display: flex;

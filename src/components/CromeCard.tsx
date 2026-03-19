@@ -197,6 +197,18 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                                     <span className="detail-label">Net Return</span>
                                     <span className="detail-value">{crome.cromeReturn.netReturnStock.toFixed(3)} {crome.unit}</span>
                                 </div>
+                                {crome.cromeReturn.rate != null && (
+                                    <div className="detail-row">
+                                        <span className="detail-label">Rate</span>
+                                        <span className="detail-value">₹ {crome.cromeReturn.rate}/Kg</span>
+                                    </div>
+                                )}
+                                {crome.cromeReturn.amount != null && (
+                                    <div className="detail-row">
+                                        <span className="detail-label">Amount</span>
+                                        <span className="detail-value">₹ {crome.cromeReturn.amount.toFixed(2)}</span>
+                                    </div>
+                                )}
                                 <div className="diff-section">
                                     <span className="diff-label">DIFFERENCE</span>
                                     <span className={`diff-value ${(crome.cromeReturn.netReturnStock - crome.sentStock) < -0.001 ? 'negative' : (crome.cromeReturn.netReturnStock - crome.sentStock) > 0.001 ? 'positive' : 'neutral'}`}>
