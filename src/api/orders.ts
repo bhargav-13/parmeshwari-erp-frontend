@@ -5,7 +5,7 @@ export const ordersApi = {
   createOrder: (payload: OrderRequest): Promise<Order> =>
     promisify<Order>(cb => generatedOrdersApi.createOrder(payload, cb)),
 
-  getOrderList: (params: {
+  getOrderList: async (params: {
     floor: OrderFloor;
     page?: number;
     size?: number;
@@ -13,13 +13,21 @@ export const ordersApi = {
     search?: string;
   }): Promise<PaginatedResult<Order>> => {
     const { floor, page, size, status, search } = params;
-    return promisify<PaginatedResult<Order>>(cb =>
+    const result = await promisify<PaginatedResult<Order>>(cb =>
       generatedOrdersApi.getOrderList(
         floor,
         { page, size, status: status || undefined, search },
         cb
       )
     );
+    // Ensure party name is mapped to customerName for display
+    if (result.data) {
+      result.data = result.data.map(order => ({
+        ...order,
+        customerName: order.party?.name || order.customerName || '',
+      }));
+    }
+    return result;
   },
 
   getOrderById: (orderId: number): Promise<Order> =>

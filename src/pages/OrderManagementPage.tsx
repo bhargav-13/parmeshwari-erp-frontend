@@ -278,7 +278,7 @@ const OrderManagementPage: React.FC = () => {
               {tableRows.map((order) => (
                 <tr key={order.id}>
                   <td>{order.orderDisplayId}</td>
-                  <td>{order.customerName}</td>
+                  <td>{order.party?.name || order.customerName || '—'}</td>
                   <td>{new Date(order.orderDate).toLocaleDateString('en-IN')}</td>
                   <td>{order.totalItems ?? order.products?.length ?? 0}</td>
                   <td>{formatCurrency(order.grandTotal)}</td>
