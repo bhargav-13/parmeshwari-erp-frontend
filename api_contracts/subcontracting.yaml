@@ -1214,6 +1214,22 @@ components:
       properties:
         name:
           type: string
+    PackagingDetail:
+      type: object
+      required:
+        - packagingType
+        - packagingWeight
+        - packagingCount
+      properties:
+        packagingType:
+          $ref: '#/components/schemas/PackagingType'
+        packagingWeight:
+          type: number
+          format: double
+          description: Weight per packaging unit in KG
+        packagingCount:
+          type: integer
+          description: Number of packaging units
 
     SubItem:
       type: object
@@ -1252,9 +1268,7 @@ components:
         - partyId
         - cromeDate
         - sentStock
-        - packagingType
-        - packagingWeight
-        - packagingCount
+        - packagings
       properties:
         subcontractingId:
           type: integer
@@ -1270,15 +1284,10 @@ components:
           type: number
           format: double
           description: Net stock (in KG) to send for crome (without packaging weight)
-        packagingType:
-          $ref: '#/components/schemas/PackagingType'
-        packagingWeight:
-          type: number
-          format: double
-          description: Weight per packaging unit in KG (e.g., 0.5 kg per bag)
-        packagingCount:
-          type: integer
-          description: Number of packaging units (e.g., 20 bags)
+        packagings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackagingDetail'
         remark:
           type: string
           nullable: true
@@ -1313,15 +1322,10 @@ components:
           description: Gross weight including packaging (sentStock + packagingWeight * packagingCount)
         unit:
           $ref: '#/components/schemas/unit'
-        packagingType:
-          $ref: '#/components/schemas/PackagingType'
-        packagingWeight:
-          type: number
-          format: double
-          description: Weight per packaging unit in KG
-        packagingCount:
-          type: integer
-          description: Number of packaging units
+        packagings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackagingDetail'
         status:
           $ref: '#/components/schemas/subcontractingStatus'
         remark:
@@ -1368,10 +1372,7 @@ components:
       type: object
       required:
         - returnDate
-        - returnStock
-        - packagingType
-        - packagingWeight
-        - packagingCount
+        - packagings
       properties:
         returnDate:
           type: string
@@ -1380,15 +1381,10 @@ components:
           type: number
           format: double
           description: Gross stock returned by contractor
-        packagingType:
-          $ref: '#/components/schemas/PackagingType'
-        packagingWeight:
-          type: number
-          format: double
-          description: Weight per packaging unit in KG (e.g., 1.2 kg per peti)
-        packagingCount:
-          type: integer
-          description: Number of packaging units (e.g., 10 peti)
+        packagings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackagingDetail'
         returnRemark:
           type: string
           nullable: true
@@ -1452,10 +1448,7 @@ components:
       type: object
       required:
         - returnDate
-        - returnStock
-        - packagingType
-        - packagingWeight
-        - packagingCount
+        - packagings
       properties:
         returnDate:
           type: string
@@ -1464,15 +1457,10 @@ components:
           type: number
           format: double
           description: Gross stock returned from crome
-        packagingType:
-          $ref: '#/components/schemas/PackagingType'
-        packagingWeight:
-          type: number
-          format: double
-          description: Weight per packaging unit in KG
-        packagingCount:
-          type: integer
-          description: Number of packaging units
+        packagings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackagingDetail'
         rate:
           type: number
           format: double
@@ -1513,13 +1501,10 @@ components:
           type: number
           format: double
           description: Net stock after deducting packaging (returnStock - packagingWeight * packagingCount)
-        packagingType:
-          $ref: '#/components/schemas/PackagingType'
-        packagingWeight:
-          type: number
-          format: double
-        packagingCount:
-          type: integer
+        packagings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackagingDetail'
         rate:
           type: number
           format: double
@@ -1542,15 +1527,10 @@ components:
           type: number
           format: double
           description: Gross stock returned by contractor
-        packagingType:
-          $ref: '#/components/schemas/PackagingType'
-        packagingWeight:
-          type: number
-          format: double
-          description: Weight per packaging unit (e.g., 1.2 kg per peti)
-        packagingCount:
-          type: integer
-          description: Number of packaging units (e.g., 10 peti)
+        packagings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackagingDetail'
         netReturnStock:
           type: number
           format: double
@@ -1676,7 +1656,8 @@ components:
           type: number
           format: double
         packagingType:
-          $ref: '#/components/schemas/PackagingType'
+          type: string
+          description: Comma-separated packaging types
         usedStock:
           type: number
           format: double
@@ -1828,7 +1809,8 @@ components:
           type: number
           format: double
         packagingType:
-          $ref: '#/components/schemas/PackagingType'
+          type: string
+          description: Comma-separated packaging types
         packagingCount:
           type: integer
         status:

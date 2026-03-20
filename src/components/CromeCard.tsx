@@ -145,9 +145,9 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                             <div className="detail-row">
                                 <span className="detail-label">Packaging</span>
                                 <div className="detail-value">
-                                    {(crome.packagingWeight * crome.packagingCount).toFixed(3)} {crome.unit}
+                                    {(crome.packagings || []).reduce((s, p) => s + (p.packagingWeight * p.packagingCount), 0).toFixed(3)} {crome.unit}
                                     <span className="detail-sub-value">
-                                        ({crome.packagingCount} x {crome.packagingWeight} {crome.packagingType})
+                                        ({(crome.packagings || []).map(p => `${p.packagingCount} x ${p.packagingWeight} ${p.packagingType}`).join(' + ')})
                                     </span>
                                 </div>
                             </div>
@@ -184,9 +184,9 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                                         <div className="detail-row">
                                             <span className="detail-label">Packaging</span>
                                             <div className="detail-value">
-                                                {(crome.cromeReturn.packagingWeight * crome.cromeReturn.packagingCount).toFixed(3)} {crome.unit}
+                                                {(crome.cromeReturn.packagings || []).reduce((s, p) => s + (p.packagingWeight * p.packagingCount), 0).toFixed(3)} {crome.unit}
                                                 <span className="detail-sub-value">
-                                                    ({crome.cromeReturn.packagingCount} x {crome.cromeReturn.packagingWeight} {crome.cromeReturn.packagingType})
+                                                    ({(crome.cromeReturn.packagings || []).map(p => `${p.packagingCount} x ${p.packagingWeight} ${p.packagingType}`).join(' + ')})
                                                 </span>
                                             </div>
                                         </div>

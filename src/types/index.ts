@@ -79,6 +79,12 @@ export const PackagingType = {
 
 export type PackagingType = typeof PackagingType[keyof typeof PackagingType];
 
+export interface PackagingDetail {
+  packagingType: PackagingType;
+  packagingWeight: number; // Weight per packaging unit in KG
+  packagingCount: number; // Number of packaging units
+}
+
 export const ReturnType = {
   MAAL: 'MAAL',
   CHHOL: 'CHHOL',
@@ -112,9 +118,7 @@ export interface SubOrderRequest {
 export interface SubReturnRequest {
   returnDate: string; // ISO date format
   returnStock: number; // Gross return stock
-  packagingType: PackagingType;
-  packagingWeight: number; // Weight per packaging unit in KG
-  packagingCount: number; // Number of packaging units
+  packagings: PackagingDetail[];
   returnRemark?: string | null;
 }
 
@@ -122,10 +126,7 @@ export interface SubReturn {
   returnItemName: string;
   returnDate: string;
   returnStock: number;
-  returnElement?: number | null;
-  packagingCount?: number;
-  packagingWeight?: number;
-  packagingType: PackagingType;
+  packagings?: PackagingDetail[];
   returnType: ReturnType;
   returnRemark?: string | null;
   netReturnStock?: number;
@@ -503,9 +504,7 @@ export interface CromeRequest {
   partyId: number;
   cromeDate: string;
   sentStock: number;
-  packagingType: PackagingType;
-  packagingWeight: number;
-  packagingCount: number;
+  packagings: PackagingDetail[];
   remark?: string | null;
 }
 
@@ -514,9 +513,7 @@ export interface CromeReturn {
   returnDate: string;
   returnStock: number;
   netReturnStock: number;
-  packagingType: PackagingType;
-  packagingWeight: number;
-  packagingCount: number;
+  packagings?: PackagingDetail[];
   rate: number;
   amount: number;
   returnRemark?: string | null;
@@ -532,9 +529,7 @@ export interface Crome {
   sentStock: number;
   grossWeight: number;
   unit: Unit;
-  packagingType: PackagingType;
-  packagingWeight: number;
-  packagingCount: number;
+  packagings?: PackagingDetail[];
   status: SubcontractingStatus;
   remark?: string | null;
   cromeReturn?: CromeReturn | null;
@@ -564,9 +559,7 @@ export interface SubcontractingCromeInfo {
 export interface CromeReturnRequest {
   returnDate: string;
   returnStock: number;
-  packagingType: PackagingType;
-  packagingWeight: number;
-  packagingCount: number;
+  packagings: PackagingDetail[];
   rate: number;
   returnRemark?: string | null;
   addToInventory?: boolean;

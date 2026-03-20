@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Party, CromeRequest, SubcontractingCromeInfo } from '../types';
+import type { Party, CromeRequest, SubcontractingCromeInfo, PackagingDetail } from '../types';
 import { PackagingType } from '../types';
 import { cromeApi } from '../api/crome';
 import './AddSubcontractingModal.css';
@@ -13,22 +13,38 @@ const PACKAGING_WEIGHTS_KG: Record<PackagingType, number | null> = {
   [PackagingType.DRUM]: null,
 };
 
+interface PackagingFormRow {
+  packagingType: PackagingType;
+  packagingWeight: string; // KG
+  packagingCount: string;
+}
+
 interface CromeModalProps {
   subcontractingId: number;
   onClose: () => void;
   onSuccess: () => void;
 }
 
+const createDefaultPackaging = (): PackagingFormRow => ({
+  packagingType: PackagingType.PETI,
+  packagingWeight: '1.2',
+  packagingCount: '',
+});
+
 const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSuccess }) => {
   const [parties, setParties] = useState<Party[]>([]);
   const [cromeInfo, setCromeInfo] = useState<SubcontractingCromeInfo | null>(null);
-  const [formData, setFormData] = useState<{ partyId: string; cromeDate: string; sentStock: string; packagingType: PackagingType; packagingWeight: string; packagingCount: string; remark: string; }>({
+  const [formData, setFormData] = useState<{
+    partyId: string;
+    cromeDate: string;
+    sentStock: string;
+    packagings: PackagingFormRow[];
+    remark: string;
+  }>({
     partyId: '',
     cromeDate: new Date().toISOString().split('T')[0],
     sentStock: '',
-    packagingType: PackagingType.PETI,
-    packagingWeight: '1.2',
-    packagingCount: '',
+    packagings: [createDefaultPackaging()],
     remark: '',
   });
 
@@ -51,17 +67,16 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
         setParties(partiesData);
         setCromeInfo(infoData);
 
-        // Pre-fill fields from return info
         setFormData(prev => ({
           ...prev,
-          // Always pre-fill sentStock with what's available
           sentStock: (infoData.availableStockForCrome || 0).toString(),
-          // Pre-fill packaging info if available
           ...(infoData.returnPackagingType ? {
-            packagingType: infoData.returnPackagingType,
-            packagingWeight: infoData.returnPackagingWeight?.toString() || '',
-            packagingCount: infoData.returnPackagingCount?.toString() || '',
-          } : {})
+            packagings: [{
+              packagingType: infoData.returnPackagingType,
+              packagingWeight: infoData.returnPackagingWeight?.toString() || '',
+              packagingCount: infoData.returnPackagingCount?.toString() || '',
+            }],
+          } : {}),
         }));
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -76,26 +91,44 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
-    if (name === 'packagingType') {
-      const type = value as PackagingType;
-      const weight = PACKAGING_WEIGHTS_KG[type];
-      setFormData(prev => ({
-        ...prev,
-        packagingType: type,
-        packagingWeight: weight !== null ? weight.toString() : prev.packagingWeight,
-      }));
-      return;
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setTouched(prev => ({ ...prev, [e.target.name]: true }));
+  };
+
+  // Packaging row handlers
+  const handlePackagingChange = (index: number, field: keyof PackagingFormRow, value: string) => {
+    const updated = [...formData.packagings];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData(prev => ({ ...prev, packagings: updated }));
+  };
+
+  const handlePackagingTypeChange = (index: number, value: PackagingType) => {
+    const updated = [...formData.packagings];
+    const weight = PACKAGING_WEIGHTS_KG[value];
+    updated[index] = {
+      ...updated[index],
+      packagingType: value,
+      packagingWeight: weight !== null ? weight.toString() : updated[index].packagingWeight,
+    };
+    setFormData(prev => ({ ...prev, packagings: updated }));
+  };
+
+  const addPackagingRow = () => {
+    setFormData(prev => ({
+      ...prev,
+      packagings: [...prev.packagings, createDefaultPackaging()],
+    }));
+  };
+
+  const removePackagingRow = (index: number) => {
+    if (formData.packagings.length <= 1) return;
+    setFormData(prev => ({
+      ...prev,
+      packagings: prev.packagings.filter((_, i) => i !== index),
+    }));
   };
 
   const validateField = (name: string, value: any): string | null => {
@@ -106,10 +139,14 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
         if (!value || parseFloat(value) <= 0) return 'Sent stock required';
         if (cromeInfo && parseFloat(value) > cromeInfo.availableStockForCrome) return 'Exceeds available stock';
         return null;
-      case 'packagingWeight': return !value || parseFloat(value) <= 0 ? 'Weight required' : null;
-      case 'packagingCount': return !value || parseInt(value) <= 0 ? 'Count required' : null;
       default: return null;
     }
+  };
+
+  const validatePackagingRow = (row: PackagingFormRow): string | null => {
+    if (!row.packagingWeight || parseFloat(row.packagingWeight) <= 0) return 'Weight required';
+    if (!row.packagingCount || parseInt(row.packagingCount) <= 0) return 'Count required';
+    return null;
   };
 
   const getFieldError = (name: string) => {
@@ -135,12 +172,17 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
     }
   };
 
+  // Calculate total packaging weight across all rows
+  const getTotalPackagingWeightKg = (): number => {
+    return formData.packagings.reduce((sum, row) => {
+      return sum + ((parseFloat(row.packagingWeight) || 0) * (parseInt(row.packagingCount) || 0));
+    }, 0);
+  };
+
   // Calculate gross weight
   const calculateGrossWeight = (): number => {
     const sentStock = parseFloat(formData.sentStock) || 0;
-    const packagingWeight = parseFloat(formData.packagingWeight) || 0;
-    const packagingCount = parseInt(formData.packagingCount) || 0;
-    return sentStock + (packagingWeight * packagingCount);
+    return sentStock + getTotalPackagingWeightKg();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,24 +190,30 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
     setError(null);
 
     // Mark all touched
-    const allTouched = Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+    const allTouched: Record<string, boolean> = {};
+    Object.keys(formData).forEach(key => { allTouched[key] = true; });
+    formData.packagings.forEach((_, i) => { allTouched[`packaging_${i}`] = true; });
     setTouched(allTouched);
 
-    const errors = Object.keys(formData).map(key => validateField(key, formData[key as keyof typeof formData])).filter(Boolean);
-    if (errors.length > 0) return;
+    const fieldErrors = ['partyId', 'cromeDate', 'sentStock']
+      .map(key => validateField(key, formData[key as keyof typeof formData]))
+      .filter(Boolean);
+    const packagingErrors = formData.packagings.map(row => validatePackagingRow(row)).filter(Boolean);
 
-    const sentStock = parseFloat(formData.sentStock);
-    const packagingWeight = parseFloat(formData.packagingWeight);
-    const packagingCount = parseInt(formData.packagingCount);
+    if (fieldErrors.length > 0 || packagingErrors.length > 0) return;
+
+    const packagings: PackagingDetail[] = formData.packagings.map(row => ({
+      packagingType: row.packagingType,
+      packagingWeight: parseFloat(row.packagingWeight),
+      packagingCount: parseInt(row.packagingCount),
+    }));
 
     const submitData: CromeRequest = {
       subcontractingId: subcontractingId,
       partyId: parseInt(formData.partyId, 10),
       cromeDate: formData.cromeDate,
-      sentStock: sentStock,
-      packagingType: formData.packagingType as PackagingType,
-      packagingWeight: packagingWeight,
-      packagingCount: packagingCount,
+      sentStock: parseFloat(formData.sentStock),
+      packagings,
       remark: formData.remark || null,
     };
 
@@ -278,6 +326,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={`form-input ${getFieldError('cromeDate') ? 'invalid' : ''}`}
+                title="Crome Date"
                 required
               />
               {getFieldError('cromeDate') && <span className="field-error-text">{getFieldError('cromeDate')}</span>}
@@ -303,52 +352,65 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
           </div>
 
           <div className="form-group">
-            <label className="form-label">Packaging:</label>
-            <div className="packaging-row">
-              <select
-                name="packagingType"
-                value={formData.packagingType}
-                onChange={handleChange}
-                className="form-input packaging-type"
-                required
-              >
-                <option value={PackagingType.BAG}>Bag</option>
-                <option value={PackagingType.FOAM}>Foam</option>
-                <option value={PackagingType.PETI}>Peti</option>
-                <option value={PackagingType.DRUM}>Drum</option>
-              </select>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <input
-                  type="number"
-                  name="packagingWeight"
-                  value={formData.packagingWeight}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Weight (KG)"
-                  className={`form-input packaging-weight ${getFieldError('packagingWeight') ? 'invalid' : ''}`}
-                  step="0.001"
-                  min="0"
-                  required
-                  disabled={formData.packagingType !== PackagingType.DRUM}
-                />
-                {getFieldError('packagingWeight') && <span className="field-error-text">{getFieldError('packagingWeight')}</span>}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <input
-                  type="number"
-                  name="packagingCount"
-                  value={formData.packagingCount}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Count"
-                  className={`form-input packaging-count ${getFieldError('packagingCount') ? 'invalid' : ''}`}
-                  step="1"
-                  min="1"
-                  required
-                />
-                {getFieldError('packagingCount') && <span className="field-error-text">{getFieldError('packagingCount')}</span>}
-              </div>
+            <div className="packaging-list-header">
+              <label className="form-label">Packaging:</label>
+              <button type="button" className="add-packaging-btn" onClick={addPackagingRow} title="Add packaging">
+                +
+              </button>
             </div>
+
+            {formData.packagings.map((row, index) => {
+              const rowError = touched[`packaging_${index}`] ? validatePackagingRow(row) : null;
+              return (
+                <div key={index} className="packaging-list-row">
+                  <div className="packaging-row">
+                    <select
+                      value={row.packagingType}
+                      onChange={(e) => handlePackagingTypeChange(index, e.target.value as PackagingType)}
+                      className="form-input packaging-type"
+                      title="Packaging type"
+                      required
+                    >
+                      <option value={PackagingType.BAG}>Bag</option>
+                      <option value={PackagingType.FOAM}>Foam</option>
+                      <option value={PackagingType.PETI}>Peti</option>
+                      <option value={PackagingType.DRUM}>Drum</option>
+                    </select>
+                    <input
+                      type="number"
+                      value={row.packagingWeight}
+                      onChange={(e) => handlePackagingChange(index, 'packagingWeight', e.target.value)}
+                      onBlur={() => setTouched(prev => ({ ...prev, [`packaging_${index}`]: true }))}
+                      placeholder="Weight (KG)"
+                      title="Packaging weight"
+                      className={`form-input packaging-weight ${rowError ? 'invalid' : ''}`}
+                      step="0.001"
+                      min="0"
+                      required
+                      disabled={row.packagingType !== PackagingType.DRUM}
+                    />
+                    <input
+                      type="number"
+                      value={row.packagingCount}
+                      onChange={(e) => handlePackagingChange(index, 'packagingCount', e.target.value)}
+                      onBlur={() => setTouched(prev => ({ ...prev, [`packaging_${index}`]: true }))}
+                      placeholder="Count"
+                      title="Packaging count"
+                      className={`form-input packaging-count ${rowError ? 'invalid' : ''}`}
+                      step="1"
+                      min="1"
+                      required
+                    />
+                    {formData.packagings.length > 1 && (
+                      <button type="button" className="remove-packaging-btn" onClick={() => removePackagingRow(index)} title="Remove packaging">
+                        -
+                      </button>
+                    )}
+                  </div>
+                  {rowError && <span className="field-error-text">{rowError}</span>}
+                </div>
+              );
+            })}
           </div>
 
           <div className="calculation-summary">
@@ -358,10 +420,16 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
             </div>
             <div className="calc-row">
               <span className="calc-label">Packaging Weight:</span>
-              <span className="calc-value">+ {((parseFloat(formData.packagingWeight) || 0) * (parseInt(formData.packagingCount) || 0)).toFixed(3)} {cromeInfo?.unit || 'KG'}</span>
+              <span className="calc-value">+ {getTotalPackagingWeightKg().toFixed(3)} {cromeInfo?.unit || 'KG'}</span>
             </div>
             <div className="calc-row calc-row-formula">
-              <span className="calc-formula">({formData.packagingCount || 0} x {formData.packagingWeight || 0} KG)</span>
+              <span className="calc-formula">
+                {formData.packagings.map((row) => {
+                  const c = row.packagingCount || '0';
+                  const w = row.packagingWeight || '0';
+                  return `${c} x ${w}`;
+                }).join(' + ')} KG
+              </span>
             </div>
             <div className="calc-row total-row">
               <span className="calc-label">Gross Weight:</span>
@@ -398,4 +466,3 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
 };
 
 export default CromeModal;
-

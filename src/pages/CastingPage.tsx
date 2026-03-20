@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
-import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import AddCastingEntryModal from '../components/AddCastingEntryModal';
@@ -145,6 +144,19 @@ const CastingPage: React.FC = () => {
     const totalLokhand = sellEntries.reduce((sum, entry) => sum + (entry.lokhand || 0), 0);
     const totalLokhandAmount = sellEntries.reduce((sum, entry) => sum + (entry.lokhandAmount || 0), 0);
 
+    // Filter entries based on search query (by date)
+    const filteredEntries = entries.filter(e => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return e.date.toLowerCase().includes(query);
+    });
+
+    const filteredSellEntries = sellEntries.filter(e => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return e.date.toLowerCase().includes(query);
+    });
+
     if (loading) {
         return <Loading message="Loading casting data..." />;
     }
@@ -224,10 +236,6 @@ const CastingPage: React.FC = () => {
                                 <span className="button-text">Download</span>
                                 <DownloadIcon />
                             </button>
-                            <button className="order-status-filter">
-                                <img src={FilterIcon} alt="Filter" />
-                                <span className="button-text">Filter</span>
-                            </button>
                         </div>
 
                         <div className="casting-table-container">
@@ -240,7 +248,7 @@ const CastingPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {entries.map((row) => (
+                                    {filteredEntries.map((row) => (
                                         <tr key={row.id}>
                                             <td>{row.date}</td>
                                             <td>{row.mell.toFixed(3)}</td>
@@ -265,7 +273,7 @@ const CastingPage: React.FC = () => {
                                             </td>
                                         </tr>
                                     ))}
-                                    {entries.length === 0 && (
+                                    {filteredEntries.length === 0 && (
                                         <tr>
                                             <td colSpan={3} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
                                                 No entries found
@@ -316,10 +324,6 @@ const CastingPage: React.FC = () => {
                                 <span className="button-text">Download</span>
                                 <DownloadIcon />
                             </button>
-                            <button className="order-status-filter">
-                                <img src={FilterIcon} alt="Filter" />
-                                <span className="button-text">Filter</span>
-                            </button>
                         </div>
 
                         <div className="casting-table-container">
@@ -338,7 +342,7 @@ const CastingPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {sellEntries.map((row) => (
+                                    {filteredSellEntries.map((row) => (
                                         <tr key={row.id}>
                                             <td>{row.date}</td>
                                             <td>{row.brass != null ? row.brass.toFixed(3) : ''}</td>
@@ -369,7 +373,7 @@ const CastingPage: React.FC = () => {
                                             </td>
                                         </tr>
                                     ))}
-                                    {sellEntries.length === 0 && (
+                                    {filteredSellEntries.length === 0 && (
                                         <tr>
                                             <td colSpan={9} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
                                                 No entries found

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Subcontracting, SubReturnRequest } from '../types';
+import type { Subcontracting, SubReturnRequest, PackagingDetail } from '../types';
 import { PackagingType, ReturnType } from '../types';
 import './ReturnRecordModal.css';
 
@@ -17,27 +17,35 @@ const PACKAGING_WEIGHTS: Record<PackagingType, number | null> = {
   [PackagingType.DRUM]: null, // Manual input
 };
 
+interface PackagingFormRow {
+  packagingType: PackagingType;
+  packagingCount: string;
+  drumWeight: string; // Weight per drum element as string (grams)
+}
+
 // Internal form state
 interface ReturnFormState {
   returnDate: string;
   returnStock: number; // Calculated total return
   grossReturn: string; // User input as string
-  returnElement: string; // Box/Bag count as string
-  packagingType: PackagingType;
+  packagings: PackagingFormRow[];
   returnType: ReturnType;
-  drumWeight: string; // Weight per drum element as string
   returnRemark: string;
 }
+
+const createDefaultPackaging = (): PackagingFormRow => ({
+  packagingType: PackagingType.DRUM,
+  packagingCount: '',
+  drumWeight: '',
+});
 
 const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onClose, onSubmit }) => {
   const [formData, setFormData] = useState<ReturnFormState>({
     returnDate: new Date().toISOString().split('T')[0],
     returnStock: 0,
     grossReturn: '',
-    returnElement: '',
-    packagingType: PackagingType.DRUM,
+    packagings: [createDefaultPackaging()],
     returnType: ReturnType.MAAL,
-    drumWeight: '',
     returnRemark: '',
   });
 
@@ -54,48 +62,35 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
     return isNaN(parsed) ? 0 : parsed;
   };
 
-  // Get packaging weight for current type (in grams)
-  const getPackagingWeight = (): number => {
-    if (formData.packagingType === PackagingType.DRUM) {
-      return parseNum(formData.drumWeight);
+  // Get packaging weight for a row (in grams)
+  const getRowPackagingWeight = (row: PackagingFormRow): number => {
+    if (row.packagingType === PackagingType.DRUM) {
+      return parseNum(row.drumWeight);
     }
-    return PACKAGING_WEIGHTS[formData.packagingType] || 0;
+    return PACKAGING_WEIGHTS[row.packagingType] || 0;
   };
 
-  // Calculate total return: grossReturn - (packagingWeight * returnElement)
-  const calculateTotalReturn = (
-    grossReturn: string | number,
-    returnElement: string | number,
-    packagingType: PackagingType,
-    drumWeight: string | number
-  ): number => {
+  // Calculate total packaging deduction in KG across all rows
+  const getTotalPackagingDeductionKg = (packagings: PackagingFormRow[]): number => {
+    return packagings.reduce((sum, row) => {
+      const weightGm = getRowPackagingWeight(row);
+      const count = parseNum(row.packagingCount);
+      return sum + (count * weightGm) / 1000;
+    }, 0);
+  };
+
+  // Calculate total return: grossReturn - totalPackagingDeduction
+  const calculateTotalReturn = (grossReturn: string | number, packagings: PackagingFormRow[]): number => {
     const gross = parseNum(grossReturn);
-    const element = parseNum(returnElement);
-
-    let packagingWeightGm: number;
-    if (packagingType === PackagingType.DRUM) {
-      packagingWeightGm = parseNum(drumWeight);
-    } else {
-      packagingWeightGm = PACKAGING_WEIGHTS[packagingType] || 0;
-    }
-
-    const packagingWeightKg = packagingWeightGm / 1000;
-    const deduction = element * packagingWeightKg;
-    const totalReturn = gross - deduction;
-
-    return Math.max(0, totalReturn);
+    const deduction = getTotalPackagingDeductionKg(packagings);
+    return Math.max(0, gross - deduction);
   };
 
   // Enhanced validation with all 5 business rule categories
   const validateField = (name: string, value: any, allData = formData): string | null => {
-    const grossReturnNum = parseNum(allData.grossReturn);
-    const returnElementNum = parseNum(allData.returnElement);
-    const drumWeightNum = parseNum(allData.drumWeight);
-
     switch (name) {
       case 'returnDate':
         if (!value) return 'Return Date is required';
-        // Date consistency: Return date >= Order date
         if (subcontract.orderDate && new Date(value) < new Date(subcontract.orderDate)) {
           return 'Return date cannot be before order date';
         }
@@ -105,64 +100,20 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
         const valueNum = parseNum(value);
         if (!value || valueNum <= 0) return 'Gross return must be > 0';
 
-        // Over-return prevention: Check NET return against remaining stock
         const sentStock = subcontract.sentStock || 0;
         const previousReturns = subcontract.subReturns || [];
-        // Calculate previous NET returns to find remaining stock
         const previouslyReturnedStock = previousReturns.reduce((sum, r) => {
-          const deduction = (r.packagingWeight || 0) * (r.packagingCount || 0);
-          return sum + (r.netReturnStock ?? (r.returnStock - deduction));
+          if (r.netReturnStock != null) return sum + r.netReturnStock;
+          const deduction = (r.packagings || []).reduce((d, p) => d + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
+          return sum + (r.returnStock - deduction);
         }, 0);
 
         const remainingStock = sentStock - previouslyReturnedStock;
-
-        // Calculate current deduction to find Net
-        const returnElementNum = parseNum(allData.returnElement);
-        const drumWeightNum = parseNum(allData.drumWeight);
-
-        let packagingWeightGm: number;
-        if (allData.packagingType === PackagingType.DRUM) {
-          packagingWeightGm = drumWeightNum;
-        } else {
-          packagingWeightGm = PACKAGING_WEIGHTS[allData.packagingType] || 0;
-        }
-
-        const currentDeduction = (returnElementNum * packagingWeightGm) / 1000;
+        const currentDeduction = getTotalPackagingDeductionKg(allData.packagings);
         const currentNetReturn = valueNum - currentDeduction;
 
-        // Add a small buffer for float precision
         if (currentNetReturn > remainingStock + 0.001) {
           return `Net return (${currentNetReturn.toFixed(3)}) cannot exceed remaining stock (${remainingStock.toFixed(3)} Kg)`;
-        }
-        return null;
-      }
-
-      case 'returnElement': {
-        const valueNum = parseNum(value);
-        if (valueNum < 0) return 'Element count must be >= 0';
-        // Weight integrity: Check if total packaging < gross
-        let packagingWeightGm: number;
-        if (allData.packagingType === PackagingType.DRUM) {
-          packagingWeightGm = drumWeightNum;
-        } else {
-          packagingWeightGm = PACKAGING_WEIGHTS[allData.packagingType] || 0;
-        }
-        const totalPackagingKg = (valueNum * packagingWeightGm) / 1000;
-        if (totalPackagingKg >= grossReturnNum && grossReturnNum > 0) {
-          return 'Total packaging weight cannot exceed gross return';
-        }
-        return null;
-      }
-
-      case 'drumWeight': {
-        const valueNum = parseNum(value);
-        if (allData.packagingType === PackagingType.DRUM && valueNum <= 0) {
-          return 'Drum weight is required';
-        }
-        // Weight integrity check
-        const totalPackagingKg = (returnElementNum * valueNum) / 1000;
-        if (totalPackagingKg >= grossReturnNum && grossReturnNum > 0) {
-          return 'Total packaging weight cannot exceed gross return';
         }
         return null;
       }
@@ -172,21 +123,50 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
     }
   };
 
+  // Validate a specific packaging row
+  const validatePackagingRow = (index: number, allData = formData): string | null => {
+    const row = allData.packagings[index];
+    if (!row) return null;
+
+    const count = parseNum(row.packagingCount);
+    if (count < 0) return 'Count must be >= 0';
+
+    if (row.packagingType === PackagingType.DRUM && parseNum(row.drumWeight) <= 0 && count > 0) {
+      return 'Drum weight is required';
+    }
+
+    // Weight integrity check across all packaging rows
+    const grossReturnNum = parseNum(allData.grossReturn);
+    const totalPackagingKg = getTotalPackagingDeductionKg(allData.packagings);
+    if (totalPackagingKg >= grossReturnNum && grossReturnNum > 0) {
+      return 'Total packaging weight cannot exceed gross return';
+    }
+
+    return null;
+  };
+
   const getFieldError = (name: string) => {
     if (!touched[name]) return null;
     return validateField(name, formData[name as keyof typeof formData]);
+  };
+
+  const getPackagingError = (index: number) => {
+    if (!touched[`packaging_${index}`]) return null;
+    return validatePackagingRow(index);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setTouched(prev => ({ ...prev, [e.target.name]: true }));
   };
 
+  const handlePackagingBlur = (index: number) => {
+    setTouched(prev => ({ ...prev, [`packaging_${index}`]: true }));
+  };
+
   // Handle numeric input (text with numeric-only validation)
   const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Allow digits, decimal point, and empty string
     const numericValue = value.replace(/[^0-9.]/g, '');
-    // Prevent multiple decimal points
     const parts = numericValue.split('.');
     const cleanValue = parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : numericValue;
 
@@ -195,14 +175,8 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
       [name]: cleanValue,
     };
 
-    // Recalculate return stock when relevant fields change
-    if (name === 'grossReturn' || name === 'returnElement' || name === 'drumWeight') {
-      updatedData.returnStock = calculateTotalReturn(
-        updatedData.grossReturn,
-        updatedData.returnElement,
-        updatedData.packagingType,
-        updatedData.drumWeight
-      );
+    if (name === 'grossReturn') {
+      updatedData.returnStock = calculateTotalReturn(cleanValue, updatedData.packagings);
     }
 
     setFormData(updatedData);
@@ -211,24 +185,59 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setWarnings([]);
+  };
+
+  // Packaging row handlers
+  const handlePackagingChange = (index: number, field: keyof PackagingFormRow, value: string) => {
+    const updatedPackagings = [...formData.packagings];
+    updatedPackagings[index] = { ...updatedPackagings[index], [field]: value };
 
     const updatedData = {
       ...formData,
-      [name]: value,
+      packagings: updatedPackagings,
+      returnStock: calculateTotalReturn(formData.grossReturn, updatedPackagings),
     };
-
-    // Recalculate return stock when packaging type changes
-    if (name === 'packagingType') {
-      updatedData.returnStock = calculateTotalReturn(
-        updatedData.grossReturn,
-        updatedData.returnElement,
-        value as PackagingType,
-        updatedData.drumWeight
-      );
-    }
 
     setFormData(updatedData);
     setWarnings([]);
+  };
+
+  const handlePackagingTypeChange = (index: number, value: PackagingType) => {
+    const updatedPackagings = [...formData.packagings];
+    updatedPackagings[index] = {
+      ...updatedPackagings[index],
+      packagingType: value,
+    };
+
+    const updatedData = {
+      ...formData,
+      packagings: updatedPackagings,
+      returnStock: calculateTotalReturn(formData.grossReturn, updatedPackagings),
+    };
+
+    setFormData(updatedData);
+    setWarnings([]);
+  };
+
+  const addPackagingRow = () => {
+    const updatedPackagings = [...formData.packagings, createDefaultPackaging()];
+    setFormData(prev => ({
+      ...prev,
+      packagings: updatedPackagings,
+      returnStock: calculateTotalReturn(prev.grossReturn, updatedPackagings),
+    }));
+  };
+
+  const removePackagingRow = (index: number) => {
+    if (formData.packagings.length <= 1) return;
+    const updatedPackagings = formData.packagings.filter((_, i) => i !== index);
+    setFormData(prev => ({
+      ...prev,
+      packagings: updatedPackagings,
+      returnStock: calculateTotalReturn(prev.grossReturn, updatedPackagings),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -236,19 +245,26 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
     setError(null);
     setWarnings([]);
 
-    // Workflow state protection
     if (subcontract.status === 'COMPLETED') {
       setError('Cannot add return to a completed order. Please reopen it first.');
       return;
     }
 
     // Mark all as touched
-    const allTouched = Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+    const allTouched: Record<string, boolean> = {};
+    Object.keys(formData).forEach(key => { allTouched[key] = true; });
+    formData.packagings.forEach((_, i) => { allTouched[`packaging_${i}`] = true; });
     setTouched(allTouched);
 
-    // Validate
-    const errors = Object.keys(formData).map(key => validateField(key, formData[key as keyof typeof formData])).filter(Boolean);
-    if (errors.length > 0) return;
+    // Validate fields
+    const fieldErrors = ['returnDate', 'grossReturn']
+      .map(key => validateField(key, formData[key as keyof typeof formData]))
+      .filter(Boolean);
+    const packagingErrors = formData.packagings
+      .map((_, i) => validatePackagingRow(i))
+      .filter(Boolean);
+
+    if (fieldErrors.length > 0 || packagingErrors.length > 0) return;
 
     if (formData.returnStock <= 0) {
       setError('Total return must be greater than 0');
@@ -257,13 +273,10 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
 
     // Check warnings
     const newWarnings: string[] = [];
-
-    // Future date warning
     if (new Date(formData.returnDate) > new Date()) {
       newWarnings.push('You are recording a return in the future.');
     }
 
-    // Balance check: Auto-suggest completion
     const grossReturnNum = parseNum(formData.grossReturn);
     const sentStock = subcontract.sentStock || 0;
     const previousReturns = subcontract.subReturns || [];
@@ -275,18 +288,22 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
 
     if (newWarnings.length > 0) {
       setWarnings(newWarnings);
-      // Don't block submission, just show warnings
     }
 
-    const packagingWeightGm = getPackagingWeight();
-    const packagingWeightKg = packagingWeightGm / 1000;
+    // Build packagings array for submission
+    const packagings: PackagingDetail[] = formData.packagings.map(row => {
+      const weightGm = getRowPackagingWeight(row);
+      return {
+        packagingType: row.packagingType,
+        packagingWeight: weightGm / 1000, // Convert grams to KG
+        packagingCount: parseNum(row.packagingCount),
+      };
+    });
 
     const submitData: SubReturnRequest = {
       returnDate: formData.returnDate,
       returnStock: parseNum(formData.grossReturn),
-      packagingType: formData.packagingType,
-      packagingWeight: packagingWeightKg,
-      packagingCount: parseNum(formData.returnElement),
+      packagings,
       returnRemark: formData.returnRemark || null,
     };
 
@@ -300,21 +317,29 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
     }
   };
 
-  // Get display text for packaging weight
-  const getPackagingWeightDisplay = (): string => {
-    if (formData.packagingType === PackagingType.DRUM) {
-      return formData.drumWeight ? `${formData.drumWeight} gm` : 'Enter weight';
+  // Get display text for a packaging row's weight
+  const getRowWeightDisplay = (row: PackagingFormRow): string => {
+    if (row.packagingType === PackagingType.DRUM) {
+      return row.drumWeight ? `${row.drumWeight} gm` : 'Enter weight';
     }
-    const weight = PACKAGING_WEIGHTS[formData.packagingType];
+    const weight = PACKAGING_WEIGHTS[row.packagingType];
     return weight !== null ? `${weight} gm` : '';
   };
 
   // Calculate deduction for display
   const getDeductionDisplay = (): string => {
-    const element = parseNum(formData.returnElement);
-    const packagingWeightGm = getPackagingWeight();
-    const deductionKg = (element * packagingWeightGm) / 1000;
-    return deductionKg.toFixed(3);
+    return getTotalPackagingDeductionKg(formData.packagings).toFixed(3);
+  };
+
+  // Get formula display for all packaging rows
+  const getFormulaDisplay = (): string => {
+    return formData.packagings
+      .map(row => {
+        const count = row.packagingCount || '0';
+        const weight = getRowPackagingWeight(row);
+        return `${count} x ${weight}gm`;
+      })
+      .join(' + ');
   };
 
   return (
@@ -340,47 +365,65 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
           </div>
 
           <div className="form-group">
-            <label className="form-label">Return Element (Count)</label>
-            <div className={`return-element-row ${formData.packagingType === PackagingType.DRUM ? 'has-weight' : 'no-weight'}`}>
-              <input
-                type="number"
-                name="returnElement"
-                value={formData.returnElement ?? ''}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="e.g. 10"
-                className={`form-input element-count ${getFieldError('returnElement') ? 'invalid' : ''}`}
-                step="1"
-                min="0"
-              />
-              <select
-                name="packagingType"
-                value={formData.packagingType}
-                onChange={handleChange}
-                className="form-input element-type"
-              >
-                <option value={PackagingType.BAG}>Bag (75 gm)</option>
-                <option value={PackagingType.FOAM}>Foam (150 gm)</option>
-                <option value={PackagingType.PETI}>Peti (1200 gm)</option>
-                <option value={PackagingType.DRUM}>Drum (Manual)</option>
-              </select>
-              {formData.packagingType === PackagingType.DRUM && (
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  name="drumWeight"
-                  value={formData.drumWeight}
-                  onChange={handleNumericInput}
-                  onBlur={handleBlur}
-                  placeholder="Weight in gm"
-                  className={`form-input element-weight ${getFieldError('drumWeight') ? 'invalid' : ''}`}
-                />
-              )}
+            <div className="packaging-list-header">
+              <label className="form-label">Packaging Details</label>
+              <button type="button" className="add-packaging-btn" onClick={addPackagingRow} title="Add packaging">
+                +
+              </button>
             </div>
-            {getFieldError('returnElement') && <span className="field-error-text">{getFieldError('returnElement')}</span>}
-            <span className="packaging-weight-hint">
-              Packaging weight: {getPackagingWeightDisplay()}
-            </span>
+
+            {formData.packagings.map((row, index) => (
+              <div key={index} className="packaging-list-row">
+                <div className={`return-element-row ${row.packagingType === PackagingType.DRUM ? 'has-weight' : 'no-weight'}`}>
+                  <input
+                    type="number"
+                    value={row.packagingCount}
+                    onChange={(e) => handlePackagingChange(index, 'packagingCount', e.target.value)}
+                    onBlur={() => handlePackagingBlur(index)}
+                    placeholder="Count"
+                    title="Packaging count"
+                    className="form-input element-count"
+                    step="1"
+                    min="0"
+                  />
+                  <select
+                    value={row.packagingType}
+                    onChange={(e) => handlePackagingTypeChange(index, e.target.value as PackagingType)}
+                    className="form-input element-type"
+                    title="Packaging type"
+                  >
+                    <option value={PackagingType.BAG}>Bag (75 gm)</option>
+                    <option value={PackagingType.FOAM}>Foam (150 gm)</option>
+                    <option value={PackagingType.PETI}>Peti (1200 gm)</option>
+                    <option value={PackagingType.DRUM}>Drum (Manual)</option>
+                  </select>
+                  {row.packagingType === PackagingType.DRUM && (
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={row.drumWeight}
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/[^0-9.]/g, '');
+                        const parts = v.split('.');
+                        handlePackagingChange(index, 'drumWeight', parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : v);
+                      }}
+                      onBlur={() => handlePackagingBlur(index)}
+                      placeholder="Weight in gm"
+                      className="form-input element-weight"
+                    />
+                  )}
+                  {formData.packagings.length > 1 && (
+                    <button type="button" className="remove-packaging-btn" onClick={() => removePackagingRow(index)} title="Remove packaging">
+                      -
+                    </button>
+                  )}
+                </div>
+                {getPackagingError(index) && <span className="field-error-text">{getPackagingError(index)}</span>}
+                <span className="packaging-weight-hint">
+                  {getRowWeightDisplay(row)}
+                </span>
+              </div>
+            ))}
           </div>
 
           <div className="form-group">
@@ -390,6 +433,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
               value={formData.returnType}
               onChange={handleChange}
               className="form-input"
+              title="Return type"
               required
             >
               <option value={ReturnType.MAAL}>Return Maal</option>
@@ -424,7 +468,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
               <span className="calc-value deduction">- {getDeductionDisplay()} Kg</span>
             </div>
             <div className="calc-row calc-row-formula">
-              <span className="calc-formula">({formData.returnElement || 0} pcs × {getPackagingWeight()} gm ÷ 1000)</span>
+              <span className="calc-formula">({getFormulaDisplay()}) / 1000</span>
             </div>
             <div className="calc-row total-row">
               <span className="calc-label">Total Return:</span>

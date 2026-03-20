@@ -150,14 +150,6 @@ export const forgingInwardApi = {
     delete: (id: number): Promise<void> =>
         promisify<void>(cb => generatedForgingInwardApi.deleteForgingInward(id, cb)),
 
-    // Download PDF report for forging inward
-    // Note: fromDate/toDate should be YYYY-MM-DD (native HTML date input format)
-    downloadPdf: (partyName?: string, fromDate?: string, toDate?: string): Promise<void> =>
-        downloadPdfBlob('/api/v1/forging-inward/pdf', 'forging-inward-report.pdf', {
-            ...(partyName ? { partyName } : {}),
-            ...(fromDate ? { fromDate } : {}),
-            ...(toDate ? { toDate } : {}),
-        }),
 };
 
 // Forging Outward API
@@ -189,10 +181,12 @@ export const forgingOutwardApi = {
     delete: (id: number): Promise<void> =>
         promisify<void>(cb => generatedForgingOutwardApi.deleteForgingOutward(id, cb)),
 
-    // Download PDF report for forging outward
-    // Note: fromDate/toDate should be YYYY-MM-DD (native HTML date input format)
+};
+
+// Merged Forging PDF Report - single endpoint for both inward and outward
+export const forgingReportApi = {
     downloadPdf: (partyName?: string, fromDate?: string, toDate?: string): Promise<void> =>
-        downloadPdfBlob('/api/v1/forging-outward/pdf', 'forging-outward-report.pdf', {
+        downloadPdfBlob('/api/v1/forgings/pdf', 'forging-report.pdf', {
             ...(partyName ? { partyName } : {}),
             ...(fromDate ? { fromDate } : {}),
             ...(toDate ? { toDate } : {}),

@@ -233,7 +233,7 @@ const ElectricPage: React.FC = () => {
                                     <th style={{ textAlign: 'center' }}>Date</th>
                                     <th style={{ textAlign: 'center' }}>Challan No.</th>
                                     <th style={{ textAlign: 'center' }}>Weight (Kg)</th>
-                                    <th style={{ textAlign: 'center' }}>Per Kg Wt</th>
+                                    <th style={{ textAlign: 'center' }}>Rate</th>
                                     <th style={{ textAlign: 'center' }}>Unit</th>
                                     <th style={{ textAlign: 'center' }}>Unit Rate (₹)</th>
                                     <th style={{ textAlign: 'center' }}>Unit Amt (₹)</th>
@@ -245,7 +245,7 @@ const ElectricPage: React.FC = () => {
                                 <>
                                     <th style={{ textAlign: 'center' }}>Date</th>
                                     <th style={{ textAlign: 'center' }}>Challan No.</th>
-                                    <th style={{ textAlign: 'center' }}>Rate (₹)</th>
+                                    <th style={{ textAlign: 'center' }}>Payment (₹)</th>
                                     <th style={{ textAlign: 'center' }}>Actions</th>
                                 </>
                             )}

@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './CastingPage.css';
 import '../components/AddProductModal.css';
 import SearchIcon from '../assets/search.svg';
-import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import AddForgingInwardModal from '../components/AddForgingInwardModal';
 import AddForgingOutwardModal from '../components/AddForgingOutwardModal';
-import { forgingInwardApi, forgingOutwardApi, forgingPartyApi } from '../api/forging';
+import { forgingInwardApi, forgingOutwardApi, forgingPartyApi, forgingReportApi } from '../api/forging';
 import type { ForgingInward, ForgingOutward, ForgingParty } from '../types';
 import Loading from '../components/Loading';
 
@@ -124,11 +123,7 @@ const ForgingPage: React.FC = () => {
             const fromDate = downloadFromDate || undefined;
             const toDate = downloadToDate || undefined;
             const partyName = downloadPartyName.trim() || undefined;
-            if (activeTab === 'inward') {
-                await forgingInwardApi.downloadPdf(partyName, fromDate, toDate);
-            } else {
-                await forgingOutwardApi.downloadPdf(partyName, fromDate, toDate);
-            }
+            await forgingReportApi.downloadPdf(partyName, fromDate, toDate);
             setIsDownloadPopupOpen(false);
         } catch (err: any) {
             console.error('Error downloading PDF:', err);
@@ -248,14 +243,10 @@ const ForgingPage: React.FC = () => {
                 <button
                     className="order-status-filter"
                     onClick={() => setIsDownloadPopupOpen(true)}
-                    title={`Download ${activeTab === 'inward' ? 'Inward' : 'Outward'} PDF Report`}
+                    title="Download Forging PDF Report"
                 >
                     <span className="button-text">Download</span>
                     <DownloadIcon />
-                </button>
-                <button className="order-status-filter">
-                    <span className="button-text">Filter</span>
-                    <img src={FilterIcon} alt="Filter" />
                 </button>
             </div>
 
@@ -380,7 +371,7 @@ const ForgingPage: React.FC = () => {
                 <div className="modal-overlay" onClick={() => setIsDownloadPopupOpen(false)}>
                     <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
                         <h2 className="modal-title">
-                            Download {activeTab === 'inward' ? 'Inward' : 'Outward'} PDF
+                            Download Forging PDF
                         </h2>
 
                         <p className="form-label" style={{ marginBottom: '1rem', fontWeight: 400 }}>
@@ -395,6 +386,7 @@ const ForgingPage: React.FC = () => {
                                     value={downloadPartyName}
                                     onChange={e => setDownloadPartyName(e.target.value)}
                                     disabled={downloadPartiesLoading}
+                                    title="Select party"
                                 >
                                     <option value="">
                                         {downloadPartiesLoading ? 'Loading parties...' : '— All Parties —'}
@@ -414,6 +406,7 @@ const ForgingPage: React.FC = () => {
                                     className="form-input"
                                     value={downloadFromDate}
                                     onChange={e => setDownloadFromDate(e.target.value)}
+                                    title="From date"
                                 />
                             </div>
 
@@ -424,6 +417,7 @@ const ForgingPage: React.FC = () => {
                                     className="form-input"
                                     value={downloadToDate}
                                     onChange={e => setDownloadToDate(e.target.value)}
+                                    title="To date"
                                 />
                             </div>
 

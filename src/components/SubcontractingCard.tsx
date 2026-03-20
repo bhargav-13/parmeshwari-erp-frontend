@@ -33,7 +33,9 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   // Calculate Total Net Return
   // Use backend totalNetReturnStock OR sum of netReturnStock from items OR calculate
   const totalNetReturn = subcontract.totalNetReturnStock ?? subReturns.reduce((sum, r) => {
-    return sum + (r.netReturnStock ?? (r.returnStock - ((r.packagingWeight || 0) * (r.packagingCount || 0))));
+    if (r.netReturnStock != null) return sum + r.netReturnStock;
+    const deduction = (r.packagings || []).reduce((d, p) => d + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
+    return sum + (r.returnStock - deduction);
   }, 0);
 
   // Round to 3 decimal places
@@ -213,8 +215,9 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 </div>
 
                 {isExpanded && subReturns.map((ret, index) => {
-                  const retDeduction = (ret.packagingWeight || 0) * (ret.packagingCount || 0);
+                  const retDeduction = (ret.packagings || []).reduce((d, p) => d + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
                   const retNet = ret.netReturnStock ?? (ret.returnStock - retDeduction);
+                  const pkgDisplay = (ret.packagings || []).map(p => `${p.packagingCount} ${p.packagingType}`).join(', ') || '-';
                   return (
                     <div key={index} className="return-item-summary" style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: index < subReturns.length - 1 ? '1px dashed #e2e8f0' : 'none' }}>
                       <div className="detail-row" style={{ marginBottom: '2px' }}>
@@ -222,7 +225,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                         <span className="detail-value" style={{ fontSize: '13px' }}>{ret.returnStock.toFixed(3)} {subcontract.unit} (Gr)</span>
                       </div>
                       <div className="detail-row">
-                        <span className="detail-label">Pkg: {ret.packagingCount || 0} x {ret.packagingWeight || 0}</span>
+                        <span className="detail-label">Pkg: {pkgDisplay}</span>
                         <span className="detail-value">Net: {retNet.toFixed(3)}</span>
                       </div>
                     </div>
