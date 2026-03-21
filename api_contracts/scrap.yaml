@@ -140,7 +140,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
     get:
@@ -897,11 +896,30 @@ components:
       type: object
       required:
         - withdrawAmount
+        - withdrawDate
       properties:
         withdrawAmount:
           type: number
           format: double
-          description: Amount withdrawn; pendingAmount = totalAmount - withdrawAmount
+          description: Amount withdrawn for this transaction
+        withdrawDate:
+          type: string
+          format: date
+          description: Date of this withdrawal transaction
+
+    JayeshScrapWithdrawal:
+      type: object
+      properties:
+        withdrawalId:
+          type: integer
+        withdrawAmount:
+          type: number
+          format: double
+          description: Amount withdrawn in this transaction
+        withdrawDate:
+          type: string
+          format: date
+          description: Date of this withdrawal transaction
 
     JayeshScrap:
       type: object
@@ -938,14 +956,15 @@ components:
           type: number
           format: double
           description: Calculated as netWeight * rate
-        withdrawAmount:
-          type: number
-          format: double
-          description: Amount withdrawn
+        withdrawals:
+          type: array
+          items:
+            $ref: '#/components/schemas/JayeshScrapWithdrawal'
+          description: List of all withdrawal transactions
         pendingAmount:
           type: number
           format: double
-          description: Calculated as totalAmount - withdrawAmount
+          description: Calculated as totalAmount - sum of all withdrawals
         createdAt:
           type: string
           format: date-time

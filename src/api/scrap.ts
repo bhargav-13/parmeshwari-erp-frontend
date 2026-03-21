@@ -64,6 +64,13 @@ export interface JayeshScrapRequest {
 
 export interface JayeshScrapWithdrawRequest {
     withdrawAmount: number;
+    withdrawDate: string;
+}
+
+export interface JayeshScrapWithdrawal {
+    withdrawalId: number;
+    withdrawAmount: number;
+    withdrawDate: string;
 }
 
 export interface JayeshScrap {
@@ -79,7 +86,7 @@ export interface JayeshScrap {
     netWeight: number;
     rate: number;
     totalAmount: number;
-    withdrawAmount: number;
+    withdrawals: JayeshScrapWithdrawal[];
     pendingAmount: number;
     createdAt: string;
     lastUpdatedAt: string;

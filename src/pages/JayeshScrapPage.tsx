@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest, type KevinScrapRequest } from '../api/scrap';
 import ScrapEntryModal from '../components/ScrapEntryModal';
+import WithdrawalHistoryModal from '../components/WithdrawalHistoryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
+import ViewIcon from '../assets/view.svg';
 import './JayeshScrapPage.css';
 
 interface JayeshScrapStats {
@@ -36,7 +38,9 @@ const JayeshScrapPage: React.FC = () => {
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
     const [withdrawScrap, setWithdrawScrap] = useState<JayeshScrap | null>(null);
     const [withdrawAmountInput, setWithdrawAmountInput] = useState('');
+    const [withdrawDateInput, setWithdrawDateInput] = useState('');
     const [isWithdrawing, setIsWithdrawing] = useState(false);
+    const [viewHistoryScrap, setViewHistoryScrap] = useState<JayeshScrap | null>(null);
 
     useEffect(() => {
         fetchScraps();
@@ -135,6 +139,7 @@ const JayeshScrapPage: React.FC = () => {
     const handleWithdrawOpen = (scrap: JayeshScrap) => {
         setWithdrawScrap(scrap);
         setWithdrawAmountInput('');
+        setWithdrawDateInput(new Date().toISOString().split('T')[0]);
         setIsWithdrawModalOpen(true);
     };
 
@@ -145,6 +150,10 @@ const JayeshScrapPage: React.FC = () => {
             alert('Please enter a valid withdrawal amount.');
             return;
         }
+        if (!withdrawDateInput) {
+            alert('Please select a withdrawal date.');
+            return;
+        }
         const pending = withdrawScrap.pendingAmount ?? withdrawScrap.totalAmount ?? (withdrawScrap.netWeight * withdrawScrap.rate);
         if (amount > pending) {
             alert('Withdrawal amount cannot exceed pending amount.');
@@ -152,7 +161,10 @@ const JayeshScrapPage: React.FC = () => {
         }
         try {
             setIsWithdrawing(true);
-            const updated = await jayeshScrapApi.withdrawScrap(withdrawScrap.scrapId, { withdrawAmount: amount });
+            const updated = await jayeshScrapApi.withdrawScrap(withdrawScrap.scrapId, {
+                withdrawAmount: amount,
+                withdrawDate: withdrawDateInput,
+            });
             setScraps(prev => prev.map(s => s.scrapId === updated.scrapId ? updated : s));
             setIsWithdrawModalOpen(false);
             setWithdrawScrap(null);
@@ -252,7 +264,7 @@ const JayeshScrapPage: React.FC = () => {
                                 <th>Withdrawn</th>
                                 <th>Pending</th>
                                 <th></th>
-                                <th>Actions</th>
+                                <th className="actions-header">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -268,22 +280,32 @@ const JayeshScrapPage: React.FC = () => {
                                     <td>{scrap.netWeight.toFixed(3)}kg</td>
                                     <td>₹{scrap.rate.toFixed(2)}</td>
                                     <td>₹{(scrap.totalAmount ?? scrap.netWeight * scrap.rate).toLocaleString('en-IN')}</td>
-                                    <td>₹{(scrap.withdrawAmount ?? 0).toLocaleString('en-IN')}</td>
+                                    <td>₹{((scrap.withdrawals ?? []).reduce((sum, w) => sum + w.withdrawAmount, 0)).toLocaleString('en-IN')}</td>
                                     <td>
                                         <span className={`pending-amount ${(scrap.pendingAmount ?? scrap.totalAmount ?? (scrap.netWeight * scrap.rate)) > 0 ? 'has-pending' : 'no-pending'}`}>
                                             ₹{(scrap.pendingAmount ?? scrap.totalAmount ?? (scrap.netWeight * scrap.rate)).toLocaleString('en-IN')}
                                         </span>
                                     </td>
                                     <td>
-                                        <button
-                                            type="button"
-                                            className="withdraw-button"
-                                            onClick={() => handleWithdrawOpen(scrap)}
-                                            title="Withdraw"
-                                            disabled={(scrap.pendingAmount ?? scrap.totalAmount ?? (scrap.netWeight * scrap.rate)) <= 0}
-                                        >
-                                            Withdraw
-                                        </button>
+                                        <div className="action-buttons">
+                                            <button
+                                                type="button"
+                                                className="view-history-btn"
+                                                onClick={() => setViewHistoryScrap(scrap)}
+                                                title="View Details"
+                                            >
+                                                <img src={ViewIcon} alt="View" className="icon-img" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="withdraw-button"
+                                                onClick={() => handleWithdrawOpen(scrap)}
+                                                title="Withdraw"
+                                                disabled={(scrap.pendingAmount ?? scrap.totalAmount ?? (scrap.netWeight * scrap.rate)) <= 0}
+                                            >
+                                                Withdraw
+                                            </button>
+                                        </div>
                                     </td>
                                     <td>
                                         <div className="action-buttons">
@@ -403,7 +425,7 @@ const JayeshScrapPage: React.FC = () => {
                             </div>
                             <div className="withdraw-info-row">
                                 <span className="withdraw-info-label">Already Withdrawn</span>
-                                <span className="withdraw-info-value">₹{(withdrawScrap.withdrawAmount ?? 0).toLocaleString('en-IN')}</span>
+                                <span className="withdraw-info-value">₹{((withdrawScrap.withdrawals ?? []).reduce((sum, w) => sum + w.withdrawAmount, 0)).toLocaleString('en-IN')}</span>
                             </div>
                             <div className="withdraw-info-row">
                                 <span className="withdraw-info-label">Pending Amount</span>
@@ -411,6 +433,15 @@ const JayeshScrapPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="modal-form">
+                            <div className="form-group">
+                                <label className="form-label">Withdrawal Date</label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={withdrawDateInput}
+                                    onChange={(e) => setWithdrawDateInput(e.target.value)}
+                                />
+                            </div>
                             <div className="form-group">
                                 <label className="form-label">Withdrawal Amount</label>
                                 <input
@@ -445,6 +476,12 @@ const JayeshScrapPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            )}
+            {viewHistoryScrap && (
+                <WithdrawalHistoryModal
+                    scrap={viewHistoryScrap}
+                    onClose={() => setViewHistoryScrap(null)}
+                />
             )}
         </div>
     );
