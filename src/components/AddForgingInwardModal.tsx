@@ -46,7 +46,6 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
     // Inward item state
     const [itemsOpen, setItemsOpen] = useState(false);
     const [item, setItem] = useState<ForgingInwardItem | null>(initialData?.item ?? null);
-    const [itemsLoading, setItemsLoading] = useState(false);
     const [newItemName, setNewItemName] = useState('');
     const [addingItem, setAddingItem] = useState(false);
     const [showAddItemRow, setShowAddItemRow] = useState(false);
@@ -384,11 +383,6 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                             }}
                         >
                             <div style={{ padding: '12px 14px' }}>
-                                {itemsLoading ? (
-                                    <div style={{ textAlign: 'center', padding: '12px', color: '#8E8E8E', fontSize: '13px' }}>
-                                        Loading items...
-                                    </div>
-                                ) : (
                                     <>
                                         {/* Current item */}
                                         {item ? (
@@ -480,7 +474,6 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                             </div>
                                         )}
                                     </>
-                                )}
                             </div>
                         </div>
                     </div>
