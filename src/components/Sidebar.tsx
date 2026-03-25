@@ -51,6 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const menuItems = [
     { path: '/dashboard', icon: <img src={DashboardSVG} alt='dashboard' />, label: 'Dashboard' },
+        { path: '/cashflow', icon: <img src={InvoiceIcon} alt='Cashflow' />, label: 'Cashflow' },
     { path: '/crm', icon: <img src={CRMSSVG} alt='CRM' />, label: 'CRM & Sales' },
     { path: '/party-master', icon: <img src={ProfileSVG} alt='Party Master' />, label: 'Party Master' },
     { path: '/electric', icon: <img src={SettingIcon} alt='Electric' />, label: 'Electric' },
@@ -115,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <div className="sidebar-divider"></div>
 
       <nav className="sidebar-nav">
-        {menuItems.slice(0, 7).map((item) => (
+        {menuItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}

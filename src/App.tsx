@@ -26,6 +26,7 @@ import ElectricPage from './pages/ElectricPage';
 import CastingPage from './pages/CastingPage';
 import ForgingPage from './pages/ForgingPage';
 import PurchasePage from './pages/PurchasePage';
+import CashflowPage from './pages/CashflowPage';
 import './App.css';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -78,6 +79,7 @@ function App() {
             <Route path="casting" element={<CastingPage />} />
             <Route path="forging" element={<ForgingPage />} />
             <Route path="purchase" element={<PurchasePage />} />
+            <Route path="cashflow" element={<CashflowPage />} />
             <Route path="settings" element={<div className="placeholder">Settings Coming Soon</div>} />
           </Route>
         </Routes>

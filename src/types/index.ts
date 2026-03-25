@@ -773,3 +773,54 @@ export interface PartyLedgerResponse {
   totalRemainingAmount: number;
   orders: PartyLedgerOrder[];
 }
+
+// Cashflow Types
+export interface CashflowParty {
+  id: number;
+  name: string;
+}
+
+export interface CashflowPaymentType {
+  id: number;
+  name: string;
+}
+
+export interface CashflowEntry {
+  id: number;
+  date: string;
+  amount: number;
+  party?: CashflowParty | null;
+  paymentType?: CashflowPaymentType | null;
+  note?: string;
+  carryForward?: boolean;
+}
+
+export interface CashflowEntryRequest {
+  date: string; // yyyy-MM-dd
+  amount: number;
+  partyId?: number;
+  paymentTypeId?: number;
+  note?: string;
+}
+
+export interface CashflowDailySummary {
+  date: string;
+  totalIncome: number;
+  totalExpense: number;
+  netBalance: number;
+  dayClosed: boolean;
+  carryForwardAmount: number;
+  carryForwardType: string | null; // 'INCOME' | 'EXPENSE' | null
+  incomes: CashflowEntry[];
+  expenses: CashflowEntry[];
+}
+
+export interface CashflowCloseDayResponse {
+  closedDate: string;
+  nextDate: string;
+  totalIncome: number;
+  totalExpense: number;
+  netBalance: number;
+  carryForwardAmount: number;
+  carryForwardType: string | null;
+}
