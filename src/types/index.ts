@@ -667,6 +667,52 @@ export interface ElectricCredit {
   rate: number;
 }
 
+// Purchase Types
+export const PurchaseInventoryType = {
+  RAW_MATERIAL: 'RAW_MATERIAL',
+  GROUND_FLOOR: 'GROUND_FLOOR',
+  FIRST_FLOOR: 'FIRST_FLOOR',
+} as const;
+
+export type PurchaseInventoryType = typeof PurchaseInventoryType[keyof typeof PurchaseInventoryType];
+
+export const InventoryExistStatus = {
+  CREATED: 'CREATED',
+  ALREADY_EXISTS: 'ALREADY_EXISTS',
+} as const;
+
+export type InventoryExistStatus = typeof InventoryExistStatus[keyof typeof InventoryExistStatus];
+
+export interface PurchaseRequest {
+  chNo: string;
+  partyId: number;
+  productId: number;
+  qty: number;
+  rate: number;
+  amountDeposited: number;
+  inventoryType: PurchaseInventoryType;
+  lowStockAlert: number;
+  categoryId?: number;
+  quantityInPc?: number;
+  weightPerPc?: number;
+  quantityUnit?: QuantityUnit;
+}
+
+export interface PurchaseResponse {
+  purchaseId: number;
+  chNo: string;
+  partyId: number;
+  product: Product;
+  qty: number;
+  rate: number;
+  total: number;
+  amountDeposited: number;
+  inventoryType: PurchaseInventoryType;
+  inventoryStatus: InventoryExistStatus;
+  rawInventory?: RawItem;
+  stockInventory?: StockItem;
+}
+
 // Legacy aliases kept for any other references
 export type ElectricOutwardEntry = ElectricOutward;
 export type ElectricCreditEntry = ElectricCredit;

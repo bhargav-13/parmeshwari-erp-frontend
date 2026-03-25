@@ -18,8 +18,122 @@ tags:
     description: Product Management and related Endpoints
   - name: Category
     description: Category Management and related Endpoints
+  - name: Purchase
+    description: Purchase Management and related Endpoints
 
 paths:
+  /api/v1/purchase:
+    post:
+      tags:
+        - Purchase
+      operationId: addPurchase
+      summary: Add Purchase
+      description: Adds a new Purchase. Automatically saves to raw inventory if item does not exist, or returns existing inventory details if it does.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseRequest'
+      responses:
+        '201':
+          description: Purchase successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseResponse'
+        '404':
+          description: Product or Party not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+    get:
+      tags:
+        - Purchase
+      operationId: getPurchaseList
+      summary: Get all purchases with pagination
+      description: Returns a paginated list of all purchases.
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/sizeParam'
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - $ref: '#/components/parameters/directionParam'
+      responses:
+        '200':
+          description: Paginated list of purchases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResultPurchase'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+  /api/v1/purchase/{purchaseId}:
+    get:
+      tags:
+        - Purchase
+      operationId: getPurchaseById
+      summary: Get purchase by ID
+      parameters:
+        - name: purchaseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Purchase found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseResponse'
+        '404':
+          description: Purchase not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
   /api/v1/product:
     post:
       tags:
@@ -1119,6 +1233,126 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RawItem'
+        empty:
+          type: boolean
+        last:
+          type: boolean
+        first:
+          type: boolean
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        size:
+          type: integer
+
+    InventoryExistStatus:
+      type: string
+      enum:
+        - CREATED
+        - ALREADY_EXISTS
+
+    PurchaseInventoryType:
+      type: string
+      enum:
+        - RAW_MATERIAL
+        - GROUND_FLOOR
+        - FIRST_FLOOR
+
+    PurchaseRequest:
+      type: object
+      required:
+        - chNo
+        - partyId
+        - productId
+        - qty
+        - rate
+        - amountDeposited
+        - inventoryType
+        - lowStockAlert
+      properties:
+        chNo:
+          type: string
+          description: Challan number
+        partyId:
+          type: integer
+          description: Party ID from party master
+        productId:
+          type: integer
+          description: Product ID from product master
+        qty:
+          type: number
+          format: double
+          description: Quantity in KG
+        rate:
+          type: number
+          format: double
+          description: Purchase rate per KG
+        amountDeposited:
+          type: number
+          format: double
+          description: Amount deposited / payment made
+        inventoryType:
+          $ref: '#/components/schemas/PurchaseInventoryType'
+        lowStockAlert:
+          type: number
+          format: double
+          description: Low stock alert threshold (required for all inventory types)
+        categoryId:
+          type: integer
+          description: Category ID - required when inventoryType is GROUND_FLOOR or FIRST_FLOOR
+        quantityInPc:
+          type: number
+          format: double
+          description: Quantity in pieces - required when inventoryType is GROUND_FLOOR or FIRST_FLOOR
+        weightPerPc:
+          type: number
+          format: double
+          description: Weight per piece in KG - required when inventoryType is GROUND_FLOOR or FIRST_FLOOR
+        quantityUnit:
+          $ref: '#/components/schemas/QuantityUnit'
+
+    PurchaseResponse:
+      type: object
+      properties:
+        purchaseId:
+          type: integer
+        chNo:
+          type: string
+        partyId:
+          type: integer
+        product:
+          $ref: '#/components/schemas/Product'
+        qty:
+          type: number
+          format: double
+        rate:
+          type: number
+          format: double
+        total:
+          type: number
+          format: double
+        amountDeposited:
+          type: number
+          format: double
+        inventoryType:
+          $ref: '#/components/schemas/PurchaseInventoryType'
+        inventoryStatus:
+          $ref: '#/components/schemas/InventoryExistStatus'
+        rawInventory:
+          $ref: '#/components/schemas/RawItem'
+          description: Present when inventoryType is RAW_MATERIAL
+        stockInventory:
+          $ref: '#/components/schemas/StockItem'
+          description: Present when inventoryType is GROUND_FLOOR or FIRST_FLOOR
+
+    PaginatedResultPurchase:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseResponse'
         empty:
           type: boolean
         last:
