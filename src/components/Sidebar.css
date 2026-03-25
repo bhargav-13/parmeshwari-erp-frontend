@@ -68,6 +68,38 @@
   flex-direction: column;
   gap: 8px;
   overflow-y: auto;
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+.sidebar-nav:hover {
+  scrollbar-color: rgba(23, 52, 77, 0.35) transparent;
+}
+
+/* Webkit — sidebar specific */
+.sidebar-nav::-webkit-scrollbar {
+  width: 3px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.3s ease;
+}
+
+.sidebar-nav:hover::-webkit-scrollbar-thumb {
+  background: rgba(23, 52, 77, 0.35);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(23, 52, 77, 0.6);
 }
 
 .sidebar-section {
@@ -109,18 +141,44 @@
 .sidebar-subsection {
   display: flex;
   flex-direction: column;
-  margin-left: 32px;
+  margin-left: 28px;
+  gap: 2px;
+  overflow: hidden;
+
+  /* Closed state */
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+
+  /* Transition */
+  transition:
+    max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease,
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    margin-top 0.28s ease;
+
+  border-left: 2px solid transparent;
+  padding-left: 8px;
+  margin-top: 0;
+}
+
+.sidebar-subsection.expanded {
+  max-height: 400px; /* generous cap — covers all sub-items */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  border-left-color: rgba(23, 52, 77, 0.25);
   margin-top: 4px;
-  gap: 4px;
 }
 
 .sidebar-subitem {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 7px 12px;
   border-radius: 6px;
   text-decoration: none;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.15s ease, padding-left 0.2s ease;
   cursor: pointer;
 }
 
@@ -130,6 +188,7 @@
 
 .sidebar-subitem:hover {
   background: rgba(255, 255, 255, 0.4);
+  padding-left: 16px;
 }
 
 .sidebar-sublabel {

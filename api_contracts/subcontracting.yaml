@@ -726,6 +726,48 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
+  /api/v1/subcontracting-return/{returnId}/available-crome:
+    get:
+      tags:
+        - Crome
+      operationId: getSubReturnCromeInfo
+      summary: Get available crome stock for a specific subcontracting return
+      description: |
+        Returns the available stock for crome from a specific SubcontractingReturn.
+        Includes net return stock, stock already sent to crome, and remaining available stock.
+      parameters:
+        - name: returnId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Available crome info for the subcontracting return
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubReturnCromeInfo'
+        '404':
+          description: SubcontractingReturn not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
   /api/v1/subcontracting/{subcontractingId}/cromes:
     get:
       tags:
@@ -1264,15 +1306,15 @@ components:
     CromeRequest:
       type: object
       required:
-        - subcontractingId
+        - subcontractingReturnId
         - partyId
         - cromeDate
         - sentStock
         - packagings
       properties:
-        subcontractingId:
+        subcontractingReturnId:
           type: integer
-          description: ID of the parent subcontracting order (auto-fetches contractor and item)
+          description: ID of the SubcontractingReturn this crome is for
         partyId:
           type: integer
           description: ID of the party to send the crome to
@@ -1288,6 +1330,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PackagingDetail'
+        cromeAmount:
+          type: number
+          format: double
+          nullable: true
+          description: Amount to be paid for the crome job
         remark:
           type: string
           nullable: true
@@ -1300,6 +1347,10 @@ components:
         subcontractingId:
           type: integer
           description: ID of the parent subcontracting order
+        subcontractingReturnId:
+          type: integer
+          nullable: true
+          description: ID of the linked SubcontractingReturn (if applicable)
         contractorName:
           type: string
           description: Name of the contractor (auto-fetched from subcontracting)
@@ -1328,6 +1379,11 @@ components:
             $ref: '#/components/schemas/PackagingDetail'
         status:
           $ref: '#/components/schemas/subcontractingStatus'
+        cromeAmount:
+          type: number
+          format: double
+          nullable: true
+          description: Amount to be paid for the crome job
         remark:
           type: string
           nullable: true
@@ -1444,6 +1500,25 @@ components:
           format: double
         status:
           $ref: '#/components/schemas/subcontractingStatus'
+    SubReturnCromeInfo:
+      type: object
+      description: Available crome stock info for a specific subcontracting return
+      properties:
+        returnId:
+          type: integer
+          description: ID of the subcontracting return
+        netReturnStock:
+          type: number
+          format: double
+          description: Net return stock for this return (after deducting packaging)
+        stockAlreadyInCrome:
+          type: number
+          format: double
+          description: Stock from this return already sent to crome
+        availableStockForCrome:
+          type: number
+          format: double
+          description: Available stock for new crome (netReturnStock - stockAlreadyInCrome)
     CromeReturnRequest:
       type: object
       required:

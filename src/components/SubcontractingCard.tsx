@@ -21,7 +21,7 @@ interface SubcontractingCardProps {
 const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, onDelete, onRefresh }) => {
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isCromeModalOpen, setIsCromeModalOpen] = useState(false);
+  const [cromeReturnId, setCromeReturnId] = useState<number | null>(null);
   const [status, setStatus] = useState(subcontract.status);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -185,9 +185,9 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <span className="detail-label">Total Pieces</span>
                 <span className="detail-value">{(subcontract.sentStock * 25).toLocaleString('en-IN')} Pc</span>
               </div>
-              <div className="detail-row total-row" style={{ marginTop: 'auto' }}>
+              <div className="detail-row total-row total-value-row">
                 <span className="detail-label">Total Value</span>
-                <div className="detail-value" style={{ textAlign: 'right' }}>
+                <div className="detail-value">
                   ₹{totalAmount.toLocaleString('en-IN')}
                   <span className="detail-sub-value">
                     (₹{subcontract.price}/unit + ₹{subcontract.jobWorkPay}/job)
@@ -203,14 +203,13 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                   className="block-header clickable-header"
                   onClick={() => setIsExpanded(!isExpanded)}
                   title="Click to expand/collapse return details"
-                  style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 >
                   <span>RETURN DETAILS ({subReturns.length})</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal', textTransform: 'uppercase' }}>
+                  <div className="expand-toggle">
+                    <span className="expand-label">
                       {isExpanded ? 'Collapse' : 'Expand'}
                     </span>
-                    <span style={{ fontSize: '10px', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
+                    <span className={`expand-chevron ${isExpanded ? 'expanded' : ''}`}>▼</span>
                   </div>
                 </div>
 
@@ -219,20 +218,30 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                   const retNet = ret.netReturnStock ?? (ret.returnStock - retDeduction);
                   const pkgDisplay = (ret.packagings || []).map(p => `${p.packagingCount} ${p.packagingType}`).join(', ') || '-';
                   return (
-                    <div key={index} className="return-item-summary" style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: index < subReturns.length - 1 ? '1px dashed #e2e8f0' : 'none' }}>
-                      <div className="detail-row" style={{ marginBottom: '2px' }}>
-                        <span className="detail-label" style={{ fontSize: '11px' }}>{formatDate(ret.returnDate)}</span>
-                        <span className="detail-value" style={{ fontSize: '13px' }}>{ret.returnStock.toFixed(3)} {subcontract.unit} (Gr)</span>
+                    <div key={index} className={`return-item-summary ${index < subReturns.length - 1 ? 'with-divider' : ''}`}>
+                      <div className="detail-row return-date-row">
+                        <span className="detail-label return-date-label">{formatDate(ret.returnDate)}</span>
+                        <span className="detail-value">{ret.returnStock.toFixed(3)} {subcontract.unit} (Gr)</span>
                       </div>
                       <div className="detail-row">
                         <span className="detail-label">Pkg: {pkgDisplay}</span>
                         <span className="detail-value">Net: {retNet.toFixed(3)}</span>
                       </div>
+                      <div className="return-crome-action">
+                        <button
+                          type="button"
+                          className="crome-button return-crome-btn"
+                          onClick={() => setCromeReturnId(ret.returnId!)}
+                          title="Send to Crome"
+                        >
+                          <span>Send to Crome</span>
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
 
-                <div className="detail-row total-row" style={{ paddingTop: '8px', borderTop: '1px solid #e2e8f0' }}>
+                <div className="detail-row total-row">
                   <span className="detail-label">Total Net Return</span>
                   <span className="detail-value">{totalNetReturnRounded.toFixed(3)} {subcontract.unit}</span>
                 </div>
@@ -244,18 +253,10 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 </div>
               </div>
             ) : (
-              <div className="crome-detail-block" style={{ justifyContent: 'center', alignItems: 'center', background: '#f8fafc', opacity: 0.6 }}>
-                <span style={{ color: '#94a3b8', fontSize: '13px', fontStyle: 'italic' }}>Pending Return</span>
+              <div className="crome-detail-block pending-block">
+                <span className="pending-text">Pending Return</span>
               </div>
             )}
-          </div>
-
-          {/* Crome Status Section */}
-          <div style={{ padding: '0 4px 12px 4px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', color: '#64748B' }}>
-              <span>Crome Available: <strong style={{ color: '#0F172A' }}>{subcontract.availableStockForCrome?.toFixed(3) || '0.000'} {subcontract.unit}</strong></span>
-              <span>Sent to Crome: <strong>{subcontract.cromeCount || 0}</strong></span>
-            </div>
           </div>
 
           <div className="processes-section">
@@ -287,15 +288,6 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 </button>
               )}
 
-              <button
-                type="button"
-                className="crome-button"
-                onClick={() => setIsCromeModalOpen(true)}
-                disabled={!subcontract.canCreateCrome}
-                title={subcontract.canCreateCrome ? 'Send to Crome' : 'No stock available for Crome'}
-              >
-                <span>Crome</span>
-              </button>
             </div>
           </div>
 
@@ -324,10 +316,11 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
         />
       )}
 
-      {isCromeModalOpen && (
+      {cromeReturnId !== null && (
         <CromeModal
           subcontractingId={subcontract.subcontractingId}
-          onClose={() => setIsCromeModalOpen(false)}
+          subcontractingReturnId={cromeReturnId}
+          onClose={() => setCromeReturnId(null)}
           onSuccess={onRefresh}
         />
       )}

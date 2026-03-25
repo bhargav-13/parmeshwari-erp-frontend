@@ -120,6 +120,12 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
             <p className="summary-label">GST</p>
             <p className="summary-value">{currency(order.gst)}</p>
           </div>
+          {(order.transport != null && order.transport > 0) && (
+            <div className="amount-card">
+              <p className="summary-label">Transport</p>
+              <p className="summary-value">{currency(order.transport)}</p>
+            </div>
+          )}
           <div className="amount-card highlight">
             <p className="summary-label">Grand Total</p>
             <p className="summary-value">{currency(order.grandTotal)}</p>

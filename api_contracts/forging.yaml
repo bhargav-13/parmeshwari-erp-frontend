@@ -15,6 +15,8 @@ tags:
     description: Forging Outward Management
   - name: ForgingReport
     description: Merged Forging PDF Report
+  - name: ForgingItem
+    description: Forging Inward Item Management (for TAIYAR MAAL type)
 
 paths:
   /api/v1/forging-inward:
@@ -70,6 +72,122 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedForgingInwardResponse'
+      security:
+        - oauth2: [ ]
+
+  /api/v1/forging-inward/{inwardId}/items:
+    post:
+      tags:
+        - ForgingItem
+      operationId: createForgingItem
+      summary: Add an item to a forging inward (for TAIYAR MAAL type)
+      parameters:
+        - name: inwardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgingItemRequest'
+      responses:
+        '201':
+          description: Forging item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgingItem'
+        '404':
+          description: Inward record not found
+      security:
+        - oauth2: [ ]
+    get:
+      tags:
+        - ForgingItem
+      operationId: getForgingItemsByInward
+      summary: Get the item for a given forging inward record
+      parameters:
+        - name: inwardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Forging item for this inward
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgingItem'
+        '404':
+          description: Inward record not found
+      security:
+        - oauth2: [ ]
+
+  /api/v1/forging-inward/{inwardId}/items/{itemId}:
+    put:
+      tags:
+        - ForgingItem
+      operationId: updateForgingItem
+      summary: Update a forging item
+      parameters:
+        - name: inwardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgingItemRequest'
+      responses:
+        '200':
+          description: Updated forging item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgingItem'
+        '404':
+          description: Item or inward not found
+      security:
+        - oauth2: [ ]
+    delete:
+      tags:
+        - ForgingItem
+      operationId: deleteForgingItem
+      summary: Delete a forging item
+      parameters:
+        - name: inwardId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Item not found
       security:
         - oauth2: [ ]
 
@@ -450,6 +568,8 @@ components:
           $ref: '#/components/schemas/InwardWeightUnit'
         image:
           type: string
+        item:
+          $ref: '#/components/schemas/ForgingItem'
 
     ForgingInwardRequest:
       type: object
@@ -489,6 +609,26 @@ components:
         weightUnit:
           $ref: '#/components/schemas/OutwardWeightUnit'
         image:
+          type: string
+
+    ForgingItemRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    ForgingItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        inwardId:
+          type: integer
+          format: int64
+        name:
           type: string
 
     ForgingOutwardRequest:

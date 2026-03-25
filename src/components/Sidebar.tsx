@@ -126,221 +126,151 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </Link>
         ))}
 
-        {/* Inventory Section with Subsections */}
+        {/* Inventory Section */}
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isInventoryActive ? 'active' : ''}`}
             onClick={() => setInventoryExpanded(!inventoryExpanded)}
           >
-            <span className="sidebar-icon">
-              <img src={InventorySVG} alt='Inventory' />
-            </span>
+            <span className="sidebar-icon"><img src={InventorySVG} alt='Inventory' /></span>
             <span className="sidebar-label">Inventory</span>
-            <span className={`expand-icon ${inventoryExpanded ? 'expanded' : ''}`}>
-              ▼
-            </span>
+            <span className={`expand-icon ${inventoryExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
-
-          {inventoryExpanded && (
-            <div className="sidebar-subsection">
-              {inventorySubItems.map((subItem) => (
-                <Link
-                  key={subItem.path}
-                  to={subItem.path}
-                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
-                  onClick={onClose}
-                >
-                  <span className="sidebar-sublabel">{subItem.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className={`sidebar-subsection ${inventoryExpanded ? 'expanded' : ''}`}>
+            {inventorySubItems.map((subItem) => (
+              <Link key={subItem.path} to={subItem.path}
+                className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                onClick={onClose}>
+                <span className="sidebar-sublabel">{subItem.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Item Master Section with Subsections */}
+        {/* Item Master Section */}
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isItemMasterActive ? 'active' : ''}`}
             onClick={() => setItemMasterExpanded(!itemMasterExpanded)}
           >
-            <span className="sidebar-icon">
-              <img src={InventorySVG} alt='Item Master' />
-            </span>
+            <span className="sidebar-icon"><img src={InventorySVG} alt='Item Master' /></span>
             <span className="sidebar-label">Item Master</span>
-            <span className={`expand-icon ${itemMasterExpanded ? 'expanded' : ''}`}>
-              ▼
-            </span>
+            <span className={`expand-icon ${itemMasterExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
-
-          {itemMasterExpanded && (
-            <div className="sidebar-subsection">
-              {itemMasterSubItems.map((subItem) => (
-                <Link
-                  key={subItem.path}
-                  to={subItem.path}
-                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
-                  onClick={onClose}
-                >
-                  <span className="sidebar-sublabel">{subItem.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className={`sidebar-subsection ${itemMasterExpanded ? 'expanded' : ''}`}>
+            {itemMasterSubItems.map((subItem) => (
+              <Link key={subItem.path} to={subItem.path}
+                className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                onClick={onClose}>
+                <span className="sidebar-sublabel">{subItem.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Order Management Section with Subsections */}
+        {/* Order Management Section */}
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isOrdersActive ? 'active' : ''}`}
             onClick={() => setOrdersExpanded(!ordersExpanded)}
           >
-            <span className="sidebar-icon">
-              <img src={OrderIcon} alt='Order Management' />
-            </span>
+            <span className="sidebar-icon"><img src={OrderIcon} alt='Order Management' /></span>
             <span className="sidebar-label">Order Management</span>
-            <span className={`expand-icon ${ordersExpanded ? 'expanded' : ''}`}>
-              ▼
-            </span>
+            <span className={`expand-icon ${ordersExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
-
-          {ordersExpanded && (
-            <div className="sidebar-subsection">
-              {ordersSubItems.map((subItem) => (
-                <Link
-                  key={subItem.path}
-                  to={subItem.path}
-                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
-                  onClick={onClose}
-                >
-                  <span className="sidebar-sublabel">{subItem.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className={`sidebar-subsection ${ordersExpanded ? 'expanded' : ''}`}>
+            {ordersSubItems.map((subItem) => (
+              <Link key={subItem.path} to={subItem.path}
+                className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                onClick={onClose}>
+                <span className="sidebar-sublabel">{subItem.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Subcontracting Section with Subsections */}
+        {/* Subcontracting Section */}
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isSubcontractingActive ? 'active' : ''}`}
             onClick={() => setSubcontractingExpanded(!subcontractingExpanded)}
           >
-            <span className="sidebar-icon">
-              <img src={SubcontractIcon} alt='Subcontracting' />
-            </span>
+            <span className="sidebar-icon"><img src={SubcontractIcon} alt='Subcontracting' /></span>
             <span className="sidebar-label">Subcontracting</span>
-            <span className={`expand-icon ${subcontractingExpanded ? 'expanded' : ''}`}>
-              ▼
-            </span>
+            <span className={`expand-icon ${subcontractingExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
-
-          {subcontractingExpanded && (
-            <div className="sidebar-subsection">
-              {subcontractingSubItems.map((subItem) => (
-                <Link
-                  key={subItem.path}
-                  to={subItem.path}
-                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
-                  onClick={onClose}
-                >
-                  <span className="sidebar-sublabel">{subItem.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className={`sidebar-subsection ${subcontractingExpanded ? 'expanded' : ''}`}>
+            {subcontractingSubItems.map((subItem) => (
+              <Link key={subItem.path} to={subItem.path}
+                className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                onClick={onClose}>
+                <span className="sidebar-sublabel">{subItem.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Invoices Section with Subsections */}
+        {/* Invoices Section */}
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isInvoicesActive ? 'active' : ''}`}
             onClick={() => setInvoicesExpanded(!invoicesExpanded)}
           >
-            <span className="sidebar-icon">
-              <img src={InvoiceIcon} alt='Invoices' />
-            </span>
+            <span className="sidebar-icon"><img src={InvoiceIcon} alt='Invoices' /></span>
             <span className="sidebar-label">Invoices</span>
-            <span className={`expand-icon ${invoicesExpanded ? 'expanded' : ''}`}>
-              ▼
-            </span>
+            <span className={`expand-icon ${invoicesExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
-
-          {invoicesExpanded && (
-            <div className="sidebar-subsection">
-              {invoicesSubItems.map((subItem) => (
-                <Link
-                  key={subItem.path}
-                  to={subItem.path}
-                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
-                  onClick={onClose}
-                >
-                  <span className="sidebar-sublabel">{subItem.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className={`sidebar-subsection ${invoicesExpanded ? 'expanded' : ''}`}>
+            {invoicesSubItems.map((subItem) => (
+              <Link key={subItem.path} to={subItem.path}
+                className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                onClick={onClose}>
+                <span className="sidebar-sublabel">{subItem.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Payment Reminder Section with Subsections */}
+        {/* Payment Reminder Section */}
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isPaymentReminderActive ? 'active' : ''}`}
             onClick={() => setPaymentReminderExpanded(!paymentReminderExpanded)}
           >
-            <span className="sidebar-icon">
-              <img src={ReminderIcon} alt='Payment Reminder' />
-            </span>
+            <span className="sidebar-icon"><img src={ReminderIcon} alt='Payment Reminder' /></span>
             <span className="sidebar-label">Payment Reminder</span>
-            <span className={`expand-icon ${paymentReminderExpanded ? 'expanded' : ''}`}>
-              ▼
-            </span>
+            <span className={`expand-icon ${paymentReminderExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
-
-          {paymentReminderExpanded && (
-            <div className="sidebar-subsection">
-              {paymentReminderSubItems.map((subItem) => (
-                <Link
-                  key={subItem.path}
-                  to={subItem.path}
-                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
-                  onClick={onClose}
-                >
-                  <span className="sidebar-sublabel">{subItem.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className={`sidebar-subsection ${paymentReminderExpanded ? 'expanded' : ''}`}>
+            {paymentReminderSubItems.map((subItem) => (
+              <Link key={subItem.path} to={subItem.path}
+                className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                onClick={onClose}>
+                <span className="sidebar-sublabel">{subItem.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Scrap Section with Subsections */}
+        {/* Scrap Section */}
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isScrapActive ? 'active' : ''}`}
             onClick={() => setScrapExpanded(!scrapExpanded)}
           >
-            <span className="sidebar-icon">
-              <img src={SettingIcon} alt='Scrap' />
-            </span>
+            <span className="sidebar-icon"><img src={SettingIcon} alt='Scrap' /></span>
             <span className="sidebar-label">Scrap</span>
-            <span className={`expand-icon ${scrapExpanded ? 'expanded' : ''}`}>
-              ▼
-            </span>
+            <span className={`expand-icon ${scrapExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
-
-          {scrapExpanded && (
-            <div className="sidebar-subsection">
-              {scrapSubItems.map((subItem) => (
-                <Link
-                  key={subItem.path}
-                  to={subItem.path}
-                  className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
-                  onClick={onClose}
-                >
-                  <span className="sidebar-sublabel">{subItem.label}</span>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className={`sidebar-subsection ${scrapExpanded ? 'expanded' : ''}`}>
+            {scrapSubItems.map((subItem) => (
+              <Link key={subItem.path} to={subItem.path}
+                className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                onClick={onClose}>
+                <span className="sidebar-sublabel">{subItem.label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Settings */}
@@ -349,9 +279,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           className={`sidebar-item ${location.pathname === '/settings' ? 'active' : ''}`}
           onClick={onClose}
         >
-          <span className="sidebar-icon">
-            <img src={SettingIcon} alt='Setting' />
-          </span>
+          <span className="sidebar-icon"><img src={SettingIcon} alt='Setting' /></span>
           <span className="sidebar-label">Setting</span>
         </Link>
       </nav>

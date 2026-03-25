@@ -5,6 +5,7 @@ import type {
   CromeReturnRequest,
   Crome,
   SubcontractingCromeInfo,
+  SubReturnCromeInfo,
   PaginatedResult,
 } from '../types';
 import { SubcontractingStatus } from '../types';
@@ -26,6 +27,14 @@ export const cromeApi = {
   getSubcontractingCromeInfo: async (subcontractingId: number): Promise<SubcontractingCromeInfo> => {
     const response = await apiClient.get<SubcontractingCromeInfo>(
       `/api/v1/subcontracting/${subcontractingId}/crome-info`
+    );
+    return response.data;
+  },
+
+  // Get available crome stock for a specific subcontracting return
+  getSubReturnCromeInfo: async (returnId: number): Promise<SubReturnCromeInfo> => {
+    const response = await apiClient.get<SubReturnCromeInfo>(
+      `/api/v1/subcontracting-return/${returnId}/available-crome`
     );
     return response.data;
   },

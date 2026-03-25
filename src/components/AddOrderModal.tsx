@@ -42,6 +42,7 @@ const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloo
       offlineTotal: 0,
       officialBillAmount: 0,
       gst: 0,
+      transport: 0,
       grandTotal: 0,
       productsTotal: 0,
       products: [createEmptyProduct()],
@@ -71,7 +72,8 @@ const recalculateTotals = (data: OrderRequest): OrderRequest => {
   const officialBillAmount = (onlinePercent / 100) * productsTotal;
   const offlineTotal = Math.max(productsTotal - officialBillAmount, 0);
   const gst = officialBillAmount * 0.18;
-  const grandTotal = offlineTotal + officialBillAmount + gst;
+  const transport = Number(data.transport) || 0;
+  const grandTotal = offlineTotal + officialBillAmount + gst + transport;
 
   return {
     ...data,
@@ -79,6 +81,7 @@ const recalculateTotals = (data: OrderRequest): OrderRequest => {
     offlineTotal: Number(offlineTotal.toFixed(2)),
     officialBillAmount: Number(officialBillAmount.toFixed(2)),
     gst: Number(gst.toFixed(2)),
+    transport,
     grandTotal: Number(grandTotal.toFixed(2)),
     totalItems: data.products.length,
   };
@@ -656,6 +659,17 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                   <div className="order-form-group">
                     <label>GST*</label>
                     <input type="text" value={formatCurrency(formData.gst)} readOnly />
+                  </div>
+                  <div className="order-form-group">
+                    <label>Transport</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.transport ?? ''}
+                      onChange={(e) => handleFieldChange('transport', Number(e.target.value))}
+                      placeholder="0"
+                    />
                   </div>
                   <div className="order-form-group">
                     <label>Grand Total*</label>

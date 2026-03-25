@@ -94,6 +94,7 @@
   gap: 16px;
   padding: 16px 28px;
   border-bottom: 1px solid rgba(23, 52, 77, 0.08);
+  flex-wrap: wrap;
 }
 
 .ledger-date-group {
@@ -188,6 +189,58 @@
 .ledger-apply-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Full Due Payment Buttons */
+.ledger-full-pay-actions {
+  display: flex;
+  gap: 8px;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.ledger-full-pay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: none;
+  border-radius: 20px;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.ledger-full-pay-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.ledger-full-pay-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ledger-full-pay-btn--official {
+  background: rgba(39, 174, 96, 0.12);
+  color: #1a8c49;
+  border: 1px solid rgba(39, 174, 96, 0.25);
+}
+
+.ledger-full-pay-btn--official:not(:disabled):hover {
+  background: rgba(39, 174, 96, 0.2);
+}
+
+.ledger-full-pay-btn--offline {
+  background: rgba(230, 126, 34, 0.12);
+  color: #b85c0a;
+  border: 1px solid rgba(230, 126, 34, 0.25);
+}
+
+.ledger-full-pay-btn--offline:not(:disabled):hover {
+  background: rgba(230, 126, 34, 0.2);
 }
 
 /* Spinner */

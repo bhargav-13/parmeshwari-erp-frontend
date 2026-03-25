@@ -40,12 +40,9 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
   const [expandedPartyId, setExpandedPartyId] = useState<number | null>(null);
   const [detailLedger, setDetailLedger] = useState<PartyLedgerResponse | null>(null);
 
-  // Default date range: last 1 year
-  const today = new Date();
-  const oneYearAgo = new Date(today);
-  oneYearAgo.setFullYear(today.getFullYear() - 1);
-  const startDate = oneYearAgo.toISOString().split('T')[0];
-  const endDate = today.toISOString().split('T')[0];
+  // Date range: all payments (past and future)
+  const startDate = '2020-01-01';
+  const endDate = '2099-12-31';
 
   const fetchData = useCallback(async () => {
     try {
@@ -290,6 +287,9 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
           ledger={detailLedger}
           floor={floor}
           onClose={() => setDetailLedger(null)}
+          onFullPaymentSuccess={() => {
+            fetchData();
+          }}
         />
       )}
     </div>

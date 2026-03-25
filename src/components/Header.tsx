@@ -42,14 +42,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <img src={DropdownIcon} alt="Dropdown" className={`dropdown-icon ${isDropdownOpen ? 'open' : ''}`} />
         </div>
 
-        {isDropdownOpen && (
-          <div className="dropdown-menu">
-            <button type="button" className="dropdown-item" onClick={handleLogout}>
-              <img src={LogoutIcon} alt="Logout" className="dropdown-item-icon" />
-              <span className="dropdown-item-text">Logout</span>
-            </button>
-          </div>
-        )}
+        <div className={`dropdown-menu${isDropdownOpen ? ' open' : ''}`}>
+          <button type="button" className="dropdown-item" onClick={handleLogout}>
+            <img src={LogoutIcon} alt="Logout" className="dropdown-item-icon" />
+            <span className="dropdown-item-text">Logout</span>
+          </button>
+        </div>
       </div>
     </div>
   );

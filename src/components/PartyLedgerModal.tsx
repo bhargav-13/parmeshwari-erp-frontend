@@ -9,6 +9,7 @@ interface PartyLedgerModalProps {
   ledger: PartyLedgerResponse;
   floor?: PaymentFloor;
   onClose: () => void;
+  onFullPaymentSuccess?: () => void;
 }
 
 const formatDate = (value?: string | null) => {
@@ -25,54 +26,53 @@ const currency = (value?: number | null) => {
   return `₹ ${value.toLocaleString('en-IN')}`;
 };
 
-const getDefaultDates = () => {
-  const today = new Date();
-  const oneYearAgo = new Date(today);
-  oneYearAgo.setFullYear(today.getFullYear() - 1);
-  return {
-    start: oneYearAgo.toISOString().split('T')[0],
-    end: today.toISOString().split('T')[0],
-  };
-};
+const getDefaultDates = () => ({
+  start: '2020-01-01',
+  end: '2099-12-31',
+});
 
-const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedger, floor, onClose }) => {
+const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedger, floor, onClose, onFullPaymentSuccess }) => {
   const defaults = getDefaultDates();
-  const [startDate, setStartDate] = useState(defaults.start);
-  const [endDate, setEndDate] = useState(defaults.end);
   const [ledger, setLedger] = useState<PartyLedgerResponse>(initialLedger);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
-
-  // Record payment state
-  const [recordingPayment, setRecordingPayment] = useState<Payment | null>(null);
   const [paymentFetchError, setPaymentFetchError] = useState<string | null>(null);
+
+  // Payment modal state
+  const [recordingPayment, setRecordingPayment] = useState<Payment | null>(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
 
-  const fetchLedger = useCallback(async (start: string, end: string) => {
+  const refreshLedger = useCallback(async (start?: string, end?: string) => {
     try {
       setFetching(true);
       setFetchError(null);
-      const result = await paymentApi.getPartyLedger(initialLedger.partyId, start, end);
+      const result = await paymentApi.getPartyLedger(
+        initialLedger.partyId,
+        start || defaults.start,
+        end || defaults.end,
+      );
       setLedger(result);
     } catch (err) {
       console.error('Failed to fetch ledger', err);
-      setFetchError('Failed to load ledger data for the selected dates.');
+      setFetchError('Failed to load ledger data.');
     } finally {
       setFetching(false);
     }
-  }, [initialLedger.partyId]);
+  }, [initialLedger.partyId, defaults.start, defaults.end]);
 
   const handleApplyFilter = () => {
-    fetchLedger(startDate, endDate);
+    refreshLedger(startDate || undefined, endDate || undefined);
   };
 
   const handleDownloadPdf = async () => {
     try {
       setDownloading(true);
       setDownloadError(null);
-      const blob = await paymentApi.getPartyLedgerPdf(ledger.partyId, startDate, endDate);
+      const blob = await paymentApi.getPartyLedgerPdf(ledger.partyId, defaults.start, defaults.end);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -89,18 +89,30 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
     }
   };
 
-  const handleRecordPayment = async (orderId: number, mode: BillingType) => {
+  // Open PaymentReceivedModal for the first order with due in the given mode
+  const handlePayFullDue = async (mode: BillingType) => {
     if (!floor) return;
     setPaymentFetchError(null);
     setPaymentLoading(true);
 
+    // Find first order with due > 0 for this mode
+    const dueOrder = ledger.orders.find((o) => {
+      const side = mode === BillingType.OFFICIAL ? o.paymentSummary?.official : o.paymentSummary?.offline;
+      return (side?.dueAmount ?? 0) > 0;
+    });
+
+    if (!dueOrder) {
+      setPaymentLoading(false);
+      return;
+    }
+
     try {
-      const payment = await paymentApi.getPaymentByOrderAndMode(orderId, mode);
+      const payment = await paymentApi.getPaymentByOrderAndMode(dueOrder.orderId, mode);
       setRecordingPayment(payment);
     } catch (err: any) {
       if (err?.status === 404) {
         setPaymentFetchError(
-          `No ${mode.toLowerCase()} payment record found for Order #${orderId}. It may have already been settled.`
+          `No ${mode.toLowerCase()} payment record found for Order #${dueOrder.orderId}. It may have already been settled.`
         );
       } else {
         setPaymentFetchError('Failed to fetch payment details. Please try again.');
@@ -112,9 +124,13 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
 
   const handlePaymentSuccess = async () => {
     setRecordingPayment(null);
-    // Refresh ledger to show updated amounts
-    await fetchLedger(startDate, endDate);
+    await refreshLedger();
+    if (onFullPaymentSuccess) onFullPaymentSuccess();
   };
+
+  // Compute total dues
+  const totalOfficialDue = ledger.orders.reduce((sum, o) => sum + (o.paymentSummary?.official?.dueAmount ?? 0), 0);
+  const totalOfflineDue = ledger.orders.reduce((sum, o) => sum + (o.paymentSummary?.offline?.dueAmount ?? 0), 0);
 
   const anyError = fetchError || downloadError || paymentFetchError;
 
@@ -150,7 +166,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
             </div>
           </div>
 
-          {/* Date filter bar */}
+          {/* Date filter + Payment actions */}
           <div className="ledger-filters">
             <div className="ledger-date-group">
               <label htmlFor="ledger-start-date">Start Date</label>
@@ -158,7 +174,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
                 id="ledger-start-date"
                 type="date"
                 value={startDate}
-                max={endDate}
+                max={endDate || undefined}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
@@ -168,8 +184,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
                 id="ledger-end-date"
                 type="date"
                 value={endDate}
-                min={startDate}
-                max={new Date().toISOString().split('T')[0]}
+                min={startDate || undefined}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
@@ -189,6 +204,49 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
               )}
               {fetching ? 'Loading...' : 'Apply'}
             </button>
+
+            {floor && (
+              <div className="ledger-full-pay-actions">
+                {totalOfficialDue > 0 && (
+                  <button
+                    type="button"
+                    className="ledger-full-pay-btn ledger-full-pay-btn--official"
+                    disabled={paymentLoading || fetching}
+                    onClick={() => handlePayFullDue(BillingType.OFFICIAL)}
+                  >
+                    {paymentLoading ? (
+                      <span className="ledger-spinner ledger-spinner--dark" />
+                    ) : (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                      </svg>
+                    )}
+                    Official Due: {currency(totalOfficialDue)}
+                  </button>
+                )}
+                {totalOfflineDue > 0 && (
+                  <button
+                    type="button"
+                    className="ledger-full-pay-btn ledger-full-pay-btn--offline"
+                    disabled={paymentLoading || fetching}
+                    onClick={() => handlePayFullDue(BillingType.OFFLINE)}
+                  >
+                    {paymentLoading ? (
+                      <span className="ledger-spinner ledger-spinner--dark" />
+                    ) : (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                      </svg>
+                    )}
+                    Offline Due: {currency(totalOfflineDue)}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {anyError && (
@@ -242,52 +300,6 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
                           <span className="ledger-order-customer">{ledger.partyName}</span>
                           <span className="ledger-order-date">{formatDate(order.orderDate)}</span>
                         </div>
-
-                        {/* Record Payment buttons — only if floor is known and due > 0 */}
-                        {floor && (officialDue > 0 || offlineDue > 0) && (
-                          <div className="ledger-payment-actions">
-                            {officialDue > 0 && (
-                              <button
-                                type="button"
-                                className="ledger-record-btn ledger-record-btn--official"
-                                disabled={paymentLoading}
-                                onClick={() => handleRecordPayment(order.orderId, BillingType.OFFICIAL)}
-                                title={`Record official payment (Due: ${currency(officialDue)})`}
-                              >
-                                {paymentLoading ? (
-                                  <span className="ledger-spinner ledger-spinner--dark" />
-                                ) : (
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <line x1="12" y1="8" x2="12" y2="16" />
-                                    <line x1="8" y1="12" x2="16" y2="12" />
-                                  </svg>
-                                )}
-                                Official Due: {currency(officialDue)}
-                              </button>
-                            )}
-                            {offlineDue > 0 && (
-                              <button
-                                type="button"
-                                className="ledger-record-btn ledger-record-btn--offline"
-                                disabled={paymentLoading}
-                                onClick={() => handleRecordPayment(order.orderId, BillingType.OFFLINE)}
-                                title={`Record offline payment (Due: ${currency(offlineDue)})`}
-                              >
-                                {paymentLoading ? (
-                                  <span className="ledger-spinner ledger-spinner--dark" />
-                                ) : (
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <line x1="12" y1="8" x2="12" y2="16" />
-                                    <line x1="8" y1="12" x2="16" y2="12" />
-                                  </svg>
-                                )}
-                                Offline Due: {currency(offlineDue)}
-                              </button>
-                            )}
-                          </div>
-                        )}
                       </div>
 
                       {/* Products table */}
@@ -406,7 +418,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
         </div>
       </div>
 
-      {/* Record Payment modal — renders above ledger overlay */}
+      {/* Record Payment modal */}
       {recordingPayment && (
         <PaymentReceivedModal
           payment={recordingPayment}

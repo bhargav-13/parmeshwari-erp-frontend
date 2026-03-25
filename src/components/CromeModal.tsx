@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Party, CromeRequest, SubcontractingCromeInfo, PackagingDetail } from '../types';
+import type { Party, CromeRequest, SubcontractingCromeInfo, SubReturnCromeInfo, PackagingDetail } from '../types';
 import { PackagingType } from '../types';
 import { cromeApi } from '../api/crome';
 import './AddSubcontractingModal.css';
@@ -21,6 +21,7 @@ interface PackagingFormRow {
 
 interface CromeModalProps {
   subcontractingId: number;
+  subcontractingReturnId: number;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -31,20 +32,23 @@ const createDefaultPackaging = (): PackagingFormRow => ({
   packagingCount: '',
 });
 
-const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSuccess }) => {
+const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractingReturnId, onClose, onSuccess }) => {
   const [parties, setParties] = useState<Party[]>([]);
   const [cromeInfo, setCromeInfo] = useState<SubcontractingCromeInfo | null>(null);
+  const [returnCromeInfo, setReturnCromeInfo] = useState<SubReturnCromeInfo | null>(null);
   const [formData, setFormData] = useState<{
     partyId: string;
     cromeDate: string;
     sentStock: string;
     packagings: PackagingFormRow[];
+    cromeAmount: string;
     remark: string;
   }>({
     partyId: '',
     cromeDate: new Date().toISOString().split('T')[0],
     sentStock: '',
     packagings: [createDefaultPackaging()],
+    cromeAmount: '',
     remark: '',
   });
 
@@ -60,16 +64,18 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
     const fetchData = async () => {
       try {
         setLoadingData(true);
-        const [partiesData, infoData] = await Promise.all([
+        const [partiesData, infoData, returnInfo] = await Promise.all([
           cromeApi.getPartyList(),
           cromeApi.getSubcontractingCromeInfo(subcontractingId),
+          cromeApi.getSubReturnCromeInfo(subcontractingReturnId),
         ]);
         setParties(partiesData);
         setCromeInfo(infoData);
+        setReturnCromeInfo(returnInfo);
 
         setFormData(prev => ({
           ...prev,
-          sentStock: (infoData.availableStockForCrome || 0).toString(),
+          sentStock: (returnInfo.availableStockForCrome || 0).toString(),
           ...(infoData.returnPackagingType ? {
             packagings: [{
               packagingType: infoData.returnPackagingType,
@@ -87,7 +93,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
     };
 
     fetchData();
-  }, [subcontractingId]);
+  }, [subcontractingId, subcontractingReturnId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -137,7 +143,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
       case 'cromeDate': return !value ? 'Date is required' : null;
       case 'sentStock':
         if (!value || parseFloat(value) <= 0) return 'Sent stock required';
-        if (cromeInfo && parseFloat(value) > cromeInfo.availableStockForCrome) return 'Exceeds available stock';
+        if (returnCromeInfo && parseFloat(value) > returnCromeInfo.availableStockForCrome) return 'Exceeds available stock';
         return null;
       default: return null;
     }
@@ -209,11 +215,12 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
     }));
 
     const submitData: CromeRequest = {
-      subcontractingId: subcontractingId,
+      subcontractingReturnId: subcontractingReturnId,
       partyId: parseInt(formData.partyId, 10),
       cromeDate: formData.cromeDate,
       sentStock: parseFloat(formData.sentStock),
       packagings,
+      cromeAmount: formData.cromeAmount ? parseFloat(formData.cromeAmount) : null,
       remark: formData.remark || null,
     };
 
@@ -258,7 +265,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
             <div className="info-row">
               <span className="info-label">Available Stock:</span>
               <span className="info-value available-stock">
-                {cromeInfo.availableStockForCrome.toFixed(3)} {cromeInfo.unit}
+                {(returnCromeInfo?.availableStockForCrome ?? 0).toFixed(3)} {cromeInfo.unit}
               </span>
             </div>
           </div>
@@ -344,11 +351,25 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, onClose, onSu
                 className={`form-input ${getFieldError('sentStock') ? 'invalid' : ''}`}
                 step="0.001"
                 min="0"
-                max={cromeInfo?.availableStockForCrome}
+                max={returnCromeInfo?.availableStockForCrome}
                 required
               />
               {getFieldError('sentStock') && <span className="field-error-text">{getFieldError('sentStock')}</span>}
             </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Crome Amount (Rs.):</label>
+            <input
+              type="number"
+              name="cromeAmount"
+              value={formData.cromeAmount}
+              onChange={handleChange}
+              placeholder="Enter amount (optional)"
+              className="form-input"
+              step="0.01"
+              min="0"
+            />
           </div>
 
           <div className="form-group">

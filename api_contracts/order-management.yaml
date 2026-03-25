@@ -587,6 +587,10 @@ components:
           type: number
           format: double
 
+        transport:
+          type: string
+          nullable: true
+
         # Product list
         products:
           type: array
@@ -668,6 +672,9 @@ components:
           type: number
         productsTotal:
           type: number
+        transport:
+          type: string
+          nullable: true
         products:
           type: array
           items:

@@ -562,12 +562,6 @@ components:
         orderDate:
           type: string
           format: date
-        officialGrandTotal:
-          type: number
-          format: double
-        offlineGrandTotal:
-          type: number
-          format: double
         billSummary:
           $ref: '#/components/schemas/BillSummary'
         products:

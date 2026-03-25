@@ -65,7 +65,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
             try {
                 setLoadingPrice(true);
                 const info = await cromeApi.getSubcontractingCromeInfo(crome.subcontractingId);
-                setPricePerKg(info.price);
+                setPricePerKg(info.price + info.jobWorkPay);
             } catch (err) {
                 console.error('Error fetching subcontracting price:', err);
             } finally {

@@ -123,6 +123,7 @@ export interface SubReturnRequest {
 }
 
 export interface SubReturn {
+  returnId?: number;
   returnItemName: string;
   returnDate: string;
   returnStock: number;
@@ -317,6 +318,7 @@ export interface OrderRequest {
   offlineTotal?: number | null;
   officialBillAmount: number;
   gst: number;
+  transport?: number | null;
   grandTotal: number;
   productsTotal: number;
   products: OrderProductRequest[];
@@ -500,11 +502,12 @@ export interface OrderByPartyResponse {
 
 // Crome Types
 export interface CromeRequest {
-  subcontractingId: number;
+  subcontractingReturnId: number;
   partyId: number;
   cromeDate: string;
   sentStock: number;
   packagings: PackagingDetail[];
+  cromeAmount?: number | null;
   remark?: string | null;
 }
 
@@ -522,6 +525,7 @@ export interface CromeReturn {
 export interface Crome {
   cromeId: number;
   subcontractingId: number;
+  subcontractingReturnId?: number | null;
   contractorName: string;
   partyName: string;
   cromeDate: string;
@@ -531,6 +535,7 @@ export interface Crome {
   unit: Unit;
   packagings?: PackagingDetail[];
   status: SubcontractingStatus;
+  cromeAmount?: number | null;
   remark?: string | null;
   cromeReturn?: CromeReturn | null;
 }
@@ -554,6 +559,13 @@ export interface SubcontractingCromeInfo {
   price: number;
   jobWorkPay: number;
   status: SubcontractingStatus;
+}
+
+export interface SubReturnCromeInfo {
+  returnId: number;
+  netReturnStock: number;
+  stockAlreadyInCrome: number;
+  availableStockForCrome: number;
 }
 
 export interface CromeReturnRequest {
