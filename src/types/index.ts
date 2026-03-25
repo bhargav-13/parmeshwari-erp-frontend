@@ -622,6 +622,12 @@ export interface ForgingParty {
   partyName: string;
 }
 
+export interface ForgingInwardItem {
+  id?: number;
+  inwardId?: number;
+  name: string;
+}
+
 export interface ForgingInward {
   id?: number;
   partyId?: number;
@@ -632,6 +638,7 @@ export interface ForgingInward {
   weight: number;
   weightUnit: InwardWeightUnit;
   image?: string;
+  item?: ForgingInwardItem | null;
 }
 
 export interface ForgingOutward {

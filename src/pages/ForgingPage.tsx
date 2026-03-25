@@ -6,7 +6,7 @@ import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import AddForgingInwardModal from '../components/AddForgingInwardModal';
 import AddForgingOutwardModal from '../components/AddForgingOutwardModal';
-import { forgingInwardApi, forgingOutwardApi, forgingPartyApi, forgingReportApi } from '../api/forging';
+import { forgingInwardApi, forgingInwardItemsApi, forgingOutwardApi, forgingPartyApi, forgingReportApi } from '../api/forging';
 import type { ForgingInward, ForgingOutward, ForgingParty } from '../types';
 import Loading from '../components/Loading';
 
@@ -78,7 +78,13 @@ const ForgingPage: React.FC = () => {
         if (editingInward) {
             await forgingInwardApi.update(editingInward.id!, data);
         } else {
-            await forgingInwardApi.create(data);
+            const created = await forgingInwardApi.create(data);
+            // Save locally-added item after inward is created
+            if (created.id && data.item && !data.item.id) {
+                await forgingInwardItemsApi.create(created.id, {
+                    name: data.item.name,
+                });
+            }
         }
         await fetchInwardEntries();
         setIsInwardModalOpen(false);
@@ -260,6 +266,7 @@ const ForgingPage: React.FC = () => {
                             <th>Challan No.</th>
                             <th>Weight</th>
                             <th>Unit</th>
+                            {activeTab === 'inward' && <th>Items</th>}
                             <th>Price</th>
                             <th>Actions</th>
                         </tr>
@@ -274,6 +281,7 @@ const ForgingPage: React.FC = () => {
                                         <td>{row.challanNo}</td>
                                         <td>{row.weight}</td>
                                         <td>{row.weightUnit}</td>
+                                        <td>{row.item ? row.item.name : '-'}</td>
                                         <td>-</td>
                                         <td>
                                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
@@ -300,7 +308,7 @@ const ForgingPage: React.FC = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
+                                    <td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: '#8E8E8E' }}>
                                         No inward entries found
                                     </td>
                                 </tr>

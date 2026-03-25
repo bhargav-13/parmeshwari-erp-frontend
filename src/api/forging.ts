@@ -3,7 +3,7 @@ import ForgingOutwardApi from '../api-client/forging/src/api/ForgingOutwardApi';
 import ForgingPartyApi from '../api-client/forging/src/api/PartyApi';
 import ApiClient from '../api-client/inventory/src/ApiClient';
 import { promisify } from '../lib/apiConfig';
-import type { ForgingInward, ForgingOutward, ForgingParty } from '../types';
+import type { ForgingInward, ForgingInwardItem, ForgingOutward, ForgingParty } from '../types';
 
 const BASE_URL =
     (import.meta as any).env?.VITE_API_BASE_URL?.trim() || 'http://localhost:8080';
@@ -88,6 +88,11 @@ const convertToForgingInward = (inward: any): ForgingInward => ({
     weight: inward.weight || 0,
     weightUnit: inward.weightUnit,
     image: inward.image,
+    item: inward.item ? {
+        id: inward.item.id,
+        inwardId: inward.item.inwardId,
+        name: inward.item.name || '',
+    } : null,
 });
 
 const convertToForgingInwardRequest = (data: Omit<ForgingInward, 'id'>): any => ({
@@ -181,6 +186,47 @@ export const forgingOutwardApi = {
     delete: (id: number): Promise<void> =>
         promisify<void>(cb => generatedForgingOutwardApi.deleteForgingOutward(id, cb)),
 
+};
+
+// Helper for authenticated JSON fetch calls
+const authFetch = async (url: string, options: RequestInit = {}): Promise<any> => {
+    const token = localStorage.getItem('accessToken');
+    const response = await fetch(`${BASE_URL}${url}`, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...((options.headers as Record<string, string>) || {}),
+        },
+    });
+    if (!response.ok) {
+        throw new Error(`Request failed: ${response.statusText}`);
+    }
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+};
+
+// Forging Inward Items API — /api/v1/forging-inward/{inwardId}/items
+export const forgingInwardItemsApi = {
+    getAll: (inwardId: number): Promise<ForgingInwardItem[]> =>
+        authFetch(`/api/v1/forging-inward/${inwardId}/items`).then((data: any[]) =>
+            (data || []).map((item: any) => ({
+                id: item.id,
+                inwardId: item.inwardId,
+                name: item.name || '',
+            }))
+        ),
+
+    create: (inwardId: number, item: { name: string }): Promise<ForgingInwardItem> =>
+        authFetch(`/api/v1/forging-inward/${inwardId}/items`, {
+            method: 'POST',
+            body: JSON.stringify(item),
+        }),
+
+    delete: (inwardId: number, itemId: number): Promise<void> =>
+        authFetch(`/api/v1/forging-inward/${inwardId}/items/${itemId}`, {
+            method: 'DELETE',
+        }),
 };
 
 // Merged Forging PDF Report - single endpoint for both inward and outward
