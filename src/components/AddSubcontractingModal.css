@@ -228,6 +228,22 @@
   color: #FF0101;
 }
 
+.info-message {
+  padding: 10px 14px;
+  background: #E5F0FF;
+  border: 1px solid #3B82F6;
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: #1E40AF;
+}
+
+.frozen-input {
+  background: #F0F0F0 !important;
+  color: #666 !important;
+  cursor: not-allowed !important;
+}
+
 .modal-actions {
   display: flex;
   gap: 12px;

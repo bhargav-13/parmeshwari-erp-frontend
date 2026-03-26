@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { SubOrderRequest, Contractor, SubItem } from '../types';
-import { Unit } from '../types';
+import { Unit, SubcontractingStatus } from '../types';
 import { subcontractingApi } from '../api/subcontracting';
 import './AddSubcontractingModal.css';
 
@@ -34,6 +34,12 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
   const [subItems, setSubItems] = useState<SubItem[]>([]);
   const [loadingDropdowns, setLoadingDropdowns] = useState(true);
 
+  const isEditMode = !!initialData;
+
+  // Existing order matching state
+  const [existingOrder, setExistingOrder] = useState<{ price: number; jobWorkPay: number; subcontractingId: number } | null>(null);
+  const [checkingExisting, setCheckingExisting] = useState(false);
+
   // States for adding new contractor/item inline
   const [showAddContractor, setShowAddContractor] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
@@ -62,6 +68,52 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
 
     fetchDropdownData();
   }, []);
+
+  // Check for existing IN_PROCESS order when contractor + item are both selected
+  useEffect(() => {
+    const checkExistingOrder = async () => {
+      if (!formData.contractorId || !formData.itemId || isEditMode) {
+        setExistingOrder(null);
+                return;
+      }
+
+      try {
+        setCheckingExisting(true);
+        const result = await subcontractingApi.getSubcontractingList({
+          status: SubcontractingStatus.IN_PROCESS,
+          size: 100,
+        });
+
+        const match = result.data.find(
+          (order) =>
+            Number(order.contractor.contractorId) === Number(formData.contractorId) &&
+            Number(order.item.subItemId) === Number(formData.itemId)
+        );
+
+        if (match) {
+          setExistingOrder({
+            price: match.price,
+            jobWorkPay: match.jobWorkPay,
+            subcontractingId: match.subcontractingId,
+          });
+          // Auto-fill price and jobWorkPay from existing order
+          setFormData((prev) => ({
+            ...prev,
+            price: match.price,
+            jobWorkPay: match.jobWorkPay,
+          }));
+                  } else {
+          setExistingOrder(null);
+                  }
+      } catch (err) {
+        console.error('Failed to check existing orders:', err);
+      } finally {
+        setCheckingExisting(false);
+      }
+    };
+
+    checkExistingOrder();
+  }, [formData.contractorId, formData.itemId, isEditMode]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -117,6 +169,7 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
       return;
     }
 
+
     try {
       setLoading(true);
       await onSubmit(formData);
@@ -126,8 +179,6 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
       setLoading(false);
     }
   };
-
-  const isEditMode = !!initialData;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -277,10 +328,11 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
                 value={formData.jobWorkPay}
                 onChange={handleChange}
                 placeholder="Enter Job Work Pay"
-                className="form-input"
+                className={`form-input${existingOrder ? ' frozen-input' : ''}`}
                 step="0.01"
                 min="0"
                 required
+                disabled={!!existingOrder}
               />
             </div>
 
@@ -293,10 +345,11 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
                   value={formData.price}
                   onChange={handleChange}
                   placeholder="Enter Price"
-                  className="form-input price-input"
+                  className={`form-input price-input${existingOrder ? ' frozen-input' : ''}`}
                   step="0.01"
                   min="0"
                   required
+                  disabled={!!existingOrder}
                 />
                 <select
                   name="unit"
@@ -310,6 +363,16 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
               </div>
             </div>
           </div>
+
+          {checkingExisting && (
+            <div className="info-message">Checking existing orders...</div>
+          )}
+
+          {existingOrder && (
+            <div className="info-message">
+              This Contractor + Item has an existing IN_PROCESS order (#{existingOrder.subcontractingId}). Stock will be merged. Price: ₹{existingOrder.price}, Job Work Pay: ₹{existingOrder.jobWorkPay}
+            </div>
+          )}
 
           <div className="form-group">
             <label className="form-label">Remark</label>
