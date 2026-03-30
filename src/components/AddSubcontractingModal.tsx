@@ -16,7 +16,11 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
   initialData,
 }) => {
   const [formData, setFormData] = useState<SubOrderRequest>(
-    initialData || {
+    initialData ? {
+      ...initialData,
+      price: parseFloat(Number(initialData.price).toFixed(2)),
+      jobWorkPay: parseFloat(Number(initialData.jobWorkPay).toFixed(2)),
+    } : {
       contractorId: 0,
       itemId: 0,
       orderDate: new Date().toISOString().split('T')[0],
@@ -37,7 +41,7 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
   const isEditMode = !!initialData;
 
   // Existing order matching state
-  const [existingOrder, setExistingOrder] = useState<{ price: number; jobWorkPay: number; subcontractingId: number } | null>(null);
+  const [existingOrder, setExistingOrder] = useState<{ price: number; jobWorkPay: number; subcontractingId: number; sentStock: number } | null>(null);
   const [checkingExisting, setCheckingExisting] = useState(false);
 
   // States for adding new contractor/item inline
@@ -95,13 +99,9 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
             price: match.price,
             jobWorkPay: match.jobWorkPay,
             subcontractingId: match.subcontractingId,
+            sentStock: match.sentStock,
           });
-          // Auto-fill price and jobWorkPay from existing order
-          setFormData((prev) => ({
-            ...prev,
-            price: match.price,
-            jobWorkPay: match.jobWorkPay,
-          }));
+          // No auto-fill — both price and jobWorkPay stay editable for the new batch
                   } else {
           setExistingOrder(null);
                   }
@@ -172,7 +172,24 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
 
     try {
       setLoading(true);
-      await onSubmit(formData);
+      let dataToSubmit = formData;
+      if (existingOrder) {
+        const existingStock = existingOrder.sentStock;
+        const newStock = formData.sentStock || 0;
+        const totalStock = existingStock + newStock;
+        const weightedPrice = totalStock > 0
+          ? (existingStock * existingOrder.price + newStock * formData.price) / totalStock
+          : formData.price;
+        const weightedJobWork = totalStock > 0
+          ? (existingStock * existingOrder.jobWorkPay + newStock * formData.jobWorkPay) / totalStock
+          : formData.jobWorkPay;
+        dataToSubmit = {
+          ...formData,
+          price: parseFloat(weightedPrice.toFixed(2)),
+          jobWorkPay: parseFloat(weightedJobWork.toFixed(2)),
+        };
+      }
+      await onSubmit(dataToSubmit);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to save subcontracting order');
     } finally {
@@ -299,6 +316,7 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
                 value={formData.orderDate}
                 onChange={handleChange}
                 className="form-input"
+                title="Order Date"
                 required
               />
             </div>
@@ -328,11 +346,10 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
                 value={formData.jobWorkPay}
                 onChange={handleChange}
                 placeholder="Enter Job Work Pay"
-                className={`form-input${existingOrder ? ' frozen-input' : ''}`}
+                className="form-input"
                 step="0.01"
                 min="0"
                 required
-                disabled={!!existingOrder}
               />
             </div>
 
@@ -345,11 +362,10 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
                   value={formData.price}
                   onChange={handleChange}
                   placeholder="Enter Price"
-                  className={`form-input price-input${existingOrder ? ' frozen-input' : ''}`}
+                  className="form-input price-input"
                   step="0.01"
                   min="0"
                   required
-                  disabled={!!existingOrder}
                 />
                 <select
                   name="unit"
@@ -368,11 +384,30 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
             <div className="info-message">Checking existing orders...</div>
           )}
 
-          {existingOrder && (
-            <div className="info-message">
-              This Contractor + Item has an existing IN_PROCESS order (#{existingOrder.subcontractingId}). Stock will be merged. Price: ₹{existingOrder.price}, Job Work Pay: ₹{existingOrder.jobWorkPay}
-            </div>
-          )}
+          {existingOrder && (() => {
+            const existingStock = existingOrder.sentStock;
+            const newStock = formData.sentStock || 0;
+            const totalStock = existingStock + newStock;
+            const weightedPrice = totalStock > 0
+              ? (existingStock * existingOrder.price + newStock * formData.price) / totalStock
+              : formData.price;
+            const weightedJobWork = totalStock > 0
+              ? (existingStock * existingOrder.jobWorkPay + newStock * formData.jobWorkPay) / totalStock
+              : formData.jobWorkPay;
+            return (
+              <div className="info-message">
+                Existing order (#{existingOrder.subcontractingId}) will be merged.
+                {newStock > 0 && (
+                  <>
+                    <br />
+                    Weighted Avg Price: ({existingStock} × ₹{Number(existingOrder.price).toFixed(2)} + {newStock} × ₹{Number(formData.price).toFixed(2)}) / {totalStock} = ₹{weightedPrice.toFixed(2)}
+                    <br />
+                    Weighted Avg Job Work: ({existingStock} × ₹{Number(existingOrder.jobWorkPay).toFixed(2)} + {newStock} × ₹{Number(formData.jobWorkPay).toFixed(2)}) / {totalStock} = ₹{weightedJobWork.toFixed(2)}
+                  </>
+                )}
+              </div>
+            );
+          })()}
 
           <div className="form-group">
             <label className="form-label">Remark</label>

@@ -21,7 +21,15 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
     : (purchaseResponse.stockInventory?.quantityInKg || 0);
   const totalQty = existingQty + purchaseResponse.qty;
 
-  const [pricePerKg, setPricePerKg] = useState<number>(!isRaw ? (purchaseResponse.stockInventory?.pricePerKg || 0) : 0);
+  const calculateWeightedAvgPrice = () => {
+    if (isRaw) return 0;
+    const existingPrice = purchaseResponse.stockInventory?.pricePerKg || 0;
+    const newRate = purchaseResponse.rate || 0;
+    if (totalQty === 0) return newRate;
+    return (existingQty * existingPrice + purchaseResponse.qty * newRate) / totalQty;
+  };
+
+  const [pricePerKg, setPricePerKg] = useState<number>(!isRaw ? calculateWeightedAvgPrice() : 0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -238,11 +246,11 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label form-label-highlight" htmlFor="inv-price-kg">Price per Kg*</label>
+                  <label className="form-label form-label-highlight" htmlFor="inv-price-kg">Price per Kg* (Weighted Avg)</label>
                   <input
                     id="inv-price-kg"
                     type="number"
-                    value={pricePerKg}
+                    value={parseFloat(pricePerKg.toFixed(2))}
                     onChange={(e) => setPricePerKg(parseFloat(e.target.value) || 0)}
                     placeholder="Enter Price per Kg"
                     className="form-input"
@@ -251,6 +259,9 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
                     required
                     autoFocus
                   />
+                  <small className="price-hint">
+                    ({existingQty} kg × ₹{purchaseResponse.stockInventory?.pricePerKg || 0} + {purchaseResponse.qty} kg × ₹{purchaseResponse.rate || 0}) / {totalQty} kg
+                  </small>
                 </div>
               </div>
             </>
