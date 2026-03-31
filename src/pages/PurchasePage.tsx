@@ -184,7 +184,6 @@ const PurchasePage: React.FC = () => {
           onClose={() => setIsModalOpen(false)}
           onSuccess={fetchData}
           products={products}
-          parties={parties}
           purchaseParties={purchaseParties}
           categories={categories}
           onAlreadyExists={handleAlreadyExists}

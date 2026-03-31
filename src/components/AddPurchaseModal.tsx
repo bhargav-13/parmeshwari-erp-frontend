@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { purchaseApi } from '../api/purchase';
 import { productApi, categoryApi } from '../api/inventory';
-import type { Product, Party, Category, PurchaseRequest, PurchaseResponse, ProductRequest, CategoryRequest, PurchaseParty } from '../types';
+import type { Product, Category, PurchaseRequest, PurchaseResponse, ProductRequest, CategoryRequest, PurchaseParty } from '../types';
 import { PurchaseInventoryType, QuantityUnit } from '../types';
 import './AddStockItemModal.css';
 
@@ -9,7 +9,6 @@ interface AddPurchaseModalProps {
   onClose: () => void;
   onSuccess: () => void;
   products: Product[];
-  parties: Party[];
   purchaseParties?: PurchaseParty[];
   categories: Category[];
   onAlreadyExists: (response: PurchaseResponse) => void;
@@ -34,7 +33,6 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
   onClose,
   onSuccess,
   products,
-  parties,
   purchaseParties = [],
   categories,
   onAlreadyExists,
