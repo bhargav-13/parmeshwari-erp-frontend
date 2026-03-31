@@ -20,6 +20,8 @@ tags:
     description: Category Management and related Endpoints
   - name: Purchase
     description: Purchase Management and related Endpoints
+  - name: Purchase Party
+    description: Purchase Party Master and related Endpoints
 
 paths:
   /api/v1/purchase:
@@ -965,6 +967,122 @@ paths:
       security:
         - oauth2: [ ]
 
+  /api/v1/purchase/parties:
+    get:
+      operationId: getAllPurchaseParties
+      tags:
+        - Purchase Party
+      summary: Get all purchase parties
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Purchase party list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseParty'
+      security:
+        - oauth2: [ ]
+    post:
+      operationId: createPurchaseParty
+      tags:
+        - Purchase Party
+      summary: Create purchase party
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPurchaseParty'
+      responses:
+        '201':
+          description: Purchase party created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseParty'
+      security:
+        - oauth2: [ ]
+  /api/v1/purchase/parties/{id}:
+    get:
+      operationId: getPurchasePartyById
+      tags:
+        - Purchase Party
+      summary: Get purchase party by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Purchase party details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseParty'
+        '404':
+          description: Not found
+      security:
+        - oauth2: [ ]
+    put:
+      operationId: updatePurchaseParty
+      tags:
+        - Purchase Party
+      summary: Update purchase party
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPurchaseParty'
+      responses:
+        '200':
+          description: Purchase party updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseParty'
+        '404':
+          description: Not found
+      security:
+        - oauth2: [ ]
+    delete:
+      operationId: deletePurchaseParty
+      tags:
+        - Purchase Party
+      summary: Delete purchase party
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Purchase party deleted
+        '404':
+          description: Not found
+      security:
+        - oauth2: [ ]
+
 components:
   securitySchemes:
     oauth2:
@@ -1365,6 +1483,34 @@ components:
           type: integer
         size:
           type: integer
+
+    NewPurchaseParty:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+        officialAmount:
+          type: number
+          format: double
+        offlineAmount:
+          type: number
+          format: double
+    PurchaseParty:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        officialAmount:
+          type: number
+          format: double
+        offlineAmount:
+          type: number
+          format: double
 
     ErrorResponse:
       type: object

@@ -385,6 +385,40 @@
   color: #8E8E8E;
 }
 
+.page-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.page-tab {
+  padding: 0.625rem 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 400;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.page-tab.active {
+  font-weight: 600;
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.tab-error {
+  padding: 1rem;
+  background-color: #fee;
+  color: #c33;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
 .inventory-summary {
   display: flex;
   gap: 16px;

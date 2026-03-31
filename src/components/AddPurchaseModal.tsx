@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { purchaseApi } from '../api/purchase';
 import { productApi, categoryApi } from '../api/inventory';
-import type { Product, Party, Category, PurchaseRequest, PurchaseResponse, ProductRequest, CategoryRequest } from '../types';
+import type { Product, Party, Category, PurchaseRequest, PurchaseResponse, ProductRequest, CategoryRequest, PurchaseParty } from '../types';
 import { PurchaseInventoryType, QuantityUnit } from '../types';
 import './AddStockItemModal.css';
 
@@ -10,6 +10,7 @@ interface AddPurchaseModalProps {
   onSuccess: () => void;
   products: Product[];
   parties: Party[];
+  purchaseParties?: PurchaseParty[];
   categories: Category[];
   onAlreadyExists: (response: PurchaseResponse) => void;
 }
@@ -34,6 +35,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
   onSuccess,
   products,
   parties,
+  purchaseParties = [],
   categories,
   onAlreadyExists,
 }) => {
@@ -235,8 +237,8 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
                 aria-label="Party"
               >
                 <option value={0}>Select</option>
-                {parties.map((party) => (
-                  <option key={party.partyId} value={party.partyId}>
+                {purchaseParties.map((party) => (
+                  <option key={party.id} value={party.id}>
                     {party.name}
                   </option>
                 ))}

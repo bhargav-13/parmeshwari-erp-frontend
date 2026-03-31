@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './CashflowPage.css';
+import { isOwner } from '../lib/auth';
 import {
     cashflowSummaryApi,
     cashflowIncomeApi,
@@ -58,6 +59,7 @@ const CashflowPage: React.FC = () => {
     const [closing, setClosing] = useState(false);
 
     const dayClosed = summary?.dayClosed ?? false;
+    const canEdit = !dayClosed || isOwner();
     const isToday = selectedDate === todayStr();
 
     const fetchData = useCallback(async () => {
@@ -120,9 +122,11 @@ const CashflowPage: React.FC = () => {
             const api = type === 'income' ? cashflowIncomeApi : cashflowExpenseApi;
             await api.delete(id);
             await fetchData();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to delete:', err);
-            setError('Failed to delete entry.');
+            setError(err?.response?.status === 403
+                ? 'This day is closed. Only the Owner can delete entries from a closed day.'
+                : 'Failed to delete entry.');
         }
     };
 
@@ -156,9 +160,11 @@ const CashflowPage: React.FC = () => {
             });
             cancelEdit();
             await fetchData();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to update:', err);
-            setError('Failed to update entry.');
+            setError(err?.response?.status === 403
+                ? 'This day is closed. Only the Owner can edit entries from a closed day.'
+                : 'Failed to update entry.');
         } finally {
             setAddLoading(false);
         }
@@ -246,7 +252,7 @@ const CashflowPage: React.FC = () => {
                 <td>{entry.paymentType?.name || '-'}</td>
                 <td>{entry.note || (isCarryForward ? 'Carry Forward' : '-')}</td>
                 <td>
-                    {!dayClosed && !isCarryForward && (
+                    {canEdit && !isCarryForward && (
                         <div className="entry-actions">
                             <button type="button" className="edit-btn" onClick={() => startEdit(entry, type)} title="Edit">&#9998;</button>
                             <button type="button" className="delete-btn" onClick={() => handleDelete(entry.id, type)} title="Delete">&#10005;</button>
@@ -259,7 +265,7 @@ const CashflowPage: React.FC = () => {
 
     const renderAddRow = (type: EntryType) => {
         const isShowing = type === 'income' ? showAddIncome : showAddExpense;
-        if (!isShowing || dayClosed) return null;
+        if (!isShowing || !canEdit) return null;
 
         return (
             <div className="cashflow-add-row">
@@ -401,7 +407,7 @@ const CashflowPage: React.FC = () => {
                             type="button"
                             className="cashflow-add-btn"
                             onClick={() => { resetAddForm(); setShowAddIncome(true); }}
-                            disabled={dayClosed}
+                            disabled={!canEdit}
                             title="Add income"
                         >+</button>
                     </div>
@@ -434,7 +440,7 @@ const CashflowPage: React.FC = () => {
                             type="button"
                             className="cashflow-add-btn"
                             onClick={() => { resetAddForm(); setShowAddExpense(true); }}
-                            disabled={dayClosed}
+                            disabled={!canEdit}
                             title="Add expense"
                         >+</button>
                     </div>

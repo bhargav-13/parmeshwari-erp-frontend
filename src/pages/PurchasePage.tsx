@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { purchaseApi } from '../api/purchase';
 import { productApi, categoryApi } from '../api/inventory';
 import { partyApi } from '../api/party';
-import type { PurchaseResponse, Product, Party, Category } from '../types';
+import { purchasePartyApi } from '../api/purchaseParty';
+import type { PurchaseResponse, Product, Party, Category, PurchaseParty } from '../types';
 import { PurchaseInventoryType } from '../types';
 import Loading from '../components/Loading';
 import AddPurchaseModal from '../components/AddPurchaseModal';
@@ -14,6 +15,7 @@ const PurchasePage: React.FC = () => {
   const [purchases, setPurchases] = useState<PurchaseResponse[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [parties, setParties] = useState<Party[]>([]);
+  const [purchaseParties, setPurchaseParties] = useState<PurchaseParty[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,16 +29,18 @@ const PurchasePage: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [purchasesResult, productsData, partiesData, categoriesData] = await Promise.all([
+      const [purchasesResult, productsData, partiesData, purchasePartiesData, categoriesData] = await Promise.all([
         purchaseApi.getPurchases(0, 1000, searchQuery || undefined),
         productApi.getProducts(),
         partyApi.getAllParties(),
+        purchasePartyApi.getAll(),
         categoryApi.getCategories(),
       ]);
       const data = (purchasesResult as any)?.data ?? [];
       setPurchases(data);
       setProducts(productsData);
       setParties(partiesData);
+      setPurchaseParties(purchasePartiesData);
       setCategories(categoriesData);
     } catch (error) {
       console.error('Error fetching purchase data:', error);
@@ -63,8 +67,10 @@ const PurchasePage: React.FC = () => {
   };
 
   const getPartyName = (partyId: number) => {
-    const party = parties.find((p) => p.partyId === partyId);
-    return party?.name || `Party #${partyId}`;
+    const salesParty = parties.find((p) => p.partyId === partyId);
+    if (salesParty) return salesParty.name;
+    const purchaseParty = purchaseParties.find((p) => p.id === partyId);
+    return purchaseParty?.name || `Party #${partyId}`;
   };
 
   const totalPurchases = purchases.length;
@@ -133,6 +139,7 @@ const PurchasePage: React.FC = () => {
             <tr>
               <th>Sr. No</th>
               <th>Challan No.</th>
+              <th>Party ID</th>
               <th>Party</th>
               <th>Product</th>
               <th>Qty (Kg)</th>
@@ -147,6 +154,7 @@ const PurchasePage: React.FC = () => {
               <tr key={purchase.purchaseId}>
                 <td>{String(index + 1).padStart(2, '0')}</td>
                 <td>{purchase.chNo}</td>
+                <td>{purchase.partyId}</td>
                 <td>{getPartyName(purchase.partyId)}</td>
                 <td>{purchase.product?.productName || 'N/A'}</td>
                 <td>{purchase.qty}</td>
@@ -162,7 +170,7 @@ const PurchasePage: React.FC = () => {
             ))}
             {purchases.length === 0 && (
               <tr>
-                <td colSpan={9} className="no-data">
+                <td colSpan={10} className="no-data">
                   No purchases found
                 </td>
               </tr>
@@ -177,6 +185,7 @@ const PurchasePage: React.FC = () => {
           onSuccess={fetchData}
           products={products}
           parties={parties}
+          purchaseParties={purchaseParties}
           categories={categories}
           onAlreadyExists={handleAlreadyExists}
         />

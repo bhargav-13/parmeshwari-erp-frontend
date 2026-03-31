@@ -674,6 +674,20 @@ export interface ElectricCredit {
   rate: number;
 }
 
+// Purchase Party Types
+export interface PurchaseParty {
+  id: number;
+  name: string;
+  officialAmount: number;
+  offlineAmount: number;
+}
+
+export interface PurchasePartyRequest {
+  name: string;
+  officialAmount?: number;
+  offlineAmount?: number;
+}
+
 // Purchase Types
 export const PurchaseInventoryType = {
   RAW_MATERIAL: 'RAW_MATERIAL',

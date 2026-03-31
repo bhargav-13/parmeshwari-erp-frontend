@@ -353,6 +353,7 @@ components:
       type: string
       enum:
         - Admin
+        - Owner
       description: User Group
     PaginatedResultUser:
       type: object
