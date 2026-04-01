@@ -41,7 +41,6 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         addToInventory: boolean;
         inventoryItemName: string;
         inventoryFloor: InventoryFloor;
-        inventoryQuantityPc: string;
     }>({
         returnDate: new Date().toISOString().split('T')[0],
         returnStock: '',
@@ -50,7 +49,6 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         addToInventory: true,
         inventoryItemName: itemName,
         inventoryFloor: InventoryFloor.GROUND_FLOOR,
-        inventoryQuantityPc: '',
     });
 
     const [pricePerKg, setPricePerKg] = useState<number>(0);
@@ -65,7 +63,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
             try {
                 setLoadingPrice(true);
                 const info = await cromeApi.getSubcontractingCromeInfo(crome.subcontractingId);
-                setPricePerKg(info.price + info.jobWorkPay);
+                setPricePerKg(info.price + info.jobWorkPay + (crome.cromeAmount ?? 0));
             } catch (err) {
                 console.error('Error fetching subcontracting price:', err);
             } finally {
@@ -73,7 +71,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
             }
         };
         fetchPrice();
-    }, [crome.subcontractingId]);
+    }, [crome.subcontractingId, crome.cromeAmount]);
 
     const parseNum = (val: string | number): number => {
         if (typeof val === 'number') return val;
@@ -148,11 +146,6 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
 
             case 'inventoryItemName':
                 return allData.addToInventory && !value.trim() ? 'Item Name is required' : null;
-
-            case 'inventoryQuantityPc': {
-                const valueNum = parseNum(value);
-                return allData.addToInventory && valueNum < 0 ? 'Qty cannot be negative' : null;
-            }
 
             default:
                 return null;
@@ -234,7 +227,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         setTouched(allTouched);
 
         // Validate all
-        const fieldErrors = ['returnDate', 'returnStock', 'inventoryItemName', 'inventoryQuantityPc']
+        const fieldErrors = ['returnDate', 'returnStock', 'inventoryItemName']
             .map(key => validateField(key, formData[key as keyof typeof formData]))
             .filter(Boolean);
         const packagingErrors = formData.packagings.map(row => validatePackagingRow(row)).filter(Boolean);
@@ -275,7 +268,6 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
             inventoryItemName: formData.addToInventory ? formData.inventoryItemName : undefined,
             inventoryFloor: formData.addToInventory ? formData.inventoryFloor : undefined,
             inventoryPricePerKg: formData.addToInventory ? pricePerKg : undefined,
-            inventoryQuantityPc: formData.addToInventory ? parseNum(formData.inventoryQuantityPc) : undefined,
         };
 
         try {
@@ -329,30 +321,15 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                     </div>
 
                                     <div className="form-group">
-                                        <label className="form-label">Price / Kg</label>
+                                        <label className="form-label">Price / Kg (Rate + Job Work + Crome)</label>
                                         <input
                                             type="text"
                                             className="form-input"
-                                            value={loadingPrice ? 'Loading...' : `₹ ${pricePerKg}`}
+                                            value={loadingPrice ? 'Loading...' : `₹ ${pricePerKg.toFixed(2)}`}
                                             readOnly
                                             disabled
-                                            title="Auto-filled from subcontracting order price"
+                                            title="Rate + Job Work Pay + Crome Amount per Kg"
                                         />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label className="form-label">Pieces (Qty)</label>
-                                        <input
-                                            type="text"
-                                            inputMode="numeric"
-                                            name="inventoryQuantityPc"
-                                            value={formData.inventoryQuantityPc}
-                                            onChange={handleNumericInput}
-                                            onBlur={handleBlur}
-                                            className={`form-input ${getFieldError('inventoryQuantityPc') ? 'invalid' : ''}`}
-                                            placeholder="0"
-                                        />
-                                        {getFieldError('inventoryQuantityPc') && <span className="field-error-text">{getFieldError('inventoryQuantityPc')}</span>}
                                     </div>
 
                                     <div className="form-group full-width">
@@ -506,7 +483,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                         </div>
                         <div className="calc-row pricing-separator">
                             <span className="calc-label">Rate (Price/Kg):</span>
-                            <span className="calc-value">{loadingPrice ? '...' : `₹ ${pricePerKg}`}</span>
+                            <span className="calc-value">{loadingPrice ? '...' : `₹ ${pricePerKg.toFixed(2)}`}</span>
                         </div>
                         <div className="calc-row total-row">
                             <span className="calc-label">Amount:</span>

@@ -311,7 +311,7 @@ const InventoryPage: React.FC = () => {
             </div>
             <div className="stat-card">
               <span className="stat-label">Total Amount</span>
-              <span className="stat-value">₹{totalAmount.toLocaleString('en-IN')}</span>
+              <span className="stat-value">₹{Number(totalAmount.toFixed(2)).toLocaleString('en-IN')}</span>
             </div>
           </div>
 
@@ -357,7 +357,7 @@ const InventoryPage: React.FC = () => {
                     <td>{item.category.categoryName}</td>
                     <td>{item.quantityInKg} Kg</td>
                     <td>{item.quantityInPc?.toLocaleString('en-IN') || '—'}</td>
-                    <td>₹{item.pricePerKg}/KG</td>
+                    <td>₹{Number(item.pricePerKg).toFixed(2)}/KG</td>
                     <td>
                       <span
                         className={`status-badge ${
@@ -413,7 +413,7 @@ const InventoryPage: React.FC = () => {
           <div className="inventory-summary">
             <div className="summary-card">
               <span className="summary-label">Total Amount</span>
-              <span className="summary-value">₹{totalAmount.toLocaleString('en-IN')}</span>
+              <span className="summary-value">₹{Number(totalAmount.toFixed(2)).toLocaleString('en-IN')}</span>
             </div>
             <div className="summary-card">
               <span className="summary-label">Total Items</span>

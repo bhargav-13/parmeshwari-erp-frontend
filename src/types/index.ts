@@ -578,7 +578,6 @@ export interface CromeReturnRequest {
   inventoryItemName?: string;
   inventoryFloor?: InventoryFloor;
   inventoryPricePerKg?: number;
-  inventoryQuantityPc?: number;
 }
 
 // Casting Types
