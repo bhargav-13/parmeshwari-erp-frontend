@@ -58,7 +58,7 @@ const ProductCatalogPage: React.FC = () => {
     <div className="product-catalog">
       <div className="catalog-header">
         <div className="catalog-brand">
-          <h1 className="catalog-title">Parmeshwari Brass Industries</h1>
+          <h1 className="catalog-title">4bitx ERP</h1>
           <p className="catalog-subtitle">Product Catalog</p>
         </div>
       </div>
@@ -180,7 +180,7 @@ const ProductCatalogPage: React.FC = () => {
       )}
 
       <div className="catalog-footer">
-        <p>&copy; 2025 Parmeshwari Brass Industries. All rights reserved.</p>
+        <p>&copy; 2025 4bitx ERP. All rights reserved.</p>
       </div>
 
       {selectedProduct && (

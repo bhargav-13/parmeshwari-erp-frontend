@@ -24,17 +24,17 @@
   z-index: 10;
   font-family: 'Jost', sans-serif;
   font-size: 14px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .invoice-card .download-button {
-  background: #D1EEFF;
+  background: #A5213A;
   border-radius: 6px;
   padding: 4px;
 }
 
 .invoice-card .download-button:hover {
-  background: #b8dfff;
+  background: #7A1829;
 }
 
 .invoice-card-header {
@@ -61,7 +61,7 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 22px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0;
 }
 
@@ -70,7 +70,7 @@
   font-weight: 400;
   font-size: 18px;
   line-height: 26px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0;
 }
 
@@ -118,7 +118,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #17344D;
+  border-top: 2px solid #2D1017;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -220,7 +220,7 @@
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .invoice-card-footer {
@@ -241,7 +241,7 @@
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 /* Mobile Responsive Styles */

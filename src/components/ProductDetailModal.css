@@ -72,7 +72,7 @@
 }
 
 .modal-close-btn svg {
-  color: #17344D;
+  color: #2D1017;
 }
 
 /* Modal Content Layout */
@@ -145,11 +145,11 @@
 
 .thumbnail-btn:hover {
   transform: scale(1.05);
-  border-color: #17344D;
+  border-color: #2D1017;
 }
 
 .thumbnail-btn.active {
-  border-color: #17344D;
+  border-color: #2D1017;
   box-shadow: 0 4px 12px rgba(23, 52, 77, 0.3);
 }
 
@@ -179,7 +179,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.75rem;
   font-weight: 600;
-  color: #17344D;
+  color: #2D1017;
   margin: 0 0 0.5rem 0;
   line-height: 1.3;
 }
@@ -195,7 +195,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  background: linear-gradient(135deg, #17344D 0%, #2a5170 100%);
+  background: linear-gradient(135deg, #2D1017 0%, #2a5170 100%);
   padding: 0.75rem 1.25rem;
   border-radius: 12px;
   min-width: 120px;
@@ -228,7 +228,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #17344D;
+  color: #2D1017;
   margin: 0 0 1rem 0;
 }
 
@@ -276,7 +276,7 @@
 .spec-value {
   font-family: 'Jost', sans-serif;
   font-size: 1rem;
-  color: #17344D;
+  color: #2D1017;
   font-weight: 600;
 }
 
@@ -304,7 +304,7 @@
 }
 
 .primary-action {
-  background: #17344D;
+  background: #2D1017;
   color: white;
   box-shadow: 0 4px 12px rgba(23, 52, 77, 0.3);
 }
@@ -450,7 +450,7 @@
 }
 
 .product-detail-modal::-webkit-scrollbar-thumb {
-  background: #17344D;
+  background: #2D1017;
   border-radius: 10px;
 }
 

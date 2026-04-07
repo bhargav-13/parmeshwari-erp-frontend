@@ -42,7 +42,7 @@
   font-weight: 500;
   font-size: 20px;
   line-height: 28px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0;
 }
 
@@ -59,7 +59,7 @@
   background: none;
   border: none;
   font-size: 20px;
-  color: #17344D;
+  color: #2D1017;
   cursor: pointer;
   padding: 4px 8px;
   line-height: 1;
@@ -86,7 +86,7 @@
   font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 13px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .date-filter-group input {
@@ -95,13 +95,13 @@
   border-radius: 6px;
   font-family: 'Jost', sans-serif;
   font-size: 13px;
-  color: #17344D;
+  color: #2D1017;
   background: #FFFFFF;
   outline: none;
 }
 
 .date-filter-group input:focus {
-  border-color: #17344D;
+  border-color: #2D1017;
 }
 
 .subcontract-view-content {
@@ -133,7 +133,7 @@
   font-weight: 500;
   font-size: 13px;
   line-height: 18px;
-  color: #17344D;
+  color: #2D1017;
   padding: 12px 10px;
   text-align: left;
   border-bottom: 1px solid rgba(125, 153, 169, 0.2);
@@ -145,7 +145,7 @@
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #17344D;
+  color: #2D1017;
   padding: 12px 10px;
   border-bottom: 1px solid rgba(125, 153, 169, 0.1);
   white-space: nowrap;
@@ -189,14 +189,14 @@
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 15px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .total-paid .total-value {
   font-family: 'Jost', sans-serif;
   font-weight: 600;
   font-size: 15px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .totals-row {
@@ -216,7 +216,7 @@
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .total-value.highlight-red {

@@ -32,7 +32,7 @@
   font-weight: 500;
   font-size: 20px;
   line-height: 28px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0 0 20px 0;
   padding-top: 24px;
   flex-shrink: 0;
@@ -81,7 +81,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .form-input {
@@ -92,14 +92,14 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   transition: border-color 0.3s ease;
 }
 
 .form-input:focus {
-  border-color: #17344D;
+  border-color: #2D1017;
 }
 
 .form-input::placeholder {
@@ -124,8 +124,8 @@
   padding: 0;
   border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 8px;
-  background: #D1EEFF;
-  color: #17344D;
+  background: #A5213A;
+  color: #FFFFFF;
   font-size: 20px;
   font-weight: 500;
   cursor: pointer;
@@ -136,7 +136,7 @@
 }
 
 .add-new-btn:hover {
-  background: #b8dfff;
+  background: #7A1829;
 }
 
 .add-new-input-group {
@@ -153,7 +153,7 @@
   padding: 8px 16px;
   border: none;
   border-radius: 8px;
-  background: #17344D;
+  background: #2D1017;
   color: #FFFFFF;
   font-family: 'Jost', sans-serif;
   font-size: 13px;
@@ -188,7 +188,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   cursor: pointer;
@@ -203,7 +203,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   resize: vertical;
@@ -211,7 +211,7 @@
 }
 
 .form-textarea:focus {
-  border-color: #17344D;
+  border-color: #2D1017;
 }
 
 .form-textarea::placeholder {
@@ -230,12 +230,12 @@
 
 .info-message {
   padding: 10px 14px;
-  background: #E5F0FF;
-  border: 1px solid #3B82F6;
+  background: #FDE8EC;
+  border: 1px solid #A5213A;
   border-radius: 8px;
   font-family: 'Jost', sans-serif;
   font-size: 13px;
-  color: #1E40AF;
+  color: #7A1829;
 }
 
 .frozen-input {
@@ -265,12 +265,12 @@
 }
 
 .save-button {
-  background: #D1EEFF;
-  color: #17344D;
+  background: #A5213A;
+  color: #FFFFFF;
 }
 
 .save-button:hover:not(:disabled) {
-  background: #b8dfff;
+  background: #7A1829;
 }
 
 .save-button:disabled {
@@ -280,8 +280,8 @@
 
 .cancel-button {
   background: transparent;
-  color: #17344D;
-  border: 1px solid #17344D;
+  color: #2D1017;
+  border: 1px solid #2D1017;
 }
 
 .cancel-button:hover {

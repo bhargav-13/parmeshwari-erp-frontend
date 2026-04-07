@@ -29,7 +29,7 @@
 .form-label {
     font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #17344d;
+    color: #2D1017;
     font-weight: 500;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .save-button {
-    background: #17344d;
+    background: #2D1017;
     color: white;
     border: none;
     padding: 10px 24px;

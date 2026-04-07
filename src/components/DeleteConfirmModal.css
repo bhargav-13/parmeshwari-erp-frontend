@@ -21,7 +21,7 @@
 .confirm-title {
   font-family: 'Jost', sans-serif;
   font-size: 20px;
-  color: #17344d;
+  color: #2D1017;
   margin: 0 0 12px;
 }
 
@@ -51,7 +51,7 @@
 
 .confirm-cancel {
   background: #f1f5f9;
-  color: #17344d;
+  color: #2D1017;
 }
 
 .confirm-cancel:hover {

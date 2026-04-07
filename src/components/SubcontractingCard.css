@@ -29,7 +29,7 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 22px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0;
 }
 
@@ -75,7 +75,7 @@
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .card-actions {
@@ -116,7 +116,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #17344D;
+  border-top: 2px solid #2D1017;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -164,7 +164,7 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 24px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0;
   text-align: center;
 }
@@ -201,7 +201,7 @@
   font-weight: 500;
   font-size: 15px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .stock-pieces,
@@ -300,14 +300,14 @@
   align-items: center;
   gap: 8px;
   padding: 0 22px;
-  background: #D1EEFF;
+  background: #A5213A;
   border: none;
   border-radius: 999px;
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #FFFFFF;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
   height: 40px;
@@ -327,13 +327,13 @@
   gap: 16px;
   height: 40px;
   background: transparent;
-  border: 1px solid #17344D;
+  border: 1px solid #2D1017;
   border-radius: 10px;
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -389,7 +389,7 @@
   font-weight: 500;
   font-size: 13px;
   line-height: 18px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .remark-text {

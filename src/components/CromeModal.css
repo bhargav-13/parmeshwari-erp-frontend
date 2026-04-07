@@ -30,7 +30,7 @@
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .info-value.available-stock {
@@ -64,9 +64,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1.5px solid #17344D;
+  border: 1.5px solid #2D1017;
   background: #fff;
-  color: #17344D;
+  color: #2D1017;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -78,7 +78,7 @@
 }
 
 .add-packaging-btn:hover {
-  background: #17344D;
+  background: #2D1017;
   color: #fff;
 }
 
@@ -152,7 +152,7 @@
   font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .calc-formula {

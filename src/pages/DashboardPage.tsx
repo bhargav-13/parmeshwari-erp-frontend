@@ -320,7 +320,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 
 // Color palette for charts
 const COLORS = {
-  primary: "#2563eb",
+  primary: "#A5213A",
   secondary: "#7c3aed",
   success: "#22c55e",
   warning: "#f59e0b",
@@ -333,7 +333,7 @@ const COLORS = {
 };
 
 const PIE_COLORS = [
-  "#2563eb",
+  "#A5213A",
   "#7c3aed",
   "#22c55e",
   "#f59e0b",

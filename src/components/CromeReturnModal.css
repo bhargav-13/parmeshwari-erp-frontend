@@ -16,7 +16,7 @@
 .modal-title {
     font-family: 'Jost', sans-serif;
     font-size: 24px;
-    color: #17344d;
+    color: #2D1017;
     margin: 0 0 24px 0;
     text-align: left;
 }
@@ -98,9 +98,9 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 1.5px solid #17344D;
+    border: 1.5px solid #2D1017;
     background: #fff;
-    color: #17344D;
+    color: #2D1017;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
@@ -112,7 +112,7 @@
 }
 
 .add-packaging-btn:hover {
-    background: #17344D;
+    background: #2D1017;
     color: #fff;
 }
 
@@ -163,7 +163,7 @@
     font-family: 'Jost', sans-serif;
     font-size: 15px;
     font-weight: 600;
-    color: #17344d;
+    color: #2D1017;
     margin: 0 0 12px 0;
     padding-bottom: 6px;
     border-bottom: 2px solid rgba(23, 52, 77, 0.08);
@@ -192,7 +192,7 @@
     background: #f5f7fa;
     font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #17344d;
+    color: #2D1017;
     outline: none;
     transition: all 0.2s ease;
     width: 100%;
@@ -225,7 +225,7 @@
     cursor: pointer;
     font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #17344d;
+    color: #2D1017;
     font-weight: 500;
     -webkit-user-select: none;
     user-select: none;
@@ -256,7 +256,7 @@
 }
 
 .checkbox-label input[type="checkbox"]:checked {
-    background: #3b82f6;
+    background: #A5213A;
     /* Blue matching typical primary color */
 }
 
@@ -284,7 +284,7 @@
 
 .calc-value {
     font-weight: 600;
-    color: #17344d;
+    color: #2D1017;
 }
 
 .calc-value.deduction {
@@ -318,7 +318,7 @@
 }
 
 .save-button {
-    background: #17344d;
+    background: #2D1017;
     color: #fff;
     border: none;
     border-radius: 24px;

@@ -35,7 +35,7 @@
     font-weight: 500;
     font-size: 22px;
     line-height: 28px;
-    color: #17344D;
+    color: #2D1017;
     margin: 0;
 }
 
@@ -70,18 +70,18 @@
 }
 
 .primary-button {
-    background: #D1EEFF;
-    color: #17344D;
+    background: #A5213A;
+    color: #FFFFFF;
 }
 
 .primary-button:hover {
-    background: #b8dfff;
+    background: #7A1829;
 }
 
 .secondary-button {
     background: #FFFFFF;
-    color: #17344D;
-    border: 1px solid #17344D;
+    color: #2D1017;
+    border: 1px solid #2D1017;
 }
 
 .secondary-button:hover {
@@ -122,7 +122,7 @@
 
 .casting-toggle-btn.active {
     background-color: #ffffff;
-    color: #0d6efd;
+    color: #A5213A;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     font-weight: 600;
 }
@@ -160,7 +160,7 @@
     font-weight: 500;
     font-size: 20px;
     line-height: 28px;
-    color: #17344D;
+    color: #2D1017;
 }
 
 /* Controls */
@@ -193,7 +193,7 @@
     outline: none;
     font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #17344D;
+    color: #2D1017;
     background: transparent;
 }
 
@@ -212,7 +212,7 @@
     cursor: pointer;
     font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #17344D;
+    color: #2D1017;
     transition: background-color 0.2s ease;
 }
 
@@ -254,7 +254,7 @@
     font-weight: 500;
     font-size: 14px;
     line-height: 20px;
-    color: #17344D;
+    color: #2D1017;
     border-bottom: 1px solid rgba(125, 153, 169, 0.3);
     text-align: center;
     /* Per layout requirement */
@@ -266,7 +266,7 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #17344D;
+    color: #2D1017;
     border-bottom: 1px solid rgba(125, 153, 169, 0.1);
     text-align: center;
 }

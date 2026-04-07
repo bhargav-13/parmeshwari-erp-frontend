@@ -22,7 +22,7 @@
   font-weight: 500;
   font-size: 22px;
   line-height: 28px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0;
 }
 
@@ -44,7 +44,7 @@
 .payment-reminder-page .mode-toggle {
   display: flex;
   gap: 0;
-  border: 1px solid #17344D;
+  border: 1px solid #2D1017;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -58,12 +58,12 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   transition: all 0.3s ease;
 }
 
 .payment-reminder-page .mode-btn:first-child {
-  border-right: 1px solid #17344D;
+  border-right: 1px solid #2D1017;
 }
 
 .payment-reminder-page .mode-btn:hover:not(.active) {
@@ -71,7 +71,7 @@
 }
 
 .payment-reminder-page .mode-btn.active {
-  background: #17344D;
+  background: #2D1017;
   color: #FFFFFF;
 }
 
@@ -80,7 +80,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
-  background: #D1EEFF;
+  background: #A5213A;
   border-radius: 8px;
   border: none;
   cursor: pointer;
@@ -88,12 +88,12 @@
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
-  color: #17344D;
+  color: #FFFFFF;
   transition: background-color 0.3s ease;
 }
 
 .bulk-reminder-button:hover {
-  background: #b8dfff;
+  background: #7A1829;
 }
 
 .bulk-reminder-button .send-icon {
@@ -109,7 +109,7 @@
 
 .payment-reminder-page .stat-card {
   flex: 1;
-  border: 1px solid #17344D;
+  border: 1px solid #2D1017;
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -136,7 +136,7 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 32px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .payment-table-container {
@@ -165,7 +165,7 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   border-bottom: 1px solid rgba(125, 153, 169, 0.3);
 }
 
@@ -224,7 +224,7 @@
   justify-content: center;
   gap: 8px;
   padding: 6px 14px;
-  background: #D1EEFF;
+  background: #A5213A;
   border-radius: 20px;
   border: none;
   cursor: pointer;
@@ -232,13 +232,13 @@
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #17344D;
+  color: #FFFFFF;
   transition: background-color 0.3s ease;
   min-width: 130px;
 }
 
 .send-reminder-button:hover:not(:disabled) {
-  background: #b8dfff;
+  background: #7A1829;
 }
 
 .send-reminder-button:disabled {
@@ -255,7 +255,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #17344D;
+  border-top: 2px solid #2D1017;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -285,7 +285,7 @@
 /* Party name cell */
 .party-name-cell {
   font-weight: 500;
-  color: #17344D;
+  color: #2D1017;
   text-align: left !important;
 }
 
@@ -308,7 +308,7 @@
 
 .collapse-chevron.expanded {
   transform: rotate(180deg);
-  color: #17344D;
+  color: #2D1017;
 }
 
 /* Clickable row */
@@ -342,7 +342,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .expanded-order-detail {
@@ -376,7 +376,7 @@
   padding: 6px 10px;
   font-family: 'Jost', sans-serif;
   font-size: 12px;
-  color: #17344D;
+  color: #2D1017;
   border-bottom: 1px solid rgba(23, 52, 77, 0.04);
   text-align: left;
 }

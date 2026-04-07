@@ -79,14 +79,14 @@
 
 /* In Process Status - Blue */
 .status-select-modern.status-in-process {
-  background-color: #eff6ff;
-  border-color: #93c5fd;
-  color: #1d4ed8;
+  background-color: #FFF0F2;
+  border-color: #f4a0ad;
+  color: #7A1829;
 }
 
 .status-select-modern.status-in-process:hover:not(:disabled) {
-  background-color: #dbeafe;
-  border-color: #60a5fa;
+  background-color: #FAEAED;
+  border-color: #e8838e;
 }
 
 /* Rejected Status - Red */

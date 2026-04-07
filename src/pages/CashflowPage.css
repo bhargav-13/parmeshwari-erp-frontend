@@ -32,7 +32,7 @@
     font-weight: 500;
     font-size: 22px;
     line-height: 28px;
-    color: #17344D;
+    color: #2D1017;
     margin: 0;
 }
 
@@ -59,7 +59,7 @@
     padding: 8px 14px;
     border: 1px solid rgba(125, 153, 169, 0.3);
     border-radius: 8px;
-    color: #17344D;
+    color: #2D1017;
     background: #fff;
     outline: none;
 }
@@ -112,7 +112,7 @@
     font-family: 'Jost', sans-serif;
     font-weight: 600;
     font-size: 20px;
-    color: #17344D;
+    color: #2D1017;
 }
 
 .cashflow-summary-card .stat-value.income {
@@ -158,7 +158,7 @@
     font-family: 'Jost', sans-serif;
     font-weight: 600;
     font-size: 16px;
-    color: #17344D;
+    color: #2D1017;
 }
 
 .cashflow-column-title.income {
@@ -225,7 +225,7 @@
     font-family: 'Jost', sans-serif;
     font-weight: 400;
     font-size: 13px;
-    color: #17344D;
+    color: #2D1017;
     border-bottom: 1px solid rgba(125, 153, 169, 0.08);
 }
 
@@ -309,7 +309,7 @@
     border: 1px solid rgba(125, 153, 169, 0.3);
     border-radius: 6px;
     outline: none;
-    color: #17344D;
+    color: #2D1017;
     background: #fff;
 }
 
@@ -320,7 +320,7 @@
 
 .cashflow-add-row .add-confirm-btn {
     padding: 6px 12px;
-    background: #17344D;
+    background: #2D1017;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -353,7 +353,7 @@
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: #17344D;
+    background: #2D1017;
     color: #fff;
     border: none;
     border-radius: 8px;

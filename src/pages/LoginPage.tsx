@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import Logo from '../assets/parmeshwari-logo.svg';
 import './LoginPage.css';
 
 const LoginPage: React.FC = () => {
@@ -51,11 +50,15 @@ const LoginPage: React.FC = () => {
   return (
     <div className="login-page">
       <div className="login-container">
+        <div className="login-brand-header">
+          <img src="/logo.svg" alt="4bitx ERP" className="login-logo-img" />
+          <p className="login-brand-name">4bitx &nbsp; ERP</p>
+        </div>
+
+        <div className="login-form-body">
         <div className="login-header">
-          <div className="login-logo">
-            <img src={Logo} alt="Parmeshwari Brass Industries" className="login-logo-img" />
-          </div>
-          <h2 className="login-title">ERP System Login</h2>
+          <h2 className="login-title">Welcome Back</h2>
+          <p className="login-subtitle">Sign in to your ERP account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -89,6 +92,7 @@ const LoginPage: React.FC = () => {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );

@@ -32,7 +32,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 22px;
   font-weight: 400;
-  color: #17344d;
+  color: #2D1017;
   margin: 0;
   text-align: center;
 }
@@ -48,7 +48,7 @@
   height: 28px;
   border-radius: 50%;
   font-size: 18px;
-  color: #17344d;
+  color: #2D1017;
   cursor: pointer;
   transition: background 0.2s ease;
   display: flex;
@@ -93,7 +93,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 16px;
   font-weight: 400;
-  color: #17344d;
+  color: #2D1017;
 }
 
 .dispatch-item-input-box {
@@ -156,7 +156,7 @@
 
 .dropdown-icon {
   font-size: 12px;
-  color: #17344d;
+  color: #2D1017;
   transition: transform 0.2s ease;
 }
 
@@ -204,7 +204,7 @@
   height: 20px;
   border: none;
   background: transparent;
-  color: #17344d;
+  color: #2D1017;
   font-size: 16px;
   font-weight: 400;
   cursor: pointer;
@@ -253,7 +253,7 @@
   height: 18px;
   width: 18px;
   background-color: transparent;
-  border: 1.5px solid #17344d;
+  border: 1.5px solid #2D1017;
   border-radius: 3px;
   transition: all 0.2s ease;
 }
@@ -263,8 +263,8 @@
 }
 
 .checkbox-container input:checked ~ .checkmark {
-  background-color: #17344d;
-  border-color: #17344d;
+  background-color: #2D1017;
+  border-color: #2D1017;
 }
 
 .checkmark:after {
@@ -307,8 +307,8 @@
   height: 42px;
   border-radius: 50px;
   padding: 8px 20px;
-  background: #d1eeff;
-  color: #17344d;
+  background: #A5213A;
+  color: #FFFFFF;
   font-family: 'Jost', sans-serif;
   font-size: 16px;
   font-weight: 400;

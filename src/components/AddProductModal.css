@@ -11,7 +11,7 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 26px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0 0 20px 0;
   text-align: center;
 }
@@ -43,7 +43,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .form-input {
@@ -54,13 +54,13 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   outline: none;
   transition: border-color 0.3s ease;
 }
 
 .form-input:focus {
-  border-color: #17344D;
+  border-color: #2D1017;
 }
 
 .form-input::placeholder {
@@ -87,12 +87,12 @@
 }
 
 .save-button {
-  background: #D1EEFF;
-  color: #17344D;
+  background: #A5213A;
+  color: #FFFFFF;
 }
 
 .save-button:hover:not(:disabled) {
-  background: #b8dfff;
+  background: #7A1829;
 }
 
 .save-button:disabled {
@@ -102,7 +102,7 @@
 
 .cancel-button {
   background: #FFFFFF;
-  color: #17344D;
+  color: #2D1017;
   border: 1px solid rgba(125, 153, 169, 0.3);
 }
 
@@ -149,8 +149,8 @@
   padding: 0;
   border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 8px;
-  background: #D1EEFF;
-  color: #17344D;
+  background: #A5213A;
+  color: #FFFFFF;
   font-size: 20px;
   font-weight: 500;
   cursor: pointer;
@@ -161,7 +161,7 @@
 }
 
 .add-new-btn:hover {
-  background: #b8dfff;
+  background: #7A1829;
 }
 
 .add-new-input-group {
@@ -178,7 +178,7 @@
   padding: 8px 16px;
   border: none;
   border-radius: 8px;
-  background: #17344D;
+  background: #2D1017;
   color: #FFFFFF;
   font-family: 'Jost', sans-serif;
   font-size: 13px;

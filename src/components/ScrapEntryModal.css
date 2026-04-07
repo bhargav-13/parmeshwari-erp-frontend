@@ -15,7 +15,7 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 32px;
-  color: #17344D;
+  color: #2D1017;
   margin: 0 0 24px 0;
 }
 
@@ -65,7 +65,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
 }
 
 .scrap-form-input {
@@ -76,14 +76,14 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   transition: border-color 0.3s ease;
 }
 
 .scrap-form-input:focus {
-  border-color: #17344D;
+  border-color: #2D1017;
   background: #FFFFFF;
 }
 
@@ -99,7 +99,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   cursor: pointer;
@@ -139,12 +139,12 @@
 }
 
 .scrap-save-button {
-  background: #D1EEFF;
-  color: #17344D;
+  background: #A5213A;
+  color: #FFFFFF;
 }
 
 .scrap-save-button:hover:not(:disabled) {
-  background: #b8dfff;
+  background: #7A1829;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -156,8 +156,8 @@
 
 .scrap-cancel-button {
   background: transparent;
-  color: #17344D;
-  border: 1px solid #17344D;
+  color: #2D1017;
+  border: 1px solid #2D1017;
 }
 
 .scrap-cancel-button:hover {

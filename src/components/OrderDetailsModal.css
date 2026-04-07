@@ -38,7 +38,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 20px;
   font-weight: 600;
-  color: #17344d;
+  color: #2D1017;
   margin: 4px 0 2px;
 }
 
@@ -56,7 +56,7 @@
   height: 32px;
   border-radius: 50%;
   font-size: 16px;
-  color: #17344d;
+  color: #2D1017;
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -86,7 +86,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #17344d;
+  color: #2D1017;
   margin: 0;
 }
 
@@ -110,7 +110,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: #17344d;
+  color: #2D1017;
   text-align: left;
 }
 
@@ -118,7 +118,7 @@
   padding: 10px 12px;
   font-family: 'Jost', sans-serif;
   font-size: 13px;
-  color: #17344d;
+  color: #2D1017;
   border-bottom: 1px solid rgba(23, 52, 77, 0.06);
 }
 
@@ -158,7 +158,7 @@
 }
 
 .amount-card.highlight {
-  background: linear-gradient(120deg, #d1eeff, #edf6ff);
+  background: linear-gradient(120deg, #A5213A, #edf6ff);
   border-color: transparent;
 }
 
