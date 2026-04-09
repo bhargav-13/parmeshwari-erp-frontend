@@ -81,9 +81,7 @@ const ForgingPage: React.FC = () => {
             const created = await forgingInwardApi.create(data);
             // Save locally-added item after inward is created
             if (created.id && data.item && !data.item.id) {
-                await forgingInwardItemsApi.create(created.id, {
-                    name: data.item.name,
-                });
+                await forgingInwardItemsApi.create(created.id, data.item);
             }
         }
         await fetchInwardEntries();
@@ -363,6 +361,7 @@ const ForgingPage: React.FC = () => {
                     onClose={() => { setIsInwardModalOpen(false); setEditingInward(null); }}
                     onSubmit={handleInwardSubmit}
                     initialData={editingInward}
+                    existingInwards={inwardEntries}
                 />
             )}
 

@@ -625,6 +625,10 @@ export interface ForgingInwardItem {
   id?: number;
   inwardId?: number;
   name: string;
+  pricePerKg?: number;
+  lowStockAlert?: number;
+  quantityInPc?: number;
+  weightPerPc?: number;
 }
 
 export interface ForgingInward {

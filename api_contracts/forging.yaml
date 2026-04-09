@@ -618,6 +618,22 @@ components:
       properties:
         name:
           type: string
+        pricePerKg:
+          type: number
+          format: double
+          description: Price per KG for inventory valuation
+        lowStockAlert:
+          type: number
+          format: double
+          description: Low stock threshold in KG to trigger alert
+        quantityInPc:
+          type: number
+          format: double
+          description: Quantity in pieces (optional)
+        weightPerPc:
+          type: number
+          format: double
+          description: Weight per piece in KG; if set, piece count is auto-calculated from KG
 
     ForgingItem:
       type: object

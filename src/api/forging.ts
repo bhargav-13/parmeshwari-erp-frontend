@@ -92,6 +92,10 @@ const convertToForgingInward = (inward: any): ForgingInward => ({
         id: inward.item.id,
         inwardId: inward.item.inwardId,
         name: inward.item.name || '',
+        ...(inward.item.pricePerKg != null ? { pricePerKg: inward.item.pricePerKg } : {}),
+        ...(inward.item.lowStockAlert != null ? { lowStockAlert: inward.item.lowStockAlert } : {}),
+        ...(inward.item.quantityInPc != null ? { quantityInPc: inward.item.quantityInPc } : {}),
+        ...(inward.item.weightPerPc != null ? { weightPerPc: inward.item.weightPerPc } : {}),
     } : null,
 });
 
@@ -217,11 +221,29 @@ export const forgingInwardItemsApi = {
             }))
         ),
 
-    create: (inwardId: number, item: { name: string }): Promise<ForgingInwardItem> =>
-        authFetch(`/api/v1/forging-inward/${inwardId}/items`, {
+    create: (inwardId: number, item: Omit<ForgingInwardItem, 'id' | 'inwardId'>): Promise<ForgingInwardItem> => {
+        const body: Record<string, any> = { name: item.name };
+        if (item.pricePerKg != null) body.pricePerKg = item.pricePerKg;
+        if (item.lowStockAlert != null) body.lowStockAlert = item.lowStockAlert;
+        if (item.quantityInPc != null) body.quantityInPc = item.quantityInPc;
+        if (item.weightPerPc != null) body.weightPerPc = item.weightPerPc;
+        return authFetch(`/api/v1/forging-inward/${inwardId}/items`, {
             method: 'POST',
-            body: JSON.stringify(item),
-        }),
+            body: JSON.stringify(body),
+        });
+    },
+
+    update: (inwardId: number, itemId: number, item: Omit<ForgingInwardItem, 'id' | 'inwardId'>): Promise<ForgingInwardItem> => {
+        const body: Record<string, any> = { name: item.name };
+        if (item.pricePerKg != null) body.pricePerKg = item.pricePerKg;
+        if (item.lowStockAlert != null) body.lowStockAlert = item.lowStockAlert;
+        if (item.quantityInPc != null) body.quantityInPc = item.quantityInPc;
+        if (item.weightPerPc != null) body.weightPerPc = item.weightPerPc;
+        return authFetch(`/api/v1/forging-inward/${inwardId}/items/${itemId}`, {
+            method: 'PUT',
+            body: JSON.stringify(body),
+        });
+    },
 
     delete: (inwardId: number, itemId: number): Promise<void> =>
         authFetch(`/api/v1/forging-inward/${inwardId}/items/${itemId}`, {
