@@ -25,7 +25,6 @@ dist-ssr/
 # Generated API clients
 # ======================
 src/api/generated/
-src/api-client/
 
 # ======================
 # Environment / Sensitive files

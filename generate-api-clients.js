@@ -5,6 +5,13 @@ import { join, basename, extname } from 'path';
 const contractsDir = './api_contracts';
 const outputDir = './src/api-client';
 
+// Skip generation if clients are already present (e.g. on Vercel where
+// the openapi-generator Java runtime is unavailable — clients are committed).
+if (existsSync(outputDir) && readdirSync(outputDir).length > 0) {
+    console.log("API clients already present, skipping generation.");
+    process.exit(0);
+}
+
 console.log("Generating API clients from OpenAPI specs...");
 
 if (!existsSync(outputDir)) {
