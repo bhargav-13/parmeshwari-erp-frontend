@@ -9,6 +9,7 @@ import RawInventoryApi from '../api-client/inventory/src/api/RawInventoryApi';
 import CategoryApi from '../api-client/inventory/src/api/CategoryApi';
 import ProductApi from '../api-client/inventory/src/api/ProductApi';
 import PurchaseApi from '../api-client/inventory/src/api/PurchaseApi';
+import RejectionApi from '../api-client/inventory/src/api/RejectionApi';
 
 // Order Management API
 import OrdersApi from '../api-client/order-management/src/api/OrdersApi';
@@ -143,6 +144,7 @@ export const invoicesApi = new InvoicesApi(apiClient);
 export const paymentsApi = new PaymentsApi(apiClient);
 export const imageApi = new ImageManagementApi(apiClient);
 export const purchaseApiClient = new PurchaseApi(apiClient);
+export const rejectionApi = new RejectionApi(apiClient);
 
 // Helper function to convert callback-based API to Promise
 export function promisify<T>(

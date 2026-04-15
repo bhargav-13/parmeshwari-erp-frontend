@@ -590,6 +590,9 @@ components:
         transport:
           type: string
           nullable: true
+        note:
+          type: string
+          nullable: true
 
         # Product list
         products:
@@ -673,6 +676,9 @@ components:
         productsTotal:
           type: number
         transport:
+          type: string
+          nullable: true
+        note:
           type: string
           nullable: true
         products:

@@ -12,7 +12,7 @@ export interface KevinScrapRequest {
     orderDate: string;
     item: string;
     elementValue: number;
-    elementType: 'FOAM' | 'BAG' | 'PETI' | 'DRUM' | 'OTHER';
+    elementType: 'BAG';
     totalWeight: number;
     outWeight: number;
     netWeight: number;
@@ -25,7 +25,7 @@ export interface KevinScrap {
     orderDate: string;
     item: string;
     elementValue: number;
-    elementType: 'FOAM' | 'BAG' | 'PETI' | 'DRUM' | 'OTHER';
+    elementType: 'BAG';
     totalWeight: number;
     outWeight: number;
     netWeight: number;
@@ -55,7 +55,7 @@ export interface JayeshScrapRequest {
     orderDate: string;
     item: string;
     elementValue: number;
-    elementType: 'FOAM' | 'BAG' | 'PETI' | 'DRUM' | 'OTHER';
+    elementType: 'BAG';
     totalWeight: number;
     outWeight: number;
     netWeight: number;
@@ -80,7 +80,7 @@ export interface JayeshScrap {
     orderDate: string;
     item: string;
     elementValue: number;
-    elementType: 'FOAM' | 'BAG' | 'PETI' | 'DRUM' | 'OTHER';
+    elementType: 'BAG';
     totalWeight: number;
     outWeight: number;
     netWeight: number;
@@ -149,6 +149,11 @@ export const kevinScrapApi = {
 
     deleteScrap: async (id: number): Promise<void> => {
         await apiClient.delete(`/api/v1/kevin/scrap/${id}`);
+    },
+
+    getScrapItems: async (): Promise<string[]> => {
+        const response = await apiClient.get<string[]>('/api/v1/kevin/scrap/items');
+        return response.data;
     },
 
     downloadPdf: async (fromDate?: string, toDate?: string): Promise<void> => {
@@ -222,6 +227,11 @@ export const jayeshScrapApi = {
 
     withdrawScrap: async (id: number, data: JayeshScrapWithdrawRequest): Promise<JayeshScrap> => {
         const response = await apiClient.patch<JayeshScrap>(`/api/v1/jayesh/scrap/${id}/withdraw`, data);
+        return response.data;
+    },
+
+    getScrapItems: async (): Promise<string[]> => {
+        const response = await apiClient.get<string[]>('/api/v1/jayesh/scrap/items');
         return response.data;
     },
 

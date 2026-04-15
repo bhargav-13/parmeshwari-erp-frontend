@@ -58,6 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { path: '/casting', icon: <img src={SubcontractIcon} alt='Casting' />, label: 'Casting' },
     { path: '/forging', icon: <img src={SettingIcon} alt='Forging' />, label: 'Forging' },
     { path: '/purchase', icon: <img src={OrderIcon} alt='Purchase' />, label: 'Purchase' },
+    { path: '/rejection', icon: <img src={SettingIcon} alt='Rejection' />, label: 'Rejection' },
   ];
 
   const inventorySubItems = [

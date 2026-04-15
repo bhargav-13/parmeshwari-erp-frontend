@@ -22,6 +22,8 @@ tags:
     description: Purchase Management and related Endpoints
   - name: Purchase Party
     description: Purchase Party Master and related Endpoints
+  - name: Rejection
+    description: Rejection entry management
 
 paths:
   /api/v1/purchase:
@@ -129,6 +131,308 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+    put:
+      tags:
+        - Purchase
+      operationId: updatePurchase
+      summary: Update an existing purchase and adjust inventory
+      parameters:
+        - name: purchaseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseRequest'
+      responses:
+        '200':
+          description: Purchase successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseResponse'
+        '404':
+          description: Purchase not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+    delete:
+      tags:
+        - Purchase
+      operationId: deletePurchase
+      summary: Delete a purchase and reverse inventory quantity
+      parameters:
+        - name: purchaseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Purchase successfully deleted
+        '404':
+          description: Purchase not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+  # ========================
+  # Rejection
+  # ========================
+  /api/v1/rejection:
+    post:
+      tags:
+        - Rejection
+      operationId: addRejection
+      summary: Add a new rejection entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectionRequest'
+      responses:
+        '201':
+          description: Rejection successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectionResponse'
+        '400':
+          description: Insufficient inventory or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Party or stock item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+    get:
+      tags:
+        - Rejection
+      operationId: getRejectionList
+      summary: Get paginated rejection entries, optionally filtered by returnType
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/sizeParam'
+        - $ref: '#/components/parameters/directionParam'
+        - name: returnType
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ReturnType'
+      responses:
+        '200':
+          description: Paginated list of rejections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResultRejection'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+  /api/v1/rejection/export/pdf:
+    get:
+      tags:
+        - Rejection
+      operationId: exportRejectionPdf
+      summary: Export rejection entries as PDF (optional party + date range filters)
+      parameters:
+        - name: partyId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+      security:
+        - oauth2: [ ]
+
+  /api/v1/rejection/{rejectionId}:
+    get:
+      tags:
+        - Rejection
+      operationId: getRejectionById
+      summary: Get rejection entry by ID
+      parameters:
+        - name: rejectionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Rejection found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectionResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+    put:
+      tags:
+        - Rejection
+      operationId: updateRejection
+      summary: Update rejection entry and adjust inventory accordingly
+      parameters:
+        - name: rejectionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectionRequest'
+      responses:
+        '200':
+          description: Rejection updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectionResponse'
+        '400':
+          description: Insufficient inventory or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - oauth2: [ ]
+
+    delete:
+      tags:
+        - Rejection
+      operationId: deleteRejection
+      summary: Delete rejection entry and restore inventory if returnType was MAAL
+      parameters:
+        - name: rejectionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Rejection deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
@@ -1313,6 +1617,7 @@ components:
       enum:
         - KG
         - GM
+        - PCS
 
     InventoryStatus:
       type: string
@@ -1511,6 +1816,91 @@ components:
         offlineAmount:
           type: number
           format: double
+
+    ReturnType:
+      type: string
+      enum:
+        - CASH
+        - MAAL
+
+    RejectionRequest:
+      type: object
+      required:
+        - partyId
+        - date
+        - weight
+        - returnType
+      properties:
+        partyId:
+          type: integer
+          format: int64
+          description: Party ID from purchase_party master
+        date:
+          type: string
+          format: date
+        weight:
+          type: number
+          format: double
+          description: Weight of the rejected item in kg
+        returnType:
+          $ref: '#/components/schemas/ReturnType'
+        amount:
+          type: number
+          format: double
+          description: Cash amount returned — required when returnType is CASH
+        stockItemId:
+          type: integer
+          format: int64
+          description: Stock item ID from inventory — required when returnType is MAAL
+        returnQty:
+          type: number
+          format: double
+          description: Quantity (kg) to deduct from stock item — required when returnType is MAAL
+
+    RejectionResponse:
+      type: object
+      properties:
+        rejectionId:
+          type: integer
+          format: int64
+        party:
+          $ref: '#/components/schemas/PurchaseParty'
+        date:
+          type: string
+          format: date
+        weight:
+          type: number
+          format: double
+        returnType:
+          $ref: '#/components/schemas/ReturnType'
+        amount:
+          type: number
+          format: double
+        stockItem:
+          $ref: '#/components/schemas/StockItem'
+        returnQty:
+          type: number
+          format: double
+
+    PaginatedResultRejection:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RejectionResponse'
+        empty:
+          type: boolean
+        last:
+          type: boolean
+        first:
+          type: boolean
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        size:
+          type: integer
 
     ErrorResponse:
       type: object

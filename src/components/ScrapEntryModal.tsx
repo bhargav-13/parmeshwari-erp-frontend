@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { KevinScrapRequest, JayeshScrapRequest, KevinScrapContractor, JayeshScrapContractor } from '../api/scrap';
 import { kevinScrapApi, jayeshScrapApi } from '../api/scrap';
 import './ScrapEntryModal.css';
@@ -23,7 +23,7 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
             orderDate: new Date().toISOString().split('T')[0],
             item: '',
             elementValue: 0,
-            elementType: 'FOAM',
+            elementType: 'BAG',
             totalWeight: 0,
             outWeight: 0,
             netWeight: 0,
@@ -35,6 +35,12 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
     const [error, setError] = useState<string | null>(null);
     const [contractors, setContractors] = useState<(KevinScrapContractor | JayeshScrapContractor)[]>([]);
     const [loadingContractors, setLoadingContractors] = useState(true);
+
+    // Item autocomplete state
+    const [itemOptions, setItemOptions] = useState<string[]>([]);
+    const [itemInput, setItemInput] = useState(initialData?.item ?? '');
+    const [itemDropdownOpen, setItemDropdownOpen] = useState(false);
+    const itemInputRef = useRef<HTMLInputElement>(null);
 
     // States for adding new contractor inline
     const [showAddContractor, setShowAddContractor] = useState(false);
@@ -57,7 +63,19 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
             }
         };
 
+        const fetchItems = async () => {
+            try {
+                const items = scrapType === 'kevin'
+                    ? await kevinScrapApi.getScrapItems()
+                    : await jayeshScrapApi.getScrapItems();
+                setItemOptions(items);
+            } catch (err) {
+                console.error('Failed to fetch scrap items:', err);
+            }
+        };
+
         fetchContractors();
+        fetchItems();
     }, [scrapType]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -205,17 +223,44 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
                     </div>
 
                     <div className="scrap-form-row">
-                        <div className="scrap-form-group">
+                        <div className="scrap-form-group scrap-item-combobox">
                             <label className="scrap-form-label">Item</label>
                             <input
+                                ref={itemInputRef}
                                 type="text"
-                                name="item"
-                                value={formData.item}
-                                onChange={handleChange}
+                                value={itemInput}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setItemInput(val);
+                                    setFormData((prev) => ({ ...prev, item: val }));
+                                    setItemDropdownOpen(true);
+                                }}
+                                onFocus={() => setItemDropdownOpen(true)}
+                                onBlur={() => setTimeout(() => setItemDropdownOpen(false), 150)}
                                 placeholder="Brass"
                                 className="scrap-form-input"
                                 required
+                                autoComplete="off"
                             />
+                            {itemDropdownOpen && itemOptions.length > 0 && (
+                                <ul className="scrap-item-dropdown">
+                                    {itemOptions
+                                        .filter((opt) => opt.toLowerCase().includes(itemInput.toLowerCase()))
+                                        .map((opt) => (
+                                            <li
+                                                key={opt}
+                                                className="scrap-item-dropdown-option"
+                                                onMouseDown={() => {
+                                                    setItemInput(opt);
+                                                    setFormData((prev) => ({ ...prev, item: opt }));
+                                                    setItemDropdownOpen(false);
+                                                }}
+                                            >
+                                                {opt}
+                                            </li>
+                                        ))}
+                                </ul>
+                            )}
                         </div>
 
                         <div className="scrap-form-group scrap-element-group">
@@ -238,11 +283,7 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
                                     onChange={handleChange}
                                     className="scrap-form-select element-type"
                                 >
-                                    <option value="FOAM">Foam</option>
                                     <option value="BAG">Bag</option>
-                                    <option value="PETI">Peti</option>
-                                    <option value="DRUM">Drum</option>
-                                    <option value="OTHER">Other</option>
                                 </select>
                             </div>
                         </div>
