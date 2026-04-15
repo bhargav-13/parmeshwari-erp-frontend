@@ -543,6 +543,7 @@ components:
         - CHHOL
         - KG
         - TAIYAR MAAL
+        - REJECTION
     OutwardWeightUnit:
       type: string
       enum:

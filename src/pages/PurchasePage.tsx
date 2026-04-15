@@ -10,6 +10,8 @@ import AddPurchaseModal from '../components/AddPurchaseModal';
 import InventoryUpdateModal from '../components/InventoryUpdateModal';
 import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
+import EditIcon from '../assets/edit.svg';
+import DeleteIcon from '../assets/delete.svg';
 
 const PurchasePage: React.FC = () => {
   const [purchases, setPurchases] = useState<PurchaseResponse[]>([]);
@@ -19,8 +21,12 @@ const PurchasePage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPurchase, setEditingPurchase] = useState<PurchaseResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [alreadyExistsResponse, setAlreadyExistsResponse] = useState<PurchaseResponse | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -49,8 +55,38 @@ const PurchasePage: React.FC = () => {
     }
   };
 
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const handleAlreadyExists = (response: PurchaseResponse) => {
     setAlreadyExistsResponse(response);
+  };
+
+  const handleEditClick = (purchase: PurchaseResponse) => {
+    setEditingPurchase(purchase);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = (purchaseId: number) => {
+    setDeleteConfirmId(purchaseId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteConfirmId === null) return;
+    try {
+      setIsDeleting(true);
+      await purchaseApi.deletePurchase(deleteConfirmId);
+      setDeleteConfirmId(null);
+      showToast('Purchase deleted successfully.', 'success');
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting purchase:', error);
+      showToast('Failed to delete purchase.', 'error');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const getInventoryTypeLabel = (type: PurchaseInventoryType) => {
@@ -147,6 +183,7 @@ const PurchasePage: React.FC = () => {
               <th>Total</th>
               <th>Deposited</th>
               <th>Inventory Type</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -166,11 +203,31 @@ const PurchasePage: React.FC = () => {
                     {getInventoryTypeLabel(purchase.inventoryType)}
                   </span>
                 </td>
+                <td>
+                  <div className="action-buttons">
+                    <button
+                      type="button"
+                      className="icon-button"
+                      onClick={() => handleEditClick(purchase)}
+                      title="Edit"
+                    >
+                      <img src={EditIcon} alt="Edit" className="icon-img" />
+                    </button>
+                    <button
+                      type="button"
+                      className="icon-button"
+                      onClick={() => handleDeleteClick(purchase.purchaseId)}
+                      title="Delete"
+                    >
+                      <img src={DeleteIcon} alt="Delete" className="icon-img" />
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
             {purchases.length === 0 && (
               <tr>
-                <td colSpan={10} className="no-data">
+                <td colSpan={11} className="no-data">
                   No purchases found
                 </td>
               </tr>
@@ -181,12 +238,13 @@ const PurchasePage: React.FC = () => {
 
       {isModalOpen && (
         <AddPurchaseModal
-          onClose={() => setIsModalOpen(false)}
-          onSuccess={fetchData}
+          onClose={() => { setIsModalOpen(false); setEditingPurchase(null); }}
+          onSuccess={() => { showToast(editingPurchase ? 'Purchase updated successfully.' : 'Purchase created successfully.', 'success'); fetchData(); }}
           products={products}
           purchaseParties={purchaseParties}
           categories={categories}
           onAlreadyExists={handleAlreadyExists}
+          editingPurchase={editingPurchase}
         />
       )}
 
@@ -196,6 +254,41 @@ const PurchasePage: React.FC = () => {
           onSuccess={fetchData}
           purchaseResponse={alreadyExistsResponse}
         />
+      )}
+
+      {deleteConfirmId !== null && (
+        <div className="modal-overlay" onClick={() => setDeleteConfirmId(null)}>
+          <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Delete Purchase</h2>
+            <p className="delete-confirm-text">
+              Are you sure you want to delete this purchase? Inventory will be adjusted.
+            </p>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="save-button"
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+              <button
+                type="button"
+                className="cancel-button"
+                onClick={() => setDeleteConfirmId(null)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div className={`toast toast-${toast.type}`}>
+          {toast.message}
+        </div>
       )}
     </div>
   );

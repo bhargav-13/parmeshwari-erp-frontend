@@ -109,7 +109,8 @@
 }
 
 .order-form-group input,
-.order-form-group select {
+.order-form-group select,
+.order-form-group textarea {
   border: 1px solid rgba(23, 52, 77, 0.15);
   border-radius: 10px;
   padding: 10px 14px;
@@ -122,9 +123,20 @@
 }
 
 .order-form-group input:focus,
-.order-form-group select:focus {
+.order-form-group select:focus,
+.order-form-group textarea:focus {
   border-color: #4a8fdc;
   background: #ffffff;
+}
+
+.order-form-group textarea {
+  min-height: 44px;
+  line-height: 1.35;
+  resize: vertical;
+}
+
+.order-form-group--full {
+  grid-column: 1 / -1;
 }
 
 .line-items-section {

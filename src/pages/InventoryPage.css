@@ -734,3 +734,38 @@
     line-height: 20px;
   }
 }
+
+.delete-confirm-text {
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Jost', sans-serif;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: toast-in 0.2s ease;
+}
+
+.toast-success {
+  background: #e6f4ea;
+  color: #1a7a3c;
+  border: 1px solid #b7dfc4;
+}
+
+.toast-error {
+  background: #fdecea;
+  color: #8b0000;
+  border: 1px solid #f5b7b7;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

@@ -22,6 +22,7 @@ const currency = (value?: number | null) => {
 };
 
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose }) => {
+  const note = order.note?.trim();
   return (
     <div className="order-details-overlay" onClick={onClose}>
       <div className="order-details-modal" onClick={(e) => e.stopPropagation()}>
@@ -58,6 +59,12 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
               <p className="summary-label">Payment Date</p>
               <p className="summary-value">{formatDate(order.paymentDate)}</p>
             </div>
+            {note && (
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p className="summary-label">Note</p>
+                <p className="summary-value">{note}</p>
+              </div>
+            )}
           </div>
         </div>
 

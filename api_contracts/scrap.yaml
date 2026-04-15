@@ -140,7 +140,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
     get:
@@ -179,6 +178,26 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
+  /api/v1/kevin/scrap/items:
+    get:
+      tags:
+        - KevinScrap
+      operationId: getKevinScrapItems
+      summary: Get distinct item names from Kevin scrap entries
+      responses:
+        '200':
+          description: List of distinct item names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '401':
+          description: Unauthorized
+      security:
+        - oauth2: [ ]
+
   /api/v1/kevin/scrap/export/pdf:
     get:
       tags:
@@ -479,6 +498,26 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
+  /api/v1/jayesh/scrap/items:
+    get:
+      tags:
+        - JayeshScrap
+      operationId: getJayeshScrapItems
+      summary: Get distinct item names from Jayesh scrap entries
+      responses:
+        '200':
+          description: List of distinct item names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '401':
+          description: Unauthorized
+      security:
+        - oauth2: [ ]
+
   /api/v1/jayesh/scrap/export/pdf:
     get:
       tags:

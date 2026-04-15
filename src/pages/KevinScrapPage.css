@@ -296,3 +296,24 @@
         min-width: 800px;
     }
 }
+
+.download-hint-text {
+    margin-bottom: 1rem;
+    font-weight: 400;
+}
+
+.optional-label {
+    opacity: 0.5;
+}
+
+.item-filter-select {
+    padding: 8px 12px;
+    border: 1px solid #d0dde8;
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: #17344D;
+    background: #fff;
+    cursor: pointer;
+    min-width: 160px;
+}

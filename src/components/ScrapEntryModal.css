@@ -245,3 +245,36 @@
     padding: 10px 20px;
   }
 }
+
+.scrap-item-combobox {
+  position: relative;
+}
+
+.scrap-item-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #d0dde8;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 100;
+  margin: 2px 0 0;
+  padding: 4px 0;
+  list-style: none;
+}
+
+.scrap-item-dropdown-option {
+  padding: 8px 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: #17344D;
+  cursor: pointer;
+}
+
+.scrap-item-dropdown-option:hover {
+  background: #f0f7ff;
+}

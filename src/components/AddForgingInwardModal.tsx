@@ -7,6 +7,7 @@ const INWARD_WEIGHT_UNITS: { value: InwardWeightUnit; label: string }[] = [
     { value: 'KG', label: 'KG' },
     { value: 'CHHOL', label: 'Chhol' },
     { value: 'TAIYAR MAAL', label: 'Taiyar Maal' },
+    { value: 'REJECTION', label: 'Rejection' },
 ];
 
 interface AddForgingInwardModalProps {
