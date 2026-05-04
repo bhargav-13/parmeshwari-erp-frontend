@@ -862,6 +862,14 @@ export interface CashflowEntryRequest {
   note?: string;
 }
 
+export interface CashflowPaymentTypeSummary {
+  paymentTypeId: number;
+  paymentTypeName: string;
+  totalIncome: number;
+  totalExpense: number;
+  netBalance: number;
+}
+
 export interface CashflowDailySummary {
   date: string;
   totalIncome: number;
@@ -872,6 +880,7 @@ export interface CashflowDailySummary {
   carryForwardType: string | null; // 'INCOME' | 'EXPENSE' | null
   incomes: CashflowEntry[];
   expenses: CashflowEntry[];
+  paymentTypeSummary?: CashflowPaymentTypeSummary[];
 }
 
 export interface CashflowCloseDayResponse {

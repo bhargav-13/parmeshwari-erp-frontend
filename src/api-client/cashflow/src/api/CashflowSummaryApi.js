@@ -85,9 +85,11 @@ export default class CashflowSummaryApi {
      */
 
     /**
-     * Get daily summary with totals and carry-forward preview
+     * Get daily summary with totals, carry-forward preview, and party-wise breakdown
      * @param {Object} opts Optional parameters
      * @param {Date} [date] Filter by date (yyyy-MM-dd)
+     * @param {Date} [fromDate] Start date for range filter (yyyy-MM-dd)
+     * @param {Date} [toDate] End date for range filter (yyyy-MM-dd)
      * @param {module:api/CashflowSummaryApi~getDailySummaryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/DailySummaryResponse}
      */
@@ -98,7 +100,9 @@ export default class CashflowSummaryApi {
       let pathParams = {
       };
       let queryParams = {
-        'date': opts['date']
+        'date': opts['date'],
+        'fromDate': opts['fromDate'],
+        'toDate': opts['toDate']
       };
       let headerParams = {
       };

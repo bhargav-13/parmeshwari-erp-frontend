@@ -13,6 +13,8 @@
 
 import ApiClient from '../ApiClient';
 import CashflowEntryResponse from './CashflowEntryResponse';
+import CashflowPartySummary from './CashflowPartySummary';
+import CashflowPaymentTypeSummary from './CashflowPaymentTypeSummary';
 
 /**
  * The DailySummaryResponse model module.
@@ -51,6 +53,12 @@ class DailySummaryResponse {
             if (data.hasOwnProperty('date')) {
                 obj['date'] = ApiClient.convertToType(data['date'], 'Date');
             }
+            if (data.hasOwnProperty('fromDate')) {
+                obj['fromDate'] = ApiClient.convertToType(data['fromDate'], 'Date');
+            }
+            if (data.hasOwnProperty('toDate')) {
+                obj['toDate'] = ApiClient.convertToType(data['toDate'], 'Date');
+            }
             if (data.hasOwnProperty('totalIncome')) {
                 obj['totalIncome'] = ApiClient.convertToType(data['totalIncome'], 'Number');
             }
@@ -74,6 +82,12 @@ class DailySummaryResponse {
             }
             if (data.hasOwnProperty('expenses')) {
                 obj['expenses'] = ApiClient.convertToType(data['expenses'], [CashflowEntryResponse]);
+            }
+            if (data.hasOwnProperty('partySummary')) {
+                obj['partySummary'] = ApiClient.convertToType(data['partySummary'], [CashflowPartySummary]);
+            }
+            if (data.hasOwnProperty('paymentTypeSummary')) {
+                obj['paymentTypeSummary'] = ApiClient.convertToType(data['paymentTypeSummary'], [CashflowPaymentTypeSummary]);
             }
         }
         return obj;
@@ -109,6 +123,26 @@ class DailySummaryResponse {
                 CashflowEntryResponse.validateJSON(item);
             };
         }
+        if (data['partySummary']) { // data not null
+            // ensure the json data is an array
+            if (!Array.isArray(data['partySummary'])) {
+                throw new Error("Expected the field `partySummary` to be an array in the JSON data but got " + data['partySummary']);
+            }
+            // validate the optional field `partySummary` (array)
+            for (const item of data['partySummary']) {
+                CashflowPartySummary.validateJSON(item);
+            };
+        }
+        if (data['paymentTypeSummary']) { // data not null
+            // ensure the json data is an array
+            if (!Array.isArray(data['paymentTypeSummary'])) {
+                throw new Error("Expected the field `paymentTypeSummary` to be an array in the JSON data but got " + data['paymentTypeSummary']);
+            }
+            // validate the optional field `paymentTypeSummary` (array)
+            for (const item of data['paymentTypeSummary']) {
+                CashflowPaymentTypeSummary.validateJSON(item);
+            };
+        }
 
         return true;
     }
@@ -122,6 +156,16 @@ class DailySummaryResponse {
  * @member {Date} date
  */
 DailySummaryResponse.prototype['date'] = undefined;
+
+/**
+ * @member {Date} fromDate
+ */
+DailySummaryResponse.prototype['fromDate'] = undefined;
+
+/**
+ * @member {Date} toDate
+ */
+DailySummaryResponse.prototype['toDate'] = undefined;
 
 /**
  * @member {Number} totalIncome
@@ -166,6 +210,16 @@ DailySummaryResponse.prototype['incomes'] = undefined;
  * @member {Array.<module:model/CashflowEntryResponse>} expenses
  */
 DailySummaryResponse.prototype['expenses'] = undefined;
+
+/**
+ * @member {Array.<module:model/CashflowPartySummary>} partySummary
+ */
+DailySummaryResponse.prototype['partySummary'] = undefined;
+
+/**
+ * @member {Array.<module:model/CashflowPaymentTypeSummary>} paymentTypeSummary
+ */
+DailySummaryResponse.prototype['paymentTypeSummary'] = undefined;
 
 
 

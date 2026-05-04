@@ -249,9 +249,11 @@ paths:
       tags:
         - Cashflow Summary
       operationId: getDailySummary
-      summary: Get daily summary with totals and carry-forward preview
+      summary: Get daily summary with totals, carry-forward preview, and party-wise breakdown
       parameters:
         - $ref: '#/components/parameters/dateParam'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
       responses:
         '200':
           description: Daily cashflow summary
@@ -453,6 +455,24 @@ components:
         type: string
         format: date
 
+    fromDateParam:
+      name: fromDate
+      in: query
+      required: false
+      description: Start date for range filter (yyyy-MM-dd)
+      schema:
+        type: string
+        format: date
+
+    toDateParam:
+      name: toDate
+      in: query
+      required: false
+      description: End date for range filter (yyyy-MM-dd)
+      schema:
+        type: string
+        format: date
+
   schemas:
 
     CashflowNameRequest:
@@ -548,10 +568,52 @@ components:
         size:
           type: integer
 
+    CashflowPartySummary:
+      type: object
+      properties:
+        partyId:
+          type: integer
+          format: int64
+        partyName:
+          type: string
+        totalIncome:
+          type: number
+          format: double
+        totalExpense:
+          type: number
+          format: double
+        netBalance:
+          type: number
+          format: double
+
+    CashflowPaymentTypeSummary:
+      type: object
+      properties:
+        paymentTypeId:
+          type: integer
+          format: int64
+        paymentTypeName:
+          type: string
+        totalIncome:
+          type: number
+          format: double
+        totalExpense:
+          type: number
+          format: double
+        netBalance:
+          type: number
+          format: double
+
     DailySummaryResponse:
       type: object
       properties:
         date:
+          type: string
+          format: date
+        fromDate:
+          type: string
+          format: date
+        toDate:
           type: string
           format: date
         totalIncome:
@@ -582,6 +644,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CashflowEntryResponse'
+        partySummary:
+          type: array
+          items:
+            $ref: '#/components/schemas/CashflowPartySummary'
+        paymentTypeSummary:
+          type: array
+          items:
+            $ref: '#/components/schemas/CashflowPaymentTypeSummary'
 
     CloseDayResponse:
       type: object
