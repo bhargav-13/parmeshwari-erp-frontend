@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest, type KevinScrapRequest } from '../api/scrap';
+import { jayeshScrapApi, type JayeshScrap, type JayeshScrapRequest, type KevinScrapRequest, type JayeshScrapStats } from '../api/scrap';
 import ScrapEntryModal from '../components/ScrapEntryModal';
 import WithdrawalHistoryModal from '../components/WithdrawalHistoryModal';
 import Pagination from '../components/Pagination';
@@ -10,19 +10,34 @@ import DeleteIcon from '../assets/delete.svg';
 import ViewIcon from '../assets/view.svg';
 import './JayeshScrapPage.css';
 
-interface JayeshScrapStats {
-    totalEntries: number;
-    totalNetWeight: number;
-    totalAmount: number;
-}
+const getCurrentYearMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+};
+
+const getMonthDateRange = (yearMonth: string) => {
+    const [year, month] = yearMonth.split('-').map(Number);
+    const fromDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const toDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    return { fromDate, toDate };
+};
+
+const generateMonthOptions = () => {
+    const options: { value: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const label = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+        options.push({ value, label });
+    }
+    return options;
+};
 
 const JayeshScrapPage: React.FC = () => {
     const [scraps, setScraps] = useState<JayeshScrap[]>([]);
-    const [stats, setStats] = useState<JayeshScrapStats>({
-        totalEntries: 0,
-        totalNetWeight: 0,
-        totalAmount: 0,
-    });
+    const [stats, setStats] = useState<JayeshScrapStats>({ totalEntries: 0, totalNetWeight: 0, totalAmount: 0 });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingScrap, setEditingScrap] = useState<JayeshScrap | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +57,8 @@ const JayeshScrapPage: React.FC = () => {
     const [viewHistoryScrap, setViewHistoryScrap] = useState<JayeshScrap | null>(null);
     const [itemOptions, setItemOptions] = useState<string[]>([]);
     const [selectedItem, setSelectedItem] = useState<string>('');
+    const [selectedMonth, setSelectedMonth] = useState<string>(getCurrentYearMonth());
+    const monthOptions = generateMonthOptions();
 
     useEffect(() => {
         jayeshScrapApi.getScrapItems()
@@ -52,23 +69,32 @@ const JayeshScrapPage: React.FC = () => {
     useEffect(() => {
         fetchScraps();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, searchQuery, selectedItem]);
+    }, [page, searchQuery, selectedItem, selectedMonth]);
+
+    useEffect(() => {
+        fetchStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedMonth, selectedItem, searchQuery]);
+
+    const getDateRangeForMonth = () => {
+        return getMonthDateRange(selectedMonth);
+    };
 
     const fetchScraps = async () => {
         try {
             setLoading(true);
+            const { fromDate, toDate } = getDateRangeForMonth();
             const response = await jayeshScrapApi.getScrapList({
                 page,
                 size: 10,
                 search: selectedItem || searchQuery || undefined,
+                fromDate,
+                toDate,
             });
 
             setScraps(response.data);
             setTotalPages(response.totalPages);
             setTotalElements(response.totalElements);
-
-            // Calculate stats
-            calculateStats(response.data);
         } catch (error) {
             console.error('Error fetching Jayesh scraps:', error);
         } finally {
@@ -76,15 +102,23 @@ const JayeshScrapPage: React.FC = () => {
         }
     };
 
-    const calculateStats = (data: JayeshScrap[]) => {
-        const totalNetWeight = data.reduce((sum, s) => sum + (s.netWeight || 0), 0);
-        const totalAmount = data.reduce((sum, s) => sum + (s.netWeight * s.rate || 0), 0);
-
-        setStats({
-            totalEntries: data.length,
-            totalNetWeight,
-            totalAmount,
-        });
+    const fetchStats = async () => {
+        try {
+            const { fromDate, toDate } = getDateRangeForMonth();
+            const search = selectedItem || searchQuery || undefined;
+            if (search) {
+                // Filter active: aggregate all matching rows locally
+                const response = await jayeshScrapApi.getScrapList({ page: 0, size: 10000, fromDate, toDate, search });
+                const totalNetWeight = response.data.reduce((sum, s) => sum + (s.netWeight || 0), 0);
+                const totalAmount = response.data.reduce((sum, s) => sum + ((s.totalAmount ?? (s.netWeight * s.rate)) || 0), 0);
+                setStats({ totalEntries: response.totalElements, totalNetWeight, totalAmount });
+            } else {
+                const data = await jayeshScrapApi.getScrapStats(fromDate, toDate);
+                setStats(data);
+            }
+        } catch (error) {
+            console.error('Error fetching Jayesh scrap stats:', error);
+        }
     };
 
     const handleAddScrap = async (data: KevinScrapRequest | JayeshScrapRequest) => {
@@ -99,6 +133,7 @@ const JayeshScrapPage: React.FC = () => {
             setIsModalOpen(false);
             setEditingScrap(null);
             fetchScraps();
+            fetchStats();
         } catch (error) {
             console.error('Error saving Jayesh scrap:', error);
             throw error;
@@ -120,6 +155,7 @@ const JayeshScrapPage: React.FC = () => {
             try {
                 await jayeshScrapApi.deleteScrap(id);
                 fetchScraps();
+                fetchStats();
             } catch (error) {
                 console.error('Error deleting Jayesh scrap:', error);
             }
@@ -197,25 +233,40 @@ const JayeshScrapPage: React.FC = () => {
                 </button>
             </div>
 
-            <div className="stats-cards">
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-label">Total Entries</span>
-                        <span className="stat-value">{totalElements}</span>
-                    </div>
+            <div className="stats-section">
+                <div className="stats-month-selector">
+                    <select
+                        className="month-filter-select"
+                        value={selectedMonth}
+                        onChange={(e) => { setSelectedMonth(e.target.value); setPage(0); }}
+                        aria-label="Select month"
+                        title="Select month"
+                    >
+                        {monthOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
                 </div>
-
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-label">Total Net Weight</span>
-                        <span className="stat-value">{stats.totalNetWeight.toFixed(3)} kg</span>
+                <div className="stats-cards">
+                    <div className="stat-card">
+                        <div className="stat-content">
+                            <span className="stat-label">Total Entries</span>
+                            <span className="stat-value">{stats.totalEntries}</span>
+                        </div>
                     </div>
-                </div>
 
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-label">Total Amount</span>
-                        <span className="stat-value">₹ {stats.totalAmount.toLocaleString('en-IN')}</span>
+                    <div className="stat-card">
+                        <div className="stat-content">
+                            <span className="stat-label">Total Net Weight</span>
+                            <span className="stat-value">{stats.totalNetWeight.toFixed(3)} kg</span>
+                        </div>
+                    </div>
+
+                    <div className="stat-card">
+                        <div className="stat-content">
+                            <span className="stat-label">Total Amount</span>
+                            <span className="stat-value">₹ {stats.totalAmount.toLocaleString('en-IN')}</span>
+                        </div>
                     </div>
                 </div>
             </div>

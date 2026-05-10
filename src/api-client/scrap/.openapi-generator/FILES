@@ -9,11 +9,13 @@ src/model/JayeshScrap.js
 src/model/JayeshScrapContractor.js
 src/model/JayeshScrapContractorRequest.js
 src/model/JayeshScrapRequest.js
+src/model/JayeshScrapStats.js
 src/model/JayeshScrapWithdrawRequest.js
 src/model/JayeshScrapWithdrawal.js
 src/model/KevinScrap.js
 src/model/KevinScrapContractor.js
 src/model/KevinScrapContractorRequest.js
 src/model/KevinScrapRequest.js
+src/model/KevinScrapStats.js
 src/model/PaginatedResultJayeshScrap.js
 src/model/PaginatedResultKevinScrap.js

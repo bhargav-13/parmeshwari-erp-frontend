@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { kevinScrapApi, type KevinScrap, type KevinScrapRequest, type JayeshScrapRequest } from '../api/scrap';
+import { kevinScrapApi, type KevinScrap, type KevinScrapRequest, type JayeshScrapRequest, type KevinScrapStats } from '../api/scrap';
 import ScrapEntryModal from '../components/ScrapEntryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
@@ -8,17 +8,34 @@ import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import './KevinScrapPage.css';
 
-interface KevinScrapStats {
-    totalEntries: number;
-    totalNetWeight: number;
-}
+const getCurrentYearMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+};
+
+const getMonthDateRange = (yearMonth: string) => {
+    const [year, month] = yearMonth.split('-').map(Number);
+    const fromDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const toDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    return { fromDate, toDate };
+};
+
+const generateMonthOptions = () => {
+    const options: { value: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const label = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+        options.push({ value, label });
+    }
+    return options;
+};
 
 const KevinScrapPage: React.FC = () => {
     const [scraps, setScraps] = useState<KevinScrap[]>([]);
-    const [stats, setStats] = useState<KevinScrapStats>({
-        totalEntries: 0,
-        totalNetWeight: 0,
-    });
+    const [stats, setStats] = useState<KevinScrapStats>({ totalEntries: 0, totalNetWeight: 0 });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingScrap, setEditingScrap] = useState<KevinScrap | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -32,6 +49,8 @@ const KevinScrapPage: React.FC = () => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [itemOptions, setItemOptions] = useState<string[]>([]);
     const [selectedItem, setSelectedItem] = useState<string>('');
+    const [selectedMonth, setSelectedMonth] = useState<string>(getCurrentYearMonth());
+    const monthOptions = generateMonthOptions();
 
     useEffect(() => {
         kevinScrapApi.getScrapItems()
@@ -42,23 +61,32 @@ const KevinScrapPage: React.FC = () => {
     useEffect(() => {
         fetchScraps();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, searchQuery, selectedItem]);
+    }, [page, searchQuery, selectedItem, selectedMonth]);
+
+    useEffect(() => {
+        fetchStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedMonth, selectedItem, searchQuery]);
+
+    const getDateRangeForMonth = () => {
+        return getMonthDateRange(selectedMonth);
+    };
 
     const fetchScraps = async () => {
         try {
             setLoading(true);
+            const { fromDate, toDate } = getDateRangeForMonth();
             const response = await kevinScrapApi.getScrapList({
                 page,
                 size: 10,
                 search: selectedItem || searchQuery || undefined,
+                fromDate,
+                toDate,
             });
 
             setScraps(response.data);
             setTotalPages(response.totalPages);
             setTotalElements(response.totalElements);
-
-            // Calculate stats
-            calculateStats(response.data);
         } catch (error) {
             console.error('Error fetching Kevin scraps:', error);
         } finally {
@@ -66,13 +94,22 @@ const KevinScrapPage: React.FC = () => {
         }
     };
 
-    const calculateStats = (data: KevinScrap[]) => {
-        const totalNetWeight = data.reduce((sum, s) => sum + (s.netWeight || 0), 0);
-
-        setStats({
-            totalEntries: data.length,
-            totalNetWeight,
-        });
+    const fetchStats = async () => {
+        try {
+            const { fromDate, toDate } = getDateRangeForMonth();
+            const search = selectedItem || searchQuery || undefined;
+            if (search) {
+                // Filter active: aggregate all matching rows locally
+                const response = await kevinScrapApi.getScrapList({ page: 0, size: 10000, fromDate, toDate, search });
+                const totalNetWeight = response.data.reduce((sum, s) => sum + (s.netWeight || 0), 0);
+                setStats({ totalEntries: response.totalElements, totalNetWeight });
+            } else {
+                const data = await kevinScrapApi.getScrapStats(fromDate, toDate);
+                setStats(data);
+            }
+        } catch (error) {
+            console.error('Error fetching Kevin scrap stats:', error);
+        }
     };
 
     const handleAddScrap = async (data: KevinScrapRequest | JayeshScrapRequest) => {
@@ -87,6 +124,7 @@ const KevinScrapPage: React.FC = () => {
             setIsModalOpen(false);
             setEditingScrap(null);
             fetchScraps();
+            fetchStats();
         } catch (error) {
             console.error('Error saving Kevin scrap:', error);
             throw error;
@@ -108,6 +146,7 @@ const KevinScrapPage: React.FC = () => {
             try {
                 await kevinScrapApi.deleteScrap(id);
                 fetchScraps();
+                fetchStats();
             } catch (error) {
                 console.error('Error deleting Kevin scrap:', error);
             }
@@ -145,18 +184,33 @@ const KevinScrapPage: React.FC = () => {
                 </button>
             </div>
 
-            <div className="stats-cards">
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-label">Total Entries</span>
-                        <span className="stat-value">{totalElements}</span>
-                    </div>
+            <div className="stats-section">
+                <div className="stats-month-selector">
+                    <select
+                        className="month-filter-select"
+                        value={selectedMonth}
+                        onChange={(e) => { setSelectedMonth(e.target.value); setPage(0); }}
+                        aria-label="Select month"
+                        title="Select month"
+                    >
+                        {monthOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
                 </div>
+                <div className="stats-cards">
+                    <div className="stat-card">
+                        <div className="stat-content">
+                            <span className="stat-label">Total Entries</span>
+                            <span className="stat-value">{stats.totalEntries}</span>
+                        </div>
+                    </div>
 
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-label">Total Net Weight</span>
-                        <span className="stat-value">{stats.totalNetWeight.toFixed(3)} kg</span>
+                    <div className="stat-card">
+                        <div className="stat-content">
+                            <span className="stat-label">Total Net Weight</span>
+                            <span className="stat-value">{stats.totalNetWeight.toFixed(3)} kg</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -102,6 +102,17 @@ export interface PaginatedJayeshScrap {
     size: number;
 }
 
+export interface KevinScrapStats {
+    totalEntries: number;
+    totalNetWeight: number;
+}
+
+export interface JayeshScrapStats {
+    totalEntries: number;
+    totalNetWeight: number;
+    totalAmount: number;
+}
+
 // Kevin Scrap API
 export const kevinScrapApi = {
     // Contractor operations
@@ -130,10 +141,20 @@ export const kevinScrapApi = {
         page?: number;
         size?: number;
         search?: string;
+        fromDate?: string;
+        toDate?: string;
         sortByFields?: string;
         direction?: 'ASC' | 'DESC';
     }): Promise<PaginatedKevinScrap> => {
         const response = await apiClient.get<PaginatedKevinScrap>('/api/v1/kevin/scrap', { params });
+        return response.data;
+    },
+
+    getScrapStats: async (fromDate?: string, toDate?: string): Promise<KevinScrapStats> => {
+        const params: Record<string, string> = {};
+        if (fromDate) params.fromDate = fromDate;
+        if (toDate) params.toDate = toDate;
+        const response = await apiClient.get<KevinScrapStats>('/api/v1/kevin/scrap/stats', { params });
         return response.data;
     },
 
@@ -204,10 +225,20 @@ export const jayeshScrapApi = {
         page?: number;
         size?: number;
         search?: string;
+        fromDate?: string;
+        toDate?: string;
         sortByFields?: string;
         direction?: 'ASC' | 'DESC';
     }): Promise<PaginatedJayeshScrap> => {
         const response = await apiClient.get<PaginatedJayeshScrap>('/api/v1/jayesh/scrap', { params });
+        return response.data;
+    },
+
+    getScrapStats: async (fromDate?: string, toDate?: string): Promise<JayeshScrapStats> => {
+        const params: Record<string, string> = {};
+        if (fromDate) params.fromDate = fromDate;
+        if (toDate) params.toDate = toDate;
+        const response = await apiClient.get<JayeshScrapStats>('/api/v1/jayesh/scrap/stats', { params });
         return response.data;
     },
 

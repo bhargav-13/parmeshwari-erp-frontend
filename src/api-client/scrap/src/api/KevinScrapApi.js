@@ -16,6 +16,7 @@ import ApiClient from "../ApiClient";
 import ErrorResponse from '../model/ErrorResponse';
 import KevinScrap from '../model/KevinScrap';
 import KevinScrapRequest from '../model/KevinScrapRequest';
+import KevinScrapStats from '../model/KevinScrapStats';
 import PaginatedResultKevinScrap from '../model/PaginatedResultKevinScrap';
 
 /**
@@ -204,54 +205,6 @@ export default class KevinScrapApi {
     }
 
     /**
-     * Callback function to receive the result of the getKevinScrapList operation.
-     * @callback module:api/KevinScrapApi~getKevinScrapListCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/PaginatedResultKevinScrap} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Get all Kevin scrap entries with pagination
-     * @param {Object} opts Optional parameters
-     * @param {Number} [page = 0)] Page number starting from 0
-     * @param {Number} [size = 10)] Number of items (records) per page
-     * @param {String} [search] 
-     * @param {module:model/String} [sortByFields] Field to sort by
-     * @param {module:model/String} [direction] Sort direction
-     * @param {module:api/KevinScrapApi~getKevinScrapListCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/PaginatedResultKevinScrap}
-     */
-    getKevinScrapList(opts, callback) {
-      opts = opts || {};
-      let postBody = null;
-
-      let pathParams = {
-      };
-      let queryParams = {
-        'page': opts['page'],
-        'size': opts['size'],
-        'search': opts['search'],
-        'sortByFields': opts['sortByFields'],
-        'direction': opts['direction']
-      };
-      let headerParams = {
-      };
-      let formParams = {
-      };
-
-      let authNames = ['oauth2'];
-      let contentTypes = [];
-      let accepts = ['application/json'];
-      let returnType = PaginatedResultKevinScrap;
-      return this.apiClient.callApi(
-        '/api/v1/kevin/scrap', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, null, callback
-      );
-    }
-
-    /**
      * Callback function to receive the result of the getKevinScrapItems operation.
      * @callback module:api/KevinScrapApi~getKevinScrapItemsCallback
      * @param {String} error Error message, if any.
@@ -282,6 +235,100 @@ export default class KevinScrapApi {
       let returnType = ['String'];
       return this.apiClient.callApi(
         '/api/v1/kevin/scrap/items', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getKevinScrapList operation.
+     * @callback module:api/KevinScrapApi~getKevinScrapListCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/PaginatedResultKevinScrap} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get all Kevin scrap entries with pagination
+     * @param {Object} opts Optional parameters
+     * @param {Number} [page = 0)] Page number starting from 0
+     * @param {Number} [size = 10)] Number of items (records) per page
+     * @param {String} [search] 
+     * @param {Date} [fromDate] 
+     * @param {Date} [toDate] 
+     * @param {module:model/String} [sortByFields] Field to sort by
+     * @param {module:model/String} [direction] Sort direction
+     * @param {module:api/KevinScrapApi~getKevinScrapListCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/PaginatedResultKevinScrap}
+     */
+    getKevinScrapList(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'page': opts['page'],
+        'size': opts['size'],
+        'search': opts['search'],
+        'fromDate': opts['fromDate'],
+        'toDate': opts['toDate'],
+        'sortByFields': opts['sortByFields'],
+        'direction': opts['direction']
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['oauth2'];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = PaginatedResultKevinScrap;
+      return this.apiClient.callApi(
+        '/api/v1/kevin/scrap', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getKevinScrapStats operation.
+     * @callback module:api/KevinScrapApi~getKevinScrapStatsCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/KevinScrapStats} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get aggregated stats for Kevin scrap entries
+     * @param {Object} opts Optional parameters
+     * @param {Date} [fromDate] 
+     * @param {Date} [toDate] 
+     * @param {module:api/KevinScrapApi~getKevinScrapStatsCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/KevinScrapStats}
+     */
+    getKevinScrapStats(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'fromDate': opts['fromDate'],
+        'toDate': opts['toDate']
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['oauth2'];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = KevinScrapStats;
+      return this.apiClient.callApi(
+        '/api/v1/kevin/scrap/stats', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );

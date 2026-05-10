@@ -110,6 +110,37 @@ paths:
   # ========================
   # Kevin Scrap
   # ========================
+  /api/v1/kevin/scrap/stats:
+    get:
+      tags:
+        - KevinScrap
+      operationId: getKevinScrapStats
+      summary: Get aggregated stats for Kevin scrap entries
+      parameters:
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Aggregated Kevin scrap stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KevinScrapStats'
+        '401':
+          description: Unauthorized
+      security:
+        - oauth2: [ ]
+
   /api/v1/kevin/scrap:
     post:
       tags:
@@ -140,6 +171,7 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
         - oauth2: [ ]
     get:
@@ -155,6 +187,18 @@ paths:
           required: false
           schema:
             type: string
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
         - $ref: '#/components/parameters/SortByFields'
         - $ref: '#/components/parameters/directionParam'
       responses:
@@ -429,6 +473,37 @@ paths:
   # ========================
   # Jayesh Scrap
   # ========================
+  /api/v1/jayesh/scrap/stats:
+    get:
+      tags:
+        - JayeshScrap
+      operationId: getJayeshScrapStats
+      summary: Get aggregated stats for Jayesh scrap entries
+      parameters:
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Aggregated Jayesh scrap stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JayeshScrapStats'
+        '401':
+          description: Unauthorized
+      security:
+        - oauth2: [ ]
+
   /api/v1/jayesh/scrap:
     post:
       tags:
@@ -475,6 +550,18 @@ paths:
           required: false
           schema:
             type: string
+        - name: fromDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
         - $ref: '#/components/parameters/SortByFields'
         - $ref: '#/components/parameters/directionParam'
       responses:
@@ -1037,6 +1124,27 @@ components:
         size:
           type: integer
           description: Number of items per page
+
+    KevinScrapStats:
+      type: object
+      properties:
+        totalEntries:
+          type: integer
+        totalNetWeight:
+          type: number
+          format: double
+
+    JayeshScrapStats:
+      type: object
+      properties:
+        totalEntries:
+          type: integer
+        totalNetWeight:
+          type: number
+          format: double
+        totalAmount:
+          type: number
+          format: double
 
     # ========================
     # Shared Schemas

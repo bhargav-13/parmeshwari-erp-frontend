@@ -16,6 +16,7 @@ import ApiClient from "../ApiClient";
 import ErrorResponse from '../model/ErrorResponse';
 import JayeshScrap from '../model/JayeshScrap';
 import JayeshScrapRequest from '../model/JayeshScrapRequest';
+import JayeshScrapStats from '../model/JayeshScrapStats';
 import JayeshScrapWithdrawRequest from '../model/JayeshScrapWithdrawRequest';
 import PaginatedResultJayeshScrap from '../model/PaginatedResultJayeshScrap';
 
@@ -205,54 +206,6 @@ export default class JayeshScrapApi {
     }
 
     /**
-     * Callback function to receive the result of the getJayeshScrapList operation.
-     * @callback module:api/JayeshScrapApi~getJayeshScrapListCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/PaginatedResultJayeshScrap} data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Get all Jayesh scrap entries with pagination
-     * @param {Object} opts Optional parameters
-     * @param {Number} [page = 0)] Page number starting from 0
-     * @param {Number} [size = 10)] Number of items (records) per page
-     * @param {String} [search] 
-     * @param {module:model/String} [sortByFields] Field to sort by
-     * @param {module:model/String} [direction] Sort direction
-     * @param {module:api/JayeshScrapApi~getJayeshScrapListCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link module:model/PaginatedResultJayeshScrap}
-     */
-    getJayeshScrapList(opts, callback) {
-      opts = opts || {};
-      let postBody = null;
-
-      let pathParams = {
-      };
-      let queryParams = {
-        'page': opts['page'],
-        'size': opts['size'],
-        'search': opts['search'],
-        'sortByFields': opts['sortByFields'],
-        'direction': opts['direction']
-      };
-      let headerParams = {
-      };
-      let formParams = {
-      };
-
-      let authNames = ['oauth2'];
-      let contentTypes = [];
-      let accepts = ['application/json'];
-      let returnType = PaginatedResultJayeshScrap;
-      return this.apiClient.callApi(
-        '/api/v1/jayesh/scrap', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, null, callback
-      );
-    }
-
-    /**
      * Callback function to receive the result of the getJayeshScrapItems operation.
      * @callback module:api/JayeshScrapApi~getJayeshScrapItemsCallback
      * @param {String} error Error message, if any.
@@ -283,6 +236,100 @@ export default class JayeshScrapApi {
       let returnType = ['String'];
       return this.apiClient.callApi(
         '/api/v1/jayesh/scrap/items', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getJayeshScrapList operation.
+     * @callback module:api/JayeshScrapApi~getJayeshScrapListCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/PaginatedResultJayeshScrap} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get all Jayesh scrap entries with pagination
+     * @param {Object} opts Optional parameters
+     * @param {Number} [page = 0)] Page number starting from 0
+     * @param {Number} [size = 10)] Number of items (records) per page
+     * @param {String} [search] 
+     * @param {Date} [fromDate] 
+     * @param {Date} [toDate] 
+     * @param {module:model/String} [sortByFields] Field to sort by
+     * @param {module:model/String} [direction] Sort direction
+     * @param {module:api/JayeshScrapApi~getJayeshScrapListCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/PaginatedResultJayeshScrap}
+     */
+    getJayeshScrapList(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'page': opts['page'],
+        'size': opts['size'],
+        'search': opts['search'],
+        'fromDate': opts['fromDate'],
+        'toDate': opts['toDate'],
+        'sortByFields': opts['sortByFields'],
+        'direction': opts['direction']
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['oauth2'];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = PaginatedResultJayeshScrap;
+      return this.apiClient.callApi(
+        '/api/v1/jayesh/scrap', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getJayeshScrapStats operation.
+     * @callback module:api/JayeshScrapApi~getJayeshScrapStatsCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/JayeshScrapStats} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get aggregated stats for Jayesh scrap entries
+     * @param {Object} opts Optional parameters
+     * @param {Date} [fromDate] 
+     * @param {Date} [toDate] 
+     * @param {module:api/JayeshScrapApi~getJayeshScrapStatsCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/JayeshScrapStats}
+     */
+    getJayeshScrapStats(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'fromDate': opts['fromDate'],
+        'toDate': opts['toDate']
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['oauth2'];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = JayeshScrapStats;
+      return this.apiClient.callApi(
+        '/api/v1/jayesh/scrap/stats', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );

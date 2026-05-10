@@ -61,11 +61,38 @@
     font-weight: 600;
 }
 
+.stats-section {
+    margin-bottom: 24px;
+}
+
+.stats-month-selector {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.month-filter-select {
+    padding: 8px 12px;
+    border: 1px solid #D1E9F5;
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #17344D;
+    background: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.month-filter-select:focus {
+    border-color: #4AACDC;
+}
+
 .stats-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
-    margin-bottom: 24px;
 }
 
 .stat-card {
@@ -282,6 +309,10 @@
 
     .stats-cards {
         grid-template-columns: 1fr;
+    }
+
+    .month-filter-select {
+        width: 100%;
     }
 
     .order-filters {
