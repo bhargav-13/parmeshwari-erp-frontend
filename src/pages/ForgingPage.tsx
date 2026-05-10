@@ -39,6 +39,7 @@ const ForgingPage: React.FC = () => {
     const [downloadToDate, setDownloadToDate] = useState('');
     const [downloadParties, setDownloadParties] = useState<ForgingParty[]>([]);
     const [downloadPartiesLoading, setDownloadPartiesLoading] = useState(true);
+    const [selectedParty, setSelectedParty] = useState('');
 
     // Fetch forging entries and parties for PDF filter dropdown
     useEffect(() => {
@@ -142,23 +143,29 @@ const ForgingPage: React.FC = () => {
         return entries.reduce((sum, entry) => sum + entry.weight, 0);
     };
 
-    const totalInward = calculateTotalWeight(inwardEntries);
-    const totalOutward = calculateTotalWeight(outwardEntries);
-    const netStock = totalInward - totalOutward;
-    const pendingOrders = inwardEntries.length + outwardEntries.length;
-
-    // Filter entries based on search query
+    // Filter entries based on search query and selected party
     const filterEntries = (entries: (ForgingInward | ForgingOutward)[]) => {
-        if (!searchQuery) return entries;
-        const query = searchQuery.toLowerCase();
-        return entries.filter(entry =>
-            entry.partyName.toLowerCase().includes(query) ||
-            entry.challanNo.toLowerCase().includes(query)
-        );
+        let result = entries;
+        if (selectedParty) {
+            result = result.filter(entry => entry.partyName === selectedParty);
+        }
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            result = result.filter(entry =>
+                entry.partyName.toLowerCase().includes(query) ||
+                entry.challanNo.toLowerCase().includes(query)
+            );
+        }
+        return result;
     };
 
     const filteredInwardEntries = filterEntries(inwardEntries);
     const filteredOutwardEntries = filterEntries(outwardEntries);
+
+    const totalInward = calculateTotalWeight(filteredInwardEntries);
+    const totalOutward = calculateTotalWeight(filteredOutwardEntries);
+    const netStock = totalInward - totalOutward;
+    const pendingOrders = filteredInwardEntries.length + filteredOutwardEntries.length;
 
     if (loading) {
         return <Loading message="Loading forging data..." />;
@@ -243,6 +250,18 @@ const ForgingPage: React.FC = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                </div>
+                <div className="order-status-filter">
+                    <select
+                        value={selectedParty}
+                        onChange={e => setSelectedParty(e.target.value)}
+                        title="Filter by party"
+                    >
+                        <option value="">All Parties</option>
+                        {downloadParties.map(p => (
+                            <option key={p.partyId} value={p.partyName}>{p.partyName}</option>
+                        ))}
+                    </select>
                 </div>
                 <button
                     className="order-status-filter"

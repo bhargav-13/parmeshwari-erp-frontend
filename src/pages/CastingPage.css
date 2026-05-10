@@ -201,6 +201,36 @@
     color: #A7A7A7;
 }
 
+.casting-page .order-status-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #FFFFFF;
+    border: 1px solid rgba(125, 153, 169, 0.2);
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: #17344D;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.casting-page .order-status-filter:hover {
+    background: #F5F5F5;
+}
+
+.casting-page .order-status-filter select {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: #17344D;
+    cursor: pointer;
+    min-width: 120px;
+}
+
 .casting-page .filter-group-btn {
     display: flex;
     align-items: center;
