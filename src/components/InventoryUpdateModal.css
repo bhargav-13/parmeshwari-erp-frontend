@@ -1,4 +1,4 @@
-﻿@import './AddStockItemModal.css';
+@import './AddStockItemModal.css';
 
 .inventory-update-warning {
   background: #FFF3CD;
@@ -6,21 +6,21 @@
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 14px;
   flex-shrink: 0;
 }
 
 .form-label-highlight {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 15px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .price-hint {
-  color: #6e6e73;
+  color: #6b7280;
   font-size: 11px;
   margin-top: 4px;
   display: block;

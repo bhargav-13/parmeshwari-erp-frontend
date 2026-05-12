@@ -1,7 +1,7 @@
-﻿.order-details-overlay {
+.order-details-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
+  background: rgba(12, 30, 51, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,26 +24,26 @@
   display: flex;
   justify-content: space-between;
   padding: 20px 28px;
-  border-bottom: 1px solid rgba(0,0,0,0.07);
+  border-bottom: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .order-details-subtitle {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 12px;
   color: #8ea3b5;
   margin: 0;
 }
 
 .order-details-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 20px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 4px 0 2px;
 }
 
 .order-details-id {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 12px;
   color: #8ea3b5;
   margin: 0;
@@ -51,18 +51,18 @@
 
 .order-details-close {
   border: none;
-  background: rgba(0,0,0,0.06);
+  background: rgba(209, 238, 255, 0.6);
   width: 32px;
   height: 32px;
   border-radius: 50%;
   font-size: 16px;
-  color: #1d1d1f;
+  color: #2D1017;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .order-details-close:hover {
-  background: rgba(0,0,0,0.1);
+  background: #c2e5ff;
 }
 
 .order-details-summary {
@@ -76,17 +76,17 @@
 }
 
 .order-details-summary .summary-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 11px;
   color: #8ea3b5;
   margin: 0 0 3px;
 }
 
 .order-details-summary .summary-value {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 0;
 }
 
@@ -101,24 +101,24 @@
   border-collapse: collapse;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.07);
+  border: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .order-details-table th {
   background: #edf6ff;
   padding: 10px 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: #2D1017;
   text-align: left;
 }
 
 .order-details-table td {
   padding: 10px 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 13px;
-  color: #1d1d1f;
+  color: #2D1017;
   border-bottom: 1px solid rgba(23, 52, 77, 0.06);
 }
 
@@ -137,14 +137,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
-  border-top: 1px solid rgba(0,0,0,0.07);
+  border-top: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .amount-card {
   background: #f5f8fb;
   border-radius: 14px;
   padding: 10px 14px;
-  border: 1px solid rgba(0,0,0,0.07);
+  border: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .amount-card .summary-label {
@@ -158,7 +158,7 @@
 }
 
 .amount-card.highlight {
-  background: linear-gradient(120deg, #007AFF, #edf6ff);
+  background: linear-gradient(120deg, #A5213A, #edf6ff);
   border-color: transparent;
 }
 

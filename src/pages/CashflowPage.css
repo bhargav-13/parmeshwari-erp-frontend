@@ -1,10 +1,10 @@
-﻿.cashflow-page {
+.cashflow-page {
     padding: 20px 24px;
     max-width: 100vw;
     width: 100%;
     overflow-x: hidden;
     box-sizing: border-box;
-    background-color: #f5f5f7;
+    background-color: #f8f9fa;
     min-height: 100vh;
 }
 
@@ -28,20 +28,20 @@
 }
 
 .cashflow-page .page-title {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-weight: 500;
     font-size: 22px;
     line-height: 28px;
-    color: #1d1d1f;
+    color: #2D1017;
     margin: 0;
 }
 
 .cashflow-page .page-subtitle {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #6e6e73;
+    color: #8E8E8E;
     margin: 0;
 }
 
@@ -54,12 +54,12 @@
 }
 
 .cashflow-date-row input[type="date"] {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
     padding: 8px 14px;
-    border: 1px solid rgba(0,0,0,0.08);
+    border: 1px solid rgba(125, 153, 169, 0.3);
     border-radius: 8px;
-    color: #1d1d1f;
+    color: #2D1017;
     background: #fff;
     outline: none;
 }
@@ -69,7 +69,7 @@
 }
 
 .cashflow-day-badge {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 13px;
     font-weight: 500;
     padding: 4px 12px;
@@ -92,7 +92,7 @@
 }
 
 .cashflow-summary-card {
-    border: 1px solid rgba(0,0,0,0.08);
+    border: 1px solid rgba(125, 153, 169, 0.3);
     border-radius: 12px;
     padding: 16px;
     display: flex;
@@ -102,17 +102,17 @@
 }
 
 .cashflow-summary-card .stat-title {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-weight: 400;
     font-size: 13px;
-    color: #6e6e73;
+    color: #8E8E8E;
 }
 
 .cashflow-summary-card .stat-value {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-weight: 600;
     font-size: 20px;
-    color: #1d1d1f;
+    color: #2D1017;
 }
 
 .cashflow-summary-card .stat-value.income {
@@ -140,7 +140,7 @@
 }
 
 .cashflow-column {
-    border: 1px solid rgba(0,0,0,0.08);
+    border: 1px solid rgba(125, 153, 169, 0.3);
     border-radius: 12px;
     background: #fff;
     overflow: hidden;
@@ -155,10 +155,10 @@
 }
 
 .cashflow-column-title {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-weight: 600;
     font-size: 16px;
-    color: #1d1d1f;
+    color: #2D1017;
 }
 
 .cashflow-column-title.income {
@@ -207,13 +207,13 @@
 }
 
 .cashflow-table thead {
-    background: #f5f5f7;
+    background: #f8f9fa;
 }
 
 .cashflow-table th {
     padding: 10px 14px;
     text-align: left;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-weight: 500;
     font-size: 13px;
     color: #5b7a95;
@@ -222,10 +222,10 @@
 
 .cashflow-table td {
     padding: 10px 14px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-weight: 400;
     font-size: 13px;
-    color: #1d1d1f;
+    color: #2D1017;
     border-bottom: 1px solid rgba(125, 153, 169, 0.08);
 }
 
@@ -249,7 +249,7 @@
 .cashflow-table .no-data {
     text-align: center;
     padding: 24px 14px;
-    color: #6e6e73;
+    color: #8E8E8E;
     font-size: 13px;
 }
 
@@ -282,7 +282,7 @@
     display: flex;
     gap: 6px;
     padding: 10px 14px;
-    border-top: 1px solid rgba(0,0,0,0.06);
+    border-top: 1px solid rgba(125, 153, 169, 0.15);
     background: #fafbfc;
     align-items: flex-end;
 }
@@ -295,7 +295,7 @@
 }
 
 .cashflow-add-row .form-mini-label {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 11px;
     font-weight: 500;
     color: #5b7a95;
@@ -303,13 +303,13 @@
 
 .cashflow-add-row input,
 .cashflow-add-row select {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 12px;
     padding: 6px 8px;
-    border: 1px solid rgba(0,0,0,0.08);
+    border: 1px solid rgba(125, 153, 169, 0.3);
     border-radius: 6px;
     outline: none;
-    color: #1d1d1f;
+    color: #2D1017;
     background: #fff;
 }
 
@@ -320,11 +320,11 @@
 
 .cashflow-add-row .add-confirm-btn {
     padding: 6px 12px;
-    background: #1d1d1f;
+    background: #2D1017;
     color: #fff;
     border: none;
     border-radius: 6px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
@@ -353,11 +353,11 @@
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: #1d1d1f;
+    background: #2D1017;
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -375,7 +375,7 @@
 
 /* Keyboard hint */
 .cashflow-kb-hint {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 11px;
     color: #a7a7a7;
     background: #eee;

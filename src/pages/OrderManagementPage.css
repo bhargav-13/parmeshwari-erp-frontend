@@ -1,7 +1,7 @@
-﻿.order-page {
+.order-page {
   padding: 24px 28px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  color: #1d1d1f;
+  font-family: 'Jost', sans-serif;
+  color: #2D1017;
 }
 
 .order-page-header {
@@ -22,12 +22,12 @@
   margin: 0;
   font-size: 26px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .order-page-header p {
   margin: 4px 0 0;
-  color: #6e6e73;
+  color: #7d99a9;
   font-size: 15px;
 }
 
@@ -36,16 +36,16 @@
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
-  background: #007AFF;
+  background: #A5213A;
   border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
 }
 
 .order-add-button:hover {
-  background: #0051d0;
+  background: #7A1829;
   transform: translateY(-1px);
 }
 
@@ -53,14 +53,14 @@
   font-size: 20px;
   font-weight: 300;
   line-height: 1;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .order-add-button .add-text {
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .order-stats {
@@ -87,7 +87,7 @@
   margin: 8px 0 0;
   font-size: 26px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .order-filters {
@@ -127,14 +127,14 @@
   outline: none;
   font-family: inherit;
   font-size: 14px;
-  color: #1d1d1f;
+  color: #2D1017;
   flex: 1;
 }
 
 .order-table-container {
   background: #ffffff;
   border-radius: 20px;
-  border: 1px solid rgba(0,0,0,0.07);
+  border: 1px solid rgba(23, 52, 77, 0.08);
   overflow: hidden;
 }
 
@@ -191,7 +191,7 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   border: none;
   cursor: pointer;
   outline: none;
@@ -256,7 +256,7 @@
   justify-content: center;
   background: rgba(255, 255, 255, 0.7);
   font-size: 16px;
-  color: #1d1d1f;
+  color: #2D1017;
   z-index: 1000;
 }
 
@@ -267,16 +267,16 @@
   justify-content: center;
   padding: 6px 24px;
   gap: 15px;
-  border: 1px solid #1d1d1f;
+  border: 1px solid #2D1017;
   border-radius: 39px;
   background: transparent;
   cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
   transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
@@ -301,7 +301,7 @@
   border-radius: 39px;
   background: transparent;
   cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;

@@ -1,4 +1,4 @@
-﻿.scrap-modal-content {
+.scrap-modal-content {
   background: #FFFFFF;
   border-radius: 16px;
   max-width: 700px;
@@ -11,11 +11,11 @@
 }
 
 .scrap-modal-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 24px;
   line-height: 32px;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 0 0 24px 0;
 }
 
@@ -61,29 +61,29 @@
 }
 
 .scrap-form-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .scrap-form-input {
   padding: 12px 16px;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   transition: border-color 0.3s ease;
 }
 
 .scrap-form-input:focus {
-  border-color: #1d1d1f;
+  border-color: #2D1017;
   background: #FFFFFF;
 }
 
@@ -93,13 +93,13 @@
 
 .scrap-form-select {
   padding: 12px 16px;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   cursor: pointer;
@@ -129,7 +129,7 @@
 .scrap-cancel-button {
   padding: 12px 48px;
   border-radius: 24px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
@@ -139,12 +139,12 @@
 }
 
 .scrap-save-button {
-  background: #007AFF;
+  background: #A5213A;
   color: #FFFFFF;
 }
 
 .scrap-save-button:hover:not(:disabled) {
-  background: #0051d0;
+  background: #7A1829;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -156,8 +156,8 @@
 
 .scrap-cancel-button {
   background: transparent;
-  color: #1d1d1f;
-  border: 1px solid #1d1d1f;
+  color: #2D1017;
+  border: 1px solid #2D1017;
 }
 
 .scrap-cancel-button:hover {

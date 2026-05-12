@@ -1,4 +1,4 @@
-﻿.invoice-page {
+.invoice-page {
   padding: 20px 24px;
   max-width: 100%;
 }
@@ -18,27 +18,27 @@
 }
 
 .invoice-page .page-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 22px;
   line-height: 28px;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 0;
 }
 
 .invoice-page .page-subtitle {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #6e6e73;
+  color: #8E8E8E;
   margin: 0;
 }
 
 .invoice-page .mode-toggle {
   display: flex;
   gap: 0;
-  border: 1px solid #1d1d1f;
+  border: 1px solid #2D1017;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -48,16 +48,16 @@
   background: #FFFFFF;
   border: none;
   cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
   transition: all 0.3s ease;
 }
 
 .invoice-page .mode-btn:first-child {
-  border-right: 1px solid #1d1d1f;
+  border-right: 1px solid #2D1017;
 }
 
 .invoice-page .mode-btn:hover:not(.active) {
@@ -65,7 +65,7 @@
 }
 
 .invoice-page .mode-btn.active {
-  background: #1d1d1f;
+  background: #2D1017;
   color: #FFFFFF;
 }
 
@@ -77,7 +77,7 @@
 
 .invoice-page .stat-card {
   flex: 1;
-  border: 1px solid #1d1d1f;
+  border: 1px solid #2D1017;
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -92,19 +92,19 @@
 }
 
 .invoice-page .stat-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #6e6e73;
+  color: #8E8E8E;
 }
 
 .invoice-page .stat-value {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 24px;
   line-height: 32px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .invoices-list {
@@ -123,9 +123,9 @@
 .invoice-page .no-data {
   text-align: center;
   padding: 32px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 16px;
-  color: #6e6e73;
+  color: #8E8E8E;
 }
 
 /* Mobile Responsive Styles */

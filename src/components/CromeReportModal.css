@@ -1,4 +1,4 @@
-﻿/* Reuse variables or similar styles from options */
+/* Reuse variables or similar styles from options */
 .report-modal {
     width: min(500px, 95%);
     background: #ffffff;
@@ -27,9 +27,9 @@
 }
 
 .form-label {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #1d1d1f;
+    color: #2D1017;
     font-weight: 500;
 }
 
@@ -37,7 +37,7 @@
     padding: 10px 14px;
     border: 1px solid rgba(23, 52, 77, 0.15);
     border-radius: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
     outline: none;
     transition: all 0.2s;
@@ -55,12 +55,12 @@
 }
 
 .save-button {
-    background: #1d1d1f;
+    background: #2D1017;
     color: white;
     border: none;
     padding: 10px 24px;
     border-radius: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     cursor: pointer;
     font-weight: 500;
 }
@@ -76,6 +76,6 @@
     border: 1px solid #cbd5e1;
     padding: 10px 24px;
     border-radius: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     cursor: pointer;
 }

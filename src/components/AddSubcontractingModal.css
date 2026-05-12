@@ -1,4 +1,4 @@
-﻿.modal-overlay {
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -28,11 +28,11 @@
 }
 
 .modal-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 20px;
   line-height: 28px;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 0 0 20px 0;
   padding-top: 24px;
   flex-shrink: 0;
@@ -77,29 +77,29 @@
 }
 
 .form-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .form-input {
   padding: 10px 14px;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   transition: border-color 0.3s ease;
 }
 
 .form-input:focus {
-  border-color: #1d1d1f;
+  border-color: #2D1017;
 }
 
 .form-input::placeholder {
@@ -122,9 +122,9 @@
   min-width: 36px;
   height: auto;
   padding: 0;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 8px;
-  background: #007AFF;
+  background: #A5213A;
   color: #FFFFFF;
   font-size: 20px;
   font-weight: 500;
@@ -136,7 +136,7 @@
 }
 
 .add-new-btn:hover {
-  background: #0051d0;
+  background: #7A1829;
 }
 
 .add-new-input-group {
@@ -153,9 +153,9 @@
   padding: 8px 16px;
   border: none;
   border-radius: 8px;
-  background: #1d1d1f;
+  background: #2D1017;
   color: #FFFFFF;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 13px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -182,13 +182,13 @@
 
 .unit-select {
   padding: 10px 14px;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   cursor: pointer;
@@ -197,13 +197,13 @@
 
 .form-textarea {
   padding: 10px 14px;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
   background: #F5F5F5;
   outline: none;
   resize: vertical;
@@ -211,7 +211,7 @@
 }
 
 .form-textarea:focus {
-  border-color: #1d1d1f;
+  border-color: #2D1017;
 }
 
 .form-textarea::placeholder {
@@ -223,7 +223,7 @@
   background: #FFE5E5;
   border: 1px solid #FF0101;
   border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 13px;
   color: #FF0101;
 }
@@ -231,11 +231,11 @@
 .info-message {
   padding: 10px 14px;
   background: #FDE8EC;
-  border: 1px solid #007AFF;
+  border: 1px solid #A5213A;
   border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 13px;
-  color: #0051d0;
+  color: #7A1829;
 }
 
 .frozen-input {
@@ -255,7 +255,7 @@
 .cancel-button {
   padding: 10px 32px;
   border-radius: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
@@ -265,12 +265,12 @@
 }
 
 .save-button {
-  background: #007AFF;
+  background: #A5213A;
   color: #FFFFFF;
 }
 
 .save-button:hover:not(:disabled) {
-  background: #0051d0;
+  background: #7A1829;
 }
 
 .save-button:disabled {
@@ -280,8 +280,8 @@
 
 .cancel-button {
   background: transparent;
-  color: #1d1d1f;
-  border: 1px solid #1d1d1f;
+  color: #2D1017;
+  border: 1px solid #2D1017;
 }
 
 .cancel-button:hover {

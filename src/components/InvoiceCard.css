@@ -1,5 +1,5 @@
-﻿.invoice-card {
-  border: 2px solid rgba(0,0,0,0.08);
+.invoice-card {
+  border: 2px solid rgba(125, 153, 169, 0.3);
   border-radius: 20px;
   padding: 32px;
   background: #FFFFFF;
@@ -22,19 +22,19 @@
   gap: 12px;
   border-radius: 20px;
   z-index: 10;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 14px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .invoice-card .download-button {
-  background: #007AFF;
+  background: #A5213A;
   border-radius: 6px;
   padding: 4px;
 }
 
 .invoice-card .download-button:hover {
-  background: #0051d0;
+  background: #7A1829;
 }
 
 .invoice-card-header {
@@ -57,25 +57,25 @@
 }
 
 .invoice-card-id {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 16px;
   line-height: 22px;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 0;
 }
 
 .invoice-card-customer {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 18px;
   line-height: 26px;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 0;
 }
 
 .invoice-card-date {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
@@ -118,7 +118,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #1d1d1f;
+  border-top: 2px solid #2D1017;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -146,7 +146,7 @@
   padding: 6px 36px 6px 16px;
   border-radius: 40px;
   border: 1px solid transparent;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
@@ -191,7 +191,7 @@
 
 .invoice-card-divider {
   height: 1px;
-  background: #6e6e73;
+  background: #7D99A9;
   margin: 24px 0;
 }
 
@@ -208,7 +208,7 @@
 }
 
 .invoice-amount-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
@@ -216,11 +216,11 @@
 }
 
 .invoice-amount-value {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .invoice-card-footer {
@@ -229,7 +229,7 @@
 }
 
 .invoice-total-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
@@ -237,11 +237,11 @@
 }
 
 .invoice-total-value {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 /* Mobile Responsive Styles */

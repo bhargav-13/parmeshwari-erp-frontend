@@ -1,7 +1,7 @@
-﻿.wh-overlay {
+.wh-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.35);
+    background: rgba(12, 30, 51, 0.45);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -26,39 +26,39 @@
     justify-content: space-between;
     align-items: flex-start;
     padding: 20px 28px;
-    border-bottom: 1px solid rgba(0,0,0,0.07);
+    border-bottom: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .wh-subtitle {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 12px;
     color: #8ea3b5;
     margin: 0;
 }
 
 .wh-title {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 20px;
     font-weight: 600;
-    color: #1d1d1f;
+    color: #2D1017;
     margin: 4px 0 0;
 }
 
 .wh-close {
     border: none;
-    background: rgba(0,0,0,0.06);
+    background: rgba(209, 238, 255, 0.6);
     width: 32px;
     height: 32px;
     border-radius: 50%;
     font-size: 16px;
-    color: #1d1d1f;
+    color: #2D1017;
     cursor: pointer;
     transition: background 0.2s ease;
     flex-shrink: 0;
 }
 
 .wh-close:hover {
-    background: rgba(0,0,0,0.1);
+    background: #c2e5ff;
 }
 
 /* Info Grid */
@@ -67,7 +67,7 @@
     flex-wrap: wrap;
     gap: 16px;
     padding: 16px 28px;
-    border-bottom: 1px solid rgba(0,0,0,0.07);
+    border-bottom: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .wh-info-item {
@@ -78,16 +78,16 @@
 }
 
 .wh-info-label {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 11px;
     color: #8ea3b5;
 }
 
 .wh-info-value {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
     font-weight: 500;
-    color: #1d1d1f;
+    color: #2D1017;
 }
 
 /* Summary Cards */
@@ -96,14 +96,14 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     padding: 16px 28px;
-    border-bottom: 1px solid rgba(0,0,0,0.07);
+    border-bottom: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .wh-summary-card {
     background: #f5f8fb;
     border-radius: 14px;
     padding: 12px 14px;
-    border: 1px solid rgba(0,0,0,0.07);
+    border: 1px solid rgba(23, 52, 77, 0.08);
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -128,16 +128,16 @@
 }
 
 .wh-summary-label {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 11px;
     color: #8ea3b5;
 }
 
 .wh-summary-value {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 16px;
     font-weight: 600;
-    color: #1d1d1f;
+    color: #2D1017;
 }
 
 /* Body */
@@ -148,10 +148,10 @@
 }
 
 .wh-section-title {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: #1d1d1f;
+    color: #2D1017;
     display: block;
     margin-bottom: 12px;
 }
@@ -159,7 +159,7 @@
 .wh-empty {
     text-align: center;
     padding: 32px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
     color: #8ea3b5;
 }
@@ -175,20 +175,20 @@
 
 .wh-table th {
     padding: 10px 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 12px;
     font-weight: 500;
     color: #8ea3b5;
     text-align: left;
-    background: #f5f5f7;
-    border-bottom: 1px solid rgba(0,0,0,0.07);
+    background: #f8f9fa;
+    border-bottom: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .wh-table td {
     padding: 10px 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 13px;
-    color: #1d1d1f;
+    color: #2D1017;
     border-bottom: 1px solid rgba(23, 52, 77, 0.05);
 }
 
@@ -197,7 +197,7 @@
 }
 
 .wh-table tbody tr:hover {
-    background: #f5f5f7;
+    background: #f8f9fa;
 }
 
 .wh-table tfoot {
@@ -211,18 +211,18 @@
 }
 
 .wh-total-label {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 13px;
     font-weight: 600;
-    color: #1d1d1f;
+    color: #2D1017;
     text-align: right;
 }
 
 .wh-total-value {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 13px;
     font-weight: 600;
-    color: #1d1d1f;
+    color: #2D1017;
 }
 
 /* Responsive */

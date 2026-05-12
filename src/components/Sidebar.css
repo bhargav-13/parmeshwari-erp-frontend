@@ -1,17 +1,15 @@
-﻿.sidebar {
-  width: 240px;
+.sidebar {
+  width: 260px;
   height: 100vh;
-  background: rgba(246, 246, 248, 0.94);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  border-right: 1px solid #F0DEE2;
   display: flex;
   flex-direction: column;
   position: fixed;
   left: 0;
   top: 0;
   z-index: 999;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s ease;
 }
 
 .sidebar-header {
@@ -20,74 +18,81 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  margin-bottom: 8px;
 }
 
+/* Mobile Close Button - Hidden on Desktop */
 .mobile-close-btn {
   display: none;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: none;
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: 50%;
-  font-size: 14px;
-  color: #6e6e73;
+  background: rgba(165, 33, 58, 0.08);
+  border-radius: 6px;
+  font-size: 20px;
+  color: #A5213A;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
-  font-weight: 500;
+  transition: background 0.3s ease;
 }
 
 .mobile-close-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(165, 33, 58, 0.16);
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
 }
 
 .logo-img {
   width: auto;
-  max-width: 110px;
-  max-height: 36px;
+  max-width: 120px;
+  max-height: 40px;
   height: auto;
   display: block;
   flex-shrink: 0;
 }
 
 .brand-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.06em;
-  color: #007AFF;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  color: #A5213A;
   text-transform: uppercase;
   line-height: 1;
 }
 
 .sidebar-divider {
-  display: none;
+  width: calc(100% - 32px);
+  margin: 0 16px;
+  height: 1px;
+  background: #F0DEE2;
+  margin-bottom: 16px;
 }
 
 .sidebar-nav {
   flex: 1;
-  padding: 4px 10px;
+  padding: 0 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   overflow-y: auto;
+
+  /* Firefox */
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
 }
 
 .sidebar-nav:hover {
-  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  scrollbar-color: rgba(165, 33, 58, 0.25) transparent;
 }
 
+/* Webkit — sidebar specific */
 .sidebar-nav::-webkit-scrollbar {
   width: 3px;
 }
@@ -99,10 +104,15 @@
 .sidebar-nav::-webkit-scrollbar-thumb {
   background: transparent;
   border-radius: 999px;
+  transition: background 0.3s ease;
 }
 
 .sidebar-nav:hover::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(165, 33, 58, 0.25);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(165, 33, 58, 0.5);
 }
 
 .sidebar-section {
@@ -113,43 +123,34 @@
 .sidebar-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 12px;
+  padding: 10px 12px;
   border-radius: 8px;
   text-decoration: none;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   cursor: pointer;
   position: relative;
-  min-height: 36px;
 }
 
 .sidebar-item.active {
-  background: rgba(0, 122, 255, 0.1);
+  background: #A5213A;
 }
 
-.sidebar-item.active .sidebar-label {
-  color: #007AFF;
-  font-weight: 600;
-}
-
-.sidebar-item.active .sidebar-icon img {
-  opacity: 1;
-  filter: invert(35%) sepia(98%) saturate(1500%) hue-rotate(200deg) brightness(100%);
-}
-
+.sidebar-item.active .sidebar-label,
+.sidebar-item.active .sidebar-icon,
 .sidebar-item.active .expand-icon {
-  color: #007AFF;
+  color: #FFFFFF;
 }
 
 .sidebar-item:not(.active):hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: #FFF0F2;
 }
 
 .expand-icon {
   margin-left: auto;
-  font-size: 9px;
-  transition: transform 0.25s ease;
-  color: #aeaeb2;
+  font-size: 10px;
+  transition: transform 0.3s ease;
+  color: #2D1017;
 }
 
 .expand-icon.expanded {
@@ -159,19 +160,24 @@
 .sidebar-subsection {
   display: flex;
   flex-direction: column;
-  margin-left: 20px;
-  gap: 1px;
+  margin-left: 28px;
+  gap: 2px;
   overflow: hidden;
+
+  /* Closed state */
   max-height: 0;
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   pointer-events: none;
+
+  /* Transition */
   transition:
-    max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.22s ease,
-    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    margin-top 0.25s ease;
-  border-left: 1.5px solid rgba(0, 0, 0, 0.1);
+    max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease,
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    margin-top 0.28s ease;
+
+  border-left: 2px solid transparent;
   padding-left: 8px;
   margin-top: 0;
 }
@@ -181,133 +187,104 @@
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
-  margin-top: 2px;
-  margin-bottom: 2px;
+  border-left-color: #F0DEE2;
+  margin-top: 4px;
 }
 
 .sidebar-subitem {
   display: flex;
   align-items: center;
-  padding: 6px 10px;
+  padding: 7px 12px;
   border-radius: 6px;
   text-decoration: none;
-  transition: background-color 0.15s ease, padding-left 0.18s ease;
+  transition: background-color 0.2s ease, padding-left 0.2s ease;
   cursor: pointer;
-  min-height: 30px;
 }
 
 .sidebar-subitem.active {
-  background: rgba(0, 122, 255, 0.08);
+  background: #FAEAED;
 }
 
 .sidebar-subitem.active .sidebar-sublabel {
-  color: #007AFF;
+  color: #A5213A;
   font-weight: 600;
 }
 
 .sidebar-subitem:not(.active):hover {
-  background: rgba(0, 0, 0, 0.04);
-  padding-left: 14px;
+  background: #FFF0F2;
+  padding-left: 16px;
 }
 
 .sidebar-sublabel {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 18px;
-  color: #6e6e73;
-  letter-spacing: -0.01em;
-}
-
-.sidebar-icon {
-  font-size: 16px;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.sidebar-icon img {
-  width: 16px;
-  height: 16px;
-  opacity: 0.5;
-  transition: opacity 0.15s ease;
-}
-
-.sidebar-item:not(.active):hover .sidebar-icon img {
-  opacity: 0.7;
-}
-
-.sidebar-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
-  letter-spacing: -0.01em;
+  color: #4A2030;
+}
+
+.sidebar-icon {
+  font-size: 18px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4A2030;
+}
+
+.sidebar-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 22px;
+  color: #2D1017;
 }
 
 .sidebar-footer {
-  padding: 12px 10px 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  padding: 16px 12px;
+  margin-top: auto;
+  border-top: 1px solid #F0DEE2;
 }
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 10px;
+  padding: 8px 12px;
+  background: #FFF0F2;
+  border-radius: 8px;
   height: 44px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.user-profile:hover {
-  background: rgba(0, 0, 0, 0.07);
 }
 
 .user-avatar {
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #007AFF, #0051d0);
-  border-radius: 50%;
+  background: #A5213A;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0, 122, 255, 0.25);
 }
 
 .avatar-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar-icon img {
-  width: 14px;
-  height: 14px;
-  filter: brightness(0) invert(1);
-  opacity: 1;
+  font-size: 14px;
+  color: #FFFFFF;
 }
 
 .user-name {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
-  font-size: 13px;
-  line-height: 18px;
-  color: #1d1d1f;
-  letter-spacing: -0.01em;
+  font-size: 14px;
+  line-height: 20px;
+  color: #2D1017;
 }
 
+/* Tablet and Mobile Responsive */
 @media (max-width: 1024px) {
   .sidebar {
     transform: translateX(-100%);
-    box-shadow: 2px 0 24px rgba(0, 0, 0, 0.12);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
   }
 
   .sidebar.mobile-open {
@@ -317,17 +294,41 @@
   .mobile-close-btn {
     display: flex;
   }
+
+  .sidebar-header {
+    justify-content: space-between;
+  }
+
+  .logo {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 270px;
+    width: 280px;
+  }
+
+  .sidebar-header {
+    height: 60px;
+  }
+
+  .sidebar-nav {
+    padding: 0 12px;
+  }
+
+  .sidebar-item {
+    padding: 12px 14px;
+  }
+
+  .sidebar-label {
+    font-size: 16px;
   }
 }
 
 @media (max-width: 480px) {
   .sidebar {
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
   }
 }

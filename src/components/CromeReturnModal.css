@@ -1,4 +1,4 @@
-﻿/* Crome Return Modal Styles - Matched to AddOrderModal */
+/* Crome Return Modal Styles - Matched to AddOrderModal */
 
 .crome-return-modal {
     width: min(900px, 95%);
@@ -6,7 +6,7 @@
     max-height: 95vh;
     background: #ffffff;
     border-radius: 24px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+    box-shadow: 0 30px 60px rgba(32, 67, 106, 0.15);
     display: flex;
     flex-direction: column;
     padding: 32px;
@@ -14,9 +14,9 @@
 }
 
 .modal-title {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 24px;
-    color: #1d1d1f;
+    color: #2D1017;
     margin: 0 0 24px 0;
     text-align: left;
 }
@@ -61,7 +61,7 @@
 
 .divider-line {
     height: 1px;
-    background-color: rgba(0,0,0,0.07);
+    background-color: rgba(23, 52, 77, 0.08);
     margin: 0 0 24px 0;
 }
 
@@ -98,9 +98,9 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 1.5px solid #1d1d1f;
+    border: 1.5px solid #2D1017;
     background: #fff;
-    color: #1d1d1f;
+    color: #2D1017;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
@@ -112,7 +112,7 @@
 }
 
 .add-packaging-btn:hover {
-    background: #1d1d1f;
+    background: #2D1017;
     color: #fff;
 }
 
@@ -160,13 +160,13 @@
 }
 
 .section-subtitle {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 15px;
     font-weight: 600;
-    color: #1d1d1f;
+    color: #2D1017;
     margin: 0 0 12px 0;
     padding-bottom: 6px;
-    border-bottom: 2px solid rgba(0,0,0,0.07);
+    border-bottom: 2px solid rgba(23, 52, 77, 0.08);
 }
 
 /* Form Styling - Matching Order Modal */
@@ -178,7 +178,7 @@
 }
 
 .form-label {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 13px;
     color: #5a738b;
     font-weight: 500;
@@ -190,9 +190,9 @@
     border-radius: 10px;
     padding: 10px 14px;
     background: #f5f7fa;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #1d1d1f;
+    color: #2D1017;
     outline: none;
     transition: all 0.2s ease;
     width: 100%;
@@ -223,9 +223,9 @@
     align-items: center;
     gap: 12px;
     cursor: pointer;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
-    color: #1d1d1f;
+    color: #2D1017;
     font-weight: 500;
     -webkit-user-select: none;
     user-select: none;
@@ -235,7 +235,7 @@
     appearance: none;
     width: 44px;
     height: 24px;
-    background: rgba(0,0,0,0.12);
+    background: #d1d5db;
     border-radius: 24px;
     position: relative;
     cursor: pointer;
@@ -256,7 +256,7 @@
 }
 
 .checkbox-label input[type="checkbox"]:checked {
-    background: #007AFF;
+    background: #A5213A;
     /* Blue matching typical primary color */
 }
 
@@ -267,7 +267,7 @@
 /* Calculation & Summary */
 .calculation-summary {
     background: #f1f7ff;
-    border: 1px solid rgba(0,0,0,0.07);
+    border: 1px solid rgba(23, 52, 77, 0.08);
     border-radius: 16px;
     padding: 20px 24px;
     margin-bottom: 24px;
@@ -277,14 +277,14 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 14px;
     color: #5a738b;
 }
 
 .calc-value {
     font-weight: 600;
-    color: #1d1d1f;
+    color: #2D1017;
 }
 
 .calc-value.deduction {
@@ -318,13 +318,13 @@
 }
 
 .save-button {
-    background: #1d1d1f;
+    background: #2D1017;
     color: #fff;
     border: none;
     border-radius: 24px;
     /* Pill shape like order buttons */
     padding: 12px 32px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
@@ -349,7 +349,7 @@
     border: 1px solid rgba(100, 116, 139, 0.3);
     border-radius: 24px;
     padding: 12px 24px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    font-family: 'Jost', sans-serif;
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;

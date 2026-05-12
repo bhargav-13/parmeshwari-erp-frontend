@@ -1,4 +1,4 @@
-﻿@import './AddStockItemModal.css';
+@import './AddStockItemModal.css';
 
 .add-raw-modal {
   max-width: 520px;
@@ -7,7 +7,7 @@
 .modal-loading-message {
   padding: 32px;
   text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 15px;
-  color: #1d1d1f;
+  color: #2D1017;
 }

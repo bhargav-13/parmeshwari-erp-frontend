@@ -1,4 +1,4 @@
-﻿.inventory-page {
+.inventory-page {
   padding: 20px 24px;
   max-width: 100vw;
   width: 100%;
@@ -27,20 +27,20 @@
 }
 
 .page-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 22px;
   line-height: 28px;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 0;
 }
 
 .page-subtitle {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #6e6e73;
+  color: #8E8E8E;
   margin: 0;
 }
 
@@ -55,9 +55,9 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   background: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 15px;
-  color: #1d1d1f;
+  color: #2D1017;
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
@@ -80,7 +80,7 @@
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
@@ -88,18 +88,18 @@
 }
 
 .primary-button {
-  background: #007AFF;
+  background: #A5213A;
   color: #FFFFFF;
 }
 
 .primary-button:hover {
-  background: #0051d0;
+  background: #7A1829;
 }
 
 .secondary-button {
   background: #FFFFFF;
-  color: #1d1d1f;
-  border: 1px solid #1d1d1f;
+  color: #2D1017;
+  border: 1px solid #2D1017;
 }
 
 .secondary-button:hover {
@@ -120,7 +120,7 @@
   gap: 0;
   margin: 0 -24px 20px;
   padding: 0 24px;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 1px solid rgba(125, 153, 169, 0.3);
   width: calc(100% + 48px);
   max-width: calc(100% + 48px);
 }
@@ -131,7 +131,7 @@
   background: #FFFFFF;
   border: none;
   border-bottom: 3px solid transparent;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
@@ -141,7 +141,7 @@
 }
 
 .tab-button.active {
-  background: #007AFF;
+  background: #A5213A;
   color: #FFFFFF;
   font-weight: 500;
   border-bottom-color: #FFFFFF;
@@ -161,7 +161,7 @@
 }
 
 .stat-card {
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -173,19 +173,19 @@
 }
 
 .stat-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #6e6e73;
+  color: #8E8E8E;
 }
 
 .stat-value {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 20px;
   line-height: 28px;
-  color: #1d1d1f;
+  color: #2D1017;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -237,24 +237,24 @@
   border: none;
   background: transparent;
   outline: none;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 14px;
-  color: #1d1d1f;
+  color: #2D1017;
   flex: 1;
   width: 100%;
 }
 
 .inventory-page .order-search input::placeholder {
-  color: #6e6e73;
+  color: #8E8E8E;
 }
 
 .inventory-page .order-status-filter select {
   border: none;
   background: transparent;
   outline: none;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 14px;
-  color: #1d1d1f;
+  color: #2D1017;
   flex: 1;
   cursor: pointer;
   -webkit-appearance: none;
@@ -265,7 +265,7 @@
 .inventory-table-container {
   overflow-x: auto;
   margin-bottom: 20px;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 12px;
   width: 100%;
   max-width: 100%;
@@ -285,21 +285,21 @@
 .inventory-table th {
   padding: 12px 16px;
   text-align: left;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
+  color: #2D1017;
+  border-bottom: 1px solid rgba(125, 153, 169, 0.3);
 }
 
 .inventory-table td {
   padding: 12px 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #1d1d1f;
+  color: #2D1017;
   border-bottom: 1px solid rgba(125, 153, 169, 0.1);
 }
 
@@ -314,7 +314,7 @@
 .status-badge {
   padding: 4px 12px;
   border-radius: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
@@ -368,7 +368,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #1d1d1f;
+  border-top: 2px solid #2D1017;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -382,14 +382,14 @@
 .no-data {
   text-align: center;
   padding: 32px;
-  color: #6e6e73;
+  color: #8E8E8E;
 }
 
 .page-tabs {
   display: flex;
   gap: 0;
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid rgba(0,0,0,0.08);
+  border-bottom: 2px solid #e5e7eb;
 }
 
 .page-tab {
@@ -398,7 +398,7 @@
   background: none;
   cursor: pointer;
   font-weight: 400;
-  color: #6e6e73;
+  color: #6b7280;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
   font-size: 0.9rem;
@@ -407,8 +407,8 @@
 
 .page-tab.active {
   font-weight: 600;
-  color: #007AFF;
-  border-bottom-color: #007AFF;
+  color: #A5213A;
+  border-bottom-color: #A5213A;
 }
 
 .tab-error {
@@ -428,7 +428,7 @@
 }
 
 .summary-card {
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 12px;
   padding: 16px 24px;
   display: flex;
@@ -440,19 +440,19 @@
 }
 
 .summary-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #6e6e73;
+  color: #8E8E8E;
 }
 
 .summary-value {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 600;
   font-size: 22px;
   line-height: 30px;
-  color: #1d1d1f;
+  color: #2D1017;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }

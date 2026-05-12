@@ -1,4 +1,4 @@
-﻿.subcontracting-page {
+.subcontracting-page {
   padding: 20px 24px;
   max-width: 100%;
 }
@@ -18,20 +18,20 @@
 }
 
 .page-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 22px;
   line-height: 28px;
-  color: #1d1d1f;
+  color: #2D1017;
   margin: 0;
 }
 
 .page-subtitle {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #6e6e73;
+  color: #8E8E8E;
   margin: 0;
 }
 
@@ -40,7 +40,7 @@
   align-items: center;
   gap: 10px;
   padding: 8px 16px;
-  background: #007AFF;
+  background: #A5213A;
   border-radius: 8px;
   border: none;
   cursor: pointer;
@@ -49,14 +49,14 @@
 }
 
 .add-button:hover {
-  background: #0051d0;
+  background: #7A1829;
 }
 
 .add-icon {
   font-size: 20px;
   font-weight: 300;
   line-height: 1;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .report-btn {
@@ -64,27 +64,27 @@
   align-items: center;
   gap: 10px;
   padding: 8px 16px;
-  background: #007AFF;
+  background: #A5213A;
   border-radius: 8px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 15px;
   color: #FFFFFF;
 }
 
 .report-btn:hover {
-  background: #0051d0;
+  background: #7A1829;
 }
 
 .add-text {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
-  color: #1d1d1f;
+  color: #2D1017;
   white-space: nowrap;
 }
 
@@ -96,7 +96,7 @@
 
 .stat-card {
   flex: 1;
-  border: 1px solid #1d1d1f;
+  border: 1px solid #2D1017;
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -111,19 +111,19 @@
 }
 
 .stat-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #6e6e73;
+  color: #8E8E8E;
 }
 
 .stat-value {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-weight: 500;
   font-size: 24px;
   line-height: 32px;
-  color: #1d1d1f;
+  color: #2D1017;
 }
 
 .subcontracts-list {
@@ -136,9 +136,9 @@
 .no-data {
   text-align: center;
   padding: 32px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-family: 'Jost', sans-serif;
   font-size: 16px;
-  color: #6e6e73;
+  color: #8E8E8E;
 }
 
 /* Mobile Responsive Styles */
