@@ -1,4 +1,4 @@
-.crome-modal {
+﻿.crome-modal {
   max-width: 600px;
   width: 90%;
 }
@@ -20,17 +20,17 @@
 }
 
 .info-label {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 13px;
   color: #888888;
 }
 
 .info-value {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .info-value.available-stock {
@@ -64,9 +64,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1.5px solid #2D1017;
+  border: 1.5px solid #1d1d1f;
   background: #fff;
-  color: #2D1017;
+  color: #1d1d1f;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -78,7 +78,7 @@
 }
 
 .add-packaging-btn:hover {
-  background: #2D1017;
+  background: #1d1d1f;
   color: #fff;
 }
 
@@ -142,21 +142,21 @@
 }
 
 .calc-label {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 13px;
   color: #888888;
 }
 
 .calc-value {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .calc-formula {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 12px;
   color: #888888;

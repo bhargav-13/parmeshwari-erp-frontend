@@ -1,4 +1,4 @@
-.subcontracting-card {
+﻿.subcontracting-card {
   border: 1px solid rgba(125, 153, 169, 0.3);
   border-radius: 12px;
   padding: 16px;
@@ -25,16 +25,16 @@
 }
 
 .card-order-id {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 16px;
   line-height: 22px;
-  color: #2D1017;
+  color: #1d1d1f;
   margin: 0;
 }
 
 .card-contractor {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
@@ -51,7 +51,7 @@
 }
 
 .card-sub-id {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 13px;
   color: #888888;
@@ -65,17 +65,17 @@
 }
 
 .card-info-row .info-label {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 13px;
   color: #888888;
 }
 
 .card-info-row .info-value {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .card-actions {
@@ -116,7 +116,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #2D1017;
+  border-top: 2px solid #1d1d1f;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -140,7 +140,7 @@
 }
 
 .card-date {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 12px;
   line-height: 16px;
@@ -160,11 +160,11 @@
 }
 
 .section-title {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 18px;
   line-height: 24px;
-  color: #2D1017;
+  color: #1d1d1f;
   margin: 0;
   text-align: center;
 }
@@ -183,7 +183,7 @@
 }
 
 .stock-label {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
@@ -197,16 +197,16 @@
 }
 
 .stock-value {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 15px;
   line-height: 20px;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .stock-pieces,
 .stock-total {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
@@ -220,7 +220,7 @@
 }
 
 .subcontracting-card .processes-label {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
@@ -246,7 +246,7 @@
   padding: 0 42px 0 20px;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
@@ -303,7 +303,7 @@
   background: #A5213A;
   border: none;
   border-radius: 999px;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
@@ -327,13 +327,13 @@
   gap: 16px;
   height: 40px;
   background: transparent;
-  border: 1px solid #2D1017;
+  border: 1px solid #1d1d1f;
   border-radius: 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #2D1017;
+  color: #1d1d1f;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -385,15 +385,15 @@
 }
 
 .remark-label {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 13px;
   line-height: 18px;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .remark-text {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;

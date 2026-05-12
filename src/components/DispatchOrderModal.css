@@ -1,4 +1,4 @@
-.dispatch-modal-overlay {
+﻿.dispatch-modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(10, 18, 31, 0.4);
@@ -29,10 +29,10 @@
 }
 
 .dispatch-modal-title {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 22px;
   font-weight: 400;
-  color: #2D1017;
+  color: #1d1d1f;
   margin: 0;
   text-align: center;
 }
@@ -48,7 +48,7 @@
   height: 28px;
   border-radius: 50%;
   font-size: 18px;
-  color: #2D1017;
+  color: #1d1d1f;
   cursor: pointer;
   transition: background 0.2s ease;
   display: flex;
@@ -71,7 +71,7 @@
   text-align: center;
   color: #8ea3b5;
   padding: 24px 16px;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 14px;
 }
 
@@ -90,10 +90,10 @@
 }
 
 .dispatch-item-field label {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 16px;
   font-weight: 400;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .dispatch-item-input-box {
@@ -110,7 +110,7 @@
 }
 
 .dispatch-item-input-box span {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #888888;
@@ -148,7 +148,7 @@
 }
 
 .dispatch-items-header span {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #888888;
@@ -156,7 +156,7 @@
 
 .dropdown-icon {
   font-size: 12px;
-  color: #2D1017;
+  color: #1d1d1f;
   transition: transform 0.2s ease;
 }
 
@@ -186,7 +186,7 @@
 }
 
 .item-name {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #888888;
@@ -204,7 +204,7 @@
   height: 20px;
   border: none;
   background: transparent;
-  color: #2D1017;
+  color: #1d1d1f;
   font-size: 16px;
   font-weight: 400;
   cursor: pointer;
@@ -221,7 +221,7 @@
 .qty-display {
   min-width: 18px;
   text-align: center;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #888888;
@@ -253,7 +253,7 @@
   height: 18px;
   width: 18px;
   background-color: transparent;
-  border: 1.5px solid #2D1017;
+  border: 1.5px solid #1d1d1f;
   border-radius: 3px;
   transition: all 0.2s ease;
 }
@@ -263,8 +263,8 @@
 }
 
 .checkbox-container input:checked ~ .checkmark {
-  background-color: #2D1017;
-  border-color: #2D1017;
+  background-color: #1d1d1f;
+  border-color: #1d1d1f;
 }
 
 .checkmark:after {
@@ -292,7 +292,7 @@
   border-radius: 8px;
   background: rgba(255, 88, 88, 0.12);
   color: #c53030;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 13px;
 }
 
@@ -309,7 +309,7 @@
   padding: 8px 20px;
   background: #A5213A;
   color: #FFFFFF;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 16px;
   font-weight: 400;
   border: none;

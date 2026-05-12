@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Status Dropdown - Professional Design
  * Unified status dropdown styling across the application
  */
@@ -12,7 +12,7 @@
   padding: 8px 28px 8px 16px;
   border-radius: 8px;
   border: 1px solid transparent;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 500;
   font-size: 13px;
   line-height: 18px;
@@ -79,13 +79,13 @@
 
 /* In Process Status - Blue */
 .status-select-modern.status-in-process {
-  background-color: #FFF0F2;
+  background-color: rgba(0, 0, 0, 0.04);
   border-color: #f4a0ad;
   color: #7A1829;
 }
 
 .status-select-modern.status-in-process:hover:not(:disabled) {
-  background-color: #FAEAED;
+  background-color: rgba(165, 33, 58, 0.06);
   border-color: #e8838e;
 }
 

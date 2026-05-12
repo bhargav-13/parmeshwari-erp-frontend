@@ -1,7 +1,7 @@
-.order-page {
+﻿.order-page {
   padding: 24px 28px;
-  font-family: 'Jost', sans-serif;
-  color: #2D1017;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  color: #1d1d1f;
 }
 
 .order-page-header {
@@ -22,7 +22,7 @@
   margin: 0;
   font-size: 26px;
   font-weight: 500;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .order-page-header p {
@@ -41,7 +41,7 @@
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 }
 
 .order-add-button:hover {
@@ -53,14 +53,14 @@
   font-size: 20px;
   font-weight: 300;
   line-height: 1;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .order-add-button .add-text {
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .order-stats {
@@ -87,7 +87,7 @@
   margin: 8px 0 0;
   font-size: 26px;
   font-weight: 500;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .order-filters {
@@ -127,7 +127,7 @@
   outline: none;
   font-family: inherit;
   font-size: 14px;
-  color: #2D1017;
+  color: #1d1d1f;
   flex: 1;
 }
 
@@ -191,7 +191,7 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   border: none;
   cursor: pointer;
   outline: none;
@@ -256,7 +256,7 @@
   justify-content: center;
   background: rgba(255, 255, 255, 0.7);
   font-size: 16px;
-  color: #2D1017;
+  color: #1d1d1f;
   z-index: 1000;
 }
 
@@ -267,16 +267,16 @@
   justify-content: center;
   padding: 6px 24px;
   gap: 15px;
-  border: 1px solid #2D1017;
+  border: 1px solid #1d1d1f;
   border-radius: 39px;
   background: transparent;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #2D1017;
+  color: #1d1d1f;
   transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
@@ -301,7 +301,7 @@
   border-radius: 39px;
   background: transparent;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;

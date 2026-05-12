@@ -1,4 +1,4 @@
-.confirm-overlay {
+﻿.confirm-overlay {
   position: fixed;
   inset: 0;
   background: rgba(12, 30, 51, 0.45);
@@ -19,14 +19,14 @@
 }
 
 .confirm-title {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 20px;
-  color: #2D1017;
+  color: #1d1d1f;
   margin: 0 0 12px;
 }
 
 .confirm-message {
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 15px;
   color: #526375;
   margin: 0 0 24px;
@@ -42,7 +42,7 @@
   flex: 1;
   border-radius: 24px;
   padding: 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 15px;
   border: none;
   cursor: pointer;
@@ -51,7 +51,7 @@
 
 .confirm-cancel {
   background: #f1f5f9;
-  color: #2D1017;
+  color: #1d1d1f;
 }
 
 .confirm-cancel:hover {

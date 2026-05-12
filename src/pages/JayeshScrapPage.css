@@ -1,4 +1,4 @@
-.jayesh-scrap-page {
+﻿.jayesh-scrap-page {
     padding: 24px;
     max-width: 1400px;
     margin: 0 auto;
@@ -17,16 +17,16 @@
 }
 
 .page-title {
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 600;
     font-size: 24px;
     line-height: 32px;
-    color: #2D1017;
+    color: #1d1d1f;
     margin: 0 0 4px 0;
 }
 
 .page-subtitle {
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -42,7 +42,7 @@
     background: #A5213A;
     border: none;
     border-radius: 8px;
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 500;
     font-size: 14px;
     color: #FFFFFF;
@@ -82,7 +82,7 @@
 }
 
 .stat-label {
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -90,11 +90,11 @@
 }
 
 .stat-value {
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 600;
     font-size: 24px;
     line-height: 32px;
-    color: #2D1017;
+    color: #1d1d1f;
 }
 
 .order-filters {
@@ -124,9 +124,9 @@
     flex: 1;
     border: none;
     outline: none;
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-size: 14px;
-    color: #2D1017;
+    color: #1d1d1f;
     background: transparent;
 }
 
@@ -143,9 +143,9 @@
     border: 1px solid rgba(125, 153, 169, 0.2);
     border-radius: 8px;
     cursor: pointer;
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-size: 14px;
-    color: #2D1017;
+    color: #1d1d1f;
     transition: background-color 0.2s ease;
 }
 
@@ -180,11 +180,11 @@
 .scrap-table th {
     padding: 12px 10px;
     text-align: left;
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 500;
     font-size: 13px;
     line-height: 20px;
-    color: #2D1017;
+    color: #1d1d1f;
     white-space: nowrap;
 }
 
@@ -203,11 +203,11 @@
 
 .scrap-table td {
     padding: 12px 10px;
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 400;
     font-size: 13px;
     line-height: 20px;
-    color: #2D1017;
+    color: #1d1d1f;
     white-space: nowrap;
 }
 
@@ -305,7 +305,7 @@
     background: #A5213A;
     border: none;
     border-radius: 6px;
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 500;
     font-size: 12px;
     color: #FFFFFF;
@@ -343,17 +343,17 @@
 }
 
 .withdraw-info-label {
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 400;
     font-size: 14px;
     color: #7D99A9;
 }
 
 .withdraw-info-value {
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 500;
     font-size: 14px;
-    color: #2D1017;
+    color: #1d1d1f;
 }
 
 .pending-highlight {
@@ -364,7 +364,7 @@
 .no-data {
     padding: 48px 24px;
     text-align: center;
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-size: 16px;
     color: #7D99A9;
 }

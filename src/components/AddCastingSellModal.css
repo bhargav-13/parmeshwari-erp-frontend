@@ -1,4 +1,4 @@
-/* Specific styles for AddCastingSellModal to match the clean grid layout */
+﻿/* Specific styles for AddCastingSellModal to match the clean grid layout */
 
 .medium-modal {
     width: 600px;
@@ -48,7 +48,7 @@
 
 .form-label {
     display: block;
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-size: 14px;
     font-weight: 500;
     color: #212529;
@@ -86,7 +86,7 @@
 }
 
 .modal-title {
-    font-family: 'Jost', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-size: 20px;
     font-weight: 500;
     margin-bottom: 24px;
