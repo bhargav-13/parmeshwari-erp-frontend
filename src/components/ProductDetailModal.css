@@ -187,7 +187,7 @@
 .product-detail-category {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 1rem;
-  color: #8E8E8E;
+  color: #6e6e73;
   margin: 0;
 }
 
@@ -219,7 +219,7 @@
 
 /* Specifications */
 .product-specs {
-  background: #f8f9fa;
+  background: #f5f5f7;
   padding: 1.5rem;
   border-radius: 16px;
 }
@@ -269,7 +269,7 @@
 .spec-label {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 0.8125rem;
-  color: #8E8E8E;
+  color: #6e6e73;
   font-weight: 400;
 }
 

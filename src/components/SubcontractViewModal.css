@@ -51,7 +51,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #8E8E8E;
+  color: #6e6e73;
   margin: 0;
 }
 
@@ -66,7 +66,7 @@
 }
 
 .subcontract-view-close:hover {
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 .subcontract-view-date-filters {
@@ -91,7 +91,7 @@
 
 .date-filter-group input {
   padding: 8px 12px;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 6px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 13px;
@@ -209,7 +209,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
   font-size: 14px;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 .total-value {
@@ -238,7 +238,7 @@
   padding: 40px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 16px;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 /* Mobile Responsive Styles */

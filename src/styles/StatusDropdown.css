@@ -81,11 +81,11 @@
 .status-select-modern.status-in-process {
   background-color: rgba(0, 0, 0, 0.04);
   border-color: #f4a0ad;
-  color: #7A1829;
+  color: #0051d0;
 }
 
 .status-select-modern.status-in-process:hover:not(:disabled) {
-  background-color: rgba(165, 33, 58, 0.06);
+  background-color: rgba(0, 122, 255, 0.06);
   border-color: #e8838e;
 }
 

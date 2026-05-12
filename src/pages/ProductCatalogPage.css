@@ -52,7 +52,7 @@
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #8E8E8E;
+  color: #6e6e73;
   pointer-events: none;
 }
 
@@ -117,7 +117,7 @@
 .results-count {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 0.875rem;
-  color: #8E8E8E;
+  color: #6e6e73;
   margin: 0;
 }
 
@@ -211,7 +211,7 @@
 .product-category {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 0.875rem;
-  color: #8E8E8E;
+  color: #6e6e73;
   margin: 0 0 1rem 0;
 }
 
@@ -222,7 +222,7 @@
   gap: 0.75rem;
   margin-bottom: 1rem;
   padding: 1rem;
-  background: #f8f9fa;
+  background: #f5f5f7;
   border-radius: 8px;
 }
 
@@ -235,7 +235,7 @@
 .detail-label {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 0.875rem;
-  color: #8E8E8E;
+  color: #6e6e73;
   font-weight: 400;
 }
 
@@ -293,7 +293,7 @@
 .catalog-loading p {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 1rem;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 /* No Products */
@@ -307,7 +307,7 @@
 .no-products p {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 1.125rem;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 /* Footer */

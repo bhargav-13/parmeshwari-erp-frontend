@@ -31,7 +31,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #8E8E8E;
+  color: #6e6e73;
   margin: 0;
 }
 
@@ -80,7 +80,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
-  background: #A5213A;
+  background: #007AFF;
   border-radius: 8px;
   border: none;
   cursor: pointer;
@@ -93,7 +93,7 @@
 }
 
 .bulk-reminder-button:hover {
-  background: #7A1829;
+  background: #0051d0;
 }
 
 .bulk-reminder-button .send-icon {
@@ -128,7 +128,7 @@
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 .payment-reminder-page .stat-value {
@@ -141,7 +141,7 @@
 
 .payment-table-container {
   overflow-x: auto;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 12px;
   width: 100%;
   max-width: 100%;
@@ -166,7 +166,7 @@
   font-size: 14px;
   line-height: 20px;
   color: #1d1d1f;
-  border-bottom: 1px solid rgba(125, 153, 169, 0.3);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
 .payment-table td {
@@ -224,7 +224,7 @@
   justify-content: center;
   gap: 8px;
   padding: 6px 14px;
-  background: #A5213A;
+  background: #007AFF;
   border-radius: 20px;
   border: none;
   cursor: pointer;
@@ -238,7 +238,7 @@
 }
 
 .send-reminder-button:hover:not(:disabled) {
-  background: #7A1829;
+  background: #0051d0;
 }
 
 .send-reminder-button:disabled {
@@ -277,7 +277,7 @@
   padding: 32px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 16px;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 /* Toggle column - removed, chevron is now inline */
@@ -301,7 +301,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #7d99a9;
+  color: #6e6e73;
   flex-shrink: 0;
   transition: transform 0.25s ease, color 0.2s ease;
 }
@@ -355,7 +355,7 @@
 .expanded-products-table {
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid rgba(23, 52, 77, 0.08);
+  border: 1px solid rgba(0,0,0,0.07);
   border-radius: 8px;
   overflow: hidden;
   margin-top: 4px;
@@ -399,7 +399,7 @@
 }
 
 .view-ledger-btn:hover:not(:disabled) {
-  background: #c2e5ff;
+  background: rgba(0,0,0,0.1);
 }
 
 .view-ledger-btn:disabled {

@@ -4,7 +4,7 @@
     width: 100%;
     overflow-x: hidden;
     box-sizing: border-box;
-    background-color: #f8f9fa;
+    background-color: #f5f5f7;
     min-height: 100vh;
 }
 
@@ -41,7 +41,7 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #8E8E8E;
+    color: #6e6e73;
     margin: 0;
 }
 
@@ -57,7 +57,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-size: 14px;
     padding: 8px 14px;
-    border: 1px solid rgba(125, 153, 169, 0.3);
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 8px;
     color: #1d1d1f;
     background: #fff;
@@ -92,7 +92,7 @@
 }
 
 .cashflow-summary-card {
-    border: 1px solid rgba(125, 153, 169, 0.3);
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 12px;
     padding: 16px;
     display: flex;
@@ -105,7 +105,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 400;
     font-size: 13px;
-    color: #8E8E8E;
+    color: #6e6e73;
 }
 
 .cashflow-summary-card .stat-value {
@@ -140,7 +140,7 @@
 }
 
 .cashflow-column {
-    border: 1px solid rgba(125, 153, 169, 0.3);
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 12px;
     background: #fff;
     overflow: hidden;
@@ -207,7 +207,7 @@
 }
 
 .cashflow-table thead {
-    background: #f8f9fa;
+    background: #f5f5f7;
 }
 
 .cashflow-table th {
@@ -249,7 +249,7 @@
 .cashflow-table .no-data {
     text-align: center;
     padding: 24px 14px;
-    color: #8E8E8E;
+    color: #6e6e73;
     font-size: 13px;
 }
 
@@ -282,7 +282,7 @@
     display: flex;
     gap: 6px;
     padding: 10px 14px;
-    border-top: 1px solid rgba(125, 153, 169, 0.15);
+    border-top: 1px solid rgba(0,0,0,0.06);
     background: #fafbfc;
     align-items: flex-end;
 }
@@ -306,7 +306,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-size: 12px;
     padding: 6px 8px;
-    border: 1px solid rgba(125, 153, 169, 0.3);
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 6px;
     outline: none;
     color: #1d1d1f;

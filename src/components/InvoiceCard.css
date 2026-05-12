@@ -1,5 +1,5 @@
 ﻿.invoice-card {
-  border: 2px solid rgba(125, 153, 169, 0.3);
+  border: 2px solid rgba(0,0,0,0.08);
   border-radius: 20px;
   padding: 32px;
   background: #FFFFFF;
@@ -28,13 +28,13 @@
 }
 
 .invoice-card .download-button {
-  background: #A5213A;
+  background: #007AFF;
   border-radius: 6px;
   padding: 4px;
 }
 
 .invoice-card .download-button:hover {
-  background: #7A1829;
+  background: #0051d0;
 }
 
 .invoice-card-header {
@@ -191,7 +191,7 @@
 
 .invoice-card-divider {
   height: 1px;
-  background: #7D99A9;
+  background: #6e6e73;
   margin: 24px 0;
 }
 

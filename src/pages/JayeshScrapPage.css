@@ -30,7 +30,7 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #7D99A9;
+    color: #6e6e73;
     margin: 0;
 }
 
@@ -39,7 +39,7 @@
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: #A5213A;
+    background: #007AFF;
     border: none;
     border-radius: 8px;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
@@ -51,7 +51,7 @@
 }
 
 .add-button:hover {
-    background: #7A1829;
+    background: #0051d0;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -86,7 +86,7 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #7D99A9;
+    color: #6e6e73;
 }
 
 .stat-value {
@@ -287,7 +287,7 @@
 }
 
 .view-history-btn:hover {
-    background: #c2e5ff;
+    background: rgba(0,0,0,0.1);
 }
 
 .view-history-btn .icon-img {
@@ -302,7 +302,7 @@
 
 .withdraw-button {
     padding: 5px 12px;
-    background: #A5213A;
+    background: #007AFF;
     border: none;
     border-radius: 6px;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
@@ -315,7 +315,7 @@
 }
 
 .withdraw-button:hover:not(:disabled) {
-    background: #7A1829;
+    background: #0051d0;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -333,7 +333,7 @@
     padding: 16px;
     background: #F8F9FA;
     border-radius: 8px;
-    border: 1px solid rgba(125, 153, 169, 0.15);
+    border: 1px solid rgba(0,0,0,0.06);
 }
 
 .withdraw-info-row {
@@ -346,7 +346,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-weight: 400;
     font-size: 14px;
-    color: #7D99A9;
+    color: #6e6e73;
 }
 
 .withdraw-info-value {
@@ -366,7 +366,7 @@
     text-align: center;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     font-size: 16px;
-    color: #7D99A9;
+    color: #6e6e73;
 }
 
 /* Mobile Responsive */

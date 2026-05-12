@@ -31,7 +31,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #8E8E8E;
+  color: #6e6e73;
   margin: 0;
 }
 
@@ -50,7 +50,7 @@
   padding: 10px 16px;
   background: #F5F5F5;
   border-radius: 8px;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
 }
 
 .subcontract-search img {
@@ -78,7 +78,7 @@
 .subcontract-search-by select {
   padding: 10px 16px;
   background: #F5F5F5;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 8px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
@@ -140,7 +140,7 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: #A5213A;
+  background: #007AFF;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -153,7 +153,7 @@
 }
 
 .action-button:hover:not(:disabled) {
-  background: #7A1829;
+  background: #0051d0;
 }
 
 .action-button:disabled {
@@ -190,7 +190,7 @@
   padding: 40px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 16px;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 /* Mobile Responsive Styles */

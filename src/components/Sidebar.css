@@ -1,4 +1,4 @@
-.sidebar {
+﻿.sidebar {
   width: 240px;
   height: 100vh;
   background: rgba(246, 246, 248, 0.94);
@@ -64,7 +64,7 @@
   font-weight: 700;
   font-size: 16px;
   letter-spacing: 0.06em;
-  color: #A5213A;
+  color: #007AFF;
   text-transform: uppercase;
   line-height: 1;
 }
@@ -124,21 +124,21 @@
 }
 
 .sidebar-item.active {
-  background: rgba(165, 33, 58, 0.1);
+  background: rgba(0, 122, 255, 0.1);
 }
 
 .sidebar-item.active .sidebar-label {
-  color: #A5213A;
+  color: #007AFF;
   font-weight: 600;
 }
 
 .sidebar-item.active .sidebar-icon img {
   opacity: 1;
-  filter: invert(20%) sepia(95%) saturate(1200%) hue-rotate(320deg) brightness(80%);
+  filter: invert(35%) sepia(98%) saturate(1500%) hue-rotate(200deg) brightness(100%);
 }
 
 .sidebar-item.active .expand-icon {
-  color: #A5213A;
+  color: #007AFF;
 }
 
 .sidebar-item:not(.active):hover {
@@ -197,11 +197,11 @@
 }
 
 .sidebar-subitem.active {
-  background: rgba(165, 33, 58, 0.08);
+  background: rgba(0, 122, 255, 0.08);
 }
 
 .sidebar-subitem.active .sidebar-sublabel {
-  color: #A5213A;
+  color: #007AFF;
   font-weight: 600;
 }
 
@@ -273,13 +273,13 @@
 .user-avatar {
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #A5213A, #7A1829);
+  background: linear-gradient(135deg, #007AFF, #0051d0);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(165, 33, 58, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 122, 255, 0.25);
 }
 
 .avatar-icon {

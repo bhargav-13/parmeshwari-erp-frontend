@@ -1,4 +1,4 @@
-.recent-orders-table-container {
+﻿.recent-orders-table-container {
   background-color: #fff;
   border-radius: 8px;
   padding: 20px;
@@ -19,7 +19,7 @@
 }
 
 .recent-orders-table th {
-  background-color: #f8f9fa;
+  background-color: #f5f5f7;
   font-weight: bold;
 }
 
@@ -37,5 +37,5 @@
 
 .status-completed {
   background-color: #FDE8EC;
-  color: #A5213A;
+  color: #007AFF;
 }

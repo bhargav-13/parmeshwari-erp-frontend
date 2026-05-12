@@ -31,7 +31,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #8E8E8E;
+  color: #6e6e73;
   margin: 0;
 }
 
@@ -96,7 +96,7 @@
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 .invoice-page .stat-value {
@@ -125,7 +125,7 @@
   padding: 32px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 16px;
-  color: #8E8E8E;
+  color: #6e6e73;
 }
 
 /* Mobile Responsive Styles */

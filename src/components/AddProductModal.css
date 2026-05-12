@@ -48,7 +48,7 @@
 
 .form-input {
   padding: 10px 14px;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 8px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-weight: 400;
@@ -87,12 +87,12 @@
 }
 
 .save-button {
-  background: #A5213A;
+  background: #007AFF;
   color: #FFFFFF;
 }
 
 .save-button:hover:not(:disabled) {
-  background: #7A1829;
+  background: #0051d0;
 }
 
 .save-button:disabled {
@@ -103,7 +103,7 @@
 .cancel-button {
   background: #FFFFFF;
   color: #1d1d1f;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
 }
 
 .cancel-button:hover {
@@ -147,9 +147,9 @@
   min-width: 36px;
   height: auto;
   padding: 0;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 8px;
-  background: #A5213A;
+  background: #007AFF;
   color: #FFFFFF;
   font-size: 20px;
   font-weight: 500;
@@ -161,7 +161,7 @@
 }
 
 .add-new-btn:hover {
-  background: #7A1829;
+  background: #0051d0;
 }
 
 .add-new-input-group {

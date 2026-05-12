@@ -1,5 +1,5 @@
 ﻿.subcontracting-card {
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 12px;
   padding: 16px;
   background: #FFFFFF;
@@ -148,7 +148,7 @@
 }
 
 .card-body {
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 12px;
   padding: 16px;
 }
@@ -254,7 +254,7 @@
   cursor: pointer;
   outline: none;
   appearance: none;
-  box-shadow: 0 8px 18px rgba(23, 52, 77, 0.08);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.07);
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
               box-shadow 0.22s ease,
               background-color 0.2s ease;
@@ -300,7 +300,7 @@
   align-items: center;
   gap: 8px;
   padding: 0 22px;
-  background: #A5213A;
+  background: #007AFF;
   border: none;
   border-radius: 999px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
@@ -311,7 +311,7 @@
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
   height: 40px;
-  box-shadow: 0 8px 18px rgba(23, 52, 77, 0.08);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.07);
 }
 
 .subcontracting-card .return-record-button:hover {

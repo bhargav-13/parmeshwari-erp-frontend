@@ -1,4 +1,4 @@
-.header {
+﻿.header {
   position: fixed;
   top: 0;
   left: 240px;
@@ -67,7 +67,7 @@
   height: 28px;
   display: block;
   border-radius: 50%;
-  background: linear-gradient(135deg, #A5213A, #7A1829);
+  background: linear-gradient(135deg, #007AFF, #0051d0);
   padding: 5px;
   filter: brightness(0) invert(1);
 }

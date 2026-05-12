@@ -1,7 +1,7 @@
 ﻿.order-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 18, 31, 0.4);
+  background: rgba(0,0,0,0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +14,7 @@
   max-height: 95vh;
   background: #ffffff;
   border-radius: 24px;
-  box-shadow: 0 30px 60px rgba(32, 67, 106, 0.15);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
 }
@@ -23,13 +23,13 @@
   display: flex;
   justify-content: space-between;
   padding: 24px 32px 12px;
-  border-bottom: 1px solid rgba(23, 52, 77, 0.08);
+  border-bottom: 1px solid rgba(0,0,0,0.07);
 }
 
 .order-modal-subtitle {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 14px;
-  color: #8e9fb1;
+  color: #6e6e73;
   margin: 0 0 4px;
 }
 
@@ -42,7 +42,7 @@
 
 .order-modal-close {
   border: none;
-  background: rgba(209, 238, 255, 0.6);
+  background: rgba(0,0,0,0.06);
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -53,7 +53,7 @@
 }
 
 .order-modal-close:hover {
-  background: #c2e5ff;
+  background: rgba(0,0,0,0.1);
 }
 
 .order-modal-tabs {
@@ -71,13 +71,13 @@
   border-radius: 16px 16px 0 0;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 15px;
-  color: #7d99a9;
+  color: #6e6e73;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .order-modal-tab.active {
-  background: #A5213A;
+  background: #007AFF;
   color: #FFFFFF;
   font-weight: 500;
 }
@@ -149,7 +149,7 @@
 
 .add-item-btn {
   border: none;
-  background: #A5213A;
+  background: #007AFF;
   color: #FFFFFF;
   border-radius: 20px;
   padding: 8px 16px;
@@ -359,7 +359,7 @@
   background: #ffffff;
   color: #1d1d1f;
   border: 1px solid rgba(23, 52, 77, 0.2);
-  box-shadow: 0 6px 14px rgba(23, 52, 77, 0.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.07);
 }
 
 .order-btn[data-variant='secondary']:hover {
