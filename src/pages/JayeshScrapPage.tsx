@@ -5,7 +5,6 @@ import WithdrawalHistoryModal from '../components/WithdrawalHistoryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
-import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import ViewIcon from '../assets/view.svg';
@@ -41,11 +40,19 @@ const JayeshScrapPage: React.FC = () => {
     const [withdrawDateInput, setWithdrawDateInput] = useState('');
     const [isWithdrawing, setIsWithdrawing] = useState(false);
     const [viewHistoryScrap, setViewHistoryScrap] = useState<JayeshScrap | null>(null);
+    const [itemOptions, setItemOptions] = useState<string[]>([]);
+    const [selectedItem, setSelectedItem] = useState<string>('');
+
+    useEffect(() => {
+        jayeshScrapApi.getScrapItems()
+            .then(setItemOptions)
+            .catch((err) => console.error('Failed to fetch scrap items:', err));
+    }, []);
 
     useEffect(() => {
         fetchScraps();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, searchQuery]);
+    }, [page, searchQuery, selectedItem]);
 
     const fetchScraps = async () => {
         try {
@@ -53,7 +60,7 @@ const JayeshScrapPage: React.FC = () => {
             const response = await jayeshScrapApi.getScrapList({
                 page,
                 size: 10,
-                search: searchQuery || undefined,
+                search: selectedItem || searchQuery || undefined,
             });
 
             setScraps(response.data);
@@ -220,9 +227,21 @@ const JayeshScrapPage: React.FC = () => {
                         type="text"
                         placeholder="Search"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => { setSearchQuery(e.target.value); setPage(0); }}
                     />
                 </div>
+                <select
+                    className="item-filter-select"
+                    value={selectedItem}
+                    onChange={(e) => { setSelectedItem(e.target.value); setPage(0); }}
+                    aria-label="Filter by item"
+                    title="Filter by item"
+                >
+                    <option value="">All Items</option>
+                    {itemOptions.map((item) => (
+                        <option key={item} value={item}>{item}</option>
+                    ))}
+                </select>
                 <button
                     type="button"
                     className="order-status-filter"
@@ -236,10 +255,6 @@ const JayeshScrapPage: React.FC = () => {
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                 </button>
-                <div className="order-status-filter">
-                    <img src={FilterIcon} alt="Filter" />
-                    <span>Filter</span>
-                </div>
             </div>
 
             <div className="scrap-table-container">
@@ -366,26 +381,30 @@ const JayeshScrapPage: React.FC = () => {
                 <div className="modal-overlay" onClick={() => setIsDownloadPopupOpen(false)}>
                     <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
                         <h2 className="modal-title">Download Jayesh Scrap PDF</h2>
-                        <p className="form-label" style={{ marginBottom: '1rem', fontWeight: 400 }}>
+                        <p className="download-hint-text">
                             Filter by date range — leave blank to download the full report.
                         </p>
                         <div className="modal-form">
                             <div className="form-group">
-                                <label className="form-label">From Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <label className="form-label" htmlFor="jayesh-from-date">From Date <span className="optional-label">(optional)</span></label>
                                 <input
+                                    id="jayesh-from-date"
                                     type="date"
                                     className="form-input"
                                     value={downloadFromDate}
                                     onChange={e => setDownloadFromDate(e.target.value)}
+                                    title="From Date"
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">To Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <label className="form-label" htmlFor="jayesh-to-date">To Date <span className="optional-label">(optional)</span></label>
                                 <input
+                                    id="jayesh-to-date"
                                     type="date"
                                     className="form-input"
                                     value={downloadToDate}
                                     onChange={e => setDownloadToDate(e.target.value)}
+                                    title="To Date"
                                 />
                             </div>
                             <div className="modal-actions">

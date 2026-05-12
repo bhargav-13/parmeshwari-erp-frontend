@@ -179,6 +179,7 @@ export type InventoryFloor = typeof InventoryFloor[keyof typeof InventoryFloor];
 export const QuantityUnit = {
   KG: 'KG',
   GM: 'GM',
+  PCS: 'PCS',
 } as const;
 
 export type QuantityUnit = typeof QuantityUnit[keyof typeof QuantityUnit];
@@ -319,6 +320,7 @@ export interface OrderRequest {
   officialBillAmount: number;
   gst: number;
   transport?: number | null;
+  note?: string | null;
   grandTotal: number;
   productsTotal: number;
   products: OrderProductRequest[];
@@ -605,6 +607,7 @@ export const InwardWeightUnit = {
   CHHOL: 'CHHOL',
   KG: 'KG',
   TAIYAR_MAAL: 'TAIYAR MAAL',
+  REJECTION: 'REJECTION',
 } as const;
 export type InwardWeightUnit = typeof InwardWeightUnit[keyof typeof InwardWeightUnit];
 
@@ -625,6 +628,10 @@ export interface ForgingInwardItem {
   id?: number;
   inwardId?: number;
   name: string;
+  pricePerKg?: number;
+  lowStockAlert?: number;
+  quantityInPc?: number;
+  weightPerPc?: number;
 }
 
 export interface ForgingInward {
@@ -685,6 +692,45 @@ export interface PurchasePartyRequest {
   name: string;
   officialAmount?: number;
   offlineAmount?: number;
+}
+
+// Rejection Types
+export const RejectionReturnType = {
+  CASH: 'CASH',
+  MAAL: 'MAAL',
+} as const;
+
+export type RejectionReturnType = typeof RejectionReturnType[keyof typeof RejectionReturnType];
+
+export interface RejectionRequest {
+  partyId: number;
+  date: string;
+  weight: number;
+  returnType: RejectionReturnType;
+  amount?: number;
+  stockItemId?: number;
+  returnQty?: number;
+}
+
+export interface RejectionResponse {
+  rejectionId: number;
+  party: PurchaseParty;
+  date: string;
+  weight: number;
+  returnType: RejectionReturnType;
+  amount?: number;
+  stockItem?: StockItem;
+  returnQty?: number;
+}
+
+export interface PaginatedResultRejection {
+  data: RejectionResponse[];
+  empty: boolean;
+  last: boolean;
+  first: boolean;
+  totalPages: number;
+  totalElements: number;
+  size: number;
 }
 
 // Purchase Types
@@ -816,6 +862,14 @@ export interface CashflowEntryRequest {
   note?: string;
 }
 
+export interface CashflowPaymentTypeSummary {
+  paymentTypeId: number;
+  paymentTypeName: string;
+  totalIncome: number;
+  totalExpense: number;
+  netBalance: number;
+}
+
 export interface CashflowDailySummary {
   date: string;
   totalIncome: number;
@@ -826,6 +880,7 @@ export interface CashflowDailySummary {
   carryForwardType: string | null; // 'INCOME' | 'EXPENSE' | null
   incomes: CashflowEntry[];
   expenses: CashflowEntry[];
+  paymentTypeSummary?: CashflowPaymentTypeSummary[];
 }
 
 export interface CashflowCloseDayResponse {

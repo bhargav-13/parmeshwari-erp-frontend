@@ -12,6 +12,7 @@ interface AddPurchaseModalProps {
   purchaseParties?: PurchaseParty[];
   categories: Category[];
   onAlreadyExists: (response: PurchaseResponse) => void;
+  editingPurchase?: PurchaseResponse | null;
 }
 
 const defaultFormData: PurchaseRequest = {
@@ -36,8 +37,28 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
   purchaseParties = [],
   categories,
   onAlreadyExists,
+  editingPurchase,
 }) => {
-  const [formData, setFormData] = useState<PurchaseRequest>({ ...defaultFormData });
+  const isEditMode = !!editingPurchase;
+
+  const initialFormData: PurchaseRequest = editingPurchase
+    ? {
+        chNo: editingPurchase.chNo,
+        partyId: editingPurchase.partyId,
+        productId: editingPurchase.product?.productId ?? 0,
+        qty: editingPurchase.qty,
+        rate: editingPurchase.rate,
+        amountDeposited: editingPurchase.amountDeposited,
+        inventoryType: editingPurchase.inventoryType,
+        lowStockAlert: editingPurchase.stockInventory?.lowStockAlert ?? editingPurchase.rawInventory?.lowStockAlert ?? 0,
+        categoryId: editingPurchase.stockInventory?.category?.categoryId,
+        quantityInPc: editingPurchase.stockInventory?.quantityInPc,
+        weightPerPc: editingPurchase.stockInventory?.weightPerPc,
+        quantityUnit: editingPurchase.stockInventory?.quantityUnit as any ?? undefined,
+      }
+    : { ...defaultFormData };
+
+  const [formData, setFormData] = useState<PurchaseRequest>(initialFormData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,6 +74,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
     formData.inventoryType === PurchaseInventoryType.FIRST_FLOOR;
 
   const calculateQuantityInPc = (quantityInKg: number, weightPerPc: number, unit: QuantityUnit): number => {
+    if (unit === QuantityUnit.PCS) return quantityInKg; // qty is already in pieces
     if (weightPerPc === 0) return 0;
     const weightPerPcInKg = unit === QuantityUnit.GM ? weightPerPc / 1000 : weightPerPc;
     return Math.floor(quantityInKg / weightPerPcInKg);
@@ -186,17 +208,22 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
         payload.quantityUnit = formData.quantityUnit || QuantityUnit.KG;
       }
 
-      const response = await purchaseApi.createPurchase(payload);
-
-      if (response.inventoryStatus === 'ALREADY_EXISTS') {
-        onClose();
-        onAlreadyExists(response);
-      } else {
+      if (isEditMode) {
+        await purchaseApi.updatePurchase(editingPurchase!.purchaseId, payload);
         onSuccess();
         onClose();
+      } else {
+        const response = await purchaseApi.createPurchase(payload);
+        if (response.inventoryStatus === 'ALREADY_EXISTS') {
+          onClose();
+          onAlreadyExists(response);
+        } else {
+          onSuccess();
+          onClose();
+        }
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.body?.message || err.message || 'Failed to create purchase');
+      setError(err.response?.data?.message || err.body?.message || err.message || (isEditMode ? 'Failed to update purchase' : 'Failed to create purchase'));
     } finally {
       setLoading(false);
     }
@@ -205,7 +232,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content add-stock-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Add Purchase</h2>
+        <h2 className="modal-title">{isEditMode ? 'Edit Purchase' : 'Add Purchase'}</h2>
 
         {error && <div className="error-message">{error}</div>}
 
@@ -428,6 +455,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
                     >
                       <option value={QuantityUnit.KG}>Kg</option>
                       <option value={QuantityUnit.GM}>Gm</option>
+                      <option value={QuantityUnit.PCS}>Pcs</option>
                     </select>
                   </div>
                 </div>
@@ -453,7 +481,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
 
           <div className="modal-actions">
             <button type="submit" className="save-button" disabled={loading}>
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? 'Saving...' : isEditMode ? 'Update' : 'Save'}
             </button>
             <button type="button" className="cancel-button" onClick={onClose}>
               Cancel

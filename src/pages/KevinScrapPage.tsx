@@ -4,7 +4,6 @@ import ScrapEntryModal from '../components/ScrapEntryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
-import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import './KevinScrapPage.css';
@@ -31,11 +30,19 @@ const KevinScrapPage: React.FC = () => {
     const [downloadFromDate, setDownloadFromDate] = useState('');
     const [downloadToDate, setDownloadToDate] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
+    const [itemOptions, setItemOptions] = useState<string[]>([]);
+    const [selectedItem, setSelectedItem] = useState<string>('');
+
+    useEffect(() => {
+        kevinScrapApi.getScrapItems()
+            .then(setItemOptions)
+            .catch((err) => console.error('Failed to fetch scrap items:', err));
+    }, []);
 
     useEffect(() => {
         fetchScraps();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, searchQuery]);
+    }, [page, searchQuery, selectedItem]);
 
     const fetchScraps = async () => {
         try {
@@ -43,7 +50,7 @@ const KevinScrapPage: React.FC = () => {
             const response = await kevinScrapApi.getScrapList({
                 page,
                 size: 10,
-                search: searchQuery || undefined,
+                search: selectedItem || searchQuery || undefined,
             });
 
             setScraps(response.data);
@@ -161,9 +168,21 @@ const KevinScrapPage: React.FC = () => {
                         type="text"
                         placeholder="Search"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => { setSearchQuery(e.target.value); setPage(0); }}
                     />
                 </div>
+                <select
+                    className="item-filter-select"
+                    value={selectedItem}
+                    onChange={(e) => { setSelectedItem(e.target.value); setPage(0); }}
+                    aria-label="Filter by item"
+                    title="Filter by item"
+                >
+                    <option value="">All Items</option>
+                    {itemOptions.map((item) => (
+                        <option key={item} value={item}>{item}</option>
+                    ))}
+                </select>
                 <button
                     type="button"
                     className="order-status-filter"
@@ -177,10 +196,6 @@ const KevinScrapPage: React.FC = () => {
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                 </button>
-                <div className="order-status-filter">
-                    <img src={FilterIcon} alt="Filter" />
-                    <span>Filter</span>
-                </div>
             </div>
 
             <div className="scrap-table-container">
@@ -272,26 +287,30 @@ const KevinScrapPage: React.FC = () => {
                 <div className="modal-overlay" onClick={() => setIsDownloadPopupOpen(false)}>
                     <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
                         <h2 className="modal-title">Download Kevin Scrap PDF</h2>
-                        <p className="form-label" style={{ marginBottom: '1rem', fontWeight: 400 }}>
+                        <p className="download-hint-text">
                             Filter by date range — leave blank to download the full report.
                         </p>
                         <div className="modal-form">
                             <div className="form-group">
-                                <label className="form-label">From Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <label className="form-label" htmlFor="kevin-from-date">From Date <span className="optional-label">(optional)</span></label>
                                 <input
+                                    id="kevin-from-date"
                                     type="date"
                                     className="form-input"
                                     value={downloadFromDate}
                                     onChange={e => setDownloadFromDate(e.target.value)}
+                                    title="From Date"
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">To Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
+                                <label className="form-label" htmlFor="kevin-to-date">To Date <span className="optional-label">(optional)</span></label>
                                 <input
+                                    id="kevin-to-date"
                                     type="date"
                                     className="form-input"
                                     value={downloadToDate}
                                     onChange={e => setDownloadToDate(e.target.value)}
+                                    title="To Date"
                                 />
                             </div>
                             <div className="modal-actions">

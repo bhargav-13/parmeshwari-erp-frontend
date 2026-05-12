@@ -43,6 +43,7 @@ const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloo
       officialBillAmount: 0,
       gst: 0,
       transport: 0,
+      note: '',
       grandTotal: 0,
       productsTotal: 0,
       products: [createEmptyProduct()],
@@ -313,7 +314,11 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
 
     try {
       setIsSaving(true);
-      await onSubmit(formData);
+      const payload: OrderRequest = {
+        ...formData,
+        note: formData.note?.trim() ? formData.note.trim() : undefined,
+      };
+      await onSubmit(payload);
     } catch (submitError: any) {
       setError(submitError?.response?.data?.message || 'Failed to save order. Please try again.');
     } finally {
@@ -451,6 +456,15 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
               <div className="order-form-group">
                 <label>Products Total</label>
                 <input type="text" value={formattedProductsTotal} readOnly />
+              </div>
+              <div className="order-form-group order-form-group--full">
+                <label>Note (optional)</label>
+                <textarea
+                  value={formData.note || ''}
+                  onChange={(e) => handleFieldChange('note', e.target.value)}
+                  placeholder="Any special instructions…"
+                  rows={2}
+                />
               </div>
             </div>
           )}

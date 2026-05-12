@@ -13,6 +13,7 @@ import type {
     CashflowDailySummary,
     CashflowParty,
     CashflowPaymentType,
+    CashflowPaymentTypeSummary,
 } from '../types';
 import Loading from '../components/Loading';
 
@@ -54,6 +55,9 @@ const CashflowPage: React.FC = () => {
     const [newPartyName, setNewPartyName] = useState('');
     const [showAddPaymentType, setShowAddPaymentType] = useState(false);
     const [newPaymentTypeName, setNewPaymentTypeName] = useState('');
+
+    // Payment type summary expand/collapse
+    const [paymentSummaryExpanded, setPaymentSummaryExpanded] = useState(true);
 
     // Close day
     const [closing, setClosing] = useState(false);
@@ -327,6 +331,7 @@ const CashflowPage: React.FC = () => {
 
     const incomes = summary?.incomes || [];
     const expenses = summary?.expenses || [];
+    const paymentTypeSummary: CashflowPaymentTypeSummary[] = (summary?.paymentTypeSummary || []).filter(p => p.totalIncome > 0 || p.totalExpense > 0);
 
     return (
         <div className="cashflow-page">
@@ -396,6 +401,40 @@ const CashflowPage: React.FC = () => {
                     </span>
                 </div>
             </div>
+
+            {/* Payment Type Summary */}
+            {paymentTypeSummary.length > 0 && (
+                <div className="cashflow-party-summary-section">
+                    <button
+                        type="button"
+                        className="cashflow-party-summary-toggle"
+                        onClick={() => setPaymentSummaryExpanded(e => !e)}
+                    >
+                        <span className="cashflow-party-summary-toggle-title">Payment Type Summary</span>
+                        <span className={`cashflow-party-summary-chevron ${paymentSummaryExpanded ? 'expanded' : ''}`}>&#8964;</span>
+                    </button>
+                    {paymentSummaryExpanded && (
+                        <div className="cashflow-party-cards">
+                            {paymentTypeSummary.map(p => (
+                                <div key={p.paymentTypeId} className="cashflow-party-card">
+                                    <span className="cashflow-party-name">{p.paymentTypeName}</span>
+                                    <div className="cashflow-party-amounts">
+                                        {p.totalIncome > 0 && (
+                                            <span className="cashflow-party-amount income">{formatCurrency(p.totalIncome)}</span>
+                                        )}
+                                        {p.totalExpense > 0 && (
+                                            <span className="cashflow-party-amount expense">- {formatCurrency(p.totalExpense)}</span>
+                                        )}
+                                        <span className={`cashflow-party-amount net ${p.netBalance >= 0 ? 'positive' : 'negative'}`}>
+                                            {p.netBalance < 0 ? '- ' : ''}{formatCurrency(p.netBalance)}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Income & Expense columns */}
             <div className="cashflow-columns">
