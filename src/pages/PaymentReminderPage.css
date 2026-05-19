@@ -385,19 +385,33 @@
   border-bottom: none;
 }
 
-/* Amount breakdown sub-text */
-.amount-cell {
+/* Party base amount breakdown (shown in expanded dropdown) */
+.party-base-breakdown {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 20px;
+  padding: 8px 0 6px;
+  flex-wrap: wrap;
+  border-bottom: 1px dashed rgba(23, 52, 77, 0.1);
+  margin-bottom: 4px;
 }
 
-.amount-breakdown {
+.party-base-label {
   font-family: 'Jost', sans-serif;
-  font-size: 10px;
-  color: #b0bec5;
-  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: #17344D;
+}
+
+.party-base-item {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  color: #8ea3b5;
+}
+
+.party-base-item strong {
+  color: #17344D;
+  font-weight: 500;
 }
 
 /* View ledger button */

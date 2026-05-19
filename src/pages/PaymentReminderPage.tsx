@@ -203,26 +203,8 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                             )}
                           </div>
                         </td>
-                        <td>
-                          {row.loading ? '...' : (
-                            <div className="amount-cell">
-                              <span>{formatCurrency((row.ledger?.totalOfficialAmount || 0) + row.party.officialAmount)}</span>
-                              {(row.party.officialAmount > 0 || (row.ledger?.totalOfficialAmount || 0) > 0) && (
-                                <span className="amount-breakdown">Party {formatCurrency(row.party.officialAmount)} + Orders {formatCurrency(row.ledger?.totalOfficialAmount)}</span>
-                              )}
-                            </div>
-                          )}
-                        </td>
-                        <td>
-                          {row.loading ? '...' : (
-                            <div className="amount-cell">
-                              <span>{formatCurrency((row.ledger?.totalOfflineAmount || 0) + row.party.offlineAmount)}</span>
-                              {(row.party.offlineAmount > 0 || (row.ledger?.totalOfflineAmount || 0) > 0) && (
-                                <span className="amount-breakdown">Party {formatCurrency(row.party.offlineAmount)} + Orders {formatCurrency(row.ledger?.totalOfflineAmount)}</span>
-                              )}
-                            </div>
-                          )}
-                        </td>
+                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalOfficialAmount || 0) + row.party.officialAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalOfflineAmount || 0) + row.party.offlineAmount)}</td>
                         <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalReceivedAmount)}</td>
                         <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalRemainingAmount || 0) + row.party.officialAmount + row.party.offlineAmount)}</td>
                         <td>{row.loading ? '...' : orderCount}</td>
@@ -243,6 +225,21 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                           </button>
                         </td>
                       </tr>
+
+                      {/* Party base amount breakdown row */}
+                      {isExpanded && (
+                        <tr className="expanded-order-row">
+                          <td colSpan={7}>
+                            <div className="party-base-breakdown">
+                              <span className="party-base-label">Party Base Amount</span>
+                              <span className="party-base-item">Official: <strong>{formatCurrency(row.party.officialAmount)}</strong></span>
+                              <span className="party-base-item">Offline: <strong>{formatCurrency(row.party.offlineAmount)}</strong></span>
+                              <span className="party-base-item">Orders Official: <strong>{formatCurrency(row.ledger?.totalOfficialAmount)}</strong></span>
+                              <span className="party-base-item">Orders Offline: <strong>{formatCurrency(row.ledger?.totalOfflineAmount)}</strong></span>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
 
                       {/* Expanded orders */}
                       {isExpanded && row.ledger?.orders && row.ledger.orders.map((order) => (
