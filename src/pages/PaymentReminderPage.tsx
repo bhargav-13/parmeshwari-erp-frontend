@@ -203,8 +203,26 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                             )}
                           </div>
                         </td>
-                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalOfficialAmount || 0) + row.party.officialAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalOfflineAmount || 0) + row.party.offlineAmount)}</td>
+                        <td>
+                          {row.loading ? '...' : (
+                            <div className="amount-cell">
+                              <span>{formatCurrency((row.ledger?.totalOfficialAmount || 0) + row.party.officialAmount)}</span>
+                              {(row.party.officialAmount > 0 || (row.ledger?.totalOfficialAmount || 0) > 0) && (
+                                <span className="amount-breakdown">Party {formatCurrency(row.party.officialAmount)} + Orders {formatCurrency(row.ledger?.totalOfficialAmount)}</span>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          {row.loading ? '...' : (
+                            <div className="amount-cell">
+                              <span>{formatCurrency((row.ledger?.totalOfflineAmount || 0) + row.party.offlineAmount)}</span>
+                              {(row.party.offlineAmount > 0 || (row.ledger?.totalOfflineAmount || 0) > 0) && (
+                                <span className="amount-breakdown">Party {formatCurrency(row.party.offlineAmount)} + Orders {formatCurrency(row.ledger?.totalOfflineAmount)}</span>
+                              )}
+                            </div>
+                          )}
+                        </td>
                         <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalReceivedAmount)}</td>
                         <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalRemainingAmount || 0) + row.party.officialAmount + row.party.offlineAmount)}</td>
                         <td>{row.loading ? '...' : orderCount}</td>

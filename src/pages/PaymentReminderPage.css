@@ -385,6 +385,21 @@
   border-bottom: none;
 }
 
+/* Amount breakdown sub-text */
+.amount-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.amount-breakdown {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  color: #b0bec5;
+  white-space: nowrap;
+}
+
 /* View ledger button */
 .view-ledger-btn {
   background: rgba(209, 238, 255, 0.5);
