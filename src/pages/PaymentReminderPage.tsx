@@ -101,11 +101,11 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
     return row.party.name.toLowerCase().includes(q);
   });
 
-  // Compute summary stats from all ledgers
-  const totalOfficial = partyRows.reduce((sum, r) => sum + (r.ledger?.totalOfficialAmount || 0), 0);
-  const totalOffline = partyRows.reduce((sum, r) => sum + (r.ledger?.totalOfflineAmount || 0), 0);
+  // Compute summary stats: ledger amounts + party's own stored amounts
+  const totalOfficial = partyRows.reduce((sum, r) => sum + (r.ledger?.totalOfficialAmount || 0) + (r.party.officialAmount || 0), 0);
+  const totalOffline = partyRows.reduce((sum, r) => sum + (r.ledger?.totalOfflineAmount || 0) + (r.party.offlineAmount || 0), 0);
   const totalReceived = partyRows.reduce((sum, r) => sum + (r.ledger?.totalReceivedAmount || 0), 0);
-  const totalRemaining = partyRows.reduce((sum, r) => sum + (r.ledger?.totalRemainingAmount || 0), 0);
+  const totalRemaining = partyRows.reduce((sum, r) => sum + (r.ledger?.totalRemainingAmount || 0) + (r.party.officialAmount || 0) + (r.party.offlineAmount || 0), 0);
 
   return (
     <div className="payment-reminder-page">
@@ -203,10 +203,10 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                             )}
                           </div>
                         </td>
-                        <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalOfficialAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalOfflineAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalOfficialAmount || 0) + row.party.officialAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalOfflineAmount || 0) + row.party.offlineAmount)}</td>
                         <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalReceivedAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalRemainingAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalRemainingAmount || 0) + row.party.officialAmount + row.party.offlineAmount)}</td>
                         <td>{row.loading ? '...' : orderCount}</td>
                         <td>
                           <button
