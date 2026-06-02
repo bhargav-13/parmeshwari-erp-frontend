@@ -137,6 +137,29 @@
     width: 100%;
 }
 
+.stats-month-selector {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.month-filter-select {
+    padding: 8px 12px;
+    border: 1px solid rgba(125, 153, 169, 0.3);
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: #17344D;
+    background: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.month-filter-select:focus {
+    border-color: #5b9bd5;
+}
+
 .casting-stat-card {
     border: 1px solid rgba(125, 153, 169, 0.3);
     border-radius: 12px;

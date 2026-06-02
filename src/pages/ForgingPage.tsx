@@ -21,6 +21,23 @@ const DownloadIcon = () => (
 
 type Tab = 'inward' | 'outward';
 
+const getCurrentYearMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+};
+
+const generateMonthOptions = () => {
+    const options: { value: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const label = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+        options.push({ value, label });
+    }
+    return options;
+};
+
 const ForgingPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<Tab>('inward');
     const [searchQuery, setSearchQuery] = useState('');
@@ -40,6 +57,8 @@ const ForgingPage: React.FC = () => {
     const [downloadParties, setDownloadParties] = useState<ForgingParty[]>([]);
     const [downloadPartiesLoading, setDownloadPartiesLoading] = useState(true);
     const [selectedParty, setSelectedParty] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState(getCurrentYearMonth());
+    const monthOptions = generateMonthOptions();
 
     // Fetch forging entries and parties for PDF filter dropdown
     useEffect(() => {
@@ -159,22 +178,19 @@ const ForgingPage: React.FC = () => {
         return result;
     };
 
-    const isCurrentMonth = (dateStr: string) => {
+    const isSelectedMonth = (dateStr: string) => {
         const [, mm, yyyy] = dateStr.split('/');
-        const now = new Date();
-        return parseInt(mm) === now.getMonth() + 1 && parseInt(yyyy) === now.getFullYear();
+        const [selYear, selMonth] = selectedMonth.split('-').map(Number);
+        return parseInt(mm) === selMonth && parseInt(yyyy) === selYear;
     };
 
-    const filteredInwardEntries = filterEntries(inwardEntries);
-    const filteredOutwardEntries = filterEntries(outwardEntries);
+    const filteredInwardEntries = filterEntries(inwardEntries).filter(e => isSelectedMonth(e.date));
+    const filteredOutwardEntries = filterEntries(outwardEntries).filter(e => isSelectedMonth(e.date));
 
-    const currentMonthInward = filteredInwardEntries.filter(e => isCurrentMonth(e.date));
-    const currentMonthOutward = filteredOutwardEntries.filter(e => isCurrentMonth(e.date));
-
-    const totalInward = calculateTotalWeight(currentMonthInward);
-    const totalOutward = calculateTotalWeight(currentMonthOutward);
+    const totalInward = calculateTotalWeight(filteredInwardEntries);
+    const totalOutward = calculateTotalWeight(filteredOutwardEntries);
     const netStock = totalInward - totalOutward;
-    const pendingOrders = currentMonthInward.length + currentMonthOutward.length;
+    const pendingOrders = filteredInwardEntries.length + filteredOutwardEntries.length;
 
     if (loading) {
         return <Loading message="Loading forging data..." />;
@@ -213,22 +229,35 @@ const ForgingPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Stats Grid - 2x2 */}
+            {/* Month selector + Stats Grid */}
+            <div className="stats-month-selector">
+                <select
+                    className="month-filter-select"
+                    value={selectedMonth}
+                    onChange={e => setSelectedMonth(e.target.value)}
+                    title="Select month"
+                >
+                    {monthOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                </select>
+            </div>
+
             <div className="sell-stats-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: '24px' }}>
                 <div className="casting-stat-card">
-                    <span className="stat-title">Total Inward (This Month)</span>
+                    <span className="stat-title">Total Inward</span>
                     <span className="stat-value">{totalInward.toFixed(2)}</span>
                 </div>
                 <div className="casting-stat-card">
-                    <span className="stat-title">Total Outward (This Month)</span>
+                    <span className="stat-title">Total Outward</span>
                     <span className="stat-value">{totalOutward.toFixed(2)}</span>
                 </div>
                 <div className="casting-stat-card">
-                    <span className="stat-title">Net Stock (This Month)</span>
+                    <span className="stat-title">Net Stock</span>
                     <span className="stat-value">{netStock.toFixed(2)}</span>
                 </div>
                 <div className="casting-stat-card">
-                    <span className="stat-title">Entries (This Month)</span>
+                    <span className="stat-title">Entries</span>
                     <span className="stat-value">{pendingOrders}</span>
                 </div>
             </div>
