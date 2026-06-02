@@ -7,6 +7,7 @@ import {
     cashflowExpenseApi,
     cashflowPartyApi,
     cashflowPaymentTypeApi,
+    cashflowAllTotalsApi,
 } from '../api/cashflow';
 import type {
     CashflowEntry,
@@ -27,6 +28,7 @@ type EntryType = 'income' | 'expense';
 const CashflowPage: React.FC = () => {
     const [selectedDate, setSelectedDate] = useState(todayStr());
     const [summary, setSummary] = useState<CashflowDailySummary | null>(null);
+    const [allTimeTotals, setAllTimeTotals] = useState<{ totalIncome: number; totalExpense: number; netBalance: number } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -70,8 +72,12 @@ const CashflowPage: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await cashflowSummaryApi.get(selectedDate);
-            setSummary(data);
+            const [dayData, allData] = await Promise.all([
+                cashflowSummaryApi.get(selectedDate),
+                cashflowAllTotalsApi.get(),
+            ]);
+            setSummary(dayData);
+            setAllTimeTotals(allData);
         } catch (err: any) {
             console.error('Failed to fetch cashflow summary:', err);
             setError('Failed to load cashflow data.');
@@ -378,26 +384,26 @@ const CashflowPage: React.FC = () => {
                 )}
             </div>
 
-            {/* Summary cards */}
+            {/* Summary cards — all-time totals */}
             <div className="cashflow-summary-grid">
                 <div className="cashflow-summary-card">
                     <span className="stat-title">Total Income</span>
-                    <span className="stat-value income">{formatCurrency(summary?.totalIncome ?? 0)}</span>
+                    <span className="stat-value income">{formatCurrency(allTimeTotals?.totalIncome ?? 0)}</span>
                 </div>
                 <div className="cashflow-summary-card">
                     <span className="stat-title">Total Expense</span>
-                    <span className="stat-value expense">{formatCurrency(summary?.totalExpense ?? 0)}</span>
+                    <span className="stat-value expense">{formatCurrency(allTimeTotals?.totalExpense ?? 0)}</span>
                 </div>
                 <div className="cashflow-summary-card">
                     <span className="stat-title">Net Balance</span>
-                    <span className={`stat-value ${(summary?.netBalance ?? 0) >= 0 ? 'positive' : 'negative'}`}>
-                        {(summary?.netBalance ?? 0) < 0 ? '- ' : ''}{formatCurrency(summary?.netBalance ?? 0)}
+                    <span className={`stat-value ${(allTimeTotals?.netBalance ?? 0) >= 0 ? 'positive' : 'negative'}`}>
+                        {(allTimeTotals?.netBalance ?? 0) < 0 ? '- ' : ''}{formatCurrency(allTimeTotals?.netBalance ?? 0)}
                     </span>
                 </div>
                 <div className="cashflow-summary-card">
-                    <span className="stat-title">Carry Forward</span>
-                    <span className="stat-value">
-                        {summary?.carryForwardAmount ? formatCurrency(summary.carryForwardAmount) : '-'}
+                    <span className="stat-title">Today's Balance</span>
+                    <span className={`stat-value ${(summary?.netBalance ?? 0) >= 0 ? 'positive' : 'negative'}`}>
+                        {(summary?.netBalance ?? 0) < 0 ? '- ' : ''}{formatCurrency(summary?.netBalance ?? 0)}
                     </span>
                 </div>
             </div>

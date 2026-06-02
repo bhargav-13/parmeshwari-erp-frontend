@@ -39,6 +39,10 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedPartyId, setExpandedPartyId] = useState<number | null>(null);
   const [detailLedger, setDetailLedger] = useState<PartyLedgerResponse | null>(null);
+  const [receivingParty, setReceivingParty] = useState<{ party: Party; mode: 'official' | 'offline' } | null>(null);
+  const [receiveAmount, setReceiveAmount] = useState<number | ''>('');
+  const [receiveLoading, setReceiveLoading] = useState(false);
+  const [receiveError, setReceiveError] = useState<string | null>(null);
 
   // Date range: all payments (past and future)
   const startDate = '2020-01-01';
@@ -92,6 +96,36 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
 
   const toggleExpand = (partyId: number) => {
     setExpandedPartyId((prev) => (prev === partyId ? null : partyId));
+  };
+
+  const handleReceiveSubmit = async () => {
+    if (!receivingParty || receiveAmount === '' || Number(receiveAmount) <= 0) return;
+    const { party, mode } = receivingParty;
+    const deduct = Number(receiveAmount);
+    const available = mode === 'official' ? (party.officialAmount || 0) : (party.offlineAmount || 0);
+    if (deduct > available) {
+      setReceiveError(`Amount cannot exceed ${mode} balance of ${formatCurrency(available)}`);
+      return;
+    }
+    const updatedOfficial = mode === 'official' ? available - deduct : (party.officialAmount || 0);
+    const updatedOffline = mode === 'offline' ? available - deduct : (party.offlineAmount || 0);
+    try {
+      setReceiveLoading(true);
+      await partyApi.updateParty(party.partyId, {
+        name: party.name,
+        officialAmount: updatedOfficial,
+        offlineAmount: updatedOffline,
+      });
+      setReceivingParty(null);
+      setReceiveAmount('');
+      setReceiveError(null);
+      await fetchData();
+    } catch (err) {
+      console.error('Failed to record payment:', err);
+      setReceiveError('Failed to save. Please try again.');
+    } finally {
+      setReceiveLoading(false);
+    }
   };
 
   // Filter by search
@@ -209,20 +243,40 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                         <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalRemainingAmount || 0) + row.party.officialAmount + row.party.offlineAmount)}</td>
                         <td>{row.loading ? '...' : orderCount}</td>
                         <td>
-                          <button
-                            type="button"
-                            className="view-ledger-btn"
-                            title="View Full Ledger"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (row.ledger) {
-                                setDetailLedger(row.ledger);
-                              }
-                            }}
-                            disabled={!row.ledger}
-                          >
-                            <img src={ViewIcon} alt="View" className="view-icon" />
-                          </button>
+                          <div className="action-buttons">
+                            <button
+                              type="button"
+                              className="view-ledger-btn"
+                              title="View Full Ledger"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (row.ledger) setDetailLedger(row.ledger);
+                              }}
+                              disabled={!row.ledger}
+                            >
+                              <img src={ViewIcon} alt="View" className="view-icon" />
+                            </button>
+                            {(row.party.officialAmount || 0) > 0 && (
+                              <button
+                                type="button"
+                                className="receive-payment-btn receive-payment-btn--official"
+                                title={`Receive against Official: ${formatCurrency(row.party.officialAmount)}`}
+                                onClick={(e) => { e.stopPropagation(); setReceivingParty({ party: row.party, mode: 'official' }); setReceiveAmount(''); setReceiveError(null); }}
+                              >
+                                Official
+                              </button>
+                            )}
+                            {(row.party.offlineAmount || 0) > 0 && (
+                              <button
+                                type="button"
+                                className="receive-payment-btn receive-payment-btn--offline"
+                                title={`Receive against Offline: ${formatCurrency(row.party.offlineAmount)}`}
+                                onClick={(e) => { e.stopPropagation(); setReceivingParty({ party: row.party, mode: 'offline' }); setReceiveAmount(''); setReceiveError(null); }}
+                              >
+                                Offline
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
 
@@ -302,10 +356,50 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
           ledger={detailLedger}
           floor={floor}
           onClose={() => setDetailLedger(null)}
-          onFullPaymentSuccess={() => {
-            fetchData();
-          }}
+          onFullPaymentSuccess={() => fetchData()}
         />
+      )}
+
+      {/* Receive payment modal for party base amounts */}
+      {receivingParty && (
+        <div className="modal-overlay" onClick={() => setReceivingParty(null)}>
+          <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Receive Payment</h2>
+            <p className="receive-modal-subtitle">
+              <strong>{receivingParty.party.name}</strong> — {receivingParty.mode === 'official' ? 'Official' : 'Offline'} Amount:{' '}
+              <strong>{formatCurrency(receivingParty.mode === 'official' ? receivingParty.party.officialAmount : receivingParty.party.offlineAmount)}</strong>
+            </p>
+            <div className="modal-form">
+              <div className="form-group">
+                <label className="form-label">Amount Received*</label>
+                <input
+                  type="number"
+                  className={`form-input${receiveError ? ' input-error' : ''}`}
+                  placeholder="Enter amount"
+                  value={receiveAmount}
+                  onChange={(e) => { setReceiveError(null); setReceiveAmount(e.target.value === '' ? '' : Number(e.target.value)); }}
+                  min="0"
+                  step="0.01"
+                  autoFocus
+                />
+                {receiveError && <span className="receive-field-error">{receiveError}</span>}
+              </div>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="save-button"
+                  onClick={handleReceiveSubmit}
+                  disabled={receiveLoading || receiveAmount === '' || Number(receiveAmount) <= 0}
+                >
+                  {receiveLoading ? 'Saving...' : 'Confirm'}
+                </button>
+                <button type="button" className="cancel-button" onClick={() => setReceivingParty(null)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

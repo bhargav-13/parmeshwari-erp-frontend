@@ -70,6 +70,18 @@ export const cashflowSummaryApi = {
         authFetch(`/api/v1/cashflow/close-day${date ? `?date=${date}` : ''}`, { method: 'POST' }),
 };
 
+export const cashflowAllTotalsApi = {
+    get: async (): Promise<{ totalIncome: number; totalExpense: number; netBalance: number }> => {
+        const [incomes, expenses] = await Promise.all([
+            authFetch('/api/v1/cashflow/income?page=0&size=100000').then((res: any) => res?.data || res?.content || []),
+            authFetch('/api/v1/cashflow/expense?page=0&size=100000').then((res: any) => res?.data || res?.content || []),
+        ]);
+        const totalIncome = (incomes as CashflowEntry[]).reduce((s: number, e: CashflowEntry) => s + e.amount, 0);
+        const totalExpense = (expenses as CashflowEntry[]).reduce((s: number, e: CashflowEntry) => s + e.amount, 0);
+        return { totalIncome, totalExpense, netBalance: totalIncome - totalExpense };
+    },
+};
+
 // Payment Types API
 export const cashflowPaymentTypeApi = {
     getAll: (): Promise<CashflowPaymentType[]> =>

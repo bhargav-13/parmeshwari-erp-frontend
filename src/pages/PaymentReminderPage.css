@@ -441,6 +441,90 @@
   height: 18px;
 }
 
+.input-error {
+  border-color: #c33 !important;
+}
+
+.receive-field-error {
+  display: block;
+  margin-top: 4px;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  color: #c33;
+}
+
+.receive-modal-subtitle {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: #5b7a95;
+  margin-bottom: 16px;
+}
+
+.receive-error-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background-color: #fee;
+  color: #c33;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+}
+
+.receive-error-dismiss {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #c33;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.receive-payment-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.receive-payment-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.receive-payment-btn--official {
+  background: #e6f4ea;
+  color: #1e7e34;
+}
+
+.receive-payment-btn--official:hover:not(:disabled) {
+  background: #c8e6c9;
+}
+
+.receive-payment-btn--offline {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.receive-payment-btn--offline:hover:not(:disabled) {
+  background: #ffe0b2;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 1200px) {
   .payment-table {

@@ -7,9 +7,10 @@ interface AddForgingOutwardModalProps {
     onClose: () => void;
     onSubmit: (entry: Omit<ForgingOutward, 'id'>) => Promise<void>;
     initialData?: ForgingOutward | null;
+    defaultPartyId?: number;
 }
 
-const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose, onSubmit, initialData }) => {
+const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose, onSubmit, initialData, defaultPartyId }) => {
     // Convert DD/MM/YYYY to YYYY-MM-DD for the date input
     const initDate = (() => {
         if (initialData?.date) {
@@ -20,7 +21,7 @@ const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose
     })();
 
     const [date, setDate] = useState(initDate);
-    const [partyId, setPartyId] = useState<number | ''>(initialData?.partyId ?? initialData?.party?.partyId ?? '');
+    const [partyId, setPartyId] = useState<number | ''>(initialData?.partyId ?? initialData?.party?.partyId ?? defaultPartyId ?? '');
     const [challanNo, setChallanNo] = useState(initialData?.challanNo ?? '');
     const [weight, setWeight] = useState<number | ''>(initialData?.weight ?? '');
     // Outward only has WIRE as per YAML schema

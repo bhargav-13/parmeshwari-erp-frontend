@@ -159,13 +159,22 @@ const ForgingPage: React.FC = () => {
         return result;
     };
 
+    const isCurrentMonth = (dateStr: string) => {
+        const [, mm, yyyy] = dateStr.split('/');
+        const now = new Date();
+        return parseInt(mm) === now.getMonth() + 1 && parseInt(yyyy) === now.getFullYear();
+    };
+
     const filteredInwardEntries = filterEntries(inwardEntries);
     const filteredOutwardEntries = filterEntries(outwardEntries);
 
-    const totalInward = calculateTotalWeight(filteredInwardEntries);
-    const totalOutward = calculateTotalWeight(filteredOutwardEntries);
+    const currentMonthInward = filteredInwardEntries.filter(e => isCurrentMonth(e.date));
+    const currentMonthOutward = filteredOutwardEntries.filter(e => isCurrentMonth(e.date));
+
+    const totalInward = calculateTotalWeight(currentMonthInward);
+    const totalOutward = calculateTotalWeight(currentMonthOutward);
     const netStock = totalInward - totalOutward;
-    const pendingOrders = filteredInwardEntries.length + filteredOutwardEntries.length;
+    const pendingOrders = currentMonthInward.length + currentMonthOutward.length;
 
     if (loading) {
         return <Loading message="Loading forging data..." />;
@@ -207,19 +216,19 @@ const ForgingPage: React.FC = () => {
             {/* Stats Grid - 2x2 */}
             <div className="sell-stats-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: '24px' }}>
                 <div className="casting-stat-card">
-                    <span className="stat-title">Total Inward</span>
+                    <span className="stat-title">Total Inward (This Month)</span>
                     <span className="stat-value">{totalInward.toFixed(2)}</span>
                 </div>
                 <div className="casting-stat-card">
-                    <span className="stat-title">Total Outward</span>
+                    <span className="stat-title">Total Outward (This Month)</span>
                     <span className="stat-value">{totalOutward.toFixed(2)}</span>
                 </div>
                 <div className="casting-stat-card">
-                    <span className="stat-title">Net Stock</span>
+                    <span className="stat-title">Net Stock (This Month)</span>
                     <span className="stat-value">{netStock.toFixed(2)}</span>
                 </div>
                 <div className="casting-stat-card">
-                    <span className="stat-title">Pending Orders</span>
+                    <span className="stat-title">Entries (This Month)</span>
                     <span className="stat-value">{pendingOrders}</span>
                 </div>
             </div>
@@ -381,6 +390,7 @@ const ForgingPage: React.FC = () => {
                     onSubmit={handleInwardSubmit}
                     initialData={editingInward}
                     existingInwards={inwardEntries}
+                    defaultPartyId={!editingInward && selectedParty ? downloadParties.find(p => p.partyName === selectedParty)?.partyId : undefined}
                 />
             )}
 
@@ -389,6 +399,7 @@ const ForgingPage: React.FC = () => {
                     onClose={() => { setIsOutwardModalOpen(false); setEditingOutward(null); }}
                     onSubmit={handleOutwardSubmit}
                     initialData={editingOutward}
+                    defaultPartyId={!editingOutward && selectedParty ? downloadParties.find(p => p.partyName === selectedParty)?.partyId : undefined}
                 />
             )}
 

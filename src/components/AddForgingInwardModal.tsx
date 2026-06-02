@@ -15,9 +15,10 @@ interface AddForgingInwardModalProps {
     onSubmit: (entry: Omit<ForgingInward, 'id'>) => Promise<void>;
     initialData?: ForgingInward | null;
     existingInwards?: ForgingInward[];
+    defaultPartyId?: number;
 }
 
-const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, onSubmit, initialData, existingInwards = [] }) => {
+const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, onSubmit, initialData, existingInwards = [], defaultPartyId }) => {
     // Convert DD/MM/YYYY to YYYY-MM-DD for the date input
     const initDate = (() => {
         if (initialData?.date) {
@@ -29,7 +30,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
 
     // Form state
     const [date, setDate] = useState(initDate);
-    const [partyId, setPartyId] = useState<number | ''>(initialData?.partyId ?? initialData?.party?.partyId ?? '');
+    const [partyId, setPartyId] = useState<number | ''>(initialData?.partyId ?? initialData?.party?.partyId ?? defaultPartyId ?? '');
     const [challanNo, setChallanNo] = useState(initialData?.challanNo ?? '');
     const [weight, setWeight] = useState<number | ''>(initialData?.weight ?? '');
     const [weightUnit, setWeightUnit] = useState<InwardWeightUnit>(initialData?.weightUnit ?? 'KG');
