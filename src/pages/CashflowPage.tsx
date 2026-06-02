@@ -449,27 +449,52 @@ const CashflowPage: React.FC = () => {
                 )}
             </div>
 
+            {/* Entry date chips */}
+            {(allTimeTotals?.entryDates.length ?? 0) > 0 && (
+                <div className="cashflow-entry-dates">
+                    <span className="cashflow-entry-dates-label">Pending carry-forward:</span>
+                    <div className="cashflow-entry-dates-chips">
+                        {allTimeTotals!.entryDates.map(({ date }) => (
+                            <button
+                                key={date}
+                                type="button"
+                                className={`cashflow-date-chip pending ${date === selectedDate ? 'active' : ''}`}
+                                onClick={() => setSelectedDate(date)}
+                                title="Entries added — not yet carried forward"
+                            >
+                                {new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}
+                                <span className="cashflow-date-chip-dot" />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Summary cards — all-time totals */}
             <div className="cashflow-summary-grid">
                 <div className="cashflow-summary-card">
                     <span className="stat-title">Total Income</span>
                     <span className="stat-value income">{formatCurrency(allTimeTotals?.totalIncome ?? 0)}</span>
+                    <span className="stat-subtitle">All time · excl. carry-forward</span>
                 </div>
                 <div className="cashflow-summary-card">
                     <span className="stat-title">Total Expense</span>
                     <span className="stat-value expense">{formatCurrency(allTimeTotals?.totalExpense ?? 0)}</span>
+                    <span className="stat-subtitle">All time · excl. carry-forward</span>
                 </div>
                 <div className="cashflow-summary-card">
                     <span className="stat-title">Net Balance</span>
                     <span className={`stat-value ${(allTimeTotals?.netBalance ?? 0) >= 0 ? 'positive' : 'negative'}`}>
                         {(allTimeTotals?.netBalance ?? 0) < 0 ? '- ' : ''}{formatCurrency(allTimeTotals?.netBalance ?? 0)}
                     </span>
+                    <span className="stat-subtitle">All time · income − expense</span>
                 </div>
                 <div className="cashflow-summary-card">
-                    <span className="stat-title">Today's Balance</span>
+                    <span className="stat-title">Selected Day Net</span>
                     <span className={`stat-value ${(summary?.netBalance ?? 0) >= 0 ? 'positive' : 'negative'}`}>
                         {(summary?.netBalance ?? 0) < 0 ? '- ' : ''}{formatCurrency(summary?.netBalance ?? 0)}
                     </span>
+                    <span className="stat-subtitle">Incl. carry-forward</span>
                 </div>
             </div>
 

@@ -155,6 +155,82 @@
     border: 1px solid #ffe082;
 }
 
+/* Entry date chips */
+.cashflow-entry-dates {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.cashflow-entry-dates-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9fb3c0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.cashflow-entry-dates-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.cashflow-date-chip {
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(125, 153, 169, 0.3);
+    background: #fff;
+    color: #5b7a95;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.cashflow-date-chip:hover {
+    border-color: #5b9bd5;
+    background: #f0f7ff;
+    color: #17344D;
+}
+
+.cashflow-date-chip.active {
+    background: #17344D;
+    border-color: #17344D;
+    color: #fff;
+}
+
+.cashflow-date-chip.active .cashflow-date-chip-dot {
+    background: #fff;
+}
+
+.cashflow-date-chip.pending {
+    border-color: #f59e0b;
+    color: #92400e;
+    background: #fffbeb;
+}
+
+.cashflow-date-chip.pending:hover {
+    background: #fef3c7;
+    border-color: #d97706;
+}
+
+.cashflow-date-chip-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #f59e0b;
+    margin-left: 5px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
 /* Summary cards */
 .cashflow-summary-grid {
     display: grid;
@@ -201,6 +277,14 @@
 
 .cashflow-summary-card .stat-value.negative {
     color: #c62828;
+}
+
+.cashflow-summary-card .stat-subtitle {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: #9fb3c0;
+    margin-top: 2px;
 }
 
 /* Party Summary */

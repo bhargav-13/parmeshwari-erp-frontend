@@ -81,6 +81,8 @@ export interface AllTimeTotals {
         totalExpense: number;
         netBalance: number;
     }[];
+    // unique dates with real entries, newest first, with closed status
+    entryDates: { date: string; closed: boolean }[];
 }
 
 export const cashflowAllTotalsApi = {
@@ -120,7 +122,26 @@ export const cashflowAllTotalsApi = {
             netBalance: v.totalIncome - v.totalExpense,
         })).sort((a, b) => a.paymentTypeName.localeCompare(b.paymentTypeName));
 
-        return { totalIncome, totalExpense, netBalance: totalIncome - totalExpense, byPaymentType };
+        // Carry-forward entries: the date on a CF entry is the day it was received (next day).
+        // So if a CF income exists on date X, it means date X-1 was closed.
+        // We derive closed dates by subtracting 1 day from each CF entry's date.
+        const cfDates = (incomes as CashflowEntry[])
+            .filter(e => e.carryForward)
+            .map(e => {
+                const d = new Date(e.date + 'T00:00:00');
+                d.setDate(d.getDate() - 1);
+                return d.toISOString().split('T')[0];
+            });
+        const closedDateSet = new Set(cfDates);
+
+        const dateSet = new Set<string>();
+        for (const e of [...realIncomes, ...realExpenses]) dateSet.add(e.date);
+        const entryDates = Array.from(dateSet)
+            .sort((a, b) => b.localeCompare(a))
+            .map(date => ({ date, closed: closedDateSet.has(date) }))
+            .filter(({ closed }) => !closed);
+
+        return { totalIncome, totalExpense, netBalance: totalIncome - totalExpense, byPaymentType, entryDates };
     },
 };
 
