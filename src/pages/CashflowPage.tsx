@@ -8,13 +8,13 @@ import {
     cashflowPartyApi,
     cashflowPaymentTypeApi,
     cashflowAllTotalsApi,
+    type AllTimeTotals,
 } from '../api/cashflow';
 import type {
     CashflowEntry,
     CashflowDailySummary,
     CashflowParty,
     CashflowPaymentType,
-    CashflowPaymentTypeSummary,
 } from '../types';
 import Loading from '../components/Loading';
 
@@ -28,7 +28,7 @@ type EntryType = 'income' | 'expense';
 const CashflowPage: React.FC = () => {
     const [selectedDate, setSelectedDate] = useState(todayStr());
     const [summary, setSummary] = useState<CashflowDailySummary | null>(null);
-    const [allTimeTotals, setAllTimeTotals] = useState<{ totalIncome: number; totalExpense: number; netBalance: number } | null>(null);
+    const [allTimeTotals, setAllTimeTotals] = useState<AllTimeTotals | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -58,7 +58,6 @@ const CashflowPage: React.FC = () => {
     const [showAddPaymentType, setShowAddPaymentType] = useState(false);
     const [newPaymentTypeName, setNewPaymentTypeName] = useState('');
 
-    // Payment type summary expand/collapse
     const [paymentSummaryExpanded, setPaymentSummaryExpanded] = useState(true);
 
     // Close day
@@ -337,7 +336,6 @@ const CashflowPage: React.FC = () => {
 
     const incomes = summary?.incomes || [];
     const expenses = summary?.expenses || [];
-    const paymentTypeSummary: CashflowPaymentTypeSummary[] = (summary?.paymentTypeSummary || []).filter(p => p.totalIncome > 0 || p.totalExpense > 0);
 
     return (
         <div className="cashflow-page">
@@ -408,8 +406,8 @@ const CashflowPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Payment Type Summary */}
-            {paymentTypeSummary.length > 0 && (
+            {/* Payment Type Summary — all-time totals */}
+            {(allTimeTotals?.byPaymentType.length ?? 0) > 0 && (
                 <div className="cashflow-party-summary-section">
                     <button
                         type="button"
@@ -421,7 +419,7 @@ const CashflowPage: React.FC = () => {
                     </button>
                     {paymentSummaryExpanded && (
                         <div className="cashflow-party-cards">
-                            {paymentTypeSummary.map(p => (
+                            {allTimeTotals!.byPaymentType.map(p => (
                                 <div key={p.paymentTypeId} className="cashflow-party-card">
                                     <span className="cashflow-party-name">{p.paymentTypeName}</span>
                                     <div className="cashflow-party-amounts">

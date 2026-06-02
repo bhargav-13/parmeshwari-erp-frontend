@@ -70,15 +70,52 @@ export const cashflowSummaryApi = {
         authFetch(`/api/v1/cashflow/close-day${date ? `?date=${date}` : ''}`, { method: 'POST' }),
 };
 
+export interface AllTimeTotals {
+    totalIncome: number;
+    totalExpense: number;
+    netBalance: number;
+    byPaymentType: {
+        paymentTypeId: number;
+        paymentTypeName: string;
+        totalIncome: number;
+        totalExpense: number;
+        netBalance: number;
+    }[];
+}
+
 export const cashflowAllTotalsApi = {
-    get: async (): Promise<{ totalIncome: number; totalExpense: number; netBalance: number }> => {
+    get: async (): Promise<AllTimeTotals> => {
         const [incomes, expenses] = await Promise.all([
             authFetch('/api/v1/cashflow/income?page=0&size=100000').then((res: any) => res?.data || res?.content || []),
             authFetch('/api/v1/cashflow/expense?page=0&size=100000').then((res: any) => res?.data || res?.content || []),
         ]);
+
         const totalIncome = (incomes as CashflowEntry[]).reduce((s: number, e: CashflowEntry) => s + e.amount, 0);
         const totalExpense = (expenses as CashflowEntry[]).reduce((s: number, e: CashflowEntry) => s + e.amount, 0);
-        return { totalIncome, totalExpense, netBalance: totalIncome - totalExpense };
+
+        const map = new Map<number, { paymentTypeName: string; totalIncome: number; totalExpense: number }>();
+        for (const e of incomes as CashflowEntry[]) {
+            if (!e.paymentType) continue;
+            const id = e.paymentType.id;
+            const existing = map.get(id) ?? { paymentTypeName: e.paymentType.name, totalIncome: 0, totalExpense: 0 };
+            map.set(id, { ...existing, totalIncome: existing.totalIncome + e.amount });
+        }
+        for (const e of expenses as CashflowEntry[]) {
+            if (!e.paymentType) continue;
+            const id = e.paymentType.id;
+            const existing = map.get(id) ?? { paymentTypeName: e.paymentType.name, totalIncome: 0, totalExpense: 0 };
+            map.set(id, { ...existing, totalExpense: existing.totalExpense + e.amount });
+        }
+
+        const byPaymentType = Array.from(map.entries()).map(([paymentTypeId, v]) => ({
+            paymentTypeId,
+            paymentTypeName: v.paymentTypeName,
+            totalIncome: v.totalIncome,
+            totalExpense: v.totalExpense,
+            netBalance: v.totalIncome - v.totalExpense,
+        })).sort((a, b) => a.paymentTypeName.localeCompare(b.paymentTypeName));
+
+        return { totalIncome, totalExpense, netBalance: totalIncome - totalExpense, byPaymentType };
     },
 };
 
