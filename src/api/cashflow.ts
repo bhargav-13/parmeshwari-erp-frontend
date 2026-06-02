@@ -90,26 +90,31 @@ export const cashflowAllTotalsApi = {
             authFetch('/api/v1/cashflow/expense?page=0&size=100000').then((res: any) => res?.data || res?.content || []),
         ]);
 
-        const totalIncome = (incomes as CashflowEntry[]).reduce((s: number, e: CashflowEntry) => s + e.amount, 0);
-        const totalExpense = (expenses as CashflowEntry[]).reduce((s: number, e: CashflowEntry) => s + e.amount, 0);
+        // Exclude carry-forward entries — they are accounting artifacts, not real transactions
+        const realIncomes = (incomes as CashflowEntry[]).filter(e => !e.carryForward);
+        const realExpenses = (expenses as CashflowEntry[]).filter(e => !e.carryForward);
 
-        const map = new Map<number, { paymentTypeName: string; totalIncome: number; totalExpense: number }>();
-        for (const e of incomes as CashflowEntry[]) {
+        const totalIncome = realIncomes.reduce((s, e) => s + e.amount, 0);
+        const totalExpense = realExpenses.reduce((s, e) => s + e.amount, 0);
+
+        // Group by payment type NAME (not id) to merge duplicates with same name
+        const map = new Map<string, { totalIncome: number; totalExpense: number }>();
+        for (const e of realIncomes) {
             if (!e.paymentType) continue;
-            const id = e.paymentType.id;
-            const existing = map.get(id) ?? { paymentTypeName: e.paymentType.name, totalIncome: 0, totalExpense: 0 };
-            map.set(id, { ...existing, totalIncome: existing.totalIncome + e.amount });
+            const name = e.paymentType.name;
+            const existing = map.get(name) ?? { totalIncome: 0, totalExpense: 0 };
+            map.set(name, { ...existing, totalIncome: existing.totalIncome + e.amount });
         }
-        for (const e of expenses as CashflowEntry[]) {
+        for (const e of realExpenses) {
             if (!e.paymentType) continue;
-            const id = e.paymentType.id;
-            const existing = map.get(id) ?? { paymentTypeName: e.paymentType.name, totalIncome: 0, totalExpense: 0 };
-            map.set(id, { ...existing, totalExpense: existing.totalExpense + e.amount });
+            const name = e.paymentType.name;
+            const existing = map.get(name) ?? { totalIncome: 0, totalExpense: 0 };
+            map.set(name, { ...existing, totalExpense: existing.totalExpense + e.amount });
         }
 
-        const byPaymentType = Array.from(map.entries()).map(([paymentTypeId, v]) => ({
-            paymentTypeId,
-            paymentTypeName: v.paymentTypeName,
+        const byPaymentType = Array.from(map.entries()).map(([paymentTypeName, v], i) => ({
+            paymentTypeId: i,
+            paymentTypeName,
             totalIncome: v.totalIncome,
             totalExpense: v.totalExpense,
             netBalance: v.totalIncome - v.totalExpense,
