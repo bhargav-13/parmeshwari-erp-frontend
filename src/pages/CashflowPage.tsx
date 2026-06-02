@@ -498,8 +498,8 @@ const CashflowPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Payment Type Summary — all-time totals */}
-            {(allTimeTotals?.byPaymentType.length ?? 0) > 0 && (
+            {/* Payment Type Summary — all-time totals, owner only */}
+            {isOwner() && (allTimeTotals?.byPaymentType.length ?? 0) > 0 && (
                 <div className="cashflow-party-summary-section">
                     <button
                         type="button"
