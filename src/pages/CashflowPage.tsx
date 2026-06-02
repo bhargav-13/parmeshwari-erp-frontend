@@ -538,6 +538,14 @@ const CashflowPage: React.FC = () => {
                                 <tr><td className="no-data" colSpan={5}>No income entries</td></tr>
                             )}
                         </tbody>
+                        {incomes.length > 0 && (
+                            <tfoot>
+                                <tr className="cashflow-table-total-row">
+                                    <td className="cashflow-table-total-label" colSpan={4}>Total Income</td>
+                                    <td className="cashflow-table-total-value income">{formatCurrency(summary?.totalIncome ?? 0)}</td>
+                                </tr>
+                            </tfoot>
+                        )}
                     </table>
                     {renderAddRow('income')}
                 </div>
@@ -571,6 +579,14 @@ const CashflowPage: React.FC = () => {
                                 <tr><td className="no-data" colSpan={5}>No expense entries</td></tr>
                             )}
                         </tbody>
+                        {expenses.length > 0 && (
+                            <tfoot>
+                                <tr className="cashflow-table-total-row">
+                                    <td className="cashflow-table-total-label" colSpan={4}>Total Expense</td>
+                                    <td className="cashflow-table-total-value expense">{formatCurrency(summary?.totalExpense ?? 0)}</td>
+                                </tr>
+                            </tfoot>
+                        )}
                     </table>
                     {renderAddRow('expense')}
                 </div>

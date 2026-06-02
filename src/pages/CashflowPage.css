@@ -463,6 +463,36 @@
     color: #5b9bd5;
 }
 
+.cashflow-table-total-row {
+    border-top: 2px solid rgba(125, 153, 169, 0.2);
+    background: #f8f9fa;
+}
+
+.cashflow-table-total-label {
+    padding: 10px 14px;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5b7a95;
+    text-align: right;
+}
+
+.cashflow-table-total-value {
+    padding: 10px 14px;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.cashflow-table-total-value.income {
+    color: #2e7d32;
+}
+
+.cashflow-table-total-value.expense {
+    color: #c62828;
+}
+
 /* Add entry form row */
 .cashflow-add-row {
     display: flex;
