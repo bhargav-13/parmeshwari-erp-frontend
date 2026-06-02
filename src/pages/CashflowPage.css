@@ -51,36 +51,108 @@
     align-items: center;
     gap: 12px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.cashflow-date-row input[type="date"] {
+.cashflow-date-nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid rgba(125, 153, 169, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(23, 52, 77, 0.06);
+}
+
+.cashflow-day-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 38px;
+    border: none;
+    background: transparent;
+    color: #5b7a95;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.cashflow-day-nav-btn:hover:not(:disabled) {
+    background: #f0f7ff;
+    color: #17344D;
+}
+
+.cashflow-day-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.cashflow-date-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    border-left: 1px solid rgba(125, 153, 169, 0.2);
+    border-right: 1px solid rgba(125, 153, 169, 0.2);
+}
+
+.cashflow-date-icon {
+    color: #5b9bd5;
+    flex-shrink: 0;
+}
+
+.cashflow-date-input-wrap input[type="date"] {
     font-family: 'Jost', sans-serif;
     font-size: 14px;
-    padding: 8px 14px;
-    border: 1px solid rgba(125, 153, 169, 0.3);
-    border-radius: 8px;
+    font-weight: 500;
     color: #17344D;
-    background: #fff;
+    background: transparent;
+    border: none;
     outline: none;
-}
-
-.cashflow-date-row input[type="date"]:focus {
-    border-color: #5b9bd5;
+    padding: 8px 0;
+    cursor: pointer;
 }
 
 .cashflow-day-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     font-family: 'Jost', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
     border-radius: 20px;
     background: #e8f5e9;
     color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.cashflow-day-badge.today {
+    background: #e3f2fd;
+    color: #1565c0;
+    border-color: #bbdefb;
 }
 
 .cashflow-day-badge.closed {
     background: #fce4ec;
     color: #c62828;
+    border-color: #f8bbd0;
+}
+
+.cashflow-carry-forward-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: #fff8e1;
+    color: #e65100;
+    border: 1px solid #ffe082;
 }
 
 /* Summary cards */
