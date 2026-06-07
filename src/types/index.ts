@@ -1,3 +1,5 @@
+export type Floor = 'GROUND_FLOOR' | 'FIRST_FLOOR';
+
 // Authentication Types
 export interface SignInRequest {
   username: string;
@@ -481,12 +483,14 @@ export interface Party {
   name: string;
   officialAmount: number;
   offlineAmount: number;
+  floor?: Floor;
 }
 
 export interface PartyRequest {
   name: string;
   officialAmount: number;
   offlineAmount: number;
+  floor?: Floor;
 }
 
 export interface OrderByParty {
@@ -686,12 +690,14 @@ export interface PurchaseParty {
   name: string;
   officialAmount: number;
   offlineAmount: number;
+  floor?: Floor;
 }
 
 export interface PurchasePartyRequest {
   name: string;
   officialAmount?: number;
   offlineAmount?: number;
+  floor?: Floor;
 }
 
 // Rejection Types

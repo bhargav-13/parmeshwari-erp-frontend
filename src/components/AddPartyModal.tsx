@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Party } from '../types';
+import type { Party, Floor } from '../types';
 import './AddProductModal.css'; // Reuse existing styles
 import { partyApi } from '../api/party';
 
@@ -13,6 +13,7 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
   const [name, setName] = useState('');
   const [officialAmount, setOfficialAmount] = useState<number | ''>('');
   const [offlineAmount, setOfflineAmount] = useState<number | ''>('');
+  const [floor, setFloor] = useState<Floor | ''>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,6 +22,7 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
       setName(initialData.name);
       setOfficialAmount(initialData.officialAmount);
       setOfflineAmount(initialData.offlineAmount);
+      setFloor(initialData.floor ?? '');
     }
   }, [initialData]);
 
@@ -42,6 +44,7 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
         name: name.trim(),
         officialAmount: Number(officialAmount) || 0,
         offlineAmount: Number(offlineAmount) || 0,
+        ...(floor ? { floor } : {}),
       };
 
       if (initialData) {
@@ -101,6 +104,19 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
               placeholder="Enter Offline Amount"
               className="form-input"
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Floor</label>
+            <select
+              value={floor}
+              onChange={(e) => setFloor(e.target.value as Floor | '')}
+              className="form-input"
+            >
+              <option value="">-- Select Floor --</option>
+              <option value="GROUND_FLOOR">Ground Floor</option>
+              <option value="FIRST_FLOOR">First Floor</option>
+            </select>
           </div>
 
           <div className="modal-actions">

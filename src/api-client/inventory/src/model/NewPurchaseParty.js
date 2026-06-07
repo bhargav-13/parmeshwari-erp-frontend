@@ -58,6 +58,9 @@ class NewPurchaseParty {
             if (data.hasOwnProperty('offlineAmount')) {
                 obj['offlineAmount'] = ApiClient.convertToType(data['offlineAmount'], 'Number');
             }
+            if (data.hasOwnProperty('floor')) {
+                obj['floor'] = ApiClient.convertToType(data['floor'], 'String');
+            }
         }
         return obj;
     }
@@ -101,6 +104,11 @@ NewPurchaseParty.prototype['officialAmount'] = undefined;
  * @member {Number} offlineAmount
  */
 NewPurchaseParty.prototype['offlineAmount'] = undefined;
+
+/**
+ * @member {module:model/InventoryFloor} floor
+ */
+NewPurchaseParty.prototype['floor'] = undefined;
 
 
 

@@ -1,6 +1,6 @@
 import PartyApi from '../api-client/order-management/src/api/PartyApi';
 import { promisify } from '../lib/apiConfig';
-import type { Party, OrderByPartyResponse } from '../types';
+import type { Party, OrderByPartyResponse, Floor } from '../types';
 
 // Import shared API client (configured with auth interceptor)
 import ApiClient from '../api-client/inventory/src/ApiClient';
@@ -13,12 +13,14 @@ const convertToParty = (orderParty: any): Party => ({
     name: orderParty.name || '',
     officialAmount: orderParty.officialAmount || 0,
     offlineAmount: orderParty.offlineAmount || 0,
+    floor: orderParty.floor,
 });
 
-const convertToNewOrderParty = (data: { name: string; officialAmount: number; offlineAmount: number }): any => ({
+const convertToNewOrderParty = (data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor }): any => ({
     name: data.name,
     officialAmount: data.officialAmount,
     offlineAmount: data.offlineAmount,
+    ...(data.floor ? { floor: data.floor } : {}),
 });
 
 const convertToOrderByPartyResponse = (response: any): OrderByPartyResponse => ({
@@ -34,10 +36,10 @@ const convertToOrderByPartyResponse = (response: any): OrderByPartyResponse => (
 
 // Party API
 export const partyApi = {
-    // Get all parties with optional search
-    getAllParties: (search?: string): Promise<Party[]> =>
+    // Get all parties with optional search/floor filter
+    getAllParties: (search?: string, floor?: Floor): Promise<Party[]> =>
         promisify<any[]>(cb =>
-            generatedPartyApi.getAllParties({ search }, cb)
+            generatedPartyApi.getAllParties({ search, floor }, cb)
         ).then(parties => parties.map(convertToParty)),
 
     // Get party by ID
@@ -47,13 +49,13 @@ export const partyApi = {
         ).then(convertToParty),
 
     // Create new party
-    createParty: (data: { name: string; officialAmount: number; offlineAmount: number }): Promise<Party> =>
+    createParty: (data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor }): Promise<Party> =>
         promisify<any>(cb =>
             generatedPartyApi.createParty(convertToNewOrderParty(data), cb)
         ).then(convertToParty),
 
     // Update existing party
-    updateParty: (id: number, data: { name: string; officialAmount: number; offlineAmount: number }): Promise<Party> =>
+    updateParty: (id: number, data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor }): Promise<Party> =>
         promisify<any>(cb =>
             generatedPartyApi.updateParty(id, convertToNewOrderParty(data), cb)
         ).then(convertToParty),

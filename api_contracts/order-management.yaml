@@ -272,6 +272,11 @@ paths:
       summary: Get all parties
       parameters:
         - $ref: '#/components/parameters/searchParam'
+        - name: floor
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/OrderFloor'
       responses:
         '200':
           description: Party list
@@ -801,6 +806,8 @@ components:
         offlineAmount:
           type: number
           format: double
+        floor:
+          $ref: '#/components/schemas/OrderFloor'
     OrderParty:
       type: object
       properties:
@@ -815,6 +822,8 @@ components:
         offlineAmount:
           type: number
           format: double
+        floor:
+          $ref: '#/components/schemas/OrderFloor'
     OrderByPartyResponse:
       type: object
       properties:

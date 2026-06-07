@@ -139,7 +139,8 @@ export default class PurchasePartyApi {
       let pathParams = {
       };
       let queryParams = {
-        'search': opts['search']
+        'search': opts['search'],
+        'floor': opts['floor']
       };
       let headerParams = {
       };

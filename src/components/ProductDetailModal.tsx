@@ -78,34 +78,12 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                 <h2 className="product-detail-title">{product.product.productName}</h2>
                 <p className="product-detail-category">{product.category.categoryName}</p>
               </div>
-              <div className="product-price-badge">
-                <span className="price-label">Price</span>
-                <span className="price-value">₹{product.pricePerKg}/KG</span>
-              </div>
             </div>
 
             <div className="product-specs">
               <h3 className="specs-title">Product Specifications</h3>
 
               <div className="spec-grid">
-                <div className="spec-item">
-                  <div className="spec-icon">📦</div>
-                  <div className="spec-content">
-                    <span className="spec-label">Available Quantity</span>
-                    <span className="spec-value">{product.quantityInKg} Kg</span>
-                  </div>
-                </div>
-
-                {product.quantityInPc && (
-                  <div className="spec-item">
-                    <div className="spec-icon">🔢</div>
-                    <div className="spec-content">
-                      <span className="spec-label">Available Pieces</span>
-                      <span className="spec-value">{product.quantityInPc.toLocaleString('en-IN')} Pc</span>
-                    </div>
-                  </div>
-                )}
-
                 {product.weightPerPc && (
                   <div className="spec-item">
                     <div className="spec-icon">⚖️</div>
@@ -117,37 +95,21 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                     </div>
                   </div>
                 )}
-
-                <div className="spec-item">
-                  <div className="spec-icon">💰</div>
-                  <div className="spec-content">
-                    <span className="spec-label">Price per Kg</span>
-                    <span className="spec-value">₹{product.pricePerKg}</span>
-                  </div>
-                </div>
-
-                {product.totalPrice && (
-                  <div className="spec-item">
-                    <div className="spec-icon">💵</div>
-                    <div className="spec-content">
-                      <span className="spec-label">Total Value</span>
-                      <span className="spec-value">₹{product.totalPrice.toLocaleString('en-IN')}</span>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
             <div className="product-actions">
-              <a
-                href={`tel:+919876543210`}
+              <button
+                type="button"
                 className="action-btn primary-action"
+                onClick={() => {}}
               >
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C7.82 21 2 15.18 2 8V5z"/>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                 </svg>
-                Call to Order
-              </a>
+                Add to Cart
+              </button>
               <a
                 href={`https://wa.me/919876543210?text=Hi, I'm interested in ${encodeURIComponent(product.product.productName)}`}
                 target="_blank"

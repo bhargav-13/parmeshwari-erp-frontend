@@ -1,6 +1,6 @@
 import ApiClient from '../api-client/inventory/src/ApiClient';
 import { promisify } from '../lib/apiConfig';
-import type { PurchaseParty, PurchasePartyRequest } from '../types';
+import type { PurchaseParty, PurchasePartyRequest, Floor } from '../types';
 
 const apiClient = ApiClient.instance;
 
@@ -25,14 +25,15 @@ const toParty = (p: any): PurchaseParty => ({
   name: p.name,
   officialAmount: p.officialAmount ?? 0,
   offlineAmount: p.offlineAmount ?? 0,
+  floor: p.floor,
 });
 
 export const purchasePartyApi = {
-  getAll: (search?: string): Promise<PurchaseParty[]> =>
+  getAll: (search?: string, floor?: Floor): Promise<PurchaseParty[]> =>
     promisify<any>(cb =>
       apiClient.callApi(
         '/api/v1/purchase/parties', 'GET',
-        {}, search ? { search } : {}, {}, {},
+        {}, { ...(search ? { search } : {}), ...(floor ? { floor } : {}) }, {}, {},
         null,
         ['oauth2'], [], ['application/json'],
         Object,

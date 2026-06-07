@@ -1283,6 +1283,11 @@ paths:
           required: false
           schema:
             type: string
+        - name: floor
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/InventoryFloor'
       responses:
         '200':
           description: Purchase party list
@@ -1611,7 +1616,7 @@ components:
           format: double
         status:
           $ref: '#/components/schemas/InventoryStatus'
-    
+
     QuantityUnit:
       type: string
       enum:
@@ -1802,6 +1807,8 @@ components:
         offlineAmount:
           type: number
           format: double
+        floor:
+          $ref: '#/components/schemas/InventoryFloor'
     PurchaseParty:
       type: object
       properties:
@@ -1816,6 +1823,8 @@ components:
         offlineAmount:
           type: number
           format: double
+        floor:
+          $ref: '#/components/schemas/InventoryFloor'
 
     ReturnType:
       type: string

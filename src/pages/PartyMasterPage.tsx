@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Party, PurchaseParty } from '../types';
+import type { Party, PurchaseParty, Floor } from '../types';
 import Loading from '../components/Loading';
 import AddPartyModal from '../components/AddPartyModal';
 import AddPurchasePartyModal from '../components/AddPurchasePartyModal';
@@ -23,6 +23,7 @@ const PartyMasterPage: React.FC = () => {
     const [salesLoading, setSalesLoading] = useState(true);
     const [isSalesModalOpen, setIsSalesModalOpen] = useState(false);
     const [salesSearchQuery, setSalesSearchQuery] = useState('');
+    const [salesFloorFilter, setSalesFloorFilter] = useState<Floor | ''>('');
     const [salesDeletingId, setSalesDeletingId] = useState<number | null>(null);
     const [salesError, setSalesError] = useState<string | null>(null);
     const [editingParty, setEditingParty] = useState<Party | undefined>(undefined);
@@ -33,23 +34,27 @@ const PartyMasterPage: React.FC = () => {
     const [purchaseLoading, setPurchaseLoading] = useState(true);
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
     const [purchaseSearchQuery, setPurchaseSearchQuery] = useState('');
+    const [purchaseFloorFilter, setPurchaseFloorFilter] = useState<Floor | ''>('');
     const [purchaseDeletingId, setPurchaseDeletingId] = useState<number | null>(null);
     const [purchaseError, setPurchaseError] = useState<string | null>(null);
     const [editingPurchaseParty, setEditingPurchaseParty] = useState<PurchaseParty | undefined>(undefined);
 
     useEffect(() => {
         fetchParties();
-    }, [salesSearchQuery]);
+    }, [salesSearchQuery, salesFloorFilter]);
 
     useEffect(() => {
         fetchPurchaseParties();
-    }, [purchaseSearchQuery]);
+    }, [purchaseSearchQuery, purchaseFloorFilter]);
 
     const fetchParties = async () => {
         try {
             setSalesLoading(true);
             setSalesError(null);
-            const data = await partyApi.getAllParties(salesSearchQuery.trim() || undefined);
+            const data = await partyApi.getAllParties(
+                salesSearchQuery.trim() || undefined,
+                salesFloorFilter || undefined,
+            );
             setParties(data);
         } catch (err: any) {
             console.error('Error fetching sales parties:', err);
@@ -63,7 +68,10 @@ const PartyMasterPage: React.FC = () => {
         try {
             setPurchaseLoading(true);
             setPurchaseError(null);
-            const data = await purchasePartyApi.getAll(purchaseSearchQuery.trim() || undefined);
+            const data = await purchasePartyApi.getAll(
+                purchaseSearchQuery.trim() || undefined,
+                purchaseFloorFilter || undefined,
+            );
             setPurchaseParties(data);
         } catch (err: any) {
             console.error('Error fetching purchase parties:', err);
@@ -198,6 +206,29 @@ const PartyMasterPage: React.FC = () => {
                                 onChange={(e) => setSalesSearchQuery(e.target.value)}
                             />
                         </div>
+                        <div className="filter-chips">
+                            <button
+                                type="button"
+                                className={`filter-chip${salesFloorFilter === '' ? ' active' : ''}`}
+                                onClick={() => setSalesFloorFilter('')}
+                            >
+                                All
+                            </button>
+                            <button
+                                type="button"
+                                className={`filter-chip${salesFloorFilter === 'GROUND_FLOOR' ? ' active' : ''}`}
+                                onClick={() => setSalesFloorFilter('GROUND_FLOOR')}
+                            >
+                                Ground Floor
+                            </button>
+                            <button
+                                type="button"
+                                className={`filter-chip${salesFloorFilter === 'FIRST_FLOOR' ? ' active' : ''}`}
+                                onClick={() => setSalesFloorFilter('FIRST_FLOOR')}
+                            >
+                                First Floor
+                            </button>
+                        </div>
                     </div>
 
                     {salesLoading ? (
@@ -210,6 +241,7 @@ const PartyMasterPage: React.FC = () => {
                                         <th>Sr. No</th>
                                         <th>Party ID</th>
                                         <th>Party Name</th>
+                                        <th>Floor</th>
                                         <th>Official Amount</th>
                                         <th>Offline Amount</th>
                                         <th>Actions</th>
@@ -221,6 +253,7 @@ const PartyMasterPage: React.FC = () => {
                                             <td>{String(index + 1).padStart(2, '0')}</td>
                                             <td>{party.partyId}</td>
                                             <td>{party.name}</td>
+                                            <td>{party.floor === 'GROUND_FLOOR' ? 'Ground Floor' : party.floor === 'FIRST_FLOOR' ? 'First Floor' : '—'}</td>
                                             <td>₹{party.officialAmount.toLocaleString('en-IN')}</td>
                                             <td>₹{party.offlineAmount.toLocaleString('en-IN')}</td>
                                             <td>
@@ -260,7 +293,7 @@ const PartyMasterPage: React.FC = () => {
                                     ))}
                                     {filteredParties.length === 0 && (
                                         <tr>
-                                            <td colSpan={6} className="no-data">
+                                            <td colSpan={7} className="no-data">
                                                 No parties found
                                             </td>
                                         </tr>
@@ -300,6 +333,29 @@ const PartyMasterPage: React.FC = () => {
                                 onChange={(e) => setPurchaseSearchQuery(e.target.value)}
                             />
                         </div>
+                        <div className="filter-chips">
+                            <button
+                                type="button"
+                                className={`filter-chip${purchaseFloorFilter === '' ? ' active' : ''}`}
+                                onClick={() => setPurchaseFloorFilter('')}
+                            >
+                                All
+                            </button>
+                            <button
+                                type="button"
+                                className={`filter-chip${purchaseFloorFilter === 'GROUND_FLOOR' ? ' active' : ''}`}
+                                onClick={() => setPurchaseFloorFilter('GROUND_FLOOR')}
+                            >
+                                Ground Floor
+                            </button>
+                            <button
+                                type="button"
+                                className={`filter-chip${purchaseFloorFilter === 'FIRST_FLOOR' ? ' active' : ''}`}
+                                onClick={() => setPurchaseFloorFilter('FIRST_FLOOR')}
+                            >
+                                First Floor
+                            </button>
+                        </div>
                     </div>
 
                     {purchaseLoading ? (
@@ -312,6 +368,7 @@ const PartyMasterPage: React.FC = () => {
                                         <th>Sr. No</th>
                                         <th>Party ID</th>
                                         <th>Party Name</th>
+                                        <th>Floor</th>
                                         <th>Official Amount</th>
                                         <th>Offline Amount</th>
                                         <th>Actions</th>
@@ -323,6 +380,7 @@ const PartyMasterPage: React.FC = () => {
                                             <td>{String(index + 1).padStart(2, '0')}</td>
                                             <td>{party.id}</td>
                                             <td>{party.name}</td>
+                                            <td>{party.floor === 'GROUND_FLOOR' ? 'Ground Floor' : party.floor === 'FIRST_FLOOR' ? 'First Floor' : '—'}</td>
                                             <td>₹{(party.officialAmount ?? 0).toLocaleString('en-IN')}</td>
                                             <td>₹{(party.offlineAmount ?? 0).toLocaleString('en-IN')}</td>
                                             <td>
@@ -354,7 +412,7 @@ const PartyMasterPage: React.FC = () => {
                                     ))}
                                     {filteredPurchaseParties.length === 0 && (
                                         <tr>
-                                            <td colSpan={6} className="no-data">
+                                            <td colSpan={7} className="no-data">
                                                 No purchase parties found
                                             </td>
                                         </tr>
