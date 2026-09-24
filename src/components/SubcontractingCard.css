@@ -401,6 +401,246 @@
   margin: 0;
 }
 
+/* ---------- Summary strip ---------- */
+.subcontracting-card .sc-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 12px 14px 10px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+}
+
+.subcontracting-card .sc-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.subcontracting-card .sc-stat-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748B;
+}
+
+.subcontracting-card .sc-stat-value {
+  font-family: 'Jost', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0F172A;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.subcontracting-card .sc-stat-value small {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94A3B8;
+}
+
+.subcontracting-card .sc-stat-sub {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  color: #7C3AED;
+}
+
+.subcontracting-card .sc-green { color: #15803D; }
+.subcontracting-card .sc-purple { color: #6D28D9; }
+
+.subcontracting-card .sc-progress {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 999px;
+  background: #E2E8F0;
+  overflow: hidden;
+}
+
+.subcontracting-card .sc-progress-fill {
+  height: 100%;
+  background: #22C55E;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* ---------- Detail columns ---------- */
+.subcontracting-card .sc-details {
+  margin: 0;
+  align-items: flex-start;
+}
+
+.subcontracting-card .sc-sent-block .block-header,
+.subcontracting-card .sc-return-title {
+  text-transform: uppercase;
+}
+
+.subcontracting-card .sc-muted {
+  color: #94A3B8;
+  font-weight: 400;
+  font-size: 11px;
+}
+
+/* ---------- Return list ---------- */
+.subcontracting-card .sc-return-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 0 6px;
+  margin: 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+}
+
+.subcontracting-card .sc-return-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #15803D;
+}
+
+.subcontracting-card .sc-expand-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #DCFCE7;
+  font-size: 11px;
+  font-weight: 600;
+  color: #15803D;
+}
+
+.subcontracting-card .sc-return-header:hover .sc-expand-toggle {
+  background: #BBF7D0;
+}
+
+.subcontracting-card .sc-chevron {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.subcontracting-card .sc-chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.subcontracting-card .sc-return-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.subcontracting-card .sc-return-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed #BBF7D0;
+}
+
+.subcontracting-card .sc-return-row:last-child {
+  border-bottom: none;
+}
+
+.subcontracting-card .sc-return-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.subcontracting-card .sc-return-date {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.subcontracting-card .sc-return-crome {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 150px;
+}
+
+.subcontracting-card .sc-crome-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.subcontracting-card .sc-crome-chip.in-crome {
+  background: #EDE9FE;
+  color: #6D28D9;
+}
+
+.subcontracting-card .sc-crome-chip.returned {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.subcontracting-card .sc-send-crome-btn {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #17344D;
+  border-radius: 6px;
+  background: #FFFFFF;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #17344D;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.subcontracting-card .sc-send-crome-btn:hover {
+  background: #17344D;
+  color: #FFFFFF;
+}
+
+.subcontracting-card .sc-return-total {
+  margin-top: 0;
+}
+
+.subcontracting-card .pending-block {
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+
+.subcontracting-card .pending-text {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: #94A3B8;
+}
+
+@media (max-width: 768px) {
+  .subcontracting-card .sc-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .subcontracting-card .sc-return-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .subcontracting-card .sc-return-crome {
+    min-width: 0;
+  }
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .subcontracting-card {

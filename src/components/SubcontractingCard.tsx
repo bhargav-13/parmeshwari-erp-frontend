@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import type { Subcontracting, SubReturnRequest, SubOrderRequest } from '../types';
+import type { Crome, Subcontracting, SubReturnRequest, SubOrderRequest } from '../types';
 import { SubcontractingStatus } from '../types';
 import { subcontractingApi } from '../api/subcontracting';
+import { cromeApi } from '../api/crome';
 import ReturnRecordModal from './ReturnRecordModal';
 import AddSubcontractingModal from './AddSubcontractingModal';
 import CromeModal from './CromeModal';
@@ -26,6 +27,34 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  // Crome records grouped by the return chunk they were sent from.
+  // A chunk with any Crome record hides its "Send to Crome" button.
+  const [cromesByReturnId, setCromesByReturnId] = useState<Map<number, Crome[]>>(new Map());
+
+  useEffect(() => {
+    if (!subcontract.cromeCount) {
+      setCromesByReturnId(new Map());
+      return;
+    }
+    let cancelled = false;
+    cromeApi
+      .getCromesBySubcontractingId(subcontract.subcontractingId)
+      .then(cromes => {
+        if (cancelled) return;
+        const grouped = new Map<number, Crome[]>();
+        cromes.forEach(c => {
+          if (c.subcontractingReturnId == null) return;
+          const list = grouped.get(c.subcontractingReturnId) || [];
+          list.push(c);
+          grouped.set(c.subcontractingReturnId, list);
+        });
+        setCromesByReturnId(grouped);
+      })
+      .catch(err => console.error('Error fetching cromes:', err));
+    return () => {
+      cancelled = true;
+    };
+  }, [subcontract.subcontractingId, subcontract.cromeCount]);
 
   // Calculate Sent, Return, and Used values
   const subReturns = subcontract.subReturns || [];
@@ -47,9 +76,22 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
   const totalAmount = subcontract.totalAmount || 0;
 
+  const sentToCromeCount = subReturns.filter(r => r.returnId != null && cromesByReturnId.has(r.returnId)).length;
+  const totalSentToCrome = Array.from(cromesByReturnId.values())
+    .flat()
+    .reduce((sum, c) => sum + (c.sentStock || 0), 0);
+  const returnedPercent = subcontract.sentStock > 0
+    ? Math.min(100, (totalNetReturnRounded / subcontract.sentStock) * 100)
+    : 0;
+
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'dd-MM-yyyy');
   };
+
+  const formatQty = (value: number) => value.toFixed(3);
+
+  const formatMoney = (value: number) =>
+    value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const getStatusClass = (status: SubcontractingStatus) => {
     switch (status) {
@@ -173,83 +215,124 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
         <div className="material-section">
           <h4 className="section-title">{subcontract.item.name}</h4>
 
-          <div className="crome-details-container">
+          {/* Summary strip */}
+          <div className="sc-summary">
+            <div className="sc-stat">
+              <span className="sc-stat-label">Sent</span>
+              <span className="sc-stat-value">{formatQty(subcontract.sentStock)} <small>{subcontract.unit}</small></span>
+            </div>
+            <div className="sc-stat">
+              <span className="sc-stat-label">Net Returned</span>
+              <span className="sc-stat-value sc-green">{formatQty(totalNetReturnRounded)} <small>{subcontract.unit}</small></span>
+            </div>
+            <div className="sc-stat">
+              <span className="sc-stat-label">Used Stock</span>
+              <span className="sc-stat-value">{formatQty(usedStock)} <small>{subcontract.unit}</small></span>
+            </div>
+            <div className="sc-stat">
+              <span className="sc-stat-label">In Crome</span>
+              <span className="sc-stat-value sc-purple">
+                {sentToCromeCount}/{subReturns.length} <small>chunks</small>
+              </span>
+              {totalSentToCrome > 0 && (
+                <span className="sc-stat-sub">{formatQty(totalSentToCrome)} {subcontract.unit}</span>
+              )}
+            </div>
+            <div className="sc-progress" title={`${returnedPercent.toFixed(1)}% returned`}>
+              <div className="sc-progress-fill" style={{ width: `${returnedPercent}%` }} />
+            </div>
+          </div>
+
+          <div className="crome-details-container sc-details">
             {/* SENT Details */}
-            <div className="crome-detail-block">
-              <div className="block-header">SENT DETAILS</div>
+            <div className="crome-detail-block sc-sent-block">
+              <div className="block-header">Sent Details</div>
               <div className="detail-row">
                 <span className="detail-label">Sent Stock</span>
-                <span className="detail-value">{subcontract.sentStock.toFixed(3)} {subcontract.unit}</span>
+                <span className="detail-value">{formatQty(subcontract.sentStock)} {subcontract.unit}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Total Pieces</span>
                 <span className="detail-value">{(subcontract.sentStock * 25).toLocaleString('en-IN')} Pc</span>
               </div>
-              <div className="detail-row total-row total-value-row">
+              <div className="detail-row">
+                <span className="detail-label">Rate</span>
+                <span className="detail-value">₹{formatMoney(subcontract.price)} / {subcontract.unit}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Job Work</span>
+                <span className="detail-value">₹{formatMoney(subcontract.jobWorkPay)} / {subcontract.unit}</span>
+              </div>
+              <div className="detail-row total-row">
                 <span className="detail-label">Total Value</span>
-                <div className="detail-value">
-                  ₹{totalAmount.toLocaleString('en-IN')}
-                  <span className="detail-sub-value">
-                    (₹{subcontract.price}/unit + ₹{subcontract.jobWorkPay}/job)
-                  </span>
-                </div>
+                <span className="detail-value">₹{formatMoney(totalAmount)}</span>
               </div>
             </div>
 
             {/* RETURN Details (List) */}
             {subReturns.length > 0 ? (
               <div className="crome-detail-block return-block">
-                <div
-                  className="block-header clickable-header"
+                <button
+                  type="button"
+                  className="sc-return-header"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  title="Click to expand/collapse return details"
+                  aria-expanded={isExpanded}
                 >
-                  <span>RETURN DETAILS ({subReturns.length})</span>
-                  <div className="expand-toggle">
-                    <span className="expand-label">
-                      {isExpanded ? 'Collapse' : 'Expand'}
-                    </span>
-                    <span className={`expand-chevron ${isExpanded ? 'expanded' : ''}`}>▼</span>
-                  </div>
-                </div>
-
-                {isExpanded && subReturns.map((ret, index) => {
-                  const retDeduction = (ret.packagings || []).reduce((d, p) => d + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
-                  const retNet = ret.netReturnStock ?? (ret.returnStock - retDeduction);
-                  const pkgDisplay = (ret.packagings || []).map(p => `${p.packagingCount} ${p.packagingType}`).join(', ') || '-';
-                  return (
-                    <div key={index} className={`return-item-summary ${index < subReturns.length - 1 ? 'with-divider' : ''}`}>
-                      <div className="detail-row return-date-row">
-                        <span className="detail-label return-date-label">{formatDate(ret.returnDate)}</span>
-                        <span className="detail-value">{ret.returnStock.toFixed(3)} {subcontract.unit} (Gr)</span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">Pkg: {pkgDisplay}</span>
-                        <span className="detail-value">Net: {retNet.toFixed(3)}</span>
-                      </div>
-                      <div className="return-crome-action">
-                        <button
-                          type="button"
-                          className="crome-button return-crome-btn"
-                          onClick={() => setCromeReturnId(ret.returnId!)}
-                          title="Send to Crome"
-                        >
-                          <span>Send to Crome</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                <div className="detail-row total-row">
-                  <span className="detail-label">Total Net Return</span>
-                  <span className="detail-value">{totalNetReturnRounded.toFixed(3)} {subcontract.unit}</span>
-                </div>
-                <div className="diff-section">
-                  <span className="diff-label">USED STOCK</span>
-                  <span className="diff-value neutral">
-                    {usedStock.toFixed(3)} {subcontract.unit}
+                  <span className="sc-return-title">Return Details ({subReturns.length})</span>
+                  <span className="sc-expand-toggle">
+                    {isExpanded ? 'Collapse' : 'Expand'}
+                    <span className={`sc-chevron ${isExpanded ? 'expanded' : ''}`}>▾</span>
                   </span>
+                </button>
+
+                {isExpanded && (
+                  <div className="sc-return-list">
+                    {subReturns.map((ret, index) => {
+                      const retDeduction = (ret.packagings || []).reduce((d, p) => d + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
+                      const retNet = ret.netReturnStock ?? (ret.returnStock - retDeduction);
+                      const pkgDisplay = (ret.packagings || []).map(p => `${p.packagingCount} ${p.packagingType}`).join(', ') || '-';
+                      const retCromes = ret.returnId != null ? cromesByReturnId.get(ret.returnId) : undefined;
+                      const retCromeSent = (retCromes || []).reduce((sum, c) => sum + (c.sentStock || 0), 0);
+                      const retCromeReturned = !!retCromes && retCromes.every(c => c.cromeReturn);
+                      return (
+                        <div key={ret.returnId ?? index} className="sc-return-row">
+                          <div className="sc-return-main">
+                            <div className="detail-row">
+                              <span className="sc-return-date">{formatDate(ret.returnDate)}</span>
+                              <span className="detail-value">{formatQty(ret.returnStock)} {subcontract.unit} <span className="sc-muted">(Gr)</span></span>
+                            </div>
+                            <div className="detail-row">
+                              <span className="detail-label">Pkg: {pkgDisplay}</span>
+                              <span className="detail-value">Net: {formatQty(retNet)}</span>
+                            </div>
+                          </div>
+                          <div className="sc-return-crome">
+                            {retCromes ? (
+                              <span
+                                className={`sc-crome-chip ${retCromeReturned ? 'returned' : 'in-crome'}`}
+                                title={retCromes.map(c => `${formatDate(c.cromeDate)} · ${c.partyName}`).join('\n')}
+                              >
+                                {retCromeReturned ? 'Crome Returned' : 'In Crome'} · {formatQty(retCromeSent)} {subcontract.unit}
+                              </span>
+                            ) : ret.returnId != null && (
+                              <button
+                                type="button"
+                                className="sc-send-crome-btn"
+                                onClick={() => setCromeReturnId(ret.returnId!)}
+                              >
+                                Send to Crome
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="detail-row total-row sc-return-total">
+                  <span className="detail-label">Total Net Return</span>
+                  <span className="detail-value">{formatQty(totalNetReturnRounded)} {subcontract.unit}</span>
                 </div>
               </div>
             ) : (
