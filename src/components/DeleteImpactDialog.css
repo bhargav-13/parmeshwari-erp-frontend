@@ -1,0 +1,134 @@
+.delete-impact-dialog {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  font-family: 'Jost', sans-serif;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+}
+
+.delete-impact-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #17344D;
+}
+
+.delete-impact-text {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.delete-impact-section {
+  margin-bottom: 16px;
+}
+
+.delete-impact-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748B;
+  margin-bottom: 6px;
+}
+
+.delete-impact-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.delete-impact-table th,
+.delete-impact-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.delete-impact-table th {
+  font-weight: 500;
+  color: #64748B;
+  background: #F8FAFC;
+}
+
+.delete-impact-table tr.insufficient td {
+  color: #B91C1C;
+  background: #FEF2F2;
+}
+
+.delete-impact-sub {
+  color: #94A3B8;
+}
+
+.delete-impact-warning {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.delete-impact-error {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #B91C1C;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.delete-impact-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.delete-impact-cancel,
+.delete-impact-confirm {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.delete-impact-cancel {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #17344D;
+}
+
+.delete-impact-confirm {
+  background: #DC2626;
+  border: 1px solid #DC2626;
+  color: #FFFFFF;
+}
+
+.delete-impact-confirm:disabled,
+.delete-impact-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.delete-impact-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
+}

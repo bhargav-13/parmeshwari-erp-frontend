@@ -7,6 +7,7 @@ import type {
   SubcontractingCromeInfo,
   SubReturnCromeInfo,
   PaginatedResult,
+  DeleteImpact,
 } from '../types';
 import { SubcontractingStatus } from '../types';
 
@@ -81,6 +82,12 @@ export const cromeApi = {
   // Delete crome
   deleteCrome: async (cromeId: number): Promise<void> => {
     await apiClient.delete(`/api/v1/crome/${cromeId}`);
+  },
+
+  // Preview what deleting a crome removes (its return + stock added to inventory)
+  getDeleteImpact: async (cromeId: number): Promise<DeleteImpact> => {
+    const response = await apiClient.get<DeleteImpact>(`/api/v1/crome/${cromeId}/delete-impact`);
+    return response.data;
   },
 
   // Update crome status

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { rejectionApi } from '../api/rejection';
-import { purchasePartyApi } from '../api/purchaseParty';
-import type { RejectionResponse, RejectionReturnType, PurchaseParty } from '../types';
+import { getRejectionPartyOptions, type RejectionPartyOption } from '../api/rejection';
+import type { RejectionResponse, RejectionReturnType } from '../types';
 import { RejectionReturnType as ReturnTypeEnum } from '../types';
 import AddRejectionModal from '../components/AddRejectionModal';
 import Pagination from '../components/Pagination';
@@ -22,15 +22,15 @@ const RejectionPage: React.FC = () => {
 
   // PDF export popup state
   const [isPdfPopupOpen, setIsPdfPopupOpen] = useState(false);
-  const [pdfPartyId, setPdfPartyId] = useState<number | ''>('');
+  const [pdfPartyKey, setPdfPartyKey] = useState('');
   const [pdfFromDate, setPdfFromDate] = useState('');
   const [pdfToDate, setPdfToDate] = useState('');
   const [isExporting, setIsExporting] = useState(false);
 
-  const [parties, setParties] = useState<PurchaseParty[]>([]);
+  const [parties, setParties] = useState<RejectionPartyOption[]>([]);
 
   useEffect(() => {
-    purchasePartyApi.getAll().then(setParties).catch(() => {});
+    getRejectionPartyOptions().then(setParties).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -90,13 +90,15 @@ const RejectionPage: React.FC = () => {
   const handleExportPdf = async () => {
     try {
       setIsExporting(true);
+      const pdfParty = parties.find(p => p.key === pdfPartyKey);
       await rejectionApi.exportPdf({
-        partyId: pdfPartyId ? Number(pdfPartyId) : undefined,
+        partyId: pdfParty?.id,
+        partyType: pdfParty?.partyType,
         fromDate: pdfFromDate || undefined,
         toDate: pdfToDate || undefined,
       });
       setIsPdfPopupOpen(false);
-      setPdfPartyId('');
+      setPdfPartyKey('');
       setPdfFromDate('');
       setPdfToDate('');
     } catch (err: any) {
@@ -181,7 +183,14 @@ const RejectionPage: React.FC = () => {
                 <tr key={r.rejectionId}>
                   <td>{page * 10 + idx + 1}</td>
                   <td>{formatDate(r.date)}</td>
-                  <td>{r.party?.name ?? '—'}</td>
+                  <td>
+                    {r.party?.name ?? '—'}
+                    {r.party && (
+                      <span className={`party-type-badge ${r.partyType === 'SALES' ? 'sales' : 'purchase'}`}>
+                        {r.partyType === 'SALES' ? 'Sales' : 'Purchase'}
+                      </span>
+                    )}
+                  </td>
                   <td>{r.weight.toFixed(3)}</td>
                   <td>
                     <span className={`return-type-badge ${r.returnType === ReturnTypeEnum.CASH ? 'cash' : 'maal'}`}>
@@ -258,13 +267,15 @@ const RejectionPage: React.FC = () => {
                 <select
                   id="pdf-party"
                   className="form-input"
-                  value={pdfPartyId}
-                  onChange={e => setPdfPartyId(e.target.value ? Number(e.target.value) : '')}
+                  value={pdfPartyKey}
+                  onChange={e => setPdfPartyKey(e.target.value)}
                   title="Filter by party"
                 >
                   <option value="">All Parties</option>
                   {parties.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
+                    <option key={p.key} value={p.key}>
+                      {p.name} ({p.partyType === 'SALES' ? 'Sales' : 'Purchase'})
+                    </option>
                   ))}
                 </select>
               </div>

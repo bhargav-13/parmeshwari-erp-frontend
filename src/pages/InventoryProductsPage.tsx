@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { productApi } from '../api/inventory';
-import type { Product } from '../types';
+import type { Product, Floor } from '../types';
 import Loading from '../components/Loading';
 import AddProductModal from '../components/AddProductModal';
 import './InventoryPage.css';
@@ -15,6 +15,7 @@ const InventoryProductsPage: React.FC = () => {
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [floorFilter, setFloorFilter] = useState<Floor | ''>('');
 
     useEffect(() => {
         fetchProducts();
@@ -57,9 +58,16 @@ const InventoryProductsPage: React.FC = () => {
         setEditingProduct(null);
     };
 
+    // Products saved before the floor split have no floor yet — treat them as First Floor
+    const productFloor = (product: Product): Floor => product.floor ?? 'FIRST_FLOOR';
+
     const filteredProducts = products.filter((product) =>
-        product.productName.toLowerCase().includes(searchQuery.toLowerCase())
+        product.productName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (floorFilter === '' || productFloor(product) === floorFilter)
     );
+
+    const groundCount = products.filter((p) => productFloor(p) === 'GROUND_FLOOR').length;
+    const firstCount = products.length - groundCount;
 
     if (loading) {
         return <Loading message="Loading products..." />;
@@ -91,8 +99,12 @@ const InventoryProductsPage: React.FC = () => {
                     <span className="stat-value">{products.length} Products</span>
                 </div>
                 <div className="stat-card">
-                    <span className="stat-label">Filtered Results</span>
-                    <span className="stat-value">{filteredProducts.length} Products</span>
+                    <span className="stat-label">Ground Floor</span>
+                    <span className="stat-value">{groundCount} Products</span>
+                </div>
+                <div className="stat-card">
+                    <span className="stat-label">First Floor</span>
+                    <span className="stat-value">{firstCount} Products</span>
                 </div>
             </div>
 
@@ -106,6 +118,18 @@ const InventoryProductsPage: React.FC = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
+                <div className="filter-chips">
+                    {([['', 'All'], ['GROUND_FLOOR', 'Ground Floor'], ['FIRST_FLOOR', 'First Floor']] as const).map(([value, label]) => (
+                        <button
+                            key={label}
+                            type="button"
+                            className={`filter-chip${floorFilter === value ? ' active' : ''}`}
+                            onClick={() => setFloorFilter(value)}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <div className="inventory-table-container">
@@ -115,6 +139,7 @@ const InventoryProductsPage: React.FC = () => {
                             <th>Sr. No</th>
                             <th>Product ID</th>
                             <th>Product Name</th>
+                            <th>Floor</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -124,6 +149,7 @@ const InventoryProductsPage: React.FC = () => {
                                 <td>{String(index + 1).padStart(2, '0')}</td>
                                 <td>{product.productId}</td>
                                 <td>{product.productName}</td>
+                                <td>{productFloor(product) === 'GROUND_FLOOR' ? 'Ground Floor' : 'First Floor'}</td>
                                 <td>
                                     <div className="action-buttons">
                                         <button
@@ -153,7 +179,7 @@ const InventoryProductsPage: React.FC = () => {
                         ))}
                         {filteredProducts.length === 0 && (
                             <tr>
-                                <td colSpan={4} className="no-data">
+                                <td colSpan={5} className="no-data">
                                     No products found
                                 </td>
                             </tr>
@@ -167,6 +193,7 @@ const InventoryProductsPage: React.FC = () => {
                     onClose={handleModalClose}
                     onSuccess={fetchProducts}
                     initialData={editingProduct || undefined}
+                    defaultFloor={floorFilter || undefined}
                 />
             )}
         </div>

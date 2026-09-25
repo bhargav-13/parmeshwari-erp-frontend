@@ -1449,6 +1449,8 @@ components:
           type: integer
         productName:
           type: string
+        floor:
+          $ref: '#/components/schemas/InventoryFloor'
 
     ProductRequest:
       type: object
@@ -1457,6 +1459,8 @@ components:
       properties:
         productName:
           type: string
+        floor:
+          $ref: '#/components/schemas/InventoryFloor'
 
     Category:
       type: object
@@ -1832,6 +1836,12 @@ components:
         - CASH
         - MAAL
 
+    RejectionPartyType:
+      type: string
+      enum:
+        - PURCHASE
+        - SALES
+
     RejectionRequest:
       type: object
       required:
@@ -1843,7 +1853,9 @@ components:
         partyId:
           type: integer
           format: int64
-          description: Party ID from purchase_party master
+          description: Party ID from purchase_party (PURCHASE) or order_party (SALES) master
+        partyType:
+          $ref: '#/components/schemas/RejectionPartyType'
         date:
           type: string
           format: date
@@ -1874,6 +1886,8 @@ components:
           format: int64
         party:
           $ref: '#/components/schemas/PurchaseParty'
+        partyType:
+          $ref: '#/components/schemas/RejectionPartyType'
         date:
           type: string
           format: date

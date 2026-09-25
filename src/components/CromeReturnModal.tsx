@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import type { CromeReturnRequest, Crome, PackagingDetail } from '../types';
-import { PackagingType, InventoryFloor, SubcontractingStatus } from '../types';
+import { PackagingType, InventoryFloor, SubcontractingStatus, QuantityUnit } from '../types';
 import { cromeApi } from '../api/crome';
+import { stockItemApi } from '../api/inventory';
 import './CromeReturnModal.css';
 
 // Packaging weights in KG
@@ -32,10 +33,36 @@ const createDefaultPackaging = (): PackagingFormRow => ({
     packagingCount: '',
 });
 
+/** Reads a piece weight from names like "TURBO 50 GM" or "A/C BODY 0.09 KG" → weight in kg. */
+const parseWeightPerPcKgFromName = (name: string): number | null => {
+    const match = name.match(/(\d+(?:\.\d+)?)\s*(GM|GMS|GRAM|G|KG)\b/i);
+    if (!match) return null;
+    const value = parseFloat(match[1]);
+    if (!value) return null;
+    return match[2].toUpperCase() === 'KG' ? value : value / 1000;
+};
+
+/** Pre-fills the return with what was sent: same packaging as the crome dispatch. */
+const initialPackagings = (crome: Crome): PackagingFormRow[] =>
+    crome.packagings && crome.packagings.length > 0
+        ? crome.packagings.map(p => ({
+            packagingType: p.packagingType,
+            packagingWeight: String(p.packagingWeight ?? ''),
+            packagingCount: String(p.packagingCount ?? ''),
+        }))
+        : [createDefaultPackaging()];
+
+/** Pre-fills gross return with the gross weight that was sent (sent stock + packaging). */
+const initialGross = (crome: Crome): string => {
+    const gross = crome.grossWeight || crome.sentStock;
+    return gross ? String(Math.round(gross * 1000) / 1000) : '';
+};
+
 const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, onClose, onSubmit }) => {
     const [formData, setFormData] = useState<{
         returnDate: string;
         returnStock: string;
+        quantityInPc: string;
         packagings: PackagingFormRow[];
         returnRemark: string;
         addToInventory: boolean;
@@ -43,8 +70,9 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         inventoryFloor: InventoryFloor;
     }>({
         returnDate: new Date().toISOString().split('T')[0],
-        returnStock: '',
-        packagings: [createDefaultPackaging()],
+        returnStock: initialGross(crome),
+        quantityInPc: '',
+        packagings: initialPackagings(crome),
         returnRemark: '',
         addToInventory: true,
         inventoryItemName: itemName,
@@ -57,6 +85,10 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [warnings, setWarnings] = useState<string[]>([]);
+    // Weight of one piece in kg, used to auto-fill Pieces: from the existing stock item, else the item name
+    const [weightPerPcKg, setWeightPerPcKg] = useState<number | null>(null);
+    // Once the user types Pieces themselves, stop overwriting it
+    const [pcsEdited, setPcsEdited] = useState(false);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -72,6 +104,28 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         };
         fetchPrice();
     }, [crome.subcontractingId, crome.cromeAmount]);
+
+    useEffect(() => {
+        const name = formData.inventoryItemName.trim().toLowerCase();
+        let cancelled = false;
+        stockItemApi
+            .getAllStockItems()
+            .then(items => {
+                if (cancelled) return;
+                const match = items.find(i => i.product?.productName?.trim().toLowerCase() === name);
+                if (match && match.weightPerPc > 0) {
+                    setWeightPerPcKg(match.quantityUnit === QuantityUnit.GM ? match.weightPerPc / 1000 : match.weightPerPc);
+                } else {
+                    setWeightPerPcKg(parseWeightPerPcKgFromName(formData.inventoryItemName));
+                }
+            })
+            .catch(() => {
+                if (!cancelled) setWeightPerPcKg(parseWeightPerPcKgFromName(formData.inventoryItemName));
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [formData.inventoryItemName]);
 
     const parseNum = (val: string | number): number => {
         if (typeof val === 'number') return val;
@@ -210,6 +264,14 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
         return Math.max(0, gross - packagingDeduction);
     };
 
+    const autoPcs = weightPerPcKg ? Math.floor(calculateNetReturn() / weightPerPcKg + 1e-9) : 0;
+
+    useEffect(() => {
+        if (!pcsEdited) {
+            setFormData(prev => ({ ...prev, quantityInPc: autoPcs > 0 ? String(autoPcs) : '' }));
+        }
+    }, [autoPcs, pcsEdited]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -268,6 +330,10 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
             inventoryItemName: formData.addToInventory ? formData.inventoryItemName : undefined,
             inventoryFloor: formData.addToInventory ? formData.inventoryFloor : undefined,
             inventoryPricePerKg: formData.addToInventory ? pricePerKg : undefined,
+            inventoryQuantityPc:
+                formData.addToInventory && parseNum(formData.quantityInPc) > 0
+                    ? parseNum(formData.quantityInPc)
+                    : undefined,
         };
 
         try {
@@ -346,6 +412,40 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                             <option value={InventoryFloor.FIRST_FLOOR}>First Floor</option>
                                         </select>
                                     </div>
+
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Pieces (Pcs)</label>
+                                        <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            name="quantityInPc"
+                                            value={formData.quantityInPc}
+                                            onChange={(e) => {
+                                                setPcsEdited(true);
+                                                setFormData(prev => ({ ...prev, quantityInPc: e.target.value.replace(/[^0-9]/g, '') }));
+                                            }}
+                                            className="form-input"
+                                            placeholder="Enter pieces"
+                                            title="Pieces added to inventory"
+                                        />
+                                        <span className="field-hint-text">
+                                            {weightPerPcKg
+                                                ? `Auto: Net ÷ ${Number((weightPerPcKg * 1000).toFixed(2))} gm per pc`
+                                                : 'Piece weight unknown, enter pieces manually'}
+                                            {pcsEdited && autoPcs > 0 && (
+                                                <>
+                                                    {' · '}
+                                                    <button
+                                                        type="button"
+                                                        className="link-button"
+                                                        onClick={() => setPcsEdited(false)}
+                                                    >
+                                                        reset to {autoPcs.toLocaleString('en-IN')}
+                                                    </button>
+                                                </>
+                                            )}
+                                        </span>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -382,6 +482,9 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                     required
                                 />
                                 {getFieldError('returnStock') && <span className="field-error-text">{getFieldError('returnStock')}</span>}
+                                <span className="field-hint-text">
+                                    Auto-filled with sent gross ({(crome.grossWeight || crome.sentStock || 0).toFixed(3)} Kg), edit if different
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -480,6 +583,14 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                         <div className="calc-row total-row">
                             <span className="calc-label">Net Return:</span>
                             <span className="calc-value total">{calculateNetReturn().toFixed(3)} Kg</span>
+                        </div>
+                        <div className="calc-row">
+                            <span className="calc-label">Net Return (Pcs):</span>
+                            <span className="calc-value">
+                                {parseNum(formData.quantityInPc) > 0
+                                    ? `${parseNum(formData.quantityInPc).toLocaleString('en-IN')} Pcs`
+                                    : '—'}
+                            </span>
                         </div>
                         <div className="calc-row pricing-separator">
                             <span className="calc-label">Rate (Price/Kg):</span>

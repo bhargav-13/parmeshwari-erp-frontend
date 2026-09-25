@@ -56,6 +56,9 @@ class RejectionResponse {
             if (data.hasOwnProperty('party')) {
                 obj['party'] = PurchaseParty.constructFromObject(data['party']);
             }
+            if (data.hasOwnProperty('partyType')) {
+                obj['partyType'] = ApiClient.convertToType(data['partyType'], 'String');
+            }
             if (data.hasOwnProperty('date')) {
                 obj['date'] = ApiClient.convertToType(data['date'], 'Date');
             }
@@ -110,6 +113,11 @@ RejectionResponse.prototype['rejectionId'] = undefined;
  * @member {module:model/PurchaseParty} party
  */
 RejectionResponse.prototype['party'] = undefined;
+
+/**
+ * @member {String} partyType
+ */
+RejectionResponse.prototype['partyType'] = undefined;
 
 /**
  * @member {Date} date

@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { productApi } from '../api/inventory';
-import type { ProductRequest, Product } from '../types';
+import type { ProductRequest, Product, Floor } from '../types';
 import './AddProductModal.css';
 
 interface AddProductModalProps {
   onClose: () => void;
   onSuccess: () => void;
   initialData?: Product;
+  /** Pre-selects the floor for a new product (e.g. the active filter) */
+  defaultFloor?: Floor;
 }
 
-const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess, initialData }) => {
+const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess, initialData, defaultFloor }) => {
   const [productName, setProductName] = useState('');
+  const [floor, setFloor] = useState<Floor>(defaultFloor ?? 'FIRST_FLOOR');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialData) {
       setProductName(initialData.productName);
+      setFloor(initialData.floor ?? 'FIRST_FLOOR');
     }
   }, [initialData]);
 
@@ -31,7 +35,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess, i
 
     try {
       setLoading(true);
-      const data: ProductRequest = { productName: productName.trim() };
+      const data: ProductRequest = { productName: productName.trim(), floor };
 
       if (initialData) {
         await productApi.updateProduct(initialData.productId, data);
@@ -67,6 +71,19 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess, i
               required
               autoFocus
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Floor*</label>
+            <select
+              value={floor}
+              onChange={(e) => setFloor(e.target.value as Floor)}
+              className="form-input"
+              title="Floor"
+            >
+              <option value="GROUND_FLOOR">Ground Floor</option>
+              <option value="FIRST_FLOOR">First Floor</option>
+            </select>
           </div>
 
           <div className="modal-actions">

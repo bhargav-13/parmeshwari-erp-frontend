@@ -189,10 +189,12 @@ export type QuantityUnit = typeof QuantityUnit[keyof typeof QuantityUnit];
 export interface Product {
   productId: number;
   productName: string;
+  floor?: Floor;
 }
 
 export interface ProductRequest {
   productName: string;
+  floor?: Floor;
 }
 
 export interface Category {
@@ -472,6 +474,7 @@ export interface SubcontractingBySubcontractList {
   contractorName: string;
   subcontractList: SubcontractingBySubcontract[];
   totalPaidRs: number;
+  totalJobPaidAmount?: number;
   totalSentStock: number;
   totalReturnStock: number;
   totalUsed: number;
@@ -567,6 +570,25 @@ export interface SubcontractingCromeInfo {
   status: SubcontractingStatus;
 }
 
+/** What deleting a job work / crome record will remove, including stock taken back out of inventory */
+export interface DeleteImpactStockLine {
+  itemName: string;
+  floor?: string | null;
+  quantityKg: number;
+  quantityPc?: number;
+  currentKg: number;
+  sufficient: boolean;
+}
+
+export interface DeleteImpact {
+  canDelete: boolean;
+  blockReason?: string | null;
+  cromeCount: number;
+  cromeReturnCount: number;
+  untrackedCromeReturnCount: number;
+  stockReversals: DeleteImpactStockLine[];
+}
+
 export interface SubReturnCromeInfo {
   returnId: number;
   netReturnStock: number;
@@ -584,6 +606,7 @@ export interface CromeReturnRequest {
   inventoryItemName?: string;
   inventoryFloor?: InventoryFloor;
   inventoryPricePerKg?: number;
+  inventoryQuantityPc?: number;
 }
 
 // Casting Types
@@ -708,8 +731,12 @@ export const RejectionReturnType = {
 
 export type RejectionReturnType = typeof RejectionReturnType[keyof typeof RejectionReturnType];
 
+/** Which party master a rejection party comes from */
+export type RejectionPartyType = 'PURCHASE' | 'SALES';
+
 export interface RejectionRequest {
   partyId: number;
+  partyType: RejectionPartyType;
   date: string;
   weight: number;
   returnType: RejectionReturnType;
@@ -721,6 +748,7 @@ export interface RejectionRequest {
 export interface RejectionResponse {
   rejectionId: number;
   party: PurchaseParty;
+  partyType?: RejectionPartyType;
   date: string;
   weight: number;
   returnType: RejectionReturnType;

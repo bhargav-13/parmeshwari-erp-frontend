@@ -10,6 +10,7 @@ import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
+import { formatQty } from '../utils/format';
 
 const RawInventoryPage: React.FC = () => {
   const [rawItems, setRawItems] = useState<RawItem[]>([]);
@@ -207,7 +208,7 @@ const RawInventoryPage: React.FC = () => {
               <tr key={item.rawItemId}>
                 <td>{String(index + 1).padStart(2, '0')}</td>
                 <td>{item.product?.productName || 'N/A'}</td>
-                <td>{item.quantityInKg} Kg</td>
+                <td>{formatQty(item.quantityInKg)} Kg</td>
                 <td>{formatLastUpdated(item.lastUpdatedAt)}</td>
                 <td>
                   <span

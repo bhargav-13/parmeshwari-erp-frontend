@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import type { PurchaseParty, RejectionRequest, RejectionResponse, RejectionReturnType, StockItem } from '../types';
+import type { RejectionRequest, RejectionResponse, RejectionReturnType, StockItem } from '../types';
 import { RejectionReturnType as ReturnTypeEnum } from '../types';
-import { purchasePartyApi } from '../api/purchaseParty';
+import { getRejectionPartyOptions, rejectionPartyKey, type RejectionPartyOption } from '../api/rejection';
 import { stockItemApi } from '../api/inventory';
 import './AddRejectionModal.css';
 
@@ -13,6 +13,7 @@ interface AddRejectionModalProps {
 
 const emptyForm = (): RejectionRequest => ({
   partyId: 0,
+  partyType: 'PURCHASE',
   date: new Date().toISOString().split('T')[0],
   weight: 0,
   returnType: ReturnTypeEnum.CASH,
@@ -29,7 +30,8 @@ const AddRejectionModal: React.FC<AddRejectionModalProps> = ({
   const [form, setForm] = useState<RejectionRequest>(() => {
     if (initialData) {
       return {
-        partyId: initialData.party.id,
+        partyId: initialData.party?.id ?? 0,
+        partyType: initialData.partyType ?? 'PURCHASE',
         date: initialData.date,
         weight: initialData.weight,
         returnType: initialData.returnType,
@@ -41,7 +43,7 @@ const AddRejectionModal: React.FC<AddRejectionModalProps> = ({
     return emptyForm();
   });
 
-  const [parties, setParties] = useState<PurchaseParty[]>([]);
+  const [parties, setParties] = useState<RejectionPartyOption[]>([]);
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [loadingParties, setLoadingParties] = useState(true);
   const [loadingStock, setLoadingStock] = useState(false);
@@ -49,8 +51,7 @@ const AddRejectionModal: React.FC<AddRejectionModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    purchasePartyApi
-      .getAll()
+    getRejectionPartyOptions()
       .then(setParties)
       .catch(() => setError('Failed to load parties'))
       .finally(() => setLoadingParties(false));
@@ -98,6 +99,7 @@ const AddRejectionModal: React.FC<AddRejectionModalProps> = ({
       setSubmitting(true);
       const payload: RejectionRequest = {
         partyId: form.partyId,
+        partyType: form.partyType,
         date: form.date,
         weight: form.weight,
         returnType: form.returnType,
@@ -132,15 +134,37 @@ const AddRejectionModal: React.FC<AddRejectionModalProps> = ({
               <select
                 id="rejection-party"
                 className="rejection-form-select"
-                value={form.partyId || ''}
-                onChange={e => set('partyId', Number(e.target.value))}
+                value={form.partyId ? rejectionPartyKey(form.partyType, form.partyId) : ''}
+                onChange={e => {
+                  const opt = parties.find(p => p.key === e.target.value);
+                  setForm(prev => ({
+                    ...prev,
+                    partyId: opt?.id ?? 0,
+                    partyType: opt?.partyType ?? 'PURCHASE',
+                  }));
+                }}
                 title="Select Party"
               >
                 <option value="">Select a party</option>
-                {parties.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
+                {(['PURCHASE', 'SALES'] as const).map(type => {
+                  const group = parties.filter(p => p.partyType === type);
+                  if (group.length === 0) return null;
+                  return (
+                    <optgroup key={type} label={type === 'PURCHASE' ? 'Purchase Parties' : 'Sales Parties'}>
+                      {group.map(p => (
+                        <option key={p.key} value={p.key}>
+                          {p.name} ({type === 'PURCHASE' ? 'Purchase' : 'Sales'})
+                        </option>
+                      ))}
+                    </optgroup>
+                  );
+                })}
               </select>
+            )}
+            {!loadingParties && parties.length === 0 && (
+              <div className="rejection-loading-text">
+                No parties found. Add one in Party Master (Purchase or Sales).
+              </div>
             )}
           </div>
 

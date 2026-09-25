@@ -123,7 +123,11 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
     }
     try {
       setLoading(true);
-      const data: ProductRequest = { productName: newProductName.trim() };
+      const data: ProductRequest = {
+        productName: newProductName.trim(),
+        ...(formData.inventoryType === PurchaseInventoryType.GROUND_FLOOR ? { floor: 'GROUND_FLOOR' as const } : {}),
+        ...(formData.inventoryType === PurchaseInventoryType.FIRST_FLOOR ? { floor: 'FIRST_FLOOR' as const } : {}),
+      };
       const newProduct = await productApi.createProduct(data);
       setLocalProducts([...localProducts, newProduct]);
       setFormData((prev) => ({ ...prev, productId: newProduct.productId }));

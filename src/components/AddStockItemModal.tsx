@@ -367,7 +367,10 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
 
     try {
       setLoading(true);
-      const data: ProductRequest = { productName: newProductName.trim() };
+      const data: ProductRequest = {
+        productName: newProductName.trim(),
+        floor: formData.inventoryFloor === InventoryFloor.GROUND_FLOOR ? 'GROUND_FLOOR' : 'FIRST_FLOOR',
+      };
       const newProduct = await productApi.createProduct(data);
       setLocalProducts([...localProducts, newProduct]);
       setFormData((prev) => ({ ...prev, productId: newProduct.productId }));

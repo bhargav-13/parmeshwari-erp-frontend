@@ -4,6 +4,7 @@ import type { Crome, CromeReturnRequest } from '../types';
 import { SubcontractingStatus } from '../types';
 import { cromeApi } from '../api/crome';
 import CromeReturnModal from './CromeReturnModal';
+import DeleteImpactDialog from './DeleteImpactDialog';
 import DeleteIcon from '../assets/delete.svg';
 import ReturnIcon from '../assets/return.svg';
 import './SubcontractingCard.css'; // Reusing the same styles
@@ -12,14 +13,14 @@ import './CromeCard.css';
 
 interface CromeCardProps {
     crome: Crome;
-    onDelete: (id: number) => void;
+    onDelete: (id: number) => Promise<void>;
     onRefresh: () => void;
 }
 
 const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => {
     const [status, setStatus] = useState(crome.status);
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -53,18 +54,7 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
         }
     };
 
-    const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this crome order?')) {
-            try {
-                setIsDeleting(true);
-                await onDelete(crome.cromeId);
-            } catch (error) {
-                console.error('Error deleting:', error);
-            } finally {
-                setIsDeleting(false);
-            }
-        }
-    };
+    const handleDelete = () => setIsDeleteDialogOpen(true);
 
     const handleReturn = async (data: CromeReturnRequest) => {
         try {
@@ -107,14 +97,9 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                             type="button"
                             className="icon-button delete-button"
                             onClick={handleDelete}
-                            disabled={isDeleting}
                             title="Delete"
                         >
-                            {isDeleting ? (
-                                <span className="loading-icon"></span>
-                            ) : (
-                                <img src={DeleteIcon} alt="Delete" className="icon-img" />
-                            )}
+                            <img src={DeleteIcon} alt="Delete" className="icon-img" />
                         </button>
                     </div>
                 </div>
@@ -270,6 +255,17 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                     )}
                 </div>
             </div>
+
+            {isDeleteDialogOpen && (
+                <DeleteImpactDialog
+                    title="Delete Crome"
+                    subject={`crome CRM-${crome.cromeId}`}
+                    subjectIsCrome
+                    loadImpact={() => cromeApi.getDeleteImpact(crome.cromeId)}
+                    onConfirm={() => onDelete(crome.cromeId)}
+                    onClose={() => setIsDeleteDialogOpen(false)}
+                />
+            )}
 
             {isReturnModalOpen && (
                 <CromeReturnModal

@@ -53,6 +53,9 @@ class Product {
             if (data.hasOwnProperty('productName')) {
                 obj['productName'] = ApiClient.convertToType(data['productName'], 'String');
             }
+            if (data.hasOwnProperty('floor')) {
+                obj['floor'] = ApiClient.convertToType(data['floor'], 'String');
+            }
         }
         return obj;
     }
@@ -85,6 +88,11 @@ Product.prototype['productId'] = undefined;
  * @member {String} productName
  */
 Product.prototype['productName'] = undefined;
+
+/**
+ * @member {String} floor
+ */
+Product.prototype['floor'] = undefined;
 
 
 

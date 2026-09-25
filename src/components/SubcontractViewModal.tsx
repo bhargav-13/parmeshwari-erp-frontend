@@ -159,9 +159,20 @@ const SubcontractViewModal: React.FC<SubcontractViewModalProps> = ({
               </div>
 
               <div className="subcontract-view-totals">
-                <div className="total-item total-paid">
-                  <span className="total-label">Total Paid Rs :-</span>
-                  <span className="total-value">{formatCurrency(data.totalPaidRs)}/-</span>
+                <div className="totals-row totals-row-money">
+                  <div className="total-item total-paid">
+                    <span className="total-label">Total Paid Rs :-</span>
+                    <span className="total-value">{formatCurrency(data.totalPaidRs)}/-</span>
+                  </div>
+                  <div className="total-item total-paid">
+                    <span className="total-label">Total Job Pay :-</span>
+                    <span className="total-value">
+                      {formatCurrency(
+                        data.totalJobPaidAmount ??
+                          data.subcontractList.reduce((sum, i) => sum + (i.totalJobPay || 0), 0)
+                      )}/-
+                    </span>
+                  </div>
                 </div>
                 <div className="totals-row">
                   <div className="total-item">

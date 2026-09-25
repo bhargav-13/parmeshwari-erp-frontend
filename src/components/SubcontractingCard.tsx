@@ -7,6 +7,7 @@ import { cromeApi } from '../api/crome';
 import ReturnRecordModal from './ReturnRecordModal';
 import AddSubcontractingModal from './AddSubcontractingModal';
 import CromeModal from './CromeModal';
+import DeleteImpactDialog from './DeleteImpactDialog';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import ReturnIcon from '../assets/return.svg';
@@ -15,7 +16,7 @@ import '../styles/StatusDropdown.css';
 
 interface SubcontractingCardProps {
   subcontract: Subcontracting;
-  onDelete: (id: number) => void;
+  onDelete: (id: number) => Promise<void>;
   onRefresh: () => void;
 }
 
@@ -25,7 +26,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [cromeReturnId, setCromeReturnId] = useState<number | null>(null);
   const [status, setStatus] = useState(subcontract.status);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   // Crome records grouped by the return chunk they were sent from.
   // A chunk with any Crome record hides its "Send to Crome" button.
@@ -131,18 +132,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
     }
   };
 
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this subcontracting order?')) {
-      try {
-        setIsDeleting(true);
-        await onDelete(subcontract.subcontractingId);
-      } catch (error) {
-        console.error('Error deleting:', error);
-      } finally {
-        setIsDeleting(false);
-      }
-    }
-  };
+  const handleDelete = () => setIsDeleteDialogOpen(true);
 
   const handleEdit = async (data: SubOrderRequest) => {
     try {
@@ -191,14 +181,9 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
               type="button"
               className="icon-button delete-button"
               onClick={handleDelete}
-              disabled={isDeleting}
               title="Delete"
             >
-              {isDeleting ? (
-                <span className="loading-icon"></span>
-              ) : (
-                <img src={DeleteIcon} alt="Delete" className="icon-img" />
-              )}
+              <img src={DeleteIcon} alt="Delete" className="icon-img" />
             </button>
           </div>
         </div>
@@ -396,6 +381,16 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
           onClose={() => setIsEditModalOpen(false)}
           onSubmit={handleEdit}
           initialData={initialEditData}
+        />
+      )}
+
+      {isDeleteDialogOpen && (
+        <DeleteImpactDialog
+          title="Delete Job Work"
+          subject={`job work PBI-${subcontract.subcontractingId}`}
+          loadImpact={() => subcontractingApi.getDeleteImpact(subcontract.subcontractingId)}
+          onConfirm={() => onDelete(subcontract.subcontractingId)}
+          onClose={() => setIsDeleteDialogOpen(false)}
         />
       )}
 

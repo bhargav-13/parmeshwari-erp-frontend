@@ -1,5 +1,6 @@
 import { apiClient } from './client';
 import type {
+  DeleteImpact,
   Subcontracting,
   SubOrderRequest,
   SubReturnRequest,
@@ -70,6 +71,12 @@ export const subcontractingApi = {
   // Delete subcontracting order
   deleteSubcontracting: async (id: number): Promise<void> => {
     await apiClient.delete(`/api/v1/subcontracting/${id}`);
+  },
+
+  // Preview what deleting a subcontracting order removes (crome records + stock)
+  getDeleteImpact: async (id: number): Promise<DeleteImpact> => {
+    const response = await apiClient.get<DeleteImpact>(`/api/v1/subcontracting/${id}/delete-impact`);
+    return response.data;
   },
 
   // Return subcontracting record

@@ -12,6 +12,7 @@ import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
+import { formatQty } from '../utils/format';
 
 const InventoryPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'stock' | 'raw'>('stock');
@@ -163,8 +164,9 @@ const InventoryPage: React.FC = () => {
   };
 
   // Calculate actual status based on quantity in pieces vs low stock alert (for stock items)
-  const getActualStatus = (quantityInPc: number, lowStockAlert: number): InventoryStatus => {
-    return quantityInPc <= lowStockAlert ? InventoryStatus.LOW_STOCK : InventoryStatus.IN_STOCK;
+  // Low stock is by weight: quantity (kg) at or below the alert (kg)
+  const getActualStatus = (quantityInKg: number, lowStockAlert: number): InventoryStatus => {
+    return (quantityInKg ?? 0) <= (lowStockAlert ?? 0) ? InventoryStatus.LOW_STOCK : InventoryStatus.IN_STOCK;
   };
 
   // Calculate actual status based on quantity in kg vs low stock alert (for raw materials)
@@ -174,10 +176,10 @@ const InventoryPage: React.FC = () => {
 
   const totalItems = stockItems.length;
   const lowStockItems = stockItems.filter(
-    (item) => item.quantityInPc <= item.lowStockAlert
+    (item) => item.quantityInKg <= item.lowStockAlert
   ).length;
   const criticalStockItems = stockItems.filter(
-    (item) => getActualStatus(item.quantityInPc, item.lowStockAlert) === InventoryStatus.LOW_STOCK
+    (item) => getActualStatus(item.quantityInKg, item.lowStockAlert) === InventoryStatus.LOW_STOCK
   ).length;
   const totalAmount = stockItems.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
 
@@ -187,7 +189,7 @@ const InventoryPage: React.FC = () => {
       item.product.productName.toLowerCase().includes(searchLower) ||
       item.category.categoryName.toLowerCase().includes(searchLower);
 
-    const itemStatus = getActualStatus(item.quantityInPc, item.lowStockAlert);
+    const itemStatus = getActualStatus(item.quantityInKg, item.lowStockAlert);
     const matchesStatus = !statusFilter || itemStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
@@ -355,16 +357,16 @@ const InventoryPage: React.FC = () => {
                     <td>{String(index + 1).padStart(2, '0')}</td>
                     <td>{item.product.productName}</td>
                     <td>{item.category.categoryName}</td>
-                    <td>{item.quantityInKg} Kg</td>
+                    <td>{formatQty(item.quantityInKg)} Kg</td>
                     <td>{item.quantityInPc?.toLocaleString('en-IN') || '—'}</td>
                     <td>₹{Number(item.pricePerKg).toFixed(2)}/KG</td>
                     <td>
                       <span
                         className={`status-badge ${
-                          getActualStatus(item.quantityInPc, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'in-stock' : 'low-stock'
+                          getActualStatus(item.quantityInKg, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'in-stock' : 'low-stock'
                         }`}
                       >
-                        {getActualStatus(item.quantityInPc, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'In Stock' : 'Low Stock'}
+                        {getActualStatus(item.quantityInKg, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'In Stock' : 'Low Stock'}
                       </span>
                     </td>
                     <td>
@@ -475,7 +477,7 @@ const InventoryPage: React.FC = () => {
                   <tr key={item.rawItemId}>
                     <td>{String(index + 1).padStart(2, '0')}</td>
                     <td>{item.product.productName}</td>
-                    <td>{item.quantityInKg} Kg</td>
+                    <td>{formatQty(item.quantityInKg)} Kg</td>
                     <td>{formatLastUpdated(item.lastUpdatedAt)}</td>
                     <td>
                       <span

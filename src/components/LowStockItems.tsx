@@ -1,6 +1,7 @@
 import React from 'react';
 import './LowStockItems.css';
 import type { StockItem } from '../types';
+import { formatQty } from '../utils/format';
 
 interface LowStockItemsProps {
   items: StockItem[];
@@ -14,7 +15,7 @@ const LowStockItems: React.FC<LowStockItemsProps> = ({ items }) => {
         {items.map((item) => (
           <li key={item.stockItemId} className="low-stock-item">
             <span className="item-name">{item.product.productName}</span>
-            <span className="item-quantity">{item.quantityInKg} kg</span>
+            <span className="item-quantity">{formatQty(item.quantityInKg)} kg</span>
           </li>
         ))}
       </ul>

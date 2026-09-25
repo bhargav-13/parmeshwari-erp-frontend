@@ -63,15 +63,10 @@ const CromePage: React.FC = () => {
         });
     };
 
+    // Confirmation (with stock impact) happens in CromeCard; errors are shown there
     const handleDeleteCrome = async (id: number) => {
-        if (window.confirm('Are you sure you want to delete this crome order?')) {
-            try {
-                await cromeApi.deleteCrome(id);
-                fetchCromes();
-            } catch (error) {
-                console.error('Error deleting crome:', error);
-            }
-        }
+        await cromeApi.deleteCrome(id);
+        fetchCromes();
     };
 
     return (

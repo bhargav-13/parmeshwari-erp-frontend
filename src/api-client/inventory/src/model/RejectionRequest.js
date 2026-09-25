@@ -59,6 +59,9 @@ class RejectionRequest {
             if (data.hasOwnProperty('partyId')) {
                 obj['partyId'] = ApiClient.convertToType(data['partyId'], 'Number');
             }
+            if (data.hasOwnProperty('partyType')) {
+                obj['partyType'] = ApiClient.convertToType(data['partyType'], 'String');
+            }
             if (data.hasOwnProperty('date')) {
                 obj['date'] = ApiClient.convertToType(data['date'], 'Date');
             }
@@ -107,6 +110,11 @@ RejectionRequest.RequiredProperties = ["partyId", "date", "weight", "returnType"
  * @member {Number} partyId
  */
 RejectionRequest.prototype['partyId'] = undefined;
+
+/**
+ * @member {String} partyType
+ */
+RejectionRequest.prototype['partyType'] = undefined;
 
 /**
  * @member {Date} date

@@ -86,15 +86,10 @@ const SubcontractingPage: React.FC = () => {
     }
   };
 
+  // Confirmation (with stock impact) happens in SubcontractingCard; errors are shown there
   const handleDeleteSubcontract = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this subcontracting order?')) {
-      try {
-        await subcontractingApi.deleteSubcontracting(id);
-        fetchSubcontracts();
-      } catch (error) {
-        console.error('Error deleting subcontract:', error);
-      }
-    }
+    await subcontractingApi.deleteSubcontracting(id);
+    fetchSubcontracts();
   };
 
   return (
