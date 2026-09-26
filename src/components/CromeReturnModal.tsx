@@ -89,6 +89,8 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
     const [weightPerPcKg, setWeightPerPcKg] = useState<number | null>(null);
     // Once the user types Pieces themselves, stop overwriting it
     const [pcsEdited, setPcsEdited] = useState(false);
+    // Pieces already in the stock row this return goes into (null = no stock row yet)
+    const [stockPcs, setStockPcs] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -112,7 +114,12 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
             .getAllStockItems()
             .then(items => {
                 if (cancelled) return;
-                const match = items.find(i => i.product?.productName?.trim().toLowerCase() === name);
+                // Same item on the chosen floor — that's the stock row the return will be added to
+                const match = items.find(i =>
+                    i.product?.productName?.trim().toLowerCase() === name &&
+                    (i.inventoryFloor ?? InventoryFloor.GROUND_FLOOR) === formData.inventoryFloor
+                );
+                setStockPcs(match ? (match.quantityInPc ?? 0) : null);
                 if (match && match.weightPerPc > 0) {
                     setWeightPerPcKg(match.quantityUnit === QuantityUnit.GM ? match.weightPerPc / 1000 : match.weightPerPc);
                 } else {
@@ -120,12 +127,15 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                 }
             })
             .catch(() => {
-                if (!cancelled) setWeightPerPcKg(parseWeightPerPcKgFromName(formData.inventoryItemName));
+                if (!cancelled) {
+                    setWeightPerPcKg(parseWeightPerPcKgFromName(formData.inventoryItemName));
+                    setStockPcs(null);
+                }
             });
         return () => {
             cancelled = true;
         };
-    }, [formData.inventoryItemName]);
+    }, [formData.inventoryItemName, formData.inventoryFloor]);
 
     const parseNum = (val: string | number): number => {
         if (typeof val === 'number') return val;
@@ -430,7 +440,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                         />
                                         <span className="field-hint-text">
                                             {weightPerPcKg
-                                                ? `Auto: Net ÷ ${Number((weightPerPcKg * 1000).toFixed(2))} gm per pc`
+                                                ? `Suggested: Net ÷ ${Number((weightPerPcKg * 1000).toFixed(2))} gm per pc`
                                                 : 'Piece weight unknown, enter pieces manually'}
                                             {pcsEdited && autoPcs > 0 && (
                                                 <>
@@ -445,6 +455,11 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                                 </>
                                             )}
                                         </span>
+                                        {stockPcs !== null && parseNum(formData.quantityInPc) > 0 && (
+                                            <span className="field-hint-text">
+                                                In stock {stockPcs.toLocaleString('en-IN')} pcs + {parseNum(formData.quantityInPc).toLocaleString('en-IN')} = <strong>{(stockPcs + parseNum(formData.quantityInPc)).toLocaleString('en-IN')} pcs</strong>
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             )}
