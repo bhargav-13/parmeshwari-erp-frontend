@@ -66,6 +66,12 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [localProducts, setLocalProducts] = useState<Product[]>(products);
+
+  // Products saved before the floor split have no floor — they belong to First Floor
+  const productFloorOf = (productId: number): string | undefined => {
+    const product = localProducts.find((p) => p.productId === productId);
+    return product ? product.floor ?? 'FIRST_FLOOR' : undefined;
+  };
   const [localCategories, setLocalCategories] = useState<Category[]>(categories);
   const [showProductInput, setShowProductInput] = useState(false);
   const [showCategoryInput, setShowCategoryInput] = useState(false);
@@ -309,7 +315,11 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
     if (name === 'productId') {
       const selectedProductId = parsedValue as number;
       // Find if this product exists in existing stock items
-      const conflict = existingStockItems.find(item => item.product.productId === selectedProductId);
+      // Stock items are per floor — only a row on this floor is a duplicate
+      const conflict = existingStockItems.find(
+        item => item.product.productId === selectedProductId &&
+          (item.inventoryFloor || InventoryFloor.GROUND_FLOOR) === formData.inventoryFloor
+      );
 
       // Use initialData or isSwitchedToEdit to determine if we are editing.
       // If we are editing (isEditMode or isSwitchedToEdit), we only care if the conflict id is DIFFERENT from current id.
@@ -344,6 +354,13 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
 
     setFormData((prev) => {
       const newData = { ...prev, [name]: parsedValue };
+
+      // Switching floor: a product from the other floor no longer fits
+      if (name === 'inventoryFloor' && prev.productId && productFloorOf(prev.productId) !== parsedValue) {
+        newData.productId = 0;
+        setDuplicateItem(null);
+        setError(null);
+      }
 
       // Auto-calculate quantity in pieces when relevant fields change
       if (name === 'quantityInKg' || name === 'weightPerPc' || name === 'quantityUnit') {
@@ -601,11 +618,17 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
                     aria-label="Product Name"
                   >
                     <option value={0}>Select</option>
-                    {localProducts.map((product) => (
-                      <option key={product.productId} value={product.productId}>
-                        {product.productName}
-                      </option>
-                    ))}
+                    {localProducts
+                      .filter((product) =>
+                        (product.floor ?? 'FIRST_FLOOR') === formData.inventoryFloor ||
+                        // keep an existing record's product visible even if it's on the other floor
+                        (!!initialData && product.productId === formData.productId)
+                      )
+                      .map((product) => (
+                        <option key={product.productId} value={product.productId}>
+                          {product.productName}
+                        </option>
+                      ))}
                     <option value="add_new" className="add-new-option">
                       + Add New Product
                     </option>

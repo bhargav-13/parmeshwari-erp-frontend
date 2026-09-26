@@ -270,7 +270,7 @@ const AddRejectionModal: React.FC<AddRejectionModalProps> = ({
                     <option value="">Select stock item</option>
                     {stockItems.map(s => (
                       <option key={s.stockItemId} value={s.stockItemId}>
-                        {s.product.productName} — {s.quantityInKg.toFixed(2)} kg
+                        {s.product.productName} ({s.inventoryFloor === 'FIRST_FLOOR' ? 'First Floor' : 'Ground Floor'}) — {s.quantityInKg.toFixed(3)} kg
                       </option>
                     ))}
                   </select>

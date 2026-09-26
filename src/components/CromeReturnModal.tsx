@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import type { CromeReturnRequest, Crome, PackagingDetail } from '../types';
+import type { CromeReturnRequest, Crome, PackagingDetail, Product } from '../types';
 import { PackagingType, InventoryFloor, SubcontractingStatus, QuantityUnit } from '../types';
 import { cromeApi } from '../api/crome';
-import { stockItemApi } from '../api/inventory';
+import { stockItemApi, productApi } from '../api/inventory';
 import './CromeReturnModal.css';
 
 // Packaging weights in KG
@@ -91,6 +91,16 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
     const [pcsEdited, setPcsEdited] = useState(false);
     // Pieces already in the stock row this return goes into (null = no stock row yet)
     const [stockPcs, setStockPcs] = useState<number | null>(null);
+    const [products, setProducts] = useState<Product[]>([]);
+
+    useEffect(() => {
+        productApi.getProducts().then(setProducts).catch(() => setProducts([]));
+    }, []);
+
+    // Item name suggestions: only products of the chosen floor (no floor yet = First Floor)
+    const floorProductNames = products
+        .filter(p => (p.floor ?? 'FIRST_FLOOR') === formData.inventoryFloor)
+        .map(p => p.productName);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -386,6 +396,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                         <input
                                             type="text"
                                             name="inventoryItemName"
+                                            list="crome-return-floor-products"
                                             value={formData.inventoryItemName}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
@@ -393,6 +404,9 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                                             placeholder="Item Name"
                                             required={formData.addToInventory}
                                         />
+                                        <datalist id="crome-return-floor-products">
+                                            {floorProductNames.map(name => <option key={name} value={name} />)}
+                                        </datalist>
                                         {getFieldError('inventoryItemName') && <span className="field-error-text">{getFieldError('inventoryItemName')}</span>}
                                     </div>
 

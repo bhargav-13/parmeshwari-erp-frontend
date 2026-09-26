@@ -63,6 +63,12 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const [localProducts, setLocalProducts] = useState<Product[]>(products);
+
+  // Floor of the chosen inventory type; raw material isn't floor-wise, so it lists every product
+  const floorOfType = (type: string): string | null =>
+    type === PurchaseInventoryType.GROUND_FLOOR ? 'GROUND_FLOOR'
+      : type === PurchaseInventoryType.FIRST_FLOOR ? 'FIRST_FLOOR'
+        : null;
   const [localCategories, setLocalCategories] = useState<Category[]>(categories);
   const [showProductInput, setShowProductInput] = useState(false);
   const [showCategoryInput, setShowCategoryInput] = useState(false);
@@ -103,6 +109,15 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
 
     setFormData((prev) => {
       const newData = { ...prev, [name]: parsedValue };
+
+      // Switching to a floor: a product from the other floor no longer fits
+      if (name === 'inventoryType' && prev.productId) {
+        const floor = floorOfType(parsedValue as string);
+        const product = localProducts.find((p) => p.productId === prev.productId);
+        if (floor && product && (product.floor ?? 'FIRST_FLOOR') !== floor) {
+          newData.productId = 0;
+        }
+      }
 
       // Auto-calculate quantityInPc when stock type and relevant fields change
       if (isStockType && (name === 'qty' || name === 'weightPerPc' || name === 'quantityUnit')) {
@@ -306,11 +321,19 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
                   aria-label="Product Name"
                 >
                   <option value={0}>Select</option>
-                  {localProducts.map((product) => (
-                    <option key={product.productId} value={product.productId}>
-                      {product.productName}
-                    </option>
-                  ))}
+                  {localProducts
+                    .filter((product) => {
+                      const floor = floorOfType(formData.inventoryType);
+                      return floor === null ||
+                        (product.floor ?? 'FIRST_FLOOR') === floor ||
+                        // keep an existing purchase's product visible even if it's on the other floor
+                        (!!editingPurchase && product.productId === formData.productId);
+                    })
+                    .map((product) => (
+                      <option key={product.productId} value={product.productId}>
+                        {product.productName}
+                      </option>
+                    ))}
                   <option value="add_new" className="add-new-option">+ Add New Product</option>
                 </select>
               )}
