@@ -127,11 +127,24 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
     setFormData((prev) => recalculateTotals(updater(prev)));
   };
 
+  // Products saved before the floor split have no floor — they belong to First Floor
+  const productFloor = (product?: Product): string => product?.floor ?? 'FIRST_FLOOR';
+
+  const floorProducts = products.filter((prod) => productFloor(prod) === formData.orderFloor);
+
   const handleFieldChange = (field: keyof OrderRequest, value: string | number) => {
-    updateFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    updateFormData((prev) => {
+      const next = { ...prev, [field]: value };
+      if (field === 'orderFloor' && value !== prev.orderFloor) {
+        // Items picked for the other floor don't belong to this order any more
+        next.products = prev.products.map((line) => {
+          const stock = stockItems.find((item) => item.stockItemId === line.itemId);
+          const lineFloor = stock ? productFloor(products.find((p) => p.productId === stock.product.productId) ?? stock.product) : null;
+          return lineFloor && lineFloor !== value ? createEmptyProduct() : line;
+        });
+      }
+      return next;
+    });
   };
 
   const handleProductChange = (index: number, field: keyof OrderProductRequest, value: string | number) => {
@@ -199,7 +212,10 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
 
   const handleProductSelection = async (index: number, productId: number) => {
     // Check if stock item exists for this product
-    const existingStockItem = stockItems.find(item => item.product.productId === productId);
+    // Stock items are per floor — use the one on this order's floor
+    const existingStockItem = stockItems.find(
+      item => item.product.productId === productId && (item.inventoryFloor ?? InventoryFloor.GROUND_FLOOR) === formData.orderFloor
+    );
 
     if (existingStockItem) {
       handleProductChange(index, 'itemId', existingStockItem.stockItemId);
@@ -221,7 +237,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
           weightPerPc: 0,
           pricePerKg: 0,
           quantityUnit: QuantityUnit.KG,
-          inventoryFloor: InventoryFloor.GROUND_FLOOR,
+          inventoryFloor: formData.orderFloor === OrderFloor.FIRST_FLOOR ? InventoryFloor.FIRST_FLOOR : InventoryFloor.GROUND_FLOOR,
           lowStockAlert: 0
         };
 
@@ -517,11 +533,15 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                           title="Select a product"
                         >
                           <option value="">{isCreating ? 'Creating Item...' : 'Select Product'}</option>
-                          {products.map((prod) => (
+                          {floorProducts.map((prod) => (
                             <option key={prod.productId} value={prod.productId}>
                               {prod.productName}
                             </option>
                           ))}
+                          {/* Keep an older order's product visible even if it's on the other floor */}
+                          {currentProductId !== '' && !floorProducts.some((prod) => prod.productId === currentProductId) && (
+                            <option value={currentProductId}>{currentStockItem?.product.productName}</option>
+                          )}
                         </select>
                       </div>
                       <div className="line-item-field">

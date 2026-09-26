@@ -17,6 +17,10 @@ const SubcontractPage: React.FC = () => {
   const [selectedContractor, setSelectedContractor] = useState<string | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [downloadingContractor, setDownloadingContractor] = useState<string | null>(null);
+  // Contractor whose PDF date-range popup is open
+  const [pdfContractor, setPdfContractor] = useState<string | null>(null);
+  const [pdfStartDate, setPdfStartDate] = useState('');
+  const [pdfEndDate, setPdfEndDate] = useState('');
 
   useEffect(() => {
     fetchSubcontractors();
@@ -71,29 +75,37 @@ const SubcontractPage: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
-  const handleDownload = async (contractorName: string) => {
+  // yyyy-mm-dd in local time (toISOString would shift to the previous day in IST)
+  const toInputDate = (date: Date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+  const openPdfDialog = (contractorName: string) => {
+    const today = new Date();
+    setPdfStartDate(toInputDate(new Date(today.getFullYear(), today.getMonth(), 1)));
+    setPdfEndDate(toInputDate(new Date(today.getFullYear(), today.getMonth() + 1, 0)));
+    setPdfContractor(contractorName);
+  };
+
+  const pdfRangeInvalid = !pdfStartDate || !pdfEndDate || pdfStartDate > pdfEndDate;
+
+  const handleDownload = async (contractorName: string, startDate: string, endDate: string) => {
     try {
       setDownloadingContractor(contractorName);
-      const today = new Date();
-      const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-      const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-      const blob = await subcontractingApi.getSubcontractByCustomerNamePdf(
-        contractorName,
-        startDate.toISOString().split('T')[0],
-        endDate.toISOString().split('T')[0]
-      );
+      const blob = await subcontractingApi.getSubcontractByCustomerNamePdf(contractorName, startDate, endDate);
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${contractorName}_subcontract_${formatDate(today.toISOString())}.pdf`;
+      link.download = `${contractorName}_subcontract_${formatDate(startDate)}_to_${formatDate(endDate)}.pdf`.replace(/\//g, '-');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      setPdfContractor(null);
     } catch (error) {
       console.error('Error downloading PDF:', error);
+      alert('Failed to download PDF. Please try again.');
     } finally {
       setDownloadingContractor(null);
     }
@@ -156,7 +168,7 @@ const SubcontractPage: React.FC = () => {
                     <button
                       type="button"
                       className={`action-button download-button ${downloadingContractor === contractor.contractorName ? 'downloading' : ''}`}
-                      onClick={() => handleDownload(contractor.contractorName)}
+                      onClick={() => openPdfDialog(contractor.contractorName)}
                       title="Download PDF"
                       disabled={downloadingContractor === contractor.contractorName}
                     >
@@ -190,6 +202,41 @@ const SubcontractPage: React.FC = () => {
           </table>
         )}
       </div>
+
+      {pdfContractor && (
+        <div className="pdf-range-overlay" onClick={() => setPdfContractor(null)}>
+          <div className="pdf-range-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <h2 className="pdf-range-title">Download PDF</h2>
+            <p className="pdf-range-subtitle">{pdfContractor}</p>
+            <div className="pdf-range-fields">
+              <label className="pdf-range-field">
+                <span>Start Date</span>
+                <input type="date" value={pdfStartDate} max={pdfEndDate || undefined} onChange={(e) => setPdfStartDate(e.target.value)} />
+              </label>
+              <label className="pdf-range-field">
+                <span>End Date</span>
+                <input type="date" value={pdfEndDate} min={pdfStartDate || undefined} onChange={(e) => setPdfEndDate(e.target.value)} />
+              </label>
+            </div>
+            {pdfStartDate && pdfEndDate && pdfStartDate > pdfEndDate && (
+              <p className="pdf-range-error">Start date must be on or before end date.</p>
+            )}
+            <div className="pdf-range-actions">
+              <button type="button" className="pdf-range-cancel" onClick={() => setPdfContractor(null)} disabled={downloadingContractor === pdfContractor}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="pdf-range-download"
+                onClick={() => handleDownload(pdfContractor, pdfStartDate, pdfEndDate)}
+                disabled={pdfRangeInvalid || downloadingContractor === pdfContractor}
+              >
+                {downloadingContractor === pdfContractor ? 'Downloading…' : 'Download'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isViewModalOpen && selectedContractor && (
         <SubcontractViewModal
