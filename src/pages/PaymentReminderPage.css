@@ -18,20 +18,20 @@
 }
 
 .payment-reminder-page .page-title {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 22px;
   line-height: 28px;
-  color: #17344D;
+  color: var(--brand);
   margin: 0;
 }
 
 .payment-reminder-page .page-subtitle {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #8E8E8E;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -44,7 +44,7 @@
 .payment-reminder-page .mode-toggle {
   display: flex;
   gap: 0;
-  border: 1px solid #17344D;
+  border: 1px solid var(--brand);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -54,24 +54,24 @@
   background: #FFFFFF;
   border: none;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: var(--brand);
   transition: all 0.3s ease;
 }
 
 .payment-reminder-page .mode-btn:first-child {
-  border-right: 1px solid #17344D;
+  border-right: 1px solid var(--brand);
 }
 
 .payment-reminder-page .mode-btn:hover:not(.active) {
-  background: #F5F5F5;
+  background: var(--surface-muted);
 }
 
 .payment-reminder-page .mode-btn.active {
-  background: #17344D;
+  background: var(--brand);
   color: #FFFFFF;
 }
 
@@ -80,20 +80,20 @@
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
-  background: #D1EEFF;
+  background: var(--brand-soft);
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
-  color: #17344D;
+  color: var(--brand);
   transition: background-color 0.3s ease;
 }
 
 .bulk-reminder-button:hover {
-  background: #b8dfff;
+  background: var(--brand-soft-hover);
 }
 
 .bulk-reminder-button .send-icon {
@@ -109,7 +109,7 @@
 
 .payment-reminder-page .stat-card {
   flex: 1;
-  border: 1px solid #17344D;
+  border: 1px solid var(--brand);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -124,24 +124,24 @@
 }
 
 .payment-reminder-page .stat-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #8E8E8E;
+  color: var(--text-muted);
 }
 
 .payment-reminder-page .stat-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 24px;
   line-height: 32px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .payment-table-container {
   overflow-x: auto;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid var(--border);
   border-radius: 12px;
   width: 100%;
   max-width: 100%;
@@ -155,28 +155,28 @@
 }
 
 .payment-table thead {
-  background: #F5F5F5;
+  background: var(--surface-muted);
 }
 
 .payment-table th {
   padding: 16px;
   text-align: center;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
-  border-bottom: 1px solid rgba(125, 153, 169, 0.3);
+  color: var(--brand);
+  border-bottom: 1px solid var(--border);
 }
 
 .payment-table td {
   padding: 16px;
   text-align: center;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #888888;
+  color: var(--text-muted);
   border-bottom: 1px solid rgba(125, 153, 169, 0.1);
 }
 
@@ -196,7 +196,7 @@
 .status-badge {
   padding: 6px 16px;
   border-radius: 20px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
@@ -224,21 +224,21 @@
   justify-content: center;
   gap: 8px;
   padding: 6px 14px;
-  background: #D1EEFF;
+  background: var(--brand-soft);
   border-radius: 20px;
   border: none;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #17344D;
+  color: var(--brand);
   transition: background-color 0.3s ease;
   min-width: 130px;
 }
 
 .send-reminder-button:hover:not(:disabled) {
-  background: #b8dfff;
+  background: var(--brand-soft-hover);
 }
 
 .send-reminder-button:disabled {
@@ -255,7 +255,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #17344D;
+  border-top: 2px solid var(--brand);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -275,9 +275,9 @@
 .payment-reminder-page .no-data {
   text-align: center;
   padding: 32px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
-  color: #8E8E8E;
+  color: var(--text-muted);
 }
 
 /* Toggle column - removed, chevron is now inline */
@@ -285,7 +285,7 @@
 /* Party name cell */
 .party-name-cell {
   font-weight: 500;
-  color: #17344D;
+  color: var(--brand);
   text-align: left !important;
 }
 
@@ -301,14 +301,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #7d99a9;
+  color: var(--text-muted);
   flex-shrink: 0;
   transition: transform 0.25s ease, color 0.2s ease;
 }
 
 .collapse-chevron.expanded {
   transform: rotate(180deg);
-  color: #17344D;
+  color: var(--brand);
 }
 
 /* Clickable row */
@@ -339,16 +339,16 @@
 }
 
 .expanded-order-id {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .expanded-order-detail {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
-  color: #8ea3b5;
+  color: var(--text-muted);
 }
 
 /* Products sub-table inside expanded row */
@@ -363,10 +363,10 @@
 
 .expanded-products-table th {
   padding: 6px 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 500;
-  color: #8ea3b5;
+  color: var(--text-muted);
   text-align: left;
   background: #edf6ff;
   border-bottom: 1px solid rgba(23, 52, 77, 0.06);
@@ -374,9 +374,9 @@
 
 .expanded-products-table td {
   padding: 6px 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
-  color: #17344D;
+  color: var(--brand);
   border-bottom: 1px solid rgba(23, 52, 77, 0.04);
   text-align: left;
 }
@@ -397,20 +397,20 @@
 }
 
 .party-base-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .party-base-item {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
-  color: #8ea3b5;
+  color: var(--text-muted);
 }
 
 .party-base-item strong {
-  color: #17344D;
+  color: var(--brand);
   font-weight: 500;
 }
 
@@ -448,15 +448,15 @@
 .receive-field-error {
   display: block;
   margin-top: 4px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   color: #c33;
 }
 
 .receive-modal-subtitle {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
-  color: #5b7a95;
+  color: var(--text-muted);
   margin-bottom: 16px;
 }
 
@@ -469,7 +469,7 @@
   color: #c33;
   border-radius: 6px;
   margin-bottom: 12px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
 }
 
@@ -494,7 +494,7 @@
   border: none;
   border-radius: 6px;
   padding: 4px 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;

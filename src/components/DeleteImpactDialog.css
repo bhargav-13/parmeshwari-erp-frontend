@@ -5,7 +5,7 @@
   width: min(560px, calc(100vw - 32px));
   max-height: calc(100vh - 48px);
   overflow-y: auto;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
 }
 
@@ -13,7 +13,7 @@
   margin: 0 0 12px;
   font-size: 20px;
   font-weight: 500;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .delete-impact-text {
@@ -32,7 +32,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #64748B;
+  color: var(--text-muted);
   margin-bottom: 6px;
 }
 
@@ -46,13 +46,13 @@
 .delete-impact-table td {
   text-align: left;
   padding: 6px 8px;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid var(--border);
 }
 
 .delete-impact-table th {
   font-weight: 500;
-  color: #64748B;
-  background: #F8FAFC;
+  color: var(--text-muted);
+  background: var(--surface-muted);
 }
 
 .delete-impact-table tr.insufficient td {
@@ -61,7 +61,7 @@
 }
 
 .delete-impact-sub {
-  color: #94A3B8;
+  color: var(--text-subtle);
 }
 
 .delete-impact-warning {
@@ -98,7 +98,7 @@
   height: 40px;
   padding: 0 20px;
   border-radius: 8px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -107,12 +107,12 @@
 .delete-impact-cancel {
   background: #FFFFFF;
   border: 1px solid #CBD5E1;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .delete-impact-confirm {
-  background: #DC2626;
-  border: 1px solid #DC2626;
+  background: var(--danger);
+  border: 1px solid var(--danger);
   color: #FFFFFF;
 }
 

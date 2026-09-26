@@ -238,7 +238,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractin
 
   if (loadingData) {
     return (
-      <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-overlay drawer-overlay" onClick={onClose}>
         <div className="modal-content crome-modal" onClick={(e) => e.stopPropagation()}>
           <h2 className="modal-title">Send to Crome</h2>
           <div className="loading-state">Loading...</div>
@@ -248,7 +248,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractin
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content crome-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">Send to Crome</h2>
 

@@ -21,7 +21,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
   const hasImages = images.length > 0;
 
   return (
-    <div className="product-detail-overlay" onClick={onClose}>
+    <div className="product-detail-overlay drawer-overlay" onClick={onClose}>
       <div className="product-detail-modal" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose} aria-label="Close">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">

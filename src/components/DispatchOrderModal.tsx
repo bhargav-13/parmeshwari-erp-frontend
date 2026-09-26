@@ -171,7 +171,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
   };
 
   return (
-    <div className="dispatch-modal-overlay" onClick={onClose}>
+    <div className="dispatch-modal-overlay drawer-overlay" onClick={onClose}>
       <div className="dispatch-modal" onClick={(e) => e.stopPropagation()}>
         <div className="dispatch-modal-header">
           <h2 className="dispatch-modal-title">{isRevoke ? 'Revoke Dispatch' : 'Dispatch Order'}</h2>

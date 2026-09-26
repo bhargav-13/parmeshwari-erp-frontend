@@ -38,20 +38,20 @@
 }
 
 .subcontract-view-title {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 20px;
   line-height: 28px;
-  color: #17344D;
+  color: var(--brand);
   margin: 0;
 }
 
 .subcontract-view-date-range {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #8E8E8E;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -59,21 +59,21 @@
   background: none;
   border: none;
   font-size: 20px;
-  color: #17344D;
+  color: var(--brand);
   cursor: pointer;
   padding: 4px 8px;
   line-height: 1;
 }
 
 .subcontract-view-close:hover {
-  color: #8E8E8E;
+  color: var(--text-muted);
 }
 
 .subcontract-view-date-filters {
   display: flex;
   gap: 16px;
   padding: 16px 24px;
-  background: #F8FAFC;
+  background: var(--surface-muted);
 }
 
 .date-filter-group {
@@ -83,25 +83,25 @@
 }
 
 .date-filter-group label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .date-filter-group input {
   padding: 8px 12px;
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid var(--border);
   border-radius: 6px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
-  color: #17344D;
+  color: var(--brand);
   background: #FFFFFF;
   outline: none;
 }
 
 .date-filter-group input:focus {
-  border-color: #17344D;
+  border-color: var(--brand);
 }
 
 .subcontract-view-content {
@@ -123,17 +123,17 @@
 }
 
 .subcontract-detail-table thead {
-  background: #F8FAFC;
+  background: var(--surface-muted);
   position: sticky;
   top: 0;
 }
 
 .subcontract-detail-table th {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 13px;
   line-height: 18px;
-  color: #17344D;
+  color: var(--brand);
   padding: 12px 10px;
   text-align: left;
   border-bottom: 1px solid rgba(125, 153, 169, 0.2);
@@ -141,18 +141,18 @@
 }
 
 .subcontract-detail-table td {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #17344D;
+  color: var(--brand);
   padding: 12px 10px;
   border-bottom: 1px solid rgba(125, 153, 169, 0.1);
   white-space: nowrap;
 }
 
 .subcontract-detail-table tbody tr:hover {
-  background: #F8FAFC;
+  background: var(--surface-muted);
 }
 
 .subcontract-detail-table tbody tr:last-child td {
@@ -186,17 +186,17 @@
 }
 
 .total-paid .total-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 15px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .total-paid .total-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 600;
   font-size: 15px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .totals-row {
@@ -206,17 +206,17 @@
 }
 
 .total-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
-  color: #8E8E8E;
+  color: var(--text-muted);
 }
 
 .total-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .total-value.highlight-red {
@@ -226,7 +226,7 @@
 .error-message {
   text-align: center;
   padding: 24px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   color: #E53935;
   background: #FFEBEE;
@@ -236,9 +236,9 @@
 .no-data {
   text-align: center;
   padding: 40px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
-  color: #8E8E8E;
+  color: var(--text-muted);
 }
 
 /* Mobile Responsive Styles */

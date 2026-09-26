@@ -39,9 +39,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1.5px solid #17344D;
+  border: 1.5px solid var(--brand);
   background: #fff;
-  color: #17344D;
+  color: var(--brand);
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -53,7 +53,7 @@
 }
 
 .add-packaging-btn:hover {
-  background: #17344D;
+  background: var(--brand);
   color: #fff;
 }
 
@@ -62,9 +62,9 @@
   height: 28px;
   min-width: 28px;
   border-radius: 50%;
-  border: 1.5px solid #dc2626;
+  border: 1.5px solid var(--danger);
   background: #fff;
-  color: #dc2626;
+  color: var(--danger);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -76,7 +76,7 @@
 }
 
 .remove-packaging-btn:hover {
-  background: #dc2626;
+  background: var(--danger);
   color: #fff;
 }
 
@@ -89,9 +89,9 @@
 }
 
 .return-calculated {
-  background-color: #f5f5f5;
+  background-color: var(--surface-muted);
   cursor: not-allowed;
-  color: #17344D;
+  color: var(--brand);
   font-weight: 500;
 }
 
@@ -99,12 +99,12 @@
   display: block;
   margin-top: 6px;
   font-size: 12px;
-  color: #8E8E8E;
-  font-family: 'Jost', sans-serif;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
 }
 
 .calculation-summary {
-  background: #f8fafc;
+  background: var(--surface-muted);
   border: 1px solid rgba(23, 52, 77, 0.15);
   border-radius: 12px;
   padding: 16px;
@@ -116,7 +116,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 0;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
 }
 
@@ -128,7 +128,7 @@
 
 .calc-formula {
   font-size: 11px;
-  color: #8E8E8E;
+  color: var(--text-muted);
   font-style: italic;
 }
 
@@ -137,12 +137,12 @@
 }
 
 .calc-value {
-  color: #17344D;
+  color: var(--brand);
   font-weight: 500;
 }
 
 .calc-value.deduction {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .calc-row.total-row {
@@ -214,12 +214,12 @@
 /* Validation error styles */
 .form-input.invalid,
 .form-textarea.invalid {
-    border-color: #dc2626;
+    border-color: var(--danger);
     background: #fef2f2;
 }
 
 .field-error-text {
     font-size: 12px;
-    color: #dc2626;
+    color: var(--danger);
     margin-top: 2px;
 }

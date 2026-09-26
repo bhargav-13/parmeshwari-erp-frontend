@@ -198,7 +198,7 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">
           {isEditMode ? 'Edit Subcontracting Order' : 'Add Subcontracting Order'}

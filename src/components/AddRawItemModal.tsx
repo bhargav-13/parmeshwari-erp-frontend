@@ -91,7 +91,7 @@ const AddRawItemModal: React.FC<AddRawItemModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content add-stock-modal add-raw-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">{isEditMode ? 'Edit Raw Item' : 'Add Raw Item'}</h2>
 

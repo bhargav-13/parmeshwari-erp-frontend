@@ -49,7 +49,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ onClose, onSuccess,
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">{initialData ? 'Edit Category' : 'Add New Category'}</h2>
 

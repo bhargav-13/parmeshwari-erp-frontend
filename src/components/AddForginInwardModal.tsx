@@ -72,7 +72,7 @@ const AddForginInwardModal: React.FC<AddForginInwardModalProps> = ({ onClose, on
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay drawer-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">Forging Order add</h2>
 

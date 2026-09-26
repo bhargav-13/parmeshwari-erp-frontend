@@ -20,17 +20,17 @@
 }
 
 .info-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 13px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .info-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .info-value.available-stock {
@@ -64,9 +64,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1.5px solid #17344D;
+  border: 1.5px solid var(--brand);
   background: #fff;
-  color: #17344D;
+  color: var(--brand);
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -78,7 +78,7 @@
 }
 
 .add-packaging-btn:hover {
-  background: #17344D;
+  background: var(--brand);
   color: #fff;
 }
 
@@ -87,9 +87,9 @@
   height: 28px;
   min-width: 28px;
   border-radius: 50%;
-  border: 1.5px solid #dc2626;
+  border: 1.5px solid var(--danger);
   background: #fff;
-  color: #dc2626;
+  color: var(--danger);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -101,7 +101,7 @@
 }
 
 .remove-packaging-btn:hover {
-  background: #dc2626;
+  background: var(--danger);
   color: #fff;
 }
 
@@ -142,24 +142,24 @@
 }
 
 .calc-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .calc-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .calc-formula {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 12px;
-  color: #888888;
+  color: var(--text-muted);
   font-style: italic;
 }
 
@@ -220,12 +220,12 @@
 /* Validation error styles */
 .form-input.invalid,
 .form-textarea.invalid {
-    border-color: #dc2626;
+    border-color: var(--danger);
     background: #fef2f2;
 }
 
 .field-error-text {
     font-size: 12px;
-    color: #dc2626;
+    color: var(--danger);
     margin-top: 2px;
 }

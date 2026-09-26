@@ -27,16 +27,16 @@
 }
 
 .order-modal-subtitle {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   color: #8e9fb1;
   margin: 0 0 4px;
 }
 
 .order-modal-title {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 24px;
-  color: #17344d;
+  color: var(--brand);
   margin: 0;
 }
 
@@ -47,7 +47,7 @@
   height: 36px;
   border-radius: 50%;
   font-size: 18px;
-  color: #17344d;
+  color: var(--brand);
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -69,16 +69,16 @@
   background: rgba(209, 238, 255, 0.3);
   border: none;
   border-radius: 16px 16px 0 0;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
-  color: #7d99a9;
+  color: var(--text-muted);
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .order-modal-tab.active {
-  background: #d1eeff;
-  color: #17344d;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-weight: 500;
 }
 
@@ -103,9 +103,9 @@
 }
 
 .order-form-group label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
-  color: #17344d;
+  color: var(--brand);
 }
 
 .order-form-group input,
@@ -115,9 +115,9 @@
   border-radius: 10px;
   padding: 10px 14px;
   background: #f5f7fa;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
-  color: #17344d;
+  color: var(--brand);
   outline: none;
   transition: border-color 0.2s ease;
 }
@@ -153,19 +153,19 @@
 
 .line-items-header h3,
 .amount-summary h3 {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 18px;
-  color: #17344d;
+  color: var(--brand);
   margin: 0;
 }
 
 .add-item-btn {
   border: none;
-  background: #d1eeff;
-  color: #17344d;
+  background: var(--brand-soft);
+  color: var(--brand);
   border-radius: 20px;
   padding: 8px 16px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -192,7 +192,7 @@
 .line-item-pill {
   padding: 6px 10px;
   background: #edf6ff;
-  color: #17344d;
+  color: var(--brand);
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
@@ -229,7 +229,7 @@
   flex: 1;
   border: none;
   background: #f5f7fa;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
   color: #5a738b;
   cursor: pointer;
@@ -238,7 +238,7 @@
 }
 
 .unit-toggle-btn.active {
-  background: #17344d;
+  background: var(--brand);
   color: #ffffff;
 }
 
@@ -247,7 +247,7 @@
 }
 
 .line-item-field label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   color: #5a738b;
 }
@@ -257,10 +257,10 @@
   border: 1px solid rgba(23, 52, 77, 0.13);
   border-radius: 10px;
   padding: 8px 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
-  color: #17344d;
-  background: #f8fafc;
+  color: var(--brand);
+  background: var(--surface-muted);
   outline: none;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
@@ -290,7 +290,7 @@
 
 .line-item-total label {
   font-size: 13px;
-  color: #17344d;
+  color: var(--brand);
 }
 
 .line-item-total input {
@@ -300,7 +300,7 @@
   padding: 8px 12px;
   background: #f0f4fa;
   font-size: 13px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .amount-summary {
@@ -325,7 +325,7 @@
   border-radius: 12px;
   background: rgba(255, 88, 88, 0.12);
   color: #c53030;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
 }
 
@@ -339,7 +339,7 @@
   min-width: 160px;
   border-radius: 24px;
   padding: 12px 22px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   border: none;
   cursor: pointer;
@@ -351,7 +351,7 @@
 }
 
 .order-btn[data-variant='primary'] {
-  background: #17344d;
+  background: var(--brand);
   color: #ffffff;
   box-shadow: 0 10px 20px rgba(23, 52, 77, 0.25);
 }
@@ -369,7 +369,7 @@
 
 .order-btn[data-variant='secondary'] {
   background: #ffffff;
-  color: #17344d;
+  color: var(--brand);
   border: 1px solid rgba(23, 52, 77, 0.2);
   box-shadow: 0 6px 14px rgba(23, 52, 77, 0.08);
 }

@@ -1,0 +1,681 @@
+/* =====================================================================
+   Shared component styles
+   Loaded after every page/component stylesheet. Selectors are prefixed
+   with `body` so they win over the single-class rules in those files,
+   while more specific per-screen rules still apply.
+   ===================================================================== */
+
+/* ---------- Base ---------- */
+body,
+body button,
+body input,
+body select,
+body textarea {
+  font-family: var(--font-sans);
+}
+
+body table,
+body .stat-value,
+body .summary-value,
+body .detail-value,
+body .calc-value {
+  font-variant-numeric: tabular-nums;
+}
+
+body :focus-visible {
+  outline: 2px solid var(--brand-ring);
+  outline-offset: 2px;
+}
+
+body button:disabled {
+  cursor: not-allowed;
+}
+
+/* ---------- App shell ---------- */
+body .layout {
+  background: var(--app-bg);
+}
+
+body .content {
+  background: var(--app-bg);
+}
+
+/* ---------- Page header ---------- */
+body .page-header {
+  margin-bottom: 20px;
+}
+
+body .page-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  line-height: 30px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+body .page-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* ---------- Buttons ---------- */
+body .action-button,
+body .save-button,
+body .cancel-button,
+body .add-confirm-btn,
+body .add-button,
+body .return-record-button,
+body .crome-button,
+body .primary-button,
+body .secondary-button {
+  min-height: var(--control-height);
+  border-radius: var(--radius);
+  font-size: var(--font-size);
+  font-weight: 500;
+  line-height: 20px;
+  transition: background-color var(--transition), border-color var(--transition),
+    box-shadow var(--transition), color var(--transition);
+  box-shadow: none;
+}
+
+/* Primary: solid brand */
+body .primary-button,
+body .action-button.primary-button,
+body .save-button,
+body .add-confirm-btn,
+body .add-button {
+  background: var(--brand);
+  color: var(--text-on-brand);
+  border: 1px solid var(--brand);
+  box-shadow: var(--shadow-xs);
+}
+
+body .primary-button:hover:not(:disabled),
+body .action-button.primary-button:hover:not(:disabled),
+body .save-button:hover:not(:disabled),
+body .add-confirm-btn:hover:not(:disabled),
+body .add-button:hover:not(:disabled) {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+  transform: none;
+}
+
+body .primary-button:active:not(:disabled),
+body .save-button:active:not(:disabled) {
+  background: var(--brand-active);
+}
+
+/* Text and icons inside solid buttons follow the button (many spans set their own navy colour) */
+body .primary-button *,
+body .save-button *,
+body .add-button *,
+body .add-confirm-btn * {
+  color: inherit;
+}
+
+body .primary-button img,
+body .save-button img,
+body .add-button img {
+  filter: brightness(0) invert(1);
+}
+
+/* Soft brand button (e.g. Return Record on cards) */
+body .return-record-button {
+  background: var(--brand-soft);
+  color: var(--brand);
+  border: 1px solid transparent;
+}
+
+body .return-record-button:hover:not(:disabled) {
+  background: var(--brand-soft-hover);
+  transform: none;
+}
+
+/* Secondary: outline */
+body .secondary-button,
+body .action-button.secondary-button,
+body .cancel-button,
+body .crome-button {
+  background: var(--surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+}
+
+body .secondary-button:hover:not(:disabled),
+body .action-button.secondary-button:hover:not(:disabled),
+body .cancel-button:hover:not(:disabled),
+body .crome-button:hover:not(:disabled) {
+  background: var(--surface-hover);
+  color: var(--text);
+  border-color: var(--border-strong);
+  transform: none;
+}
+
+body .save-button:disabled,
+body .cancel-button:disabled,
+body .action-button:disabled,
+body .primary-button:disabled {
+  opacity: 0.55;
+}
+
+/* Icon buttons (edit / delete in rows) */
+body .icon-button {
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition);
+}
+
+body .icon-button:hover:not(:disabled) {
+  background: var(--surface-hover);
+  transform: none;
+}
+
+body .icon-button.delete-button:hover:not(:disabled) {
+  background: var(--danger-soft);
+}
+
+/* ---------- Forms ---------- */
+body .form-label,
+body .order-form-group label,
+body .scrap-form-label,
+body .line-item-field label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+body .form-input,
+body .form-select,
+body .form-textarea,
+body .scrap-form-input,
+body .order-form-group input,
+body .order-form-group select,
+body .order-form-group textarea,
+body .line-item-field input,
+body .line-item-field select {
+  min-height: var(--control-height);
+  padding: 8px 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font-size: var(--font-size);
+  color: var(--text);
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+body .form-textarea,
+body .order-form-group textarea {
+  min-height: 72px;
+}
+
+body .form-input:hover:not(:disabled):not(:focus),
+body .form-select:hover:not(:disabled):not(:focus),
+body .scrap-form-input:hover:not(:disabled):not(:focus),
+body .order-form-group input:hover:not(:disabled):not(:focus),
+body .order-form-group select:hover:not(:disabled):not(:focus) {
+  border-color: var(--text-subtle);
+}
+
+body .form-input:focus,
+body .form-select:focus,
+body .form-textarea:focus,
+body .scrap-form-input:focus,
+body .order-form-group input:focus,
+body .order-form-group select:focus,
+body .order-form-group textarea:focus,
+body .line-item-field input:focus,
+body .line-item-field select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-ring);
+}
+
+body .form-input:disabled,
+body .form-input[readonly],
+body .form-select:disabled,
+body .order-form-group input:disabled,
+body .order-form-group select:disabled {
+  background-color: var(--surface-muted);
+  color: var(--text-muted);
+  box-shadow: none;
+}
+
+body .form-input.invalid,
+body .form-input.error,
+body .form-select.invalid {
+  border-color: var(--danger);
+}
+
+body .form-input.invalid:focus,
+body .form-select.invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+body .form-input::placeholder,
+body .form-textarea::placeholder,
+body .scrap-form-input::placeholder {
+  color: var(--text-subtle);
+}
+
+body .field-error-text {
+  font-size: var(--font-size-xs);
+  color: var(--danger);
+}
+
+/* Search boxes */
+body .order-search,
+body .subcontract-search,
+body .search-box,
+body .search-input-wrapper {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+body .order-search:focus-within,
+body .subcontract-search:focus-within,
+body .search-box:focus-within,
+body .search-input-wrapper:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-ring);
+}
+
+body .order-search input,
+body .subcontract-search input {
+  font-size: var(--font-size);
+  color: var(--text);
+  background: transparent;
+}
+
+/* Messages */
+body .error-message {
+  background: var(--danger-soft);
+  color: var(--danger-hover);
+  border: 1px solid #F8C9C9;
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+}
+
+body .warning-message {
+  background: var(--warning-soft);
+  color: var(--warning);
+  border-radius: var(--radius);
+}
+
+/* ---------- Modals ---------- */
+body .modal-overlay {
+  background: rgba(15, 27, 42, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: erp-fade-in 150ms ease-out;
+}
+
+body .modal-content {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  animation: erp-pop-in 180ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+body .modal-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: 26px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-align: left;
+}
+
+body .modal-actions {
+  gap: 10px;
+}
+
+body .modal-form {
+  gap: 16px;
+}
+
+body .form-group {
+  gap: 6px;
+}
+
+body .form-row {
+  gap: 16px;
+}
+
+@keyframes erp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes erp-pop-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- Cards / stats ---------- */
+body .stat-card,
+body .casting-stat-card,
+body .summary-card,
+body .dashboard-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+body .stat-label,
+body .stat-title,
+body .summary-label {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+body .stat-value,
+body .summary-value {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+/* Record cards (job work / crome) */
+body .subcontracting-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow var(--transition);
+}
+
+body .subcontracting-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+body .subcontracting-card .card-body {
+  border-color: var(--border);
+}
+
+/* ---------- Tables ---------- */
+body .inventory-table-container,
+body .order-table-container,
+body .casting-table-container,
+body .payment-table-container,
+body .recent-orders-table-container,
+body .rejection-table-container,
+body .scrap-table-container,
+body .subcontract-table-container,
+body .data-table-card,
+body .cashflow-table-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  overflow: auto;
+}
+
+body .inventory-table,
+body .order-table,
+body .casting-table,
+body .scrap-table,
+body .cashflow-table,
+body .payment-table,
+body .rejection-table,
+body .subcontract-table,
+body .subcontracting-overview-table,
+body .recent-orders-table,
+body .data-table,
+body .wh-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+body .inventory-table th,
+body .order-table th,
+body .casting-table th,
+body .scrap-table th,
+body .cashflow-table th,
+body .payment-table th,
+body .rejection-table th,
+body .subcontract-table th,
+body .subcontract-detail-table th,
+body .subcontracting-overview-table th,
+body .recent-orders-table th,
+body .data-table th,
+body .wh-table th,
+body .order-details-table th,
+body .ledger-products-table th,
+body .expanded-products-table th {
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+body .inventory-table td,
+body .order-table td,
+body .casting-table td,
+body .scrap-table td,
+body .cashflow-table td,
+body .payment-table td,
+body .rejection-table td,
+body .subcontract-table td,
+body .subcontract-detail-table td,
+body .subcontracting-overview-table td,
+body .recent-orders-table td,
+body .data-table td,
+body .wh-table td,
+body .order-details-table td,
+body .ledger-products-table td,
+body .expanded-products-table td {
+  font-size: var(--font-size);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+body .inventory-table tbody tr:last-child td,
+body .order-table tbody tr:last-child td,
+body .rejection-table tbody tr:last-child td,
+body .subcontract-table tbody tr:last-child td,
+body .data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+body .inventory-table tbody tr,
+body .order-table tbody tr,
+body .casting-table tbody tr,
+body .scrap-table tbody tr,
+body .cashflow-table tbody tr,
+body .payment-table tbody tr,
+body .rejection-table tbody tr,
+body .subcontract-table tbody tr,
+body .recent-orders-table tbody tr,
+body .data-table tbody tr {
+  transition: background-color var(--transition);
+}
+
+body .inventory-table tbody tr:hover td,
+body .order-table tbody tr:hover td,
+body .casting-table tbody tr:hover td,
+body .scrap-table tbody tr:hover td,
+body .cashflow-table tbody tr:hover td,
+body .payment-table tbody tr:hover td,
+body .rejection-table tbody tr:hover td,
+body .subcontract-table tbody tr:hover td,
+body .recent-orders-table tbody tr:hover td,
+body .data-table tbody tr:hover td {
+  background: var(--surface-hover);
+}
+
+body .no-data {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* ---------- Status badges ---------- */
+body .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 20px;
+}
+
+body .status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+body .status-badge.in-stock {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+body .status-badge.low-stock {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* ---------- Filter chips ---------- */
+body .filter-chip {
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+}
+
+body .filter-chip:hover {
+  background: var(--surface-hover);
+}
+
+body .filter-chip.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--text-on-brand);
+}
+
+/* ---------- Pagination ---------- */
+body .pagination button,
+body .pagination-button {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  transition: background-color var(--transition);
+}
+
+body .pagination button:hover:not(:disabled),
+body .pagination-button:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+
+body .pagination button.active,
+body .pagination-button.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--text-on-brand);
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 768px) {
+  body .page-title {
+    font-size: 19px;
+    line-height: 26px;
+  }
+}
+
+/* =====================================================================
+   Right-side drawer
+   Add/edit forms and detail views open as a panel sliding in from the
+   right (overlay gets `drawer-overlay`). Confirmations and wide report
+   tables stay as centred dialogs.
+   Doubled class raises specificity above per-modal overlay rules.
+   ===================================================================== */
+body .drawer-overlay.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  align-items: stretch;
+  padding: 0;
+  background: rgba(15, 27, 42, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: erp-fade-in 160ms ease-out;
+}
+
+body .drawer-overlay.drawer-overlay > * {
+  --drawer-width: 560px;
+  position: relative;
+  width: 100%;
+  max-width: min(var(--drawer-width), 100vw);
+  height: 100vh;
+  max-height: 100vh;
+  margin: 0;
+  overflow-y: auto;
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  border: none;
+  border-left: 1px solid var(--border);
+  box-shadow: -12px 0 40px rgba(15, 27, 42, 0.16);
+  background: var(--surface);
+  animation: erp-drawer-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Wider panels for forms with more columns / line items */
+body .drawer-overlay.drawer-overlay > .add-stock-modal,
+body .drawer-overlay.drawer-overlay > .medium-modal,
+body .drawer-overlay.drawer-overlay > .crome-modal,
+body .drawer-overlay.drawer-overlay > .crome-return-modal,
+body .drawer-overlay.drawer-overlay > .return-modal,
+body .drawer-overlay.drawer-overlay > .payment-received-modal,
+body .drawer-overlay.drawer-overlay > .dispatch-modal,
+body .drawer-overlay.drawer-overlay > .order-details-modal,
+body .drawer-overlay.drawer-overlay > .product-detail-modal,
+body .drawer-overlay.drawer-overlay > .modal-content:not(.small-modal) {
+  --drawer-width: 820px;
+}
+
+body .drawer-overlay.drawer-overlay > .order-modal {
+  --drawer-width: 960px;
+}
+
+/* Keep the action buttons in reach while scrolling long forms */
+body .drawer-overlay.drawer-overlay .modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin-top: 8px;
+  padding: 12px 0 4px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+@keyframes erp-drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  body .drawer-overlay.drawer-overlay > * {
+    border-radius: 0;
+  }
+}

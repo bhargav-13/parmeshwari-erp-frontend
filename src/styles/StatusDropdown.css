@@ -12,7 +12,7 @@
   padding: 8px 28px 8px 16px;
   border-radius: 8px;
   border: 1px solid transparent;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 13px;
   line-height: 18px;
@@ -117,7 +117,7 @@
 .status-select-modern.status-revoked {
   background-color: #fef2f2;
   border-color: #fca5a5;
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .status-select-modern.status-revoked:hover:not(:disabled) {

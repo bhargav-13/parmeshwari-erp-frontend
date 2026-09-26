@@ -17,16 +17,16 @@
 }
 
 .payment-modal-header .modal-title {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 24px;
   font-weight: 600;
-  color: #17344d;
+  color: var(--brand);
   margin: 0;
 }
 
 .payment-modal-header .modal-subtitle {
   font-size: 14px;
-  color: #8ea3b5;
+  color: var(--text-muted);
   margin: 4px 0 0;
 }
 
@@ -55,10 +55,10 @@
 }
 
 .summary-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 600;
-  color: #17344d;
+  color: var(--brand);
 }
 
 .summary-divider {
@@ -72,7 +72,7 @@
 }
 
 .summary-item.total .summary-label {
-  color: #17344d;
+  color: var(--brand);
   font-size: 14px;
   font-weight: 600;
 }
@@ -105,7 +105,7 @@
 .currency-prefix {
   position: absolute;
   left: 12px;
-  color: #8ea3b5;
+  color: var(--text-muted);
   font-weight: 500;
   font-size: 14px;
 }
@@ -117,12 +117,12 @@
 .last-recorded {
   margin-top: 16px;
   font-size: 12px;
-  color: #8ea3b5;
+  color: var(--text-muted);
   text-align: right;
 }
 
 .last-recorded strong {
-  color: #17344d;
+  color: var(--brand);
   font-weight: 500;
 }
 
@@ -148,12 +148,12 @@
 
 .cancel-button:hover {
   background: #e1e8f0;
-  color: #17344d;
+  color: var(--brand);
 }
 
 .payment-received-modal .save-button {
   min-width: 140px;
-  background: #17344d;
+  background: var(--brand);
   color: white;
   border: none;
   border-radius: 8px;

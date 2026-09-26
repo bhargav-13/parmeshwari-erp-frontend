@@ -350,7 +350,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
   const formattedProductsTotal = useMemo(() => formatCurrency(formData.productsTotal), [formData.productsTotal]);
 
   return (
-    <div className="order-modal-overlay" onClick={onClose}>
+    <div className="order-modal-overlay drawer-overlay" onClick={onClose}>
       <div className="order-modal" onClick={(e) => e.stopPropagation()}>
         <div className="order-modal-header">
           <div>

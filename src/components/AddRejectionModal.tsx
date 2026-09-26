@@ -116,7 +116,7 @@ const AddRejectionModal: React.FC<AddRejectionModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="rejection-modal-content" onClick={e => e.stopPropagation()}>
         <h2 className="rejection-modal-title">
           {initialData ? 'Edit Rejection Entry' : 'Add Rejection Entry'}

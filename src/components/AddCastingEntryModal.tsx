@@ -54,7 +54,7 @@ const AddCastingEntryModal: React.FC<AddCastingEntryModalProps> = ({ onClose, on
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay drawer-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">{initialData ? 'Edit Casting Entry' : 'Add Casting Entry'}</h2>
 

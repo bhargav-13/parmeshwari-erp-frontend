@@ -18,27 +18,27 @@
 }
 
 .invoice-page .page-title {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 22px;
   line-height: 28px;
-  color: #17344D;
+  color: var(--brand);
   margin: 0;
 }
 
 .invoice-page .page-subtitle {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #8E8E8E;
+  color: var(--text-muted);
   margin: 0;
 }
 
 .invoice-page .mode-toggle {
   display: flex;
   gap: 0;
-  border: 1px solid #17344D;
+  border: 1px solid var(--brand);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -48,24 +48,24 @@
   background: #FFFFFF;
   border: none;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: var(--brand);
   transition: all 0.3s ease;
 }
 
 .invoice-page .mode-btn:first-child {
-  border-right: 1px solid #17344D;
+  border-right: 1px solid var(--brand);
 }
 
 .invoice-page .mode-btn:hover:not(.active) {
-  background: #F5F5F5;
+  background: var(--surface-muted);
 }
 
 .invoice-page .mode-btn.active {
-  background: #17344D;
+  background: var(--brand);
   color: #FFFFFF;
 }
 
@@ -77,7 +77,7 @@
 
 .invoice-page .stat-card {
   flex: 1;
-  border: 1px solid #17344D;
+  border: 1px solid var(--brand);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -92,19 +92,19 @@
 }
 
 .invoice-page .stat-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #8E8E8E;
+  color: var(--text-muted);
 }
 
 .invoice-page .stat-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 24px;
   line-height: 32px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .invoices-list {
@@ -123,9 +123,9 @@
 .invoice-page .no-data {
   text-align: center;
   padding: 32px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
-  color: #8E8E8E;
+  color: var(--text-muted);
 }
 
 /* Mobile Responsive Styles */

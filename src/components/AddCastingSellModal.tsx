@@ -73,7 +73,7 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay drawer-overlay" onClick={onClose}>
             <div className="modal-content medium-modal" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">{initialData ? 'Edit Casting Sale' : 'Casting Sell Add'}</h2>
 

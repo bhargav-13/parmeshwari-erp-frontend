@@ -64,7 +64,7 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">{initialData ? 'Edit Party' : 'Add New Party'}</h2>
 

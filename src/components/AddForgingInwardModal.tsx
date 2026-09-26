@@ -256,7 +256,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
             : undefined;
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay drawer-overlay" onClick={onClose}>
             <div className="modal-content small-modal" style={{ maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">{initialData ? 'Edit Forging Inward Entry' : 'Add Forging Inward Entry'}</h2>
 
@@ -397,7 +397,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                 >
                                     <polyline points="9 18 15 12 9 6" />
                                 </svg>
-                                <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', fontWeight: 600, color: '#17344D' }}>
+                                <span style={{ fontFamily: "var(--font-sans)", fontSize: '14px', fontWeight: 600, color: '#17344D' }}>
                                     Inward Item {item ? `— ${item.name}` : ''}
                                 </span>
                             </div>
@@ -431,7 +431,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                     <div style={{
                                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                         padding: '8px', borderBottom: '1px solid #eef2f6',
-                                        fontFamily: "'Jost', sans-serif", fontSize: '13px', color: '#17344D',
+                                        fontFamily: "var(--font-sans)", fontSize: '13px', color: '#17344D',
                                     }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                             <span style={{ fontWeight: 600 }}>{item.name}</span>
@@ -445,7 +445,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                         </div>
                                         <div style={{ display: 'flex', gap: '4px' }}>
                                             <button type="button" onClick={() => setShowAddItemRow(true)}
-                                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#5b9bd5', fontSize: '12px', padding: '2px 8px', borderRadius: '4px', fontFamily: "'Jost', sans-serif" }}>
+                                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#5b9bd5', fontSize: '12px', padding: '2px 8px', borderRadius: '4px', fontFamily: "var(--font-sans)" }}>
                                                 Edit
                                             </button>
                                             <button type="button" onClick={handleDeleteItem}
@@ -457,7 +457,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                 )}
 
                                 {!item && !showAddItemRow && (
-                                    <div style={{ textAlign: 'center', padding: '12px', color: '#8E8E8E', fontSize: '13px', fontFamily: "'Jost', sans-serif" }}>
+                                    <div style={{ textAlign: 'center', padding: '12px', color: '#8E8E8E', fontSize: '13px', fontFamily: "var(--font-sans)" }}>
                                         No item added yet. Click + to add.
                                     </div>
                                 )}
@@ -468,7 +468,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
 
                                         {/* Item Name — dropdown + option to type new */}
                                         <div style={{ marginBottom: '10px' }}>
-                                            <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "'Jost', sans-serif", fontWeight: 500, marginBottom: '4px', display: 'block' }}>
+                                            <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "var(--font-sans)", fontWeight: 500, marginBottom: '4px', display: 'block' }}>
                                                 Item Name*
                                             </label>
                                             {itemNameMode === 'select' ? (
@@ -495,7 +495,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                             whiteSpace: 'nowrap', fontSize: '12px', padding: '0 12px',
                                                             border: '1.5px solid #5b9bd5', borderRadius: '6px',
                                                             background: '#fff', color: '#5b9bd5', cursor: 'pointer',
-                                                            fontFamily: "'Jost', sans-serif",
+                                                            fontFamily: "var(--font-sans)",
                                                         }}
                                                     >
                                                         + New
@@ -520,7 +520,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                                 whiteSpace: 'nowrap', fontSize: '12px', padding: '0 12px',
                                                                 border: '1.5px solid #d0dde8', borderRadius: '6px',
                                                                 background: '#fff', color: '#666', cursor: 'pointer',
-                                                                fontFamily: "'Jost', sans-serif",
+                                                                fontFamily: "var(--font-sans)",
                                                             }}
                                                         >
                                                             ← Pick
@@ -536,7 +536,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                 marginBottom: '10px', padding: '8px 12px',
                                                 background: '#fffbeb', border: '1px solid #f5d87a',
                                                 borderRadius: '6px', fontSize: '12px',
-                                                fontFamily: "'Jost', sans-serif", color: '#7a5c00',
+                                                fontFamily: "var(--font-sans)", color: '#7a5c00',
                                                 display: 'flex', alignItems: 'flex-start', gap: '8px',
                                             }}>
                                                 <span style={{ fontSize: '14px' }}>⚠</span>
@@ -562,7 +562,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                         {/* Row 2: Price Per KG, Low Stock Alert */}
                                         <div style={{ display: 'flex', gap: '12px', marginBottom: '10px' }}>
                                             <div style={{ flex: 1 }}>
-                                                <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "'Jost', sans-serif", fontWeight: 500, marginBottom: '4px', display: 'block' }}>Price Per KG</label>
+                                                <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "var(--font-sans)", fontWeight: 500, marginBottom: '4px', display: 'block' }}>Price Per KG</label>
                                                 <input
                                                     type="number"
                                                     value={newItemPricePerKg}
@@ -575,7 +575,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                 />
                                             </div>
                                             <div style={{ flex: 1 }}>
-                                                <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "'Jost', sans-serif", fontWeight: 500, marginBottom: '4px', display: 'block' }}>Low Stock Alert (KG)</label>
+                                                <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "var(--font-sans)", fontWeight: 500, marginBottom: '4px', display: 'block' }}>Low Stock Alert (KG)</label>
                                                 <input
                                                     type="number"
                                                     value={newItemLowStockAlert}
@@ -592,7 +592,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                         {/* Row 3: Weight Per Piece, Quantity in Pieces */}
                                         <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
                                             <div style={{ flex: 1 }}>
-                                                <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "'Jost', sans-serif", fontWeight: 500, marginBottom: '4px', display: 'block' }}>Weight Per Piece (KG)</label>
+                                                <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "var(--font-sans)", fontWeight: 500, marginBottom: '4px', display: 'block' }}>Weight Per Piece (KG)</label>
                                                 <input
                                                     type="number"
                                                     value={newItemWeightPerPc}
@@ -605,7 +605,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                 />
                                             </div>
                                             <div style={{ flex: 1 }}>
-                                                <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "'Jost', sans-serif", fontWeight: 500, marginBottom: '4px', display: 'block' }}>
+                                                <label style={{ fontSize: '12px', color: '#5b7a95', fontFamily: "var(--font-sans)", fontWeight: 500, marginBottom: '4px', display: 'block' }}>
                                                     Quantity (Pieces)
                                                 </label>
                                                 {newItemWeightPerPc !== '' ? (
@@ -613,7 +613,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                         padding: '8px 10px', background: '#f0f7ff',
                                                         border: '1px solid #c8dff5', borderRadius: '6px',
                                                         fontSize: '15px', fontWeight: 600, color: '#17344D',
-                                                        fontFamily: "'Jost', sans-serif", minHeight: '38px',
+                                                        fontFamily: "var(--font-sans)", minHeight: '38px',
                                                         display: 'flex', alignItems: 'center', gap: '6px',
                                                     }}>
                                                         {weight !== '' && Number(newItemWeightPerPc) > 0
@@ -658,7 +658,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                 style={{
                                                     border: '1px solid #d0dde8', background: '#fff', cursor: 'pointer',
                                                     color: '#666', fontSize: '13px', padding: '6px 14px',
-                                                    borderRadius: '6px', fontFamily: "'Jost', sans-serif",
+                                                    borderRadius: '6px', fontFamily: "var(--font-sans)",
                                                 }}
                                             >
                                                 Cancel

@@ -367,7 +367,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay drawer-overlay" onClick={onClose}>
             <div className="modal-content crome-return-modal" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">Record Crome Return</h2>
 

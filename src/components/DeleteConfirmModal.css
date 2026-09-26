@@ -19,14 +19,14 @@
 }
 
 .confirm-title {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 20px;
-  color: #17344d;
+  color: var(--brand);
   margin: 0 0 12px;
 }
 
 .confirm-message {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   color: #526375;
   margin: 0 0 24px;
@@ -42,7 +42,7 @@
   flex: 1;
   border-radius: 24px;
   padding: 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   border: none;
   cursor: pointer;
@@ -51,7 +51,7 @@
 
 .confirm-cancel {
   background: #f1f5f9;
-  color: #17344d;
+  color: var(--brand);
 }
 
 .confirm-cancel:hover {

@@ -158,7 +158,7 @@ const ElectricPage: React.FC = () => {
                         onClick={() => handleTabChange(tab)}
                         style={{
                             flex: 1, padding: '14px 0', border: 'none', outline: 'none',
-                            cursor: 'pointer', fontFamily: "'Jost', sans-serif",
+                            cursor: 'pointer', fontFamily: "var(--font-sans)",
                             fontSize: '16px',
                             fontWeight: activeTab === tab ? 600 : 500,
                             color: activeTab === tab ? '#fff' : '#17344D',
@@ -194,7 +194,7 @@ const ElectricPage: React.FC = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         style={{
                             border: 'none', background: 'transparent', outline: 'none',
-                            fontFamily: "'Jost', sans-serif", fontSize: '14px',
+                            fontFamily: "var(--font-sans)", fontSize: '14px',
                             color: '#17344d', flex: 1, width: '100%',
                         }}
                     />

@@ -15,10 +15,24 @@ import ProfileSVG from '../assets/icon/profile.svg'
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Desktop: icon-only rail */
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleCollapsed }) => {
   const location = useLocation();
+
+  // In the icon rail a section can't show its sub-pages, so clicking it expands the sidebar
+  // and opens that section; otherwise it just toggles open/closed.
+  const toggleSection = (isOpenNow: boolean, setOpen: (open: boolean) => void) => {
+    if (collapsed) {
+      onToggleCollapsed();
+      setOpen(true);
+    } else {
+      setOpen(!isOpenNow);
+    }
+  };
   const [inventoryExpanded, setInventoryExpanded] = useState(
     location.pathname.startsWith('/inventory')
   );
@@ -99,11 +113,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <div className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
+    <div className={`sidebar ${isOpen ? 'mobile-open' : ''} ${collapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
         <div className="logo">
           <img src={Logo} alt="Parmeshwari Brass Industries" className="logo-img" />
         </div>
+        <button
+          type="button"
+          className="sidebar-collapse-btn"
+          onClick={onToggleCollapsed}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={collapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)'}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path
+              d={collapsed ? 'M6 3l5 5-5 5' : 'M10 3L5 8l5 5'}
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
         <button
           type="button"
           className="mobile-close-btn"
@@ -123,6 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             to={item.path}
             className={`sidebar-item ${location.pathname.startsWith(item.path) ? 'active' : ''}`}
             onClick={onClose}
+            title={collapsed ? item.label : undefined}
           >
             <span className="sidebar-icon">{item.icon}</span>
             <span className="sidebar-label">{item.label}</span>
@@ -133,7 +165,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isInventoryActive ? 'active' : ''}`}
-            onClick={() => setInventoryExpanded(!inventoryExpanded)}
+            onClick={() => toggleSection(inventoryExpanded, setInventoryExpanded)}
+            title={collapsed ? 'Inventory' : undefined}
           >
             <span className="sidebar-icon"><img src={InventorySVG} alt='Inventory' /></span>
             <span className="sidebar-label">Inventory</span>
@@ -154,7 +187,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isItemMasterActive ? 'active' : ''}`}
-            onClick={() => setItemMasterExpanded(!itemMasterExpanded)}
+            onClick={() => toggleSection(itemMasterExpanded, setItemMasterExpanded)}
+            title={collapsed ? 'Item Master' : undefined}
           >
             <span className="sidebar-icon"><img src={InventorySVG} alt='Item Master' /></span>
             <span className="sidebar-label">Item Master</span>
@@ -175,7 +209,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isOrdersActive ? 'active' : ''}`}
-            onClick={() => setOrdersExpanded(!ordersExpanded)}
+            onClick={() => toggleSection(ordersExpanded, setOrdersExpanded)}
+            title={collapsed ? 'Order Management' : undefined}
           >
             <span className="sidebar-icon"><img src={OrderIcon} alt='Order Management' /></span>
             <span className="sidebar-label">Order Management</span>
@@ -196,7 +231,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isSubcontractingActive ? 'active' : ''}`}
-            onClick={() => setSubcontractingExpanded(!subcontractingExpanded)}
+            onClick={() => toggleSection(subcontractingExpanded, setSubcontractingExpanded)}
+            title={collapsed ? 'Subcontracting' : undefined}
           >
             <span className="sidebar-icon"><img src={SubcontractIcon} alt='Subcontracting' /></span>
             <span className="sidebar-label">Subcontracting</span>
@@ -217,7 +253,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isInvoicesActive ? 'active' : ''}`}
-            onClick={() => setInvoicesExpanded(!invoicesExpanded)}
+            onClick={() => toggleSection(invoicesExpanded, setInvoicesExpanded)}
+            title={collapsed ? 'Invoices' : undefined}
           >
             <span className="sidebar-icon"><img src={InvoiceIcon} alt='Invoices' /></span>
             <span className="sidebar-label">Invoices</span>
@@ -238,7 +275,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isPaymentReminderActive ? 'active' : ''}`}
-            onClick={() => setPaymentReminderExpanded(!paymentReminderExpanded)}
+            onClick={() => toggleSection(paymentReminderExpanded, setPaymentReminderExpanded)}
+            title={collapsed ? 'Payment Reminder' : undefined}
           >
             <span className="sidebar-icon"><img src={ReminderIcon} alt='Payment Reminder' /></span>
             <span className="sidebar-label">Payment Reminder</span>
@@ -259,7 +297,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="sidebar-section">
           <div
             className={`sidebar-item ${isScrapActive ? 'active' : ''}`}
-            onClick={() => setScrapExpanded(!scrapExpanded)}
+            onClick={() => toggleSection(scrapExpanded, setScrapExpanded)}
+            title={collapsed ? 'Scrap' : undefined}
           >
             <span className="sidebar-icon"><img src={SettingIcon} alt='Scrap' /></span>
             <span className="sidebar-label">Scrap</span>
@@ -281,6 +320,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           to="/settings"
           className={`sidebar-item ${location.pathname === '/settings' ? 'active' : ''}`}
           onClick={onClose}
+          title={collapsed ? 'Setting' : undefined}
         >
           <span className="sidebar-icon"><img src={SettingIcon} alt='Setting' /></span>
           <span className="sidebar-label">Setting</span>
@@ -288,7 +328,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       </nav>
 
       <div className="sidebar-footer">
-        <div className="user-profile">
+        <div className="user-profile" title={collapsed ? 'Admin' : undefined}>
           <div className="user-avatar">
             <span className="avatar-icon"><img src={ProfileSVG} alt="profile" /></span>
           </div>

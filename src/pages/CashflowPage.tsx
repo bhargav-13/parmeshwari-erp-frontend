@@ -364,7 +364,7 @@ const CashflowPage: React.FC = () => {
             </div>
 
             {error && (
-                <div style={{ padding: '10px 14px', backgroundColor: '#fee', color: '#c33', borderRadius: '6px', marginBottom: '16px', fontFamily: "'Jost', sans-serif", fontSize: '13px' }}>
+                <div style={{ padding: '10px 14px', backgroundColor: '#fee', color: '#c33', borderRadius: '6px', marginBottom: '16px', fontFamily: "var(--font-sans)", fontSize: '13px' }}>
                     {error}
                     <button type="button" onClick={() => setError(null)} style={{ float: 'right', border: 'none', background: 'none', cursor: 'pointer', color: '#c33', fontWeight: 700 }}>&times;</button>
                 </div>

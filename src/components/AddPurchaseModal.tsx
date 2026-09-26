@@ -249,7 +249,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content add-stock-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">{isEditMode ? 'Edit Purchase' : 'Add Purchase'}</h2>
 

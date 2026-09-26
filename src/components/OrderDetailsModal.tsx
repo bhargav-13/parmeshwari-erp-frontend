@@ -24,7 +24,7 @@ const currency = (value?: number | null) => {
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose }) => {
   const note = order.note?.trim();
   return (
-    <div className="order-details-overlay" onClick={onClose}>
+    <div className="order-details-overlay drawer-overlay" onClick={onClose}>
       <div className="order-details-modal" onClick={(e) => e.stopPropagation()}>
         <div className="order-details-header">
           <div>

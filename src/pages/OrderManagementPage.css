@@ -1,7 +1,7 @@
 .order-page {
   padding: 24px 28px;
-  font-family: 'Jost', sans-serif;
-  color: #17344d;
+  font-family: var(--font-sans);
+  color: var(--brand);
 }
 
 .order-page-header {
@@ -22,12 +22,12 @@
   margin: 0;
   font-size: 26px;
   font-weight: 500;
-  color: #17344d;
+  color: var(--brand);
 }
 
 .order-page-header p {
   margin: 4px 0 0;
-  color: #7d99a9;
+  color: var(--text-muted);
   font-size: 15px;
 }
 
@@ -36,16 +36,16 @@
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
-  background: #d1eeff;
+  background: var(--brand-soft);
   border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .order-add-button:hover {
-  background: #b8dfff;
+  background: var(--brand-soft-hover);
   transform: translateY(-1px);
 }
 
@@ -53,14 +53,14 @@
   font-size: 20px;
   font-weight: 300;
   line-height: 1;
-  color: #17344d;
+  color: inherit;
 }
 
 .order-add-button .add-text {
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #17344d;
+  color: inherit;
 }
 
 .order-stats {
@@ -79,7 +79,7 @@
 
 .stat-card p {
   margin: 0;
-  color: #8ea3b5;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
@@ -87,7 +87,7 @@
   margin: 8px 0 0;
   font-size: 26px;
   font-weight: 500;
-  color: #17344d;
+  color: var(--brand);
 }
 
 .order-filters {
@@ -127,7 +127,7 @@
   outline: none;
   font-family: inherit;
   font-size: 14px;
-  color: #17344d;
+  color: var(--brand);
   flex: 1;
 }
 
@@ -162,7 +162,7 @@
 .order-loading {
   padding: 40px;
   text-align: center;
-  color: #8ea3b5;
+  color: var(--text-muted);
   font-size: 15px;
 }
 
@@ -191,7 +191,7 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   border: none;
   cursor: pointer;
   outline: none;
@@ -256,7 +256,7 @@
   justify-content: center;
   background: rgba(255, 255, 255, 0.7);
   font-size: 16px;
-  color: #17344d;
+  color: var(--brand);
   z-index: 1000;
 }
 
@@ -267,16 +267,16 @@
   justify-content: center;
   padding: 6px 24px;
   gap: 15px;
-  border: 1px solid #17344d;
+  border: 1px solid var(--brand);
   border-radius: 39px;
   background: transparent;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #17344d;
+  color: var(--brand);
   transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
@@ -297,16 +297,16 @@
   justify-content: center;
   padding: 6px 24px;
   gap: 15px;
-  border: 1px solid #dc2626;
+  border: 1px solid var(--danger);
   border-radius: 39px;
   background: transparent;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #dc2626;
+  color: var(--danger);
   transition: background-color 0.2s ease, transform 0.15s ease;
 }
 

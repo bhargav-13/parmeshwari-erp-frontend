@@ -14,9 +14,9 @@
 }
 
 .modal-title {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 24px;
-    color: #17344d;
+    color: var(--brand);
     margin: 0 0 24px 0;
     text-align: left;
 }
@@ -98,9 +98,9 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 1.5px solid #17344D;
+    border: 1.5px solid var(--brand);
     background: #fff;
-    color: #17344D;
+    color: var(--brand);
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
@@ -112,7 +112,7 @@
 }
 
 .add-packaging-btn:hover {
-    background: #17344D;
+    background: var(--brand);
     color: #fff;
 }
 
@@ -121,9 +121,9 @@
     height: 28px;
     min-width: 28px;
     border-radius: 50%;
-    border: 1.5px solid #dc2626;
+    border: 1.5px solid var(--danger);
     background: #fff;
-    color: #dc2626;
+    color: var(--danger);
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
@@ -135,7 +135,7 @@
 }
 
 .remove-packaging-btn:hover {
-    background: #dc2626;
+    background: var(--danger);
     color: #fff;
 }
 
@@ -160,10 +160,10 @@
 }
 
 .section-subtitle {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 15px;
     font-weight: 600;
-    color: #17344d;
+    color: var(--brand);
     margin: 0 0 12px 0;
     padding-bottom: 6px;
     border-bottom: 2px solid rgba(23, 52, 77, 0.08);
@@ -178,7 +178,7 @@
 }
 
 .form-label {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
     color: #5a738b;
     font-weight: 500;
@@ -190,9 +190,9 @@
     border-radius: 10px;
     padding: 10px 14px;
     background: #f5f7fa;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
-    color: #17344d;
+    color: var(--brand);
     outline: none;
     transition: all 0.2s ease;
     width: 100%;
@@ -223,9 +223,9 @@
     align-items: center;
     gap: 12px;
     cursor: pointer;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
-    color: #17344d;
+    color: var(--brand);
     font-weight: 500;
     -webkit-user-select: none;
     user-select: none;
@@ -277,18 +277,18 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 8px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     color: #5a738b;
 }
 
 .calc-value {
     font-weight: 600;
-    color: #17344d;
+    color: var(--brand);
 }
 
 .calc-value.deduction {
-    color: #dc2626;
+    color: var(--danger);
 }
 
 .total-row {
@@ -305,7 +305,7 @@
 
 .calc-row.pricing-separator {
     margin-top: 8px;
-    border-top: 1px dashed #e2e8f0;
+    border-top: 1px dashed var(--border);
     padding-top: 8px;
 }
 
@@ -318,13 +318,13 @@
 }
 
 .save-button {
-    background: #17344d;
+    background: var(--brand);
     color: #fff;
     border: none;
     border-radius: 24px;
     /* Pill shape like order buttons */
     padding: 12px 32px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
@@ -338,18 +338,18 @@
 }
 
 .save-button:disabled {
-    background: #94a3b8;
+    background: var(--text-subtle);
     cursor: not-allowed;
     box-shadow: none;
 }
 
 .cancel-button {
     background: transparent;
-    color: #64748b;
+    color: var(--text-muted);
     border: 1px solid rgba(100, 116, 139, 0.3);
     border-radius: 24px;
     padding: 12px 24px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
@@ -357,14 +357,14 @@
 }
 
 .cancel-button:hover {
-    background: #f8fafc;
+    background: var(--surface-muted);
     color: #475569;
     border-color: #475569;
 }
 
 .error-message {
     margin-bottom: 16px;
-    color: #dc2626;
+    color: var(--danger);
     font-size: 14px;
     text-align: center;
     background: #fef2f2;
@@ -406,19 +406,19 @@
 /* Validation error styles */
 .form-input.invalid,
 .form-textarea.invalid {
-    border-color: #dc2626;
+    border-color: var(--danger);
     background: #fef2f2;
 }
 
 .field-error-text {
     font-size: 12px;
-    color: #dc2626;
+    color: var(--danger);
     margin-top: 2px;
 }
 
 .crome-return-modal .field-hint-text {
     font-size: 12px;
-    color: #64748B;
+    color: var(--text-muted);
     margin-top: 2px;
 }
 

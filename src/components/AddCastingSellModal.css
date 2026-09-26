@@ -23,7 +23,7 @@
 
 /* Custom Input Styling to match reference image (light gray bg, rounded) */
 .form-input {
-    background-color: #f8f9fa;
+    background-color: var(--surface-muted);
     /* Light gray background */
     border: 1px solid #e9ecef;
     border-radius: 8px;
@@ -48,7 +48,7 @@
 
 .form-label {
     display: block;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 500;
     color: #212529;
@@ -72,9 +72,9 @@
 }
 
 .save-button {
-    background-color: #D1EEFF;
+    background-color: var(--brand-soft);
     /* Light Blue */
-    color: #17344D;
+    color: var(--brand);
     border: none;
     font-weight: 500;
 }
@@ -86,7 +86,7 @@
 }
 
 .modal-title {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 20px;
     font-weight: 500;
     margin-bottom: 24px;

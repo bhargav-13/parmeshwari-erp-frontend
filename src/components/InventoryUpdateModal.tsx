@@ -98,7 +98,7 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content add-stock-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">Update Existing Inventory</h2>
 

@@ -68,7 +68,7 @@ const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay drawer-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">
                     {initialData ? 'Edit Electric Outward' : 'Add Electric Outward'}

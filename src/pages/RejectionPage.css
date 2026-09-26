@@ -19,19 +19,19 @@
 }
 
 .rejection-filter-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 400;
-  color: #7D99A9;
+  color: var(--text-muted);
 }
 
 .rejection-filter-select {
   padding: 9px 14px;
   border: 1px solid rgba(125, 153, 169, 0.25);
   border-radius: 8px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
-  color: #17344D;
+  color: var(--brand);
   background: #FFFFFF;
   cursor: pointer;
   min-width: 160px;
@@ -39,7 +39,7 @@
 }
 
 .rejection-filter-select:focus {
-  border-color: #17344D;
+  border-color: var(--brand);
 }
 
 .rejection-export-btn {
@@ -50,16 +50,16 @@
   background: #FFFFFF;
   border: 1px solid rgba(125, 153, 169, 0.25);
   border-radius: 8px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
-  color: #17344D;
+  color: var(--brand);
   cursor: pointer;
   transition: background 0.2s ease;
   white-space: nowrap;
 }
 
 .rejection-export-btn:hover {
-  background: #F5F5F5;
+  background: var(--surface-muted);
 }
 
 /* Table */
@@ -77,17 +77,17 @@
 }
 
 .rejection-table thead {
-  background: #F8F9FA;
+  background: var(--surface-muted);
   border-bottom: 1px solid rgba(125, 153, 169, 0.2);
 }
 
 .rejection-table th {
   padding: 12px 14px;
   text-align: left;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 13px;
-  color: #17344D;
+  color: var(--brand);
   white-space: nowrap;
 }
 
@@ -97,7 +97,7 @@
 }
 
 .rejection-table tbody tr:hover {
-  background: #F8F9FA;
+  background: var(--surface-muted);
 }
 
 .rejection-table tbody tr:last-child {
@@ -106,9 +106,9 @@
 
 .rejection-table td {
   padding: 12px 14px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
-  color: #17344D;
+  color: var(--brand);
   white-space: nowrap;
 }
 
@@ -118,7 +118,7 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .return-type-badge.cash {
@@ -138,7 +138,7 @@
   border-radius: 20px;
   font-size: 11px;
   font-weight: 500;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   vertical-align: middle;
 }
 
@@ -191,16 +191,16 @@
 .no-data {
   padding: 48px 24px;
   text-align: center;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
-  color: #7D99A9;
+  color: var(--text-muted);
 }
 
 .download-hint-text {
   margin-bottom: 1rem;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
-  color: #7D99A9;
+  color: var(--text-muted);
 }
 
 .optional-label {

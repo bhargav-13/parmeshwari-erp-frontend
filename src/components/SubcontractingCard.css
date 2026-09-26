@@ -1,5 +1,5 @@
 .subcontracting-card {
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;
   background: #FFFFFF;
@@ -25,20 +25,20 @@
 }
 
 .card-order-id {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 16px;
   line-height: 22px;
-  color: #17344D;
+  color: var(--brand);
   margin: 0;
 }
 
 .card-contractor {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
-  color: #888888;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -51,10 +51,10 @@
 }
 
 .card-sub-id {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .card-info-row {
@@ -65,17 +65,17 @@
 }
 
 .card-info-row .info-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 13px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .card-info-row .info-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .card-actions {
@@ -116,7 +116,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #17344D;
+  border-top: 2px solid var(--brand);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -140,15 +140,15 @@
 }
 
 .card-date {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 12px;
   line-height: 16px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .card-body {
-  border: 1px solid rgba(125, 153, 169, 0.3);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;
 }
@@ -160,11 +160,11 @@
 }
 
 .section-title {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 18px;
   line-height: 24px;
-  color: #17344D;
+  color: var(--brand);
   margin: 0;
   text-align: center;
 }
@@ -183,11 +183,11 @@
 }
 
 .stock-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .stock-values {
@@ -197,20 +197,20 @@
 }
 
 .stock-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 15px;
   line-height: 20px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .stock-pieces,
 .stock-total {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .subcontracting-card .processes-section {
@@ -220,11 +220,11 @@
 }
 
 .subcontracting-card .processes-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .subcontracting-card .process-actions {
@@ -246,7 +246,7 @@
   padding: 0 42px 0 20px;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
@@ -300,14 +300,14 @@
   align-items: center;
   gap: 8px;
   padding: 0 22px;
-  background: #D1EEFF;
+  background: var(--brand-soft);
   border: none;
   border-radius: 999px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: var(--brand);
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
   height: 40px;
@@ -327,13 +327,13 @@
   gap: 16px;
   height: 40px;
   background: transparent;
-  border: 1px solid #17344D;
+  border: 1px solid var(--brand);
   border-radius: 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #17344D;
+  color: var(--brand);
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -385,19 +385,19 @@
 }
 
 .remark-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 13px;
   line-height: 18px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .remark-text {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 13px;
   line-height: 18px;
-  color: #888888;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -407,8 +407,8 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   padding: 12px 14px 10px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
   border-radius: 10px;
 }
 
@@ -420,16 +420,16 @@
 }
 
 .subcontracting-card .sc-stat-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #64748B;
+  color: var(--text-muted);
 }
 
 .subcontracting-card .sc-stat-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 600;
   color: #0F172A;
@@ -440,11 +440,11 @@
 .subcontracting-card .sc-stat-value small {
   font-size: 11px;
   font-weight: 500;
-  color: #94A3B8;
+  color: var(--text-subtle);
 }
 
 .subcontracting-card .sc-stat-sub {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 11px;
   color: #7C3AED;
 }
@@ -456,7 +456,7 @@
   grid-column: 1 / -1;
   height: 4px;
   border-radius: 999px;
-  background: #E2E8F0;
+  background: var(--border);
   overflow: hidden;
 }
 
@@ -479,7 +479,7 @@
 }
 
 .subcontracting-card .sc-muted {
-  color: #94A3B8;
+  color: var(--text-subtle);
   font-weight: 400;
   font-size: 11px;
 }
@@ -496,7 +496,7 @@
   border: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .subcontracting-card .sc-return-title {
@@ -554,7 +554,7 @@
 }
 
 .subcontracting-card .sc-return-date {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
   color: #334155;
@@ -572,7 +572,7 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 999px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
@@ -592,20 +592,20 @@
 .subcontracting-card .sc-send-crome-btn {
   height: 28px;
   padding: 0 12px;
-  border: 1px solid #17344D;
+  border: 1px solid var(--brand);
   border-radius: 6px;
   background: #FFFFFF;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 500;
-  color: #17344D;
+  color: var(--brand);
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .subcontracting-card .sc-send-crome-btn:hover {
-  background: #17344D;
+  background: var(--brand);
   color: #FFFFFF;
 }
 
@@ -620,9 +620,9 @@
 }
 
 .subcontracting-card .pending-text {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
-  color: #94A3B8;
+  color: var(--text-subtle);
 }
 
 @media (max-width: 768px) {

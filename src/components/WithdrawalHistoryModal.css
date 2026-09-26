@@ -30,17 +30,17 @@
 }
 
 .wh-subtitle {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 12px;
-    color: #8ea3b5;
+    color: var(--text-muted);
     margin: 0;
 }
 
 .wh-title {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 20px;
     font-weight: 600;
-    color: #17344d;
+    color: var(--brand);
     margin: 4px 0 0;
 }
 
@@ -51,7 +51,7 @@
     height: 32px;
     border-radius: 50%;
     font-size: 16px;
-    color: #17344d;
+    color: var(--brand);
     cursor: pointer;
     transition: background 0.2s ease;
     flex-shrink: 0;
@@ -78,16 +78,16 @@
 }
 
 .wh-info-label {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 11px;
-    color: #8ea3b5;
+    color: var(--text-muted);
 }
 
 .wh-info-value {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 500;
-    color: #17344d;
+    color: var(--brand);
 }
 
 /* Summary Cards */
@@ -128,16 +128,16 @@
 }
 
 .wh-summary-label {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 11px;
-    color: #8ea3b5;
+    color: var(--text-muted);
 }
 
 .wh-summary-value {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 16px;
     font-weight: 600;
-    color: #17344d;
+    color: var(--brand);
 }
 
 /* Body */
@@ -148,10 +148,10 @@
 }
 
 .wh-section-title {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 600;
-    color: #17344d;
+    color: var(--brand);
     display: block;
     margin-bottom: 12px;
 }
@@ -159,9 +159,9 @@
 .wh-empty {
     text-align: center;
     padding: 32px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
-    color: #8ea3b5;
+    color: var(--text-muted);
 }
 
 /* Withdrawal Table */
@@ -175,20 +175,20 @@
 
 .wh-table th {
     padding: 10px 16px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 12px;
     font-weight: 500;
-    color: #8ea3b5;
+    color: var(--text-muted);
     text-align: left;
-    background: #f8f9fa;
+    background: var(--surface-muted);
     border-bottom: 1px solid rgba(23, 52, 77, 0.08);
 }
 
 .wh-table td {
     padding: 10px 16px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
-    color: #17344d;
+    color: var(--brand);
     border-bottom: 1px solid rgba(23, 52, 77, 0.05);
 }
 
@@ -197,7 +197,7 @@
 }
 
 .wh-table tbody tr:hover {
-    background: #f8f9fa;
+    background: var(--surface-muted);
 }
 
 .wh-table tfoot {
@@ -211,18 +211,18 @@
 }
 
 .wh-total-label {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 600;
-    color: #17344d;
+    color: var(--brand);
     text-align: right;
 }
 
 .wh-total-value {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 600;
-    color: #17344d;
+    color: var(--brand);
 }
 
 /* Responsive */

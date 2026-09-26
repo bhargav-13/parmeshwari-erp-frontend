@@ -343,7 +343,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content return-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">Add Return</h2>
 

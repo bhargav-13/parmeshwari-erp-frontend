@@ -84,7 +84,7 @@ const PaymentReceivedModal: React.FC<PaymentReceivedModalProps> = ({
   const remaining = (payment.totalAmount || 0) - (payment.receivedAmount || 0);
 
   return (
-    <div className="modal-overlay payment-received-modal-overlay" onClick={onClose}>
+    <div className="modal-overlay payment-received-modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content payment-received-modal" onClick={(e) => e.stopPropagation()}>
         <div className="payment-modal-header">
           <h2 className="modal-title">Record Payment</h2>

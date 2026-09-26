@@ -19,7 +19,7 @@
 }
 
 .recent-orders-table th {
-  background-color: #f8f9fa;
+  background-color: var(--surface-muted);
   font-weight: bold;
 }
 

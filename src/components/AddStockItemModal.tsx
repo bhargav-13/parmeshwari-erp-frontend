@@ -552,7 +552,7 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content add-stock-modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">{isEditMode || isSwitchedToEdit ? 'Edit Item' : 'Add Items'}</h2>
 

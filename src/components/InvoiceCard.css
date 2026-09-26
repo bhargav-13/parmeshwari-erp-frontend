@@ -1,5 +1,5 @@
 .invoice-card {
-  border: 2px solid rgba(125, 153, 169, 0.3);
+  border: 2px solid var(--border);
   border-radius: 20px;
   padding: 32px;
   background: #FFFFFF;
@@ -22,19 +22,19 @@
   gap: 12px;
   border-radius: 20px;
   z-index: 10;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .invoice-card .download-button {
-  background: #D1EEFF;
+  background: var(--brand-soft);
   border-radius: 6px;
   padding: 4px;
 }
 
 .invoice-card .download-button:hover {
-  background: #b8dfff;
+  background: var(--brand-soft-hover);
 }
 
 .invoice-card-header {
@@ -57,29 +57,29 @@
 }
 
 .invoice-card-id {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 16px;
   line-height: 22px;
-  color: #17344D;
+  color: var(--brand);
   margin: 0;
 }
 
 .invoice-card-customer {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 18px;
   line-height: 26px;
-  color: #17344D;
+  color: var(--brand);
   margin: 0;
 }
 
 .invoice-card-date {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .invoice-card-actions {
@@ -118,7 +118,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #17344D;
+  border-top: 2px solid var(--brand);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   display: inline-block;
@@ -146,7 +146,7 @@
   padding: 6px 36px 6px 16px;
   border-radius: 40px;
   border: 1px solid transparent;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
@@ -191,7 +191,7 @@
 
 .invoice-card-divider {
   height: 1px;
-  background: #7D99A9;
+  background: var(--text-muted);
   margin: 24px 0;
 }
 
@@ -208,19 +208,19 @@
 }
 
 .invoice-amount-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .invoice-amount-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 .invoice-card-footer {
@@ -229,19 +229,19 @@
 }
 
 .invoice-total-label {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
-  color: #888888;
+  color: var(--text-muted);
 }
 
 .invoice-total-value {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 15px;
   line-height: 22px;
-  color: #17344D;
+  color: var(--brand);
 }
 
 /* Mobile Responsive Styles */

@@ -17,20 +17,20 @@
 }
 
 .page-title {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 600;
     font-size: 24px;
     line-height: 32px;
-    color: #17344D;
+    color: var(--brand);
     margin: 0 0 4px 0;
 }
 
 .page-subtitle {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #7D99A9;
+    color: var(--text-muted);
     margin: 0;
 }
 
@@ -39,19 +39,19 @@
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: #D1EEFF;
+    background: var(--brand-soft);
     border: none;
     border-radius: 8px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 500;
     font-size: 14px;
-    color: #17344D;
+    color: var(--brand);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .add-button:hover {
-    background: #b8dfff;
+    background: var(--brand-soft-hover);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -75,10 +75,10 @@
     padding: 8px 12px;
     border: 1px solid #D1E9F5;
     border-radius: 8px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 500;
-    color: #17344D;
+    color: var(--brand);
     background: #fff;
     cursor: pointer;
     outline: none;
@@ -109,19 +109,19 @@
 }
 
 .stat-label {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #7D99A9;
+    color: var(--text-muted);
 }
 
 .stat-value {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 600;
     font-size: 24px;
     line-height: 32px;
-    color: #17344D;
+    color: var(--brand);
 }
 
 .order-filters {
@@ -151,14 +151,14 @@
     flex: 1;
     border: none;
     outline: none;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
-    color: #17344D;
+    color: var(--brand);
     background: transparent;
 }
 
 .order-search input::placeholder {
-    color: #A7A7A7;
+    color: var(--text-subtle);
 }
 
 .order-status-filter {
@@ -170,14 +170,14 @@
     border: 1px solid rgba(125, 153, 169, 0.2);
     border-radius: 8px;
     cursor: pointer;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
-    color: #17344D;
+    color: var(--brand);
     transition: background-color 0.2s ease;
 }
 
 .order-status-filter:hover {
-    background: #F5F5F5;
+    background: var(--surface-muted);
 }
 
 .order-status-filter img {
@@ -200,18 +200,18 @@
 }
 
 .scrap-table thead {
-    background: #F8F9FA;
+    background: var(--surface-muted);
     border-bottom: 1px solid rgba(125, 153, 169, 0.2);
 }
 
 .scrap-table th {
     padding: 12px 10px;
     text-align: left;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 500;
     font-size: 13px;
     line-height: 20px;
-    color: #17344D;
+    color: var(--brand);
     white-space: nowrap;
 }
 
@@ -221,7 +221,7 @@
 }
 
 .scrap-table tbody tr:hover {
-    background: #F8F9FA;
+    background: var(--surface-muted);
 }
 
 .scrap-table tbody tr:last-child {
@@ -230,11 +230,11 @@
 
 .scrap-table td {
     padding: 12px 10px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 400;
     font-size: 13px;
     line-height: 20px;
-    color: #17344D;
+    color: var(--brand);
     white-space: nowrap;
 }
 
@@ -329,20 +329,20 @@
 
 .withdraw-button {
     padding: 5px 12px;
-    background: #D1EEFF;
+    background: var(--brand-soft);
     border: none;
     border-radius: 6px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 500;
     font-size: 12px;
-    color: #17344D;
+    color: var(--brand);
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
 }
 
 .withdraw-button:hover:not(:disabled) {
-    background: #b8dfff;
+    background: var(--brand-soft-hover);
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -358,7 +358,7 @@
     gap: 10px;
     margin-bottom: 20px;
     padding: 16px;
-    background: #F8F9FA;
+    background: var(--surface-muted);
     border-radius: 8px;
     border: 1px solid rgba(125, 153, 169, 0.15);
 }
@@ -370,17 +370,17 @@
 }
 
 .withdraw-info-label {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 400;
     font-size: 14px;
-    color: #7D99A9;
+    color: var(--text-muted);
 }
 
 .withdraw-info-value {
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 500;
     font-size: 14px;
-    color: #17344D;
+    color: var(--brand);
 }
 
 .pending-highlight {
@@ -391,9 +391,9 @@
 .no-data {
     padding: 48px 24px;
     text-align: center;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 16px;
-    color: #7D99A9;
+    color: var(--text-muted);
 }
 
 /* Mobile Responsive */
@@ -446,9 +446,9 @@
     padding: 8px 12px;
     border: 1px solid #d0dde8;
     border-radius: 8px;
-    font-family: 'Jost', sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
-    color: #17344D;
+    color: var(--brand);
     background: #fff;
     cursor: pointer;
     min-width: 160px;

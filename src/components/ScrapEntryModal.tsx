@@ -140,7 +140,7 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay drawer-overlay" onClick={onClose}>
             <div className="scrap-modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2 className="scrap-modal-title">Scrap Entry</h2>
 

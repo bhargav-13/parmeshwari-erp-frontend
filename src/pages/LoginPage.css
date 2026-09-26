@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #D1EEFF 0%, #FFFFFF 100%);
+  background: linear-gradient(135deg, var(--brand-soft) 0%, #FFFFFF 100%);
 }
 
 .login-container {
@@ -36,11 +36,11 @@
 }
 
 .login-title {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 28px;
   line-height: 40px;
-  color: #17344D;
+  color: var(--brand);
   margin: 0;
 }
 
@@ -51,22 +51,24 @@
 }
 
 .login-button {
-  padding: 14px 32px;
-  background: #D1EEFF;
-  border: none;
-  border-radius: 10px;
-  font-family: 'Jost', sans-serif;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 35px;
-  color: #17344D;
+  min-height: 44px;
+  padding: 10px 24px;
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--font-size-md);
+  line-height: 22px;
+  color: var(--text-on-brand);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  box-shadow: var(--shadow-xs);
+  transition: background-color var(--transition);
   margin-top: 8px;
 }
 
 .login-button:hover:not(:disabled) {
-  background: #b8dfff;
+  background: var(--brand-hover);
 }
 
 .login-button:disabled {
@@ -79,7 +81,7 @@
   background: #FFE5E5;
   border: 1px solid #FF0101;
   border-radius: 10px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   color: #FF0101;
   white-space: pre-line;

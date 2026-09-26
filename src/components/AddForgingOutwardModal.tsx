@@ -111,7 +111,7 @@ const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay drawer-overlay" onClick={onClose}>
             <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">{initialData ? 'Edit Forging Outward Entry' : 'Add Forging Outward Entry'}</h2>
 
