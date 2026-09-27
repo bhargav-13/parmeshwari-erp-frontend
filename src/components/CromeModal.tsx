@@ -214,11 +214,21 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractin
       packagingCount: parseInt(row.packagingCount),
     }));
 
+    // If the entered value is at (or past) the known available stock, shave a hair off it.
+    // Avoids the backend rejecting equal-looking values (e.g. 68.05 vs 68.05) due to
+    // floating-point drift between what was fetched and what it recomputes on save.
+    const rawSentStock = parseFloat(formData.sentStock);
+    const availableStock = returnCromeInfo?.availableStockForCrome;
+    const sentStock =
+      availableStock != null && rawSentStock >= availableStock
+        ? Math.max(0, availableStock - 0.001)
+        : rawSentStock;
+
     const submitData: CromeRequest = {
       subcontractingReturnId: subcontractingReturnId,
       partyId: parseInt(formData.partyId, 10),
       cromeDate: formData.cromeDate,
-      sentStock: parseFloat(formData.sentStock),
+      sentStock,
       packagings,
       cromeAmount: formData.cromeAmount ? parseFloat(formData.cromeAmount) : null,
       remark: formData.remark || null,
