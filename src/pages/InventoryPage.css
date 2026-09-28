@@ -344,6 +344,13 @@
   border-bottom: none;
 }
 
+.inventory-table tfoot .inventory-total-row td {
+  background: var(--surface-muted);
+  border-top: 2px solid var(--border);
+  border-bottom: none;
+  font-weight: 600;
+}
+
 .status-badge {
   padding: 4px 12px;
   border-radius: 12px;

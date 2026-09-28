@@ -227,6 +227,32 @@
   color: var(--text-muted);
 }
 
+.qty-input {
+  width: 64px;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--brand);
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+
 /* Custom Checkbox */
 .checkbox-container {
   display: flex;
@@ -344,6 +370,11 @@
   .dispatch-items-header span,
   .item-name,
   .qty-display {
+    font-size: 12px;
+  }
+
+  .qty-input {
+    width: 52px;
     font-size: 12px;
   }
 

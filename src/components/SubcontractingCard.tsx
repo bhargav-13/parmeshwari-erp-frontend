@@ -28,6 +28,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSentExpanded, setIsSentExpanded] = useState(false);
   // Crome records grouped by the return chunk they were sent from.
   // A chunk with any Crome record hides its "Send to Crome" button.
   const [cromesByReturnId, setCromesByReturnId] = useState<Map<number, Crome[]>>(new Map());
@@ -58,6 +59,8 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   }, [subcontract.subcontractingId, subcontract.cromeCount]);
 
   // Calculate Sent, Return, and Used values
+  const subSends = subcontract.subSends || [];
+  const hasMultipleSends = subSends.length > 1;
   const subReturns = subcontract.subReturns || [];
 
   // Calculate Total Net Return
@@ -231,7 +234,50 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
           <div className="crome-details-container sc-details">
             {/* SENT Details */}
             <div className="crome-detail-block sc-sent-block">
-              <div className="block-header">Sent Details</div>
+              {hasMultipleSends ? (
+                <>
+                  <button
+                    type="button"
+                    className="sc-return-header sc-sent-header"
+                    onClick={() => setIsSentExpanded(!isSentExpanded)}
+                    aria-expanded={isSentExpanded}
+                  >
+                    <span className="sc-return-title">Sent Details ({subSends.length})</span>
+                    <span className="sc-expand-toggle">
+                      {isSentExpanded ? 'Collapse' : 'Expand'}
+                      <span className={`sc-chevron ${isSentExpanded ? 'expanded' : ''}`}>▾</span>
+                    </span>
+                  </button>
+
+                  {isSentExpanded && (
+                    <div className="sc-return-list sc-sent-list">
+                      {subSends.map((send, index) => (
+                        <div key={send.sendId ?? index} className="sc-return-row">
+                          <div className="sc-return-main">
+                            <div className="detail-row">
+                              <span className="sc-return-date">{formatDate(send.sendDate)}</span>
+                              <span className="detail-value">{formatQty(send.sentStock)} {subcontract.unit}</span>
+                            </div>
+                            <div className="detail-row">
+                              <span className="detail-label">
+                                Rate ₹{formatMoney(send.price)} · Job ₹{formatMoney(send.jobWorkPay)}
+                              </span>
+                              <span className="detail-value">₹{formatMoney(send.sentStock * send.price)}</span>
+                            </div>
+                            {send.remark && (
+                              <div className="detail-row">
+                                <span className="detail-label sc-muted">{send.remark}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="block-header">Sent Details</div>
+              )}
               <div className="detail-row">
                 <span className="detail-label">Sent Stock</span>
                 <span className="detail-value">{formatQty(subcontract.sentStock)} {subcontract.unit}</span>
@@ -241,11 +287,11 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <span className="detail-value">{(subcontract.sentStock * 25).toLocaleString('en-IN')} Pc</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Rate</span>
+                <span className="detail-label">{hasMultipleSends ? 'Avg Rate' : 'Rate'}</span>
                 <span className="detail-value">₹{formatMoney(subcontract.price)} / {subcontract.unit}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Job Work</span>
+                <span className="detail-label">{hasMultipleSends ? 'Avg Job Work' : 'Job Work'}</span>
                 <span className="detail-value">₹{formatMoney(subcontract.jobWorkPay)} / {subcontract.unit}</span>
               </div>
               <div className="detail-row total-row">

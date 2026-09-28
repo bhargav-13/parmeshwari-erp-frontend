@@ -128,6 +128,13 @@ const InventoryFirstFloorPage: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // Grand totals of the rows currently shown (respects search + status filter)
+  const shownTotalKg = filteredItems.reduce((sum, item) => sum + (Number(item.quantityInKg) || 0), 0);
+  const shownTotalPc = filteredItems.reduce((sum, item) => sum + (Number(item.quantityInPc) || 0), 0);
+  const shownTotalAmount = filteredItems.reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0);
+  const formatRupees = (value: number) =>
+    value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
   const handleCopyLink = async () => {
     try {
       const catalogUrl = `${window.location.origin}/catalog`;
@@ -244,6 +251,7 @@ const InventoryFirstFloorPage: React.FC = () => {
               <th>Quantity</th>
               <th>Pc.</th>
               <th>Price</th>
+              <th>Amount</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -257,6 +265,7 @@ const InventoryFirstFloorPage: React.FC = () => {
                 <td>{formatQty(item.quantityInKg)} Kg</td>
                 <td>{item.quantityInPc?.toLocaleString('en-IN') || '—'}</td>
                 <td>₹{Number(item.pricePerKg).toFixed(2)}/KG</td>
+                <td>₹{formatRupees(Number(item.totalPrice) || 0)}</td>
                 <td>
                   <span
                     className={`status-badge ${getActualStatus(item.quantityInKg, item.lowStockAlert) === InventoryStatus.IN_STOCK ? 'in-stock' : 'low-stock'
@@ -299,12 +308,24 @@ const InventoryFirstFloorPage: React.FC = () => {
             ))}
             {filteredItems.length === 0 && (
               <tr>
-                <td colSpan={8} className="no-data">
+                <td colSpan={9} className="no-data">
                   No inventory items found
                 </td>
               </tr>
             )}
           </tbody>
+          {filteredItems.length > 0 && (
+            <tfoot>
+              <tr className="inventory-total-row">
+                <td colSpan={3}>Total ({filteredItems.length} items)</td>
+                <td>{formatQty(shownTotalKg)} Kg</td>
+                <td>{shownTotalPc.toLocaleString('en-IN')}</td>
+                <td></td>
+                <td>₹{formatRupees(shownTotalAmount)}</td>
+                <td colSpan={2}></td>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
 

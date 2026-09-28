@@ -613,6 +613,29 @@
   margin-top: 0;
 }
 
+/* Sent list reuses the return list layout in the sent block's neutral tones */
+.subcontracting-card .sc-sent-header .sc-return-title {
+  color: var(--brand);
+}
+
+.subcontracting-card .sc-sent-header .sc-expand-toggle {
+  background: var(--surface-muted);
+  color: var(--brand);
+}
+
+.subcontracting-card .sc-sent-header:hover .sc-expand-toggle {
+  background: var(--border);
+}
+
+.subcontracting-card .sc-sent-list {
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.subcontracting-card .sc-sent-list .sc-return-row {
+  border-bottom-color: var(--border);
+}
+
 .subcontracting-card .pending-block {
   align-items: center;
   justify-content: center;

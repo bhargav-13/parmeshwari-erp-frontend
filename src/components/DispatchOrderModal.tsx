@@ -76,7 +76,25 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
       prev.map((item, idx) => {
         if (idx !== itemIndex) return item;
         const currentQty = item.selectedQuantities[stockItemId] || 0;
-        const newQty = Math.max(0, currentQty + delta);
+        const newQty = Math.max(0, Math.round((currentQty + delta) * 1000) / 1000);
+        return {
+          ...item,
+          selectedQuantities: {
+            ...item.selectedQuantities,
+            [stockItemId]: newQty,
+          },
+        };
+      })
+    );
+  };
+
+  // Typed quantity; blank or invalid input counts as 0
+  const handleQuantityInput = (itemIndex: number, stockItemId: number, rawValue: string) => {
+    const parsed = parseFloat(rawValue);
+    const newQty = Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+    setDispatchItems((prev) =>
+      prev.map((item, idx) => {
+        if (idx !== itemIndex) return item;
         return {
           ...item,
           selectedQuantities: {
@@ -223,9 +241,19 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
                               >
                                 &minus;
                               </button>
-                              <span className="qty-display">
-                                {item.selectedQuantities[stockItem.stockItemId] || 0}
-                              </span>
+                              <input
+                                type="number"
+                                className="qty-input"
+                                min={0}
+                                step="any"
+                                inputMode="decimal"
+                                placeholder="0"
+                                value={item.selectedQuantities[stockItem.stockItemId] || ''}
+                                onChange={(e) => handleQuantityInput(index, stockItem.stockItemId, e.target.value)}
+                                onFocus={(e) => e.target.select()}
+                                onWheel={(e) => e.currentTarget.blur()}
+                                aria-label={`Quantity for ${stockItem.product.productName}`}
+                              />
                               <button
                                 type="button"
                                 className="qty-control-btn"
