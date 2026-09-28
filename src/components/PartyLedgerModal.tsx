@@ -401,12 +401,12 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
 
                       <div className="ledger-order-totals">
                         <div>
-                          <span className="ledger-detail-label">Official Grand Total</span>
-                          <span className="ledger-detail-value">{currency(order.officialGrandTotal)}</span>
+                          <span className="ledger-detail-label">Official (Bill + GST)</span>
+                          <span className="ledger-detail-value">{currency(order.paymentSummary?.official?.totalAmount)}</span>
                         </div>
                         <div>
-                          <span className="ledger-detail-label">Offline Grand Total</span>
-                          <span className="ledger-detail-value">{currency(order.offlineGrandTotal)}</span>
+                          <span className="ledger-detail-label">Offline Total</span>
+                          <span className="ledger-detail-value">{currency(order.paymentSummary?.offline?.totalAmount)}</span>
                         </div>
                       </div>
                     </div>

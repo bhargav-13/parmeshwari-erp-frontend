@@ -135,11 +135,16 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
     return row.party.name.toLowerCase().includes(q);
   });
 
-  // Compute summary stats: ledger amounts + party's own stored amounts
-  const totalOfficial = partyRows.reduce((sum, r) => sum + (r.ledger?.totalOfficialAmount || 0) + (r.party.officialAmount || 0), 0);
-  const totalOffline = partyRows.reduce((sum, r) => sum + (r.ledger?.totalOfflineAmount || 0) + (r.party.offlineAmount || 0), 0);
+  // The party's stored amounts are its running balance: the balance from before the ERP plus
+  // every order (official bill + GST / offline total) minus what was received here. Orders are
+  // already inside it, so the ledger's order totals must not be added on top.
+  const partyRemaining = (r: PartyLedgerRow) =>
+    (r.party.officialAmount || 0) + (r.party.offlineAmount || 0) - (r.ledger?.totalReceivedAmount || 0);
+
+  const totalOfficial = partyRows.reduce((sum, r) => sum + (r.party.officialAmount || 0), 0);
+  const totalOffline = partyRows.reduce((sum, r) => sum + (r.party.offlineAmount || 0), 0);
   const totalReceived = partyRows.reduce((sum, r) => sum + (r.ledger?.totalReceivedAmount || 0), 0);
-  const totalRemaining = partyRows.reduce((sum, r) => sum + (r.ledger?.totalRemainingAmount || 0) + (r.party.officialAmount || 0) + (r.party.offlineAmount || 0), 0);
+  const totalRemaining = partyRows.reduce((sum, r) => sum + partyRemaining(r), 0);
 
   return (
     <div className="payment-reminder-page">
@@ -237,10 +242,10 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                             )}
                           </div>
                         </td>
-                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalOfficialAmount || 0) + row.party.officialAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalOfflineAmount || 0) + row.party.offlineAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency(row.party.officialAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency(row.party.offlineAmount)}</td>
                         <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalReceivedAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency((row.ledger?.totalRemainingAmount || 0) + row.party.officialAmount + row.party.offlineAmount)}</td>
+                        <td>{row.loading ? '...' : formatCurrency(partyRemaining(row))}</td>
                         <td>{row.loading ? '...' : orderCount}</td>
                         <td>
                           <div className="action-buttons">
@@ -285,11 +290,11 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                         <tr className="expanded-order-row">
                           <td colSpan={7}>
                             <div className="party-base-breakdown">
-                              <span className="party-base-label">Party Base Amount</span>
-                              <span className="party-base-item">Official: <strong>{formatCurrency(row.party.officialAmount)}</strong></span>
-                              <span className="party-base-item">Offline: <strong>{formatCurrency(row.party.offlineAmount)}</strong></span>
+                              <span className="party-base-label">Includes</span>
                               <span className="party-base-item">Orders Official: <strong>{formatCurrency(row.ledger?.totalOfficialAmount)}</strong></span>
                               <span className="party-base-item">Orders Offline: <strong>{formatCurrency(row.ledger?.totalOfflineAmount)}</strong></span>
+                              <span className="party-base-item">Previous Official: <strong>{formatCurrency((row.party.officialAmount || 0) - (row.ledger?.totalOfficialAmount || 0))}</strong></span>
+                              <span className="party-base-item">Previous Offline: <strong>{formatCurrency((row.party.offlineAmount || 0) - (row.ledger?.totalOfflineAmount || 0))}</strong></span>
                             </div>
                           </td>
                         </tr>
@@ -305,8 +310,8 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                                 <span className="expanded-order-id">Order #{order.orderId}</span>
                                 <span className="expanded-order-detail">{row.party.name}</span>
                                 <span className="expanded-order-detail">Date: {formatDate(order.orderDate)}</span>
-                                <span className="expanded-order-detail">Official: {formatCurrency(order.officialGrandTotal)}</span>
-                                <span className="expanded-order-detail">Offline: {formatCurrency(order.offlineGrandTotal)}</span>
+                                <span className="expanded-order-detail">Official: {formatCurrency(order.paymentSummary?.official?.totalAmount)}</span>
+                                <span className="expanded-order-detail">Offline: {formatCurrency(order.paymentSummary?.offline?.totalAmount)}</span>
                                 <span className="expanded-order-detail">Products: {order.products?.length || 0}</span>
                               </div>
 
