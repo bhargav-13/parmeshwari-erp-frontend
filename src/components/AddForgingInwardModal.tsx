@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './AddProductModal.css';
-import type { ForgingInward, ForgingInwardItem, ForgingParty, InwardWeightUnit } from '../types';
+import type { ForgingInward, ForgingInwardItem, ForgingParty, InwardWeightUnit, StockItem } from '../types';
+import { InventoryFloor, QuantityUnit } from '../types';
 import { forgingPartyApi, forgingInwardItemsApi } from '../api/forging';
+import { stockItemApi } from '../api/inventory';
 
 const INWARD_WEIGHT_UNITS: { value: InwardWeightUnit; label: string }[] = [
     { value: 'KG', label: 'KG' },
@@ -58,9 +60,11 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
     const [showAddItemRow, setShowAddItemRow] = useState(false);
     // "new" means user is typing a custom name not from the dropdown
     const [itemNameMode, setItemNameMode] = useState<'select' | 'new'>('select');
+    // Forging inward stock lands on the ground floor, so its items are the ones to pick from
+    const [groundFloorItems, setGroundFloorItems] = useState<StockItem[]>([]);
 
-    // Build a deduplicated catalog from existing inwards:
-    // for each unique item name, take the most recent record's fields as defaults
+    // Item choices: every ground floor inventory item (with its current stock and price), plus
+    // names from earlier forging inwards that are not in inventory (e.g. rejection-only entries)
     const itemCatalog = useMemo(() => {
         const map = new Map<string, { pricePerKg?: number; lowStockAlert?: number; weightPerPc?: number; totalKg: number; existingPricePerKg?: number }>();
         // Sort oldest-first so latest overwrites
@@ -71,11 +75,15 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
             };
             return parse(a.date) - parse(b.date);
         });
+        const inventoryNames = new Set(
+            groundFloorItems.map(s => s.product?.productName?.trim().toLowerCase()).filter(Boolean)
+        );
         for (const inward of sorted) {
             if (!inward.item?.name) continue;
             // skip the current record being edited
             if (initialData?.id && inward.id === initialData.id) continue;
             const name = inward.item.name;
+            if (inventoryNames.has(name.trim().toLowerCase())) continue;
             const existing = map.get(name);
             const totalKg = (existing?.totalKg ?? 0) + (inward.weightUnit === 'KG' ? inward.weight : 0);
             map.set(name, {
@@ -86,13 +94,31 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                 existingPricePerKg: inward.item.pricePerKg,
             });
         }
+        for (const stock of groundFloorItems) {
+            const name = stock.product?.productName;
+            if (!name) continue;
+            map.set(name, {
+                pricePerKg: stock.pricePerKg,
+                lowStockAlert: stock.lowStockAlert,
+                // The form takes weight per piece in KG; GM items store it in grams
+                weightPerPc: stock.weightPerPc
+                    ? (stock.quantityUnit === QuantityUnit.GM ? stock.weightPerPc / 1000 : stock.weightPerPc)
+                    : undefined,
+                totalKg: Number(stock.quantityInKg) || 0,
+                existingPricePerKg: stock.pricePerKg,
+            });
+        }
         return map;
-    }, [existingInwards, initialData?.id]);
+    }, [existingInwards, initialData?.id, groundFloorItems]);
 
     const catalogNames = useMemo(() => Array.from(itemCatalog.keys()).sort(), [itemCatalog]);
 
     useEffect(() => {
         fetchParties();
+        stockItemApi
+            .getStockItems(InventoryFloor.GROUND_FLOOR, 0, 1000)
+            .then(result => setGroundFloorItems((result as { data?: StockItem[] })?.data ?? []))
+            .catch(err => console.error('Failed to fetch ground floor items:', err));
     }, []);
 
     // Set item open if editing and item exists
@@ -483,7 +509,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                         style={{ flex: 1, fontSize: '13px' }}
                                                         autoFocus
                                                     >
-                                                        <option value="">{catalogNames.length > 0 ? 'Select existing item…' : 'No previous items'}</option>
+                                                        <option value="">{catalogNames.length > 0 ? 'Select ground floor item…' : 'No ground floor items'}</option>
                                                         {catalogNames.map(n => (
                                                             <option key={n} value={n}>{n}</option>
                                                         ))}
