@@ -18,6 +18,7 @@ interface DispatchItemState {
   selectedQuantities: { [stockItemId: number]: number };
   selectedItems: { [stockItemId: number]: boolean };
   isDropdownOpen: boolean;
+  search: string;
 }
 
 const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose, onSuccess, mode = 'dispatch' }) => {
@@ -65,6 +66,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
           selectedQuantities: initialSelectedQuantities,
           selectedItems: initialSelectedItems,
           isDropdownOpen: true,
+          search: '',
         };
       });
       setDispatchItems(initialItems);
@@ -130,6 +132,12 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
           isDropdownOpen: !item.isDropdownOpen,
         };
       })
+    );
+  };
+
+  const handleSearchChange = (itemIndex: number, search: string) => {
+    setDispatchItems((prev) =>
+      prev.map((item, idx) => (idx === itemIndex ? { ...item, search } : item))
     );
   };
 
@@ -208,6 +216,16 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
                 const hasKg = orderProduct?.quantityKg && orderProduct.quantityKg > 0;
                 const hasPc = orderProduct?.quantityPc && orderProduct.quantityPc > 0;
                 const unitLabel = hasKg && hasPc ? 'KG + PC' : hasKg ? 'KG' : hasPc ? 'PC' : '';
+                const selectedCount = Object.values(item.selectedItems).filter(Boolean).length;
+                const query = item.search.trim().toLowerCase();
+                // Ticked items stay visible while searching so a selection is never hidden
+                const visibleStockItems = query
+                  ? stockItems.filter(
+                      (s) =>
+                        item.selectedItems[s.stockItemId] ||
+                        s.product?.productName?.toLowerCase().includes(query)
+                    )
+                  : stockItems;
 
                 return (
                   <div className="dispatch-item-row" key={`dispatch-item-${index}`}>
@@ -224,12 +242,26 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
                           className={`dispatch-items-header ${!item.isDropdownOpen ? 'collapsed' : ''}`}
                           onClick={() => toggleDropdown(index)}
                         >
-                          <span>Select</span>
+                          <span>{selectedCount > 0 ? `${selectedCount} selected` : 'Select'}</span>
                           <span className={`dropdown-icon ${!item.isDropdownOpen ? 'collapsed' : ''}`}>&#9662;</span>
                         </div>
-                        {item.isDropdownOpen && stockItems.map((stockItem, stockIndex) => (
+                        {item.isDropdownOpen && (
+                          <div className={`dispatch-items-search ${visibleStockItems.length === 0 && !query ? 'last-row' : ''}`}>
+                            <input
+                              type="search"
+                              placeholder="Search item..."
+                              value={item.search}
+                              onChange={(e) => handleSearchChange(index, e.target.value)}
+                              aria-label={`Search stock items for ${item.productName}`}
+                            />
+                          </div>
+                        )}
+                        {item.isDropdownOpen && query && visibleStockItems.length === 0 && (
+                          <div className="dispatch-items-empty last-row">No items match "{item.search.trim()}"</div>
+                        )}
+                        {item.isDropdownOpen && visibleStockItems.map((stockItem, stockIndex) => (
                           <div
-                            className={`dispatch-items-row ${stockIndex === 0 ? 'first-row' : ''} ${stockIndex === stockItems.length - 1 ? 'last-row' : ''}`}
+                            className={`dispatch-items-row ${stockIndex === visibleStockItems.length - 1 ? 'last-row' : ''}`}
                             key={stockItem.stockItemId}
                           >
                             <span className="item-name">{stockItem.product.productName}</span>
