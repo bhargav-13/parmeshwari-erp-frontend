@@ -112,6 +112,13 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
     }, [existingInwards, initialData?.id, groundFloorItems]);
 
     const catalogNames = useMemo(() => Array.from(itemCatalog.keys()).sort(), [itemCatalog]);
+    const [itemSearch, setItemSearch] = useState('');
+    // The picked item stays in the list while searching so the select never loses it
+    const visibleCatalogNames = useMemo(() => {
+        const q = itemSearch.trim().toLowerCase();
+        if (!q) return catalogNames;
+        return catalogNames.filter(n => n === newItemName || n.toLowerCase().includes(q));
+    }, [catalogNames, itemSearch, newItemName]);
 
     useEffect(() => {
         fetchParties();
@@ -192,6 +199,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
         setNewItemQuantityInPc('');
         setNewItemWeightPerPc('');
         setItemNameMode('select');
+        setItemSearch('');
         setShowAddItemRow(false);
     };
 
@@ -498,6 +506,25 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                 Item Name*
                                             </label>
                                             {itemNameMode === 'select' ? (
+                                                <>
+                                                {catalogNames.length > 0 && (
+                                                    <input
+                                                        type="search"
+                                                        value={itemSearch}
+                                                        onChange={(e) => {
+                                                            const q = e.target.value;
+                                                            setItemSearch(q);
+                                                            // Auto-pick when the search narrows to a single item
+                                                            const matches = catalogNames.filter(n => n.toLowerCase().includes(q.trim().toLowerCase()));
+                                                            if (q.trim() && matches.length === 1 && matches[0] !== newItemName) handleSelectItemName(matches[0]);
+                                                        }}
+                                                        placeholder="Search item…"
+                                                        className="form-input"
+                                                        style={{ width: '100%', fontSize: '13px', padding: '8px 10px', marginBottom: '6px', boxSizing: 'border-box' }}
+                                                        aria-label="Search ground floor items"
+                                                        autoFocus
+                                                    />
+                                                )}
                                                 <div style={{ display: 'flex', gap: '8px' }}>
                                                     <select
                                                         value={catalogNames.includes(newItemName) ? newItemName : ''}
@@ -507,10 +534,15 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                         }}
                                                         className="form-input"
                                                         style={{ flex: 1, fontSize: '13px' }}
-                                                        autoFocus
                                                     >
-                                                        <option value="">{catalogNames.length > 0 ? 'Select ground floor item…' : 'No ground floor items'}</option>
-                                                        {catalogNames.map(n => (
+                                                        <option value="">
+                                                            {catalogNames.length === 0
+                                                                ? 'No ground floor items'
+                                                                : itemSearch.trim() && visibleCatalogNames.length === 0
+                                                                    ? `No items match "${itemSearch.trim()}"`
+                                                                    : `Select ground floor item… (${visibleCatalogNames.length})`}
+                                                        </option>
+                                                        {visibleCatalogNames.map(n => (
                                                             <option key={n} value={n}>{n}</option>
                                                         ))}
                                                     </select>
@@ -527,6 +559,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                                                         + New
                                                     </button>
                                                 </div>
+                                                </>
                                             ) : (
                                                 <div style={{ display: 'flex', gap: '8px' }}>
                                                     <input

@@ -229,7 +229,7 @@ const OrderFirstFloorPage: React.FC = () => {
           <img src={SearchIcon} alt="Search" />
           <input
             type="text"
-            placeholder="Search by customer or mobile"
+            placeholder="Search by party, mobile or item"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

@@ -3,6 +3,7 @@ import type { Order, OrderProductRequest, OrderRequest, StockItem, OrderQuantity
 import { OrderFloor, QuantityUnit, InventoryFloor } from '../types';
 import { stockItemApi, productApi } from '../api/inventory';
 import { partyApi } from '../api/party';
+import SearchableSelect, { type SearchableOption } from './SearchableSelect';
 import './AddOrderModal.css';
 import DeleteIcon from '../assets/delete.svg';
 
@@ -132,10 +133,32 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
 
   const floorProducts = products.filter((prod) => productFloor(prod) === formData.orderFloor);
 
+  // Only this floor's parties; parties with no floor set yet are listed after them so they stay reachable
+  const partyOptions = useMemo<SearchableOption[]>(() => {
+    const floorParties = parties.filter((p) => p.floor === formData.orderFloor);
+    const unassigned = parties.filter((p) => !p.floor);
+    const byName = (a: Party, b: Party) => a.name.localeCompare(b.name);
+    const options: SearchableOption[] = [
+      ...floorParties.sort(byName).map((p) => ({ value: p.partyId, label: p.name })),
+      ...unassigned.sort(byName).map((p) => ({ value: p.partyId, label: p.name, group: 'No floor set' })),
+    ];
+    // Keep an older order's party visible even if it now belongs to the other floor
+    const current = parties.find((p) => p.partyId === formData.partyId);
+    if (current && !options.some((o) => o.value === current.partyId)) {
+      options.unshift({ value: current.partyId, label: current.name });
+    }
+    return options;
+  }, [parties, formData.orderFloor, formData.partyId]);
+
   const handleFieldChange = (field: keyof OrderRequest, value: string | number) => {
     updateFormData((prev) => {
       const next = { ...prev, [field]: value };
       if (field === 'orderFloor' && value !== prev.orderFloor) {
+        const party = parties.find((p) => p.partyId === prev.partyId);
+        if (party?.floor && party.floor !== value) {
+          next.partyId = 0;
+          next.customerName = '';
+        }
         // Items picked for the other floor don't belong to this order any more
         next.products = prev.products.map((line) => {
           const stock = stockItems.find((item) => item.stockItemId === line.itemId);
@@ -384,26 +407,22 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
             <div className="order-details-grid">
               <div className="order-form-group">
                 <label>Party*</label>
-                <select
-                  value={formData.partyId}
-                  onChange={(e) => {
-                    const selectedPartyId = Number(e.target.value);
+                <SearchableSelect
+                  options={partyOptions}
+                  value={formData.partyId || ''}
+                  onChange={(v) => {
+                    const selectedPartyId = Number(v);
                     const selectedParty = parties.find(p => p.partyId === selectedPartyId);
                     handleFieldChange('partyId', selectedPartyId);
                     if (selectedParty) {
                       handleFieldChange('customerName', selectedParty.name);
                     }
                   }}
-                  required
+                  placeholder={isLoadingData ? 'Loading parties…' : 'Select Party'}
+                  searchPlaceholder="Search party…"
                   disabled={isLoadingData}
-                >
-                  <option value="0">Select Party</option>
-                  {parties.map((party) => (
-                    <option key={party.partyId} value={party.partyId}>
-                      {party.name}
-                    </option>
-                  ))}
-                </select>
+                  ariaLabel="Party"
+                />
               </div>
               <div className="order-form-group">
                 <label>Order Date*</label>
@@ -522,27 +541,21 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                     <div className="line-item-grid">
                       <div className="line-item-field line-item-field--product">
                         <label>Product*</label>
-                        <select
+                        <SearchableSelect
+                          options={[
+                            ...floorProducts.map((prod) => ({ value: prod.productId, label: prod.productName })),
+                            // Keep an older order's product visible even if it's on the other floor
+                            ...(currentProductId !== '' && !floorProducts.some((prod) => prod.productId === currentProductId)
+                              ? [{ value: currentProductId, label: currentStockItem?.product.productName ?? '' }]
+                              : []),
+                          ]}
                           value={currentProductId}
-                          onChange={(e) => {
-                            const selectedProductId = Number(e.target.value);
-                            handleProductSelection(index, selectedProductId);
-                          }}
-                          required
+                          onChange={(v) => handleProductSelection(index, Number(v))}
+                          placeholder={isCreating ? 'Creating Item...' : 'Select Product'}
+                          searchPlaceholder="Search item…"
                           disabled={isLoadingData || isCreating}
-                          title="Select a product"
-                        >
-                          <option value="">{isCreating ? 'Creating Item...' : 'Select Product'}</option>
-                          {floorProducts.map((prod) => (
-                            <option key={prod.productId} value={prod.productId}>
-                              {prod.productName}
-                            </option>
-                          ))}
-                          {/* Keep an older order's product visible even if it's on the other floor */}
-                          {currentProductId !== '' && !floorProducts.some((prod) => prod.productId === currentProductId) && (
-                            <option value={currentProductId}>{currentStockItem?.product.productName}</option>
-                          )}
-                        </select>
+                          ariaLabel="Product"
+                        />
                       </div>
                       <div className="line-item-field">
                         <label>Unit*</label>

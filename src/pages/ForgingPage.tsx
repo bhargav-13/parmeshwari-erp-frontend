@@ -171,8 +171,11 @@ const ForgingPage: React.FC = () => {
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
             result = result.filter(entry =>
-                entry.partyName.toLowerCase().includes(query) ||
-                entry.challanNo.toLowerCase().includes(query)
+                (entry.partyName || '').toLowerCase().includes(query) ||
+                (entry.challanNo || '').toLowerCase().includes(query) ||
+                ('item' in entry && (entry.item?.name || '').toLowerCase().includes(query)) ||
+                (entry.weightUnit || '').toLowerCase().includes(query) ||
+                (entry.date || '').includes(query)
             );
         }
         return result;
@@ -184,8 +187,18 @@ const ForgingPage: React.FC = () => {
         return parseInt(mm) === selMonth && parseInt(yyyy) === selYear;
     };
 
-    const filteredInwardEntries = filterEntries(inwardEntries).filter(e => isSelectedMonth(e.date));
-    const filteredOutwardEntries = filterEntries(outwardEntries).filter(e => isSelectedMonth(e.date));
+    // A search looks through every month; otherwise show the selected month
+    const isSearching = searchQuery.trim() !== '';
+    const sortNewestFirst = <T extends { date: string }>(list: T[]) => [...list].sort((a, b) => {
+        const t = (d: string) => { const [dd, mm, yyyy] = d.split('/').map(Number); return new Date(yyyy, mm - 1, dd).getTime() || 0; };
+        return t(b.date) - t(a.date);
+    });
+    const filteredInwardEntries = isSearching
+        ? sortNewestFirst(filterEntries(inwardEntries) as ForgingInward[])
+        : filterEntries(inwardEntries).filter(e => isSelectedMonth(e.date));
+    const filteredOutwardEntries = isSearching
+        ? sortNewestFirst(filterEntries(outwardEntries) as ForgingOutward[])
+        : filterEntries(outwardEntries).filter(e => isSelectedMonth(e.date));
 
     const totalInward = calculateTotalWeight(filteredInwardEntries);
     const totalOutward = calculateTotalWeight(filteredOutwardEntries);
@@ -236,11 +249,17 @@ const ForgingPage: React.FC = () => {
                     value={selectedMonth}
                     onChange={e => setSelectedMonth(e.target.value)}
                     title="Select month"
+                    disabled={isSearching}
                 >
                     {monthOptions.map(opt => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                 </select>
+                {isSearching && (
+                    <span style={{ marginLeft: '12px', fontSize: '13px', color: 'var(--text-muted)' }}>
+                        Showing search results from all months
+                    </span>
+                )}
             </div>
 
             <div className="sell-stats-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: '24px' }}>
@@ -284,7 +303,7 @@ const ForgingPage: React.FC = () => {
                     <img src={SearchIcon} alt="Search" />
                     <input
                         type="text"
-                        placeholder="Search by Challan or Party"
+                        placeholder={activeTab === 'inward' ? 'Search by Party, Challan, Item or Date' : 'Search by Party, Challan or Date'}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { kevinScrapApi, type KevinScrap, type KevinScrapRequest, type JayeshScrapRequest, type KevinScrapStats } from '../api/scrap';
+import { kevinScrapApi, type KevinScrapContractor, type KevinScrap, type KevinScrapRequest, type JayeshScrapRequest, type KevinScrapStats } from '../api/scrap';
 import ScrapEntryModal from '../components/ScrapEntryModal';
 import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
@@ -46,6 +46,8 @@ const KevinScrapPage: React.FC = () => {
     const [isDownloadPopupOpen, setIsDownloadPopupOpen] = useState(false);
     const [downloadFromDate, setDownloadFromDate] = useState('');
     const [downloadToDate, setDownloadToDate] = useState('');
+    const [downloadContractorId, setDownloadContractorId] = useState('');
+    const [contractors, setContractors] = useState<KevinScrapContractor[]>([]);
     const [isDownloading, setIsDownloading] = useState(false);
     const [itemOptions, setItemOptions] = useState<string[]>([]);
     const [selectedItem, setSelectedItem] = useState<string>('');
@@ -158,11 +160,13 @@ const KevinScrapPage: React.FC = () => {
             setIsDownloading(true);
             await kevinScrapApi.downloadPdf(
                 downloadFromDate || undefined,
-                downloadToDate || undefined
+                downloadToDate || undefined,
+                contractors.find(c => String(c.scrapContractorId) === downloadContractorId)
             );
             setIsDownloadPopupOpen(false);
             setDownloadFromDate('');
             setDownloadToDate('');
+            setDownloadContractorId('');
         } catch (err: any) {
             alert(err?.message || 'Failed to download PDF');
         } finally {
@@ -240,7 +244,12 @@ const KevinScrapPage: React.FC = () => {
                 <button
                     type="button"
                     className="order-status-filter"
-                    onClick={() => setIsDownloadPopupOpen(true)}
+                    onClick={() => {
+                        setIsDownloadPopupOpen(true);
+                        kevinScrapApi.getContractorList()
+                            .then(list => setContractors([...list].sort((a, b) => a.name.localeCompare(b.name))))
+                            .catch(err => console.error('Failed to fetch contractors:', err));
+                    }}
                     title="Download PDF Report"
                 >
                     <span>Download</span>
@@ -342,9 +351,24 @@ const KevinScrapPage: React.FC = () => {
                     <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
                         <h2 className="modal-title">Download Kevin Scrap PDF</h2>
                         <p className="download-hint-text">
-                            Filter by date range — leave blank to download the full report.
+                            Pick a party for a party-wise statement, or leave blank for all parties. Dates are optional.
                         </p>
                         <div className="modal-form">
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="kevin-party">Party <span className="optional-label">(optional)</span></label>
+                                <select
+                                    id="kevin-party"
+                                    className="form-input"
+                                    value={downloadContractorId}
+                                    onChange={e => setDownloadContractorId(e.target.value)}
+                                    title="Party"
+                                >
+                                    <option value="">— All Parties —</option>
+                                    {contractors.map(c => (
+                                        <option key={c.scrapContractorId} value={c.scrapContractorId}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
                             <div className="form-group">
                                 <label className="form-label" htmlFor="kevin-from-date">From Date <span className="optional-label">(optional)</span></label>
                                 <input

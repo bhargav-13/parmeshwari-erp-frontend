@@ -25,6 +25,7 @@ import PartyMasterPage from './pages/PartyMasterPage';
 import ElectricPage from './pages/ElectricPage';
 import CastingPage from './pages/CastingPage';
 import ForgingPage from './pages/ForgingPage';
+import ForgingPartyStockPage from './pages/ForgingPartyStockPage';
 import PurchasePage from './pages/PurchasePage';
 import CashflowPage from './pages/CashflowPage';
 import RejectionPage from './pages/RejectionPage';
@@ -79,6 +80,7 @@ function App() {
             <Route path="electric" element={<ElectricPage />} />
             <Route path="casting" element={<CastingPage />} />
             <Route path="forging" element={<ForgingPage />} />
+            <Route path="forging/party-stock" element={<ForgingPartyStockPage />} />
             <Route path="purchase" element={<PurchasePage />} />
             <Route path="rejection" element={<RejectionPage />} />
             <Route path="cashflow" element={<CashflowPage />} />

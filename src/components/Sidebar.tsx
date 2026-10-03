@@ -54,6 +54,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
   const [scrapExpanded, setScrapExpanded] = useState(
     location.pathname.startsWith('/scrap')
   );
+  const [forgingExpanded, setForgingExpanded] = useState(
+    location.pathname.startsWith('/forging')
+  );
 
   const isInventoryActive = location.pathname.startsWith('/inventory');
   const isItemMasterActive = location.pathname.startsWith('/item-master');
@@ -62,6 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
   const isInvoicesActive = location.pathname.startsWith('/invoices');
   const isPaymentReminderActive = location.pathname.startsWith('/payment-reminder');
   const isScrapActive = location.pathname.startsWith('/scrap');
+  const isForgingActive = location.pathname.startsWith('/forging');
 
   const menuItems = [
     { path: '/dashboard', icon: <img src={DashboardSVG} alt='dashboard' />, label: 'Dashboard' },
@@ -70,7 +74,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
     { path: '/party-master', icon: <img src={ProfileSVG} alt='Party Master' />, label: 'Party Master' },
     { path: '/electric', icon: <img src={SettingIcon} alt='Electric' />, label: 'Electric' },
     { path: '/casting', icon: <img src={SubcontractIcon} alt='Casting' />, label: 'Casting' },
-    { path: '/forging', icon: <img src={SettingIcon} alt='Forging' />, label: 'Forging' },
     { path: '/purchase', icon: <img src={OrderIcon} alt='Purchase' />, label: 'Purchase' },
     { path: '/rejection', icon: <img src={SettingIcon} alt='Rejection' />, label: 'Rejection' },
   ];
@@ -99,6 +102,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
   const paymentReminderSubItems = [
     { path: '/payment-reminder/ground-floor', label: 'Ground Floor' },
     { path: '/payment-reminder/first-floor', label: 'First Floor' },
+  ];
+
+  const forgingSubItems = [
+    { path: '/forging', label: 'Inward / Outward' },
+    { path: '/forging/party-stock', label: 'Party Stock' },
   ];
 
   const scrapSubItems = [
@@ -284,6 +292,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
           </div>
           <div className={`sidebar-subsection ${paymentReminderExpanded ? 'expanded' : ''}`}>
             {paymentReminderSubItems.map((subItem) => (
+              <Link key={subItem.path} to={subItem.path}
+                className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
+                onClick={onClose}>
+                <span className="sidebar-sublabel">{subItem.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Forging Section */}
+        <div className="sidebar-section">
+          <div
+            className={`sidebar-item ${isForgingActive ? 'active' : ''}`}
+            onClick={() => toggleSection(forgingExpanded, setForgingExpanded)}
+            title={collapsed ? 'Forging' : undefined}
+          >
+            <span className="sidebar-icon"><img src={SettingIcon} alt='Forging' /></span>
+            <span className="sidebar-label">Forging</span>
+            <span className={`expand-icon ${forgingExpanded ? 'expanded' : ''}`}>▼</span>
+          </div>
+          <div className={`sidebar-subsection ${forgingExpanded ? 'expanded' : ''}`}>
+            {forgingSubItems.map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
