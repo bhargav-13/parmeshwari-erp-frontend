@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import ErrorBoundary from './ErrorBoundary';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import './Layout.css';
@@ -17,6 +18,7 @@ const Layout: React.FC = () => {
     }
   });
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleSidebarCollapsed = () => {
     setIsSidebarCollapsed((prev) => {
@@ -64,7 +66,9 @@ const Layout: React.FC = () => {
       <div className="main-content">
         <Header onMenuClick={toggleMobileSidebar} />
         <div className="content">
-          <Outlet />
+          <ErrorBoundary resetKey={location.pathname}>
+            <Outlet />
+          </ErrorBoundary>
         </div>
       </div>
       {isMobileSidebarOpen && (

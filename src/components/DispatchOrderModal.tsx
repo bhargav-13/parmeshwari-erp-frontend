@@ -21,6 +21,9 @@ interface DispatchItemState {
   search: string;
 }
 
+// Stock items whose product was removed come back without one
+const stockName = (stockItem: StockItem) => stockItem.product?.productName || `Item #${stockItem.stockItemId}`;
+
 const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose, onSuccess, mode = 'dispatch' }) => {
   const isRevoke = mode === 'revoke';
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
@@ -34,7 +37,8 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
       try {
         setStockItemsLoading(true);
         const items = await stockItemApi.getAllStockItems();
-        setStockItems(items);
+        // Skip malformed rows so one bad stock item can't break the drawer
+        setStockItems((Array.isArray(items) ? items : []).filter((item) => item && item.stockItemId != null));
       } catch (err) {
         console.error('Failed to fetch stock items', err);
       } finally {
@@ -46,7 +50,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
 
   useEffect(() => {
     if (order.products && order.products.length > 0 && stockItems.length > 0) {
-      const initialItems: DispatchItemState[] = order.products.map((product) => {
+      const initialItems: DispatchItemState[] = order.products.filter(Boolean).map((product) => {
         const initialSelectedQuantities: { [key: number]: number } = {};
         const initialSelectedItems: { [key: number]: boolean } = {};
 
@@ -61,7 +65,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
 
         return {
           itemId: product.itemId,
-          productName: product.productName,
+          productName: product.productName ?? '',
           orderQuantity: product.quantityKg || product.quantityPc || 0,
           selectedQuantities: initialSelectedQuantities,
           selectedItems: initialSelectedItems,
@@ -146,7 +150,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
 
     dispatchItems.forEach((item, itemIndex) => {
       // Get the corresponding order product to determine quantity type
-      const orderProduct = order.products[itemIndex];
+      const orderProduct = order.products?.[itemIndex];
 
       Object.entries(item.selectedItems).forEach(([stockItemIdStr, isSelected]) => {
         if (isSelected) {
@@ -158,10 +162,10 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
             };
 
             // Auto-detect quantity type from order product
-            if (orderProduct.quantityKg && orderProduct.quantityKg > 0) {
+            if (orderProduct?.quantityKg && orderProduct.quantityKg > 0) {
               dispatchItem.quantityKg = quantity;
             }
-            if (orderProduct.quantityPc && orderProduct.quantityPc > 0) {
+            if (orderProduct?.quantityPc && orderProduct.quantityPc > 0) {
               dispatchItem.quantityPc = quantity;
             }
 
@@ -212,12 +216,12 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
           ) : (
             <>
               {dispatchItems.map((item, index) => {
-                const orderProduct = order.products[index];
+                const orderProduct = order.products?.[index];
                 const hasKg = orderProduct?.quantityKg && orderProduct.quantityKg > 0;
                 const hasPc = orderProduct?.quantityPc && orderProduct.quantityPc > 0;
                 const unitLabel = hasKg && hasPc ? 'KG + PC' : hasKg ? 'KG' : hasPc ? 'PC' : '';
                 const selectedCount = Object.values(item.selectedItems).filter(Boolean).length;
-                const query = item.search.trim().toLowerCase();
+                const query = (item.search ?? '').trim().toLowerCase();
                 // Ticked items stay visible while searching so a selection is never hidden
                 const visibleStockItems = query
                   ? stockItems.filter(
@@ -264,7 +268,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
                             className={`dispatch-items-row ${stockIndex === visibleStockItems.length - 1 ? 'last-row' : ''}`}
                             key={stockItem.stockItemId}
                           >
-                            <span className="item-name">{stockItem.product.productName}</span>
+                            <span className="item-name">{stockName(stockItem)}</span>
                             <div className="item-controls">
                               <button
                                 type="button"
@@ -284,7 +288,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
                                 onChange={(e) => handleQuantityInput(index, stockItem.stockItemId, e.target.value)}
                                 onFocus={(e) => e.target.select()}
                                 onWheel={(e) => e.currentTarget.blur()}
-                                aria-label={`Quantity for ${stockItem.product.productName}`}
+                                aria-label={`Quantity for ${stockName(stockItem)}`}
                               />
                               <button
                                 type="button"
