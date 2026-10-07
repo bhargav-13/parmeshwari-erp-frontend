@@ -121,6 +121,7 @@ export interface SubReturnRequest {
   returnDate: string; // ISO date format
   returnStock: number; // Gross return stock
   packagings: PackagingDetail[];
+  rejectionStock?: number | null; // Rejected kg, deducted from net with the packaging
   returnRemark?: string | null;
 }
 
@@ -132,6 +133,7 @@ export interface SubReturn {
   packagings?: PackagingDetail[];
   returnType: ReturnType;
   returnRemark?: string | null;
+  rejectionStock?: number | null;
   netReturnStock?: number;
 }
 
@@ -482,7 +484,8 @@ export interface SubcontractingBySubcontract {
   returnItemName: string;
   returnStock: number;
   returnElement: number;
-  packagingType: PackagingType;
+  packagingType: string | null; // all returns' packaging, totalled per type ("2 PETI, 9 FOAM")
+  rejectionStock?: number | null;
   usedStock: number;
   netWeight: number;
   totalJobPay: number;
@@ -496,6 +499,8 @@ export interface SubcontractingBySubcontractList {
   totalJobPaidAmount?: number;
   totalSentStock: number;
   totalReturnStock: number;
+  totalRejectionStock?: number;
+  totalElements?: string | null;
   totalUsed: number;
 }
 

@@ -130,6 +130,7 @@ const SubcontractViewModal: React.FC<SubcontractViewModalProps> = ({
                       <th>Rt. Item</th>
                       <th>Rt. Stock</th>
                       <th>Element</th>
+                      <th>Rejection</th>
                       <th>Used</th>
                       <th>Net Wgt.</th>
                       <th>Job Pay</th>
@@ -147,7 +148,8 @@ const SubcontractViewModal: React.FC<SubcontractViewModalProps> = ({
                         <td>{formatDate(item.returnDate)}</td>
                         <td>{item.returnItemName || '-'}</td>
                         <td>{formatNumber(item.returnStock, 'kg')}</td>
-                        <td>{formatNumber(item.returnElement)} {item.packagingType || ''}</td>
+                        <td>{item.packagingType || '-'}</td>
+                        <td>{item.rejectionStock ? formatNumber(item.rejectionStock, ' Kg') : '-'}</td>
                         <td className="used-cell">{formatNumber(item.usedStock, ' Kg')}</td>
                         <td className="net-weight-cell">{formatNumber(item.netWeight, ' Kg')}</td>
                         <td>{formatCurrency(item.totalJobPay)}</td>
@@ -183,11 +185,25 @@ const SubcontractViewModal: React.FC<SubcontractViewModalProps> = ({
                     <span className="total-label">Total Return Stock :-</span>
                     <span className="total-value">{formatNumber(data.totalReturnStock, 'kg')}</span>
                   </div>
+                  {(data.totalRejectionStock || 0) > 0 && (
+                    <div className="total-item">
+                      <span className="total-label">Total Rejection :-</span>
+                      <span className="total-value">{formatNumber(data.totalRejectionStock || 0, 'kg')}</span>
+                    </div>
+                  )}
                   <div className="total-item total-used">
                     <span className="total-label">Total Used :-</span>
                     <span className="total-value highlight-red">{formatNumber(data.totalUsed, 'kg')}</span>
                   </div>
                 </div>
+                {data.totalElements && (
+                  <div className="totals-row">
+                    <div className="total-item">
+                      <span className="total-label">Total Element :-</span>
+                      <span className="total-value">{data.totalElements}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}

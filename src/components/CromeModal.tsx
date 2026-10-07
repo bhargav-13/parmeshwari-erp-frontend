@@ -143,7 +143,8 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractin
       case 'cromeDate': return !value ? 'Date is required' : null;
       case 'sentStock':
         if (!value || parseFloat(value) <= 0) return 'Sent stock required';
-        if (returnCromeInfo && parseFloat(value) > returnCromeInfo.availableStockForCrome) return 'Exceeds available stock';
+        // Stock is weighed to the gram, so anything within half a gram of the available stock is the full lot
+        if (returnCromeInfo && parseFloat(value) > returnCromeInfo.availableStockForCrome + 0.0005) return 'Exceeds available stock';
         return null;
       default: return null;
     }
@@ -214,15 +215,9 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractin
       packagingCount: parseInt(row.packagingCount),
     }));
 
-    // If the entered value is at (or past) the known available stock, shave a hair off it.
-    // Avoids the backend rejecting equal-looking values (e.g. 68.05 vs 68.05) due to
-    // floating-point drift between what was fetched and what it recomputes on save.
-    const rawSentStock = parseFloat(formData.sentStock);
-    const availableStock = returnCromeInfo?.availableStockForCrome;
-    const sentStock =
-      availableStock != null && rawSentStock >= availableStock
-        ? Math.max(0, availableStock - 0.001)
-        : rawSentStock;
+    // Sent to the gram; the backend compares with the same half-gram tolerance, so the full
+    // available stock can be sent as-is
+    const sentStock = Math.round(parseFloat(formData.sentStock) * 1000) / 1000;
 
     const submitData: CromeRequest = {
       subcontractingReturnId: subcontractingReturnId,

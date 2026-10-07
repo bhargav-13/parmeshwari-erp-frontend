@@ -24,6 +24,10 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
     const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
+    // Net returned vs sent; under half a kg either way is weighing noise and shows as 0
+    const rawDifference = crome.cromeReturn ? crome.cromeReturn.netReturnStock - crome.sentStock : 0;
+    const difference = Math.abs(rawDifference) < 0.5 ? 0 : rawDifference;
+
     const formatDate = (dateString: string) => {
         return format(new Date(dateString), 'dd-MM-yyyy');
     };
@@ -185,7 +189,7 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                                 {crome.cromeReturn.rate != null && (
                                     <div className="detail-row">
                                         <span className="detail-label">Rate</span>
-                                        <span className="detail-value">₹ {crome.cromeReturn.rate}/Kg</span>
+                                        <span className="detail-value">₹ {crome.cromeReturn.rate.toFixed(2)}/Kg</span>
                                     </div>
                                 )}
                                 {crome.cromeReturn.amount != null && (
@@ -196,9 +200,9 @@ const CromeCard: React.FC<CromeCardProps> = ({ crome, onDelete, onRefresh }) => 
                                 )}
                                 <div className="diff-section">
                                     <span className="diff-label">DIFFERENCE</span>
-                                    <span className={`diff-value ${(crome.cromeReturn.netReturnStock - crome.sentStock) < -0.001 ? 'negative' : (crome.cromeReturn.netReturnStock - crome.sentStock) > 0.001 ? 'positive' : 'neutral'}`}>
-                                        {(crome.cromeReturn.netReturnStock - crome.sentStock) > 0 ? '+' : ''}
-                                        {(crome.cromeReturn.netReturnStock - crome.sentStock).toFixed(3)} {crome.unit}
+                                    <span className={`diff-value ${difference < 0 ? 'negative' : difference > 0 ? 'positive' : 'neutral'}`}>
+                                        {difference > 0 ? '+' : ''}
+                                        {difference.toFixed(3)} {crome.unit}
                                     </span>
                                 </div>
                             </div>

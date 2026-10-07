@@ -369,7 +369,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                   <div className="sc-return-list">
                     {subReturns.map((ret, index) => {
                       const retDeduction = (ret.packagings || []).reduce((d, p) => d + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
-                      const retNet = ret.netReturnStock ?? (ret.returnStock - retDeduction);
+                      const retNet = ret.netReturnStock ?? (ret.returnStock - retDeduction - (ret.rejectionStock || 0));
                       const pkgDisplay = (ret.packagings || []).map(p => `${p.packagingCount} ${p.packagingType}`).join(', ') || '-';
                       const retCromes = ret.returnId != null ? cromesByReturnId.get(ret.returnId) : undefined;
                       const retCromeSent = (retCromes || []).reduce((sum, c) => sum + (c.sentStock || 0), 0);
@@ -382,7 +382,10 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                               <span className="detail-value">{formatQty(ret.returnStock)} {subcontract.unit} <span className="sc-muted">(Gr)</span></span>
                             </div>
                             <div className="detail-row">
-                              <span className="detail-label">Pkg: {pkgDisplay}</span>
+                              <span className="detail-label">
+                                Pkg: {pkgDisplay}
+                                {(ret.rejectionStock || 0) > 0 && <> · Rej: {formatQty(ret.rejectionStock || 0)}</>}
+                              </span>
                               <span className="detail-value">Net: {formatQty(retNet)}</span>
                             </div>
                           </div>

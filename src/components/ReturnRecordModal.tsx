@@ -32,6 +32,7 @@ interface ReturnFormState {
   returnStock: number; // Calculated total return
   grossReturn: string; // User input as string
   packagings: PackagingFormRow[];
+  rejection: string; // Rejected kg as string
   returnType: ReturnType;
   returnRemark: string;
 }
@@ -61,6 +62,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
         returnStock: 0,
         grossReturn: '',
         packagings: [createDefaultPackaging()],
+        rejection: '',
         returnType: ReturnType.MAAL,
         returnRemark: '',
       };
@@ -70,11 +72,13 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
       : [createDefaultPackaging()];
     const deductionKg = (initialReturn.packagings || []).reduce(
       (sum, p) => sum + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
+    const rejectionKg = initialReturn.rejectionStock || 0;
     return {
       returnDate: initialReturn.returnDate,
-      returnStock: Math.max(0, (initialReturn.returnStock || 0) - deductionKg),
+      returnStock: Math.max(0, (initialReturn.returnStock || 0) - deductionKg - rejectionKg),
       grossReturn: String(initialReturn.returnStock ?? ''),
       packagings,
+      rejection: rejectionKg ? String(rejectionKg) : '',
       returnType: initialReturn.returnType || ReturnType.MAAL,
       returnRemark: initialReturn.returnRemark || '',
     };
@@ -115,11 +119,11 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
     }, 0);
   };
 
-  // Calculate total return: grossReturn - totalPackagingDeduction
-  const calculateTotalReturn = (grossReturn: string | number, packagings: PackagingFormRow[]): number => {
+  // Calculate total return: grossReturn - (packaging + rejection), rounded to the gram
+  const calculateTotalReturn = (grossReturn: string | number, packagings: PackagingFormRow[], rejection: string | number): number => {
     const gross = parseNum(grossReturn);
-    const deduction = getTotalPackagingDeductionKg(packagings);
-    return Math.max(0, gross - deduction);
+    const deduction = getTotalPackagingDeductionKg(packagings) + parseNum(rejection);
+    return Math.max(0, Math.round((gross - deduction) * 1000) / 1000);
   };
 
   // Enhanced validation with all 5 business rule categories
@@ -131,6 +135,16 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
           return 'Return date cannot be before order date';
         }
         return null;
+
+      case 'rejection': {
+        const rejectionKg = parseNum(value);
+        if (rejectionKg < 0) return 'Rejection cannot be negative';
+        const gross = parseNum(allData.grossReturn);
+        if (rejectionKg > 0 && rejectionKg + getTotalPackagingDeductionKg(allData.packagings) >= gross) {
+          return 'Packaging + rejection cannot exceed gross return';
+        }
+        return null;
+      }
 
       case 'grossReturn': {
         const valueNum = parseNum(value);
@@ -144,7 +158,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
         }, 0);
 
         const remainingStock = sentStock - previouslyReturnedStock;
-        const currentDeduction = getTotalPackagingDeductionKg(allData.packagings);
+        const currentDeduction = getTotalPackagingDeductionKg(allData.packagings) + parseNum(allData.rejection);
         const currentNetReturn = valueNum - currentDeduction;
 
         if (currentNetReturn > remainingStock + 0.001) {
@@ -210,8 +224,8 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
       [name]: cleanValue,
     };
 
-    if (name === 'grossReturn') {
-      updatedData.returnStock = calculateTotalReturn(cleanValue, updatedData.packagings);
+    if (name === 'grossReturn' || name === 'rejection') {
+      updatedData.returnStock = calculateTotalReturn(updatedData.grossReturn, updatedData.packagings, updatedData.rejection);
     }
 
     setFormData(updatedData);
@@ -232,7 +246,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
     const updatedData = {
       ...formData,
       packagings: updatedPackagings,
-      returnStock: calculateTotalReturn(formData.grossReturn, updatedPackagings),
+      returnStock: calculateTotalReturn(formData.grossReturn, updatedPackagings, formData.rejection),
     };
 
     setFormData(updatedData);
@@ -249,7 +263,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
     const updatedData = {
       ...formData,
       packagings: updatedPackagings,
-      returnStock: calculateTotalReturn(formData.grossReturn, updatedPackagings),
+      returnStock: calculateTotalReturn(formData.grossReturn, updatedPackagings, formData.rejection),
     };
 
     setFormData(updatedData);
@@ -261,7 +275,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
     setFormData(prev => ({
       ...prev,
       packagings: updatedPackagings,
-      returnStock: calculateTotalReturn(prev.grossReturn, updatedPackagings),
+      returnStock: calculateTotalReturn(prev.grossReturn, updatedPackagings, prev.rejection),
     }));
   };
 
@@ -271,7 +285,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
     setFormData(prev => ({
       ...prev,
       packagings: updatedPackagings,
-      returnStock: calculateTotalReturn(prev.grossReturn, updatedPackagings),
+      returnStock: calculateTotalReturn(prev.grossReturn, updatedPackagings, prev.rejection),
     }));
   };
 
@@ -287,7 +301,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
     setTouched(allTouched);
 
     // Validate fields
-    const fieldErrors = ['returnDate', 'grossReturn']
+    const fieldErrors = ['returnDate', 'grossReturn', 'rejection']
       .map(key => validateField(key, formData[key as keyof typeof formData]))
       .filter(Boolean);
     const packagingErrors = formData.packagings
@@ -333,6 +347,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
       returnDate: formData.returnDate,
       returnStock: parseNum(formData.grossReturn),
       packagings,
+      rejectionStock: parseNum(formData.rejection) || null,
       returnRemark: formData.returnRemark || null,
     };
 
@@ -487,6 +502,21 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
             {getFieldError('grossReturn') && <span className="field-error-text">{getFieldError('grossReturn')}</span>}
           </div>
 
+          <div className="form-group">
+            <label className="form-label">Rejection (Kg)</label>
+            <input
+              type="text"
+              inputMode="decimal"
+              name="rejection"
+              value={formData.rejection}
+              onChange={handleNumericInput}
+              onBlur={handleBlur}
+              className={`form-input ${getFieldError('rejection') ? 'invalid' : ''}`}
+              placeholder="Rejected weight in Kg (optional)"
+            />
+            {getFieldError('rejection') && <span className="field-error-text">{getFieldError('rejection')}</span>}
+          </div>
+
           <div className="calculation-summary">
             <div className="calc-row">
               <span className="calc-label">Gross Return:</span>
@@ -499,6 +529,12 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
             <div className="calc-row calc-row-formula">
               <span className="calc-formula">({getFormulaDisplay()}) / 1000</span>
             </div>
+            {parseNum(formData.rejection) > 0 && (
+              <div className="calc-row">
+                <span className="calc-label">Rejection:</span>
+                <span className="calc-value deduction">- {parseNum(formData.rejection).toFixed(3)} Kg</span>
+              </div>
+            )}
             <div className="calc-row total-row">
               <span className="calc-label">Total Return:</span>
               <span className="calc-value total">{formData.returnStock.toFixed(3)} Kg</span>
