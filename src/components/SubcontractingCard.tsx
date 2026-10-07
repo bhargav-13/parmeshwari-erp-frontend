@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import type { Crome, Subcontracting, SubReturnRequest, SubOrderRequest } from '../types';
+import type { Crome, Subcontracting, SubReturn, SubReturnRequest, SubOrderRequest, SubSend, SubSendRequest } from '../types';
 import { SubcontractingStatus } from '../types';
 import { subcontractingApi } from '../api/subcontracting';
 import { cromeApi } from '../api/crome';
 import ReturnRecordModal from './ReturnRecordModal';
+import EditSendModal from './EditSendModal';
 import AddSubcontractingModal from './AddSubcontractingModal';
 import CromeModal from './CromeModal';
 import DeleteImpactDialog from './DeleteImpactDialog';
@@ -23,6 +24,8 @@ interface SubcontractingCardProps {
 const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, onDelete, onRefresh }) => {
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingReturn, setEditingReturn] = useState<SubReturn | null>(null);
+  const [editingSend, setEditingSend] = useState<SubSend | null>(null);
   const [cromeReturnId, setCromeReturnId] = useState<number | null>(null);
   const [status, setStatus] = useState(subcontract.status);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -119,6 +122,42 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
     } catch (error) {
       console.error('Error returning record:', error);
       throw error;
+    }
+  };
+
+  const handleUpdateReturn = async (data: SubReturnRequest) => {
+    if (editingReturn?.returnId == null) return;
+    await subcontractingApi.updateReturn(subcontract.subcontractingId, editingReturn.returnId, data);
+    setEditingReturn(null);
+    onRefresh();
+  };
+
+  const handleDeleteReturn = async (ret: SubReturn) => {
+    if (ret.returnId == null) return;
+    if (!window.confirm(`Delete the return of ${formatQty(ret.returnStock)} ${subcontract.unit} on ${formatDate(ret.returnDate)}?`)) return;
+    try {
+      await subcontractingApi.deleteReturn(subcontract.subcontractingId, ret.returnId);
+      onRefresh();
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Failed to delete return');
+    }
+  };
+
+  const handleUpdateSend = async (data: SubSendRequest) => {
+    if (editingSend?.sendId == null) return;
+    await subcontractingApi.updateSend(subcontract.subcontractingId, editingSend.sendId, data);
+    setEditingSend(null);
+    onRefresh();
+  };
+
+  const handleDeleteSend = async (send: SubSend) => {
+    if (send.sendId == null) return;
+    if (!window.confirm(`Delete the lot of ${formatQty(send.sentStock)} ${subcontract.unit} sent on ${formatDate(send.sendDate)}?`)) return;
+    try {
+      await subcontractingApi.deleteSend(subcontract.subcontractingId, send.sendId);
+      onRefresh();
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Failed to delete sent lot');
     }
   };
 
@@ -270,6 +309,16 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                               </div>
                             )}
                           </div>
+                          {send.sendId != null && (
+                            <div className="sc-row-actions">
+                              <button type="button" className="icon-button edit-button" onClick={() => setEditingSend(send)} title="Edit sent lot">
+                                <img src={EditIcon} alt="Edit" className="icon-img" />
+                              </button>
+                              <button type="button" className="icon-button delete-button" onClick={() => handleDeleteSend(send)} title="Delete sent lot">
+                                <img src={DeleteIcon} alt="Delete" className="icon-img" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -355,6 +404,18 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                               </button>
                             )}
                           </div>
+                          {ret.returnId != null && (
+                            <div className="sc-row-actions">
+                              <button type="button" className="icon-button edit-button" onClick={() => setEditingReturn(ret)} title="Edit return">
+                                <img src={EditIcon} alt="Edit" className="icon-img" />
+                              </button>
+                              {!retCromes && (
+                                <button type="button" className="icon-button delete-button" onClick={() => handleDeleteReturn(ret)} title="Delete return">
+                                  <img src={DeleteIcon} alt="Delete" className="icon-img" />
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -391,16 +452,14 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <option value={SubcontractingStatus.REJECTED}>Rejected</option>
               </select>
 
-              {subcontract.status === SubcontractingStatus.IN_PROCESS && (
-                <button
-                  type="button"
-                  className="return-record-button"
-                  onClick={() => setIsReturnModalOpen(true)}
-                >
-                  <img src={ReturnIcon} alt="Return" className="return-icon" />
-                  <span>Return Record</span>
-                </button>
-              )}
+              <button
+                type="button"
+                className="return-record-button"
+                onClick={() => setIsReturnModalOpen(true)}
+              >
+                <img src={ReturnIcon} alt="Return" className="return-icon" />
+                <span>Return Record</span>
+              </button>
 
             </div>
           </div>
@@ -419,6 +478,24 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
           subcontract={subcontract}
           onClose={() => setIsReturnModalOpen(false)}
           onSubmit={handleReturnRecord}
+        />
+      )}
+
+      {editingReturn && (
+        <ReturnRecordModal
+          subcontract={subcontract}
+          initialReturn={editingReturn}
+          onClose={() => setEditingReturn(null)}
+          onSubmit={handleUpdateReturn}
+        />
+      )}
+
+      {editingSend && (
+        <EditSendModal
+          send={editingSend}
+          unit={subcontract.unit}
+          onClose={() => setEditingSend(null)}
+          onSubmit={handleUpdateSend}
         />
       )}
 

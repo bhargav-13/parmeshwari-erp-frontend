@@ -19,45 +19,29 @@
   margin: 0 0 24px 0;
 }
 
+/* No scroll box of its own: the drawer panel scrolls when needed, and the item
+   dropdown can overlay the rows below instead of adding a scrollbar to the form. */
 .scrap-modal-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  overflow-y: auto;
-}
-
-.scrap-modal-form::-webkit-scrollbar {
-  width: 8px;
-}
-
-.scrap-modal-form::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 8px 0;
-}
-
-.scrap-modal-form::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 4px;
-}
-
-.scrap-modal-form::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
 }
 
 .scrap-form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
 .scrap-form-row:has(.scrap-element-group) {
-  grid-template-columns: 1fr 1.5fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
 }
 
 .scrap-form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .scrap-form-label {
@@ -69,6 +53,9 @@
 }
 
 .scrap-form-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: 8px;

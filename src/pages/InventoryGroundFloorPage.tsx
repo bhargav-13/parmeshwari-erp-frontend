@@ -31,7 +31,7 @@ const InventoryGroundFloorPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [statusFilter]);
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -40,8 +40,7 @@ const InventoryGroundFloorPage: React.FC = () => {
         stockItemApi.getStockItems(
           InventoryFloor.GROUND_FLOOR,
           0,
-          1000,
-          statusFilter || undefined
+          1000
         ),
         productApi.getProducts(),
         categoryApi.getCategories(),

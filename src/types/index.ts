@@ -135,6 +135,14 @@ export interface SubReturn {
   netReturnStock?: number;
 }
 
+export interface SubSendRequest {
+  sendDate: string;
+  sentStock: number;
+  price: number;
+  jobWorkPay: number;
+  remark?: string | null;
+}
+
 // One batch of stock sent to a job work (a job work can be sent to in several batches)
 export interface SubSend {
   sendId?: number;

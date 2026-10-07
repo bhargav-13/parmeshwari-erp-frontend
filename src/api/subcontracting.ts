@@ -4,6 +4,7 @@ import type {
   Subcontracting,
   SubOrderRequest,
   SubReturnRequest,
+  SubSendRequest,
   PaginatedResult,
   SubcontractingBySubcontractInfo,
   SubcontractingBySubcontractList,
@@ -85,6 +86,30 @@ export const subcontractingApi = {
       `/api/v1/subcontracting/${id}/return`,
       data
     );
+    return response.data;
+  },
+
+  // Edit one return of a job work
+  updateReturn: async (id: number, returnId: number, data: SubReturnRequest): Promise<Subcontracting> => {
+    const response = await apiClient.put<Subcontracting>(`/api/v1/subcontracting/${id}/return/${returnId}`, data);
+    return response.data;
+  },
+
+  // Delete one return of a job work (not allowed once sent to crome)
+  deleteReturn: async (id: number, returnId: number): Promise<Subcontracting> => {
+    const response = await apiClient.delete<Subcontracting>(`/api/v1/subcontracting/${id}/return/${returnId}`);
+    return response.data;
+  },
+
+  // Edit one send (lot of stock sent) of a job work
+  updateSend: async (id: number, sendId: number, data: SubSendRequest): Promise<Subcontracting> => {
+    const response = await apiClient.put<Subcontracting>(`/api/v1/subcontracting/${id}/send/${sendId}`, data);
+    return response.data;
+  },
+
+  // Delete one send of a job work (a job work keeps at least one)
+  deleteSend: async (id: number, sendId: number): Promise<Subcontracting> => {
+    const response = await apiClient.delete<Subcontracting>(`/api/v1/subcontracting/${id}/send/${sendId}`);
     return response.data;
   },
 

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import type { Subcontracting, SubReturnRequest, PackagingDetail } from '../types';
+import type { Subcontracting, SubReturn, SubReturnRequest, PackagingDetail } from '../types';
 import { PackagingType, ReturnType } from '../types';
+import { todayLocal } from '../utils/format';
 import './ReturnRecordModal.css';
 
 interface ReturnRecordModalProps {
   subcontract: Subcontracting;
+  /** The saved return being edited; omit to add a new one */
+  initialReturn?: SubReturn;
   onClose: () => void;
   onSubmit: (data: SubReturnRequest) => Promise<void>;
 }
@@ -39,15 +42,48 @@ const createDefaultPackaging = (): PackagingFormRow => ({
   drumWeight: '',
 });
 
-const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState<ReturnFormState>({
-    returnDate: new Date().toISOString().split('T')[0],
-    returnStock: 0,
-    grossReturn: '',
-    packagings: [createDefaultPackaging()],
-    returnType: ReturnType.MAAL,
-    returnRemark: '',
+// Saved packagings are stored in KG; preset types are recognised by weight, anything else is a drum
+const toPackagingFormRow = (p: PackagingDetail): PackagingFormRow => {
+  const weightGm = Math.round((p.packagingWeight || 0) * 1000 * 1000) / 1000;
+  const type = p.packagingType as PackagingType;
+  const preset = PACKAGING_WEIGHTS[type];
+  return preset != null && Math.abs(preset - weightGm) < 0.001
+    ? { packagingType: type, packagingCount: String(p.packagingCount ?? ''), drumWeight: '' }
+    : { packagingType: PackagingType.DRUM, packagingCount: String(p.packagingCount ?? ''), drumWeight: String(weightGm) };
+};
+
+const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, initialReturn, onClose, onSubmit }) => {
+  const isEditMode = !!initialReturn;
+  const [formData, setFormData] = useState<ReturnFormState>(() => {
+    if (!initialReturn) {
+      return {
+        returnDate: todayLocal(),
+        returnStock: 0,
+        grossReturn: '',
+        packagings: [createDefaultPackaging()],
+        returnType: ReturnType.MAAL,
+        returnRemark: '',
+      };
+    }
+    const packagings = initialReturn.packagings?.length
+      ? initialReturn.packagings.map(toPackagingFormRow)
+      : [createDefaultPackaging()];
+    const deductionKg = (initialReturn.packagings || []).reduce(
+      (sum, p) => sum + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
+    return {
+      returnDate: initialReturn.returnDate,
+      returnStock: Math.max(0, (initialReturn.returnStock || 0) - deductionKg),
+      grossReturn: String(initialReturn.returnStock ?? ''),
+      packagings,
+      returnType: initialReturn.returnType || ReturnType.MAAL,
+      returnRemark: initialReturn.returnRemark || '',
+    };
   });
+
+  // Returns other than the one being edited count against the sent stock
+  const otherReturns = (subcontract.subReturns || []).filter(
+    (r) => !initialReturn || r.returnId !== initialReturn.returnId
+  );
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
@@ -101,8 +137,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
         if (!value || valueNum <= 0) return 'Gross return must be > 0';
 
         const sentStock = subcontract.sentStock || 0;
-        const previousReturns = subcontract.subReturns || [];
-        const previouslyReturnedStock = previousReturns.reduce((sum, r) => {
+        const previouslyReturnedStock = otherReturns.reduce((sum, r) => {
           if (r.netReturnStock != null) return sum + r.netReturnStock;
           const deduction = (r.packagings || []).reduce((d, p) => d + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
           return sum + (r.returnStock - deduction);
@@ -245,11 +280,6 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
     setError(null);
     setWarnings([]);
 
-    if (subcontract.status === 'COMPLETED') {
-      setError('Cannot add return to a completed order. Please reopen it first.');
-      return;
-    }
-
     // Mark all as touched
     const allTouched: Record<string, boolean> = {};
     Object.keys(formData).forEach(key => { allTouched[key] = true; });
@@ -279,8 +309,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
 
     const grossReturnNum = parseNum(formData.grossReturn);
     const sentStock = subcontract.sentStock || 0;
-    const previousReturns = subcontract.subReturns || [];
-    const previouslyReturnedStock = previousReturns.reduce((sum, r) => sum + r.returnStock, 0);
+    const previouslyReturnedStock = otherReturns.reduce((sum, r) => sum + r.returnStock, 0);
 
     if (Math.abs((grossReturnNum + previouslyReturnedStock) - sentStock) < 0.001 && subcontract.status === 'IN_PROCESS') {
       newWarnings.push('This return completes the order. Consider marking it as "Completed".');
@@ -311,7 +340,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
       setLoading(true);
       await onSubmit(submitData);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to return record');
+      setError(err.response?.data?.message || (isEditMode ? 'Failed to update return' : 'Failed to return record'));
     } finally {
       setLoading(false);
     }
@@ -345,7 +374,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
   return (
     <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content return-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Add Return</h2>
+        <h2 className="modal-title">{isEditMode ? 'Edit Return' : 'Add Return'}</h2>
 
         <form onSubmit={handleSubmit} className="modal-form" noValidate>
           <div className="form-row">
@@ -492,7 +521,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, onCl
 
           <div className="modal-actions">
             <button type="submit" className="save-button" disabled={loading}>
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? 'Saving...' : isEditMode ? 'Update' : 'Save'}
             </button>
             <button type="button" className="cancel-button" onClick={onClose}>
               Cancel

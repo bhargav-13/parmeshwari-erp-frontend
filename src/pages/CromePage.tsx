@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cromeApi } from '../api/crome';
-import type { Crome } from '../types';
+import type { Crome, Party } from '../types';
 import { SubcontractingStatus } from '../types';
 import CromeCard from '../components/CromeCard';
 import Pagination from '../components/Pagination';
@@ -21,15 +21,23 @@ const CromePage: React.FC = () => {
     });
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<SubcontractingStatus | ''>('');
+    const [partyFilter, setPartyFilter] = useState<number | ''>('');
+    const [parties, setParties] = useState<Party[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
 
     useEffect(() => {
+        cromeApi.getPartyList()
+            .then((data) => setParties([...data].sort((a, b) => a.name.localeCompare(b.name))))
+            .catch((error) => console.error('Error fetching parties:', error));
+    }, []);
+
+    useEffect(() => {
         fetchCromes();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, searchQuery, statusFilter]);
+    }, [page, searchQuery, statusFilter, partyFilter]);
 
     const fetchCromes = async () => {
         try {
@@ -39,6 +47,7 @@ const CromePage: React.FC = () => {
                 size: 10,
                 search: searchQuery || undefined,
                 status: statusFilter || undefined,
+                partyId: partyFilter || undefined,
             });
 
             setCromes(response.data);
@@ -117,14 +126,38 @@ const CromePage: React.FC = () => {
                         type="text"
                         placeholder="Search by party, contractor or item"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setPage(0);
+                        }}
                     />
                 </div>
                 <div className="order-status-filter">
                     <img src={FilterIcon} alt="Filter" />
                     <select
+                        value={partyFilter}
+                        onChange={(e) => {
+                            setPartyFilter(e.target.value ? Number(e.target.value) : '');
+                            setPage(0);
+                        }}
+                        title="Filter by party"
+                    >
+                        <option value="">All Parties</option>
+                        {parties.map((party) => (
+                            <option key={party.partyId} value={party.partyId}>
+                                {party.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="order-status-filter">
+                    <img src={FilterIcon} alt="Filter" />
+                    <select
                         value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as SubcontractingStatus | '')}
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value as SubcontractingStatus | '');
+                            setPage(0);
+                        }}
                         title="Filter by status"
                     >
                         <option value="">All Status</option>

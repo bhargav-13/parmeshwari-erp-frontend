@@ -31,7 +31,7 @@ const InventoryFirstFloorPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [statusFilter]);
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -40,8 +40,7 @@ const InventoryFirstFloorPage: React.FC = () => {
         stockItemApi.getStockItems(
           InventoryFloor.FIRST_FLOOR,
           0,
-          1000,
-          statusFilter || undefined
+          1000
         ),
         productApi.getProducts(),
         categoryApi.getCategories(),

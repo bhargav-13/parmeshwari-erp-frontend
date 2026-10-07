@@ -560,6 +560,22 @@
   color: #334155;
 }
 
+/* Edit / delete for one send or return row */
+.subcontracting-card .sc-row-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 2px;
+}
+
+.subcontracting-card .sc-row-actions .icon-button {
+  padding: 4px;
+}
+
+.subcontracting-card .sc-row-actions .icon-img {
+  width: 16px;
+  height: 16px;
+}
+
 .subcontracting-card .sc-return-crome {
   flex: 0 0 auto;
   display: flex;

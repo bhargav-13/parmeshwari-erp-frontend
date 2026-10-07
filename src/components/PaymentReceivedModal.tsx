@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { paymentApi } from '../api/payment';
 import type { Payment, PaymentReceiveRequest } from '../types';
 import './PaymentReceivedModal.css';
+import { todayLocal } from '../utils/format';
 
 interface PaymentReceivedModalProps {
   payment: Payment;
@@ -16,7 +17,7 @@ const PaymentReceivedModal: React.FC<PaymentReceivedModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<PaymentReceiveRequest>({
     newReceivedAmount: 0,
-    newReceivedDate: new Date().toISOString().split('T')[0],
+    newReceivedDate: todayLocal(),
   });
 
   const [loading, setLoading] = useState(false);

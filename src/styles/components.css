@@ -648,6 +648,7 @@ body .drawer-overlay.drawer-overlay > .crome-return-modal,
 body .drawer-overlay.drawer-overlay > .return-modal,
 body .drawer-overlay.drawer-overlay > .payment-received-modal,
 body .drawer-overlay.drawer-overlay > .dispatch-modal,
+body .drawer-overlay.drawer-overlay > .scrap-modal-content,
 body .drawer-overlay.drawer-overlay > .order-details-modal,
 body .drawer-overlay.drawer-overlay > .product-detail-modal,
 body .drawer-overlay.drawer-overlay > .modal-content:not(.small-modal) {

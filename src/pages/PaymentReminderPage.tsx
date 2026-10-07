@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { paymentApi } from '../api/payment';
 import { partyApi } from '../api/party';
 import type { Party, PartyLedgerResponse, PaymentFloor } from '../types';
+import { BillingType } from '../types';
+import { todayLocal } from '../utils/format';
 import PartyLedgerModal from '../components/PartyLedgerModal';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
@@ -39,7 +41,7 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedPartyId, setExpandedPartyId] = useState<number | null>(null);
   const [detailLedger, setDetailLedger] = useState<PartyLedgerResponse | null>(null);
-  const [receivingParty, setReceivingParty] = useState<{ party: Party; mode: 'official' | 'offline' } | null>(null);
+  const [receivingParty, setReceivingParty] = useState<{ party: Party; ledger: PartyLedgerResponse | null; mode: 'official' | 'offline' } | null>(null);
   const [receiveAmount, setReceiveAmount] = useState<number | ''>('');
   const [receiveLoading, setReceiveLoading] = useState(false);
   const [receiveError, setReceiveError] = useState<string | null>(null);
@@ -98,33 +100,69 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
     setExpandedPartyId((prev) => (prev === partyId ? null : partyId));
   };
 
+  // Received so far against the party's orders in one mode
+  const receivedInMode = (ledger: PartyLedgerResponse | null, mode: 'official' | 'offline') =>
+    (ledger?.orders || []).reduce((sum, o) => sum + (o.paymentSummary?.[mode]?.receivedAmount || 0), 0);
+
+  // What the party still owes in one mode: its running balance less what was received on its orders
+  const dueInMode = (party: Party, ledger: PartyLedgerResponse | null, mode: 'official' | 'offline') => {
+    const balance = mode === 'official' ? (party.officialAmount || 0) : (party.offlineAmount || 0);
+    return Math.max(0, Math.round((balance - receivedInMode(ledger, mode)) * 100) / 100);
+  };
+
+  // A party-level receipt is recorded against the party's orders, oldest due first, so it shows
+  // as Received and in the ledger. Only what is left after every order is paid comes off the
+  // party's stored balance (the balance from before the ERP, which has no order to pay against).
   const handleReceiveSubmit = async () => {
     if (!receivingParty || receiveAmount === '' || Number(receiveAmount) <= 0) return;
-    const { party, mode } = receivingParty;
-    const deduct = Number(receiveAmount);
-    const available = mode === 'official' ? (party.officialAmount || 0) : (party.offlineAmount || 0);
-    if (deduct > available) {
-      setReceiveError(`Amount cannot exceed ${mode} balance of ${formatCurrency(available)}`);
+    const { party, ledger, mode } = receivingParty;
+    const amount = Math.round(Number(receiveAmount) * 100) / 100;
+    const available = dueInMode(party, ledger, mode);
+    if (amount > available + 0.01) {
+      setReceiveError(`Amount cannot exceed ${mode} due of ${formatCurrency(available)}`);
       return;
     }
-    const updatedOfficial = mode === 'official' ? available - deduct : (party.officialAmount || 0);
-    const updatedOffline = mode === 'offline' ? available - deduct : (party.offlineAmount || 0);
+    const billingType = mode === 'official' ? BillingType.OFFICIAL : BillingType.OFFLINE;
+    const today = todayLocal();
+    const dueOrders = [...(ledger?.orders || [])]
+      .filter((o) => (o.paymentSummary?.[mode]?.dueAmount || 0) > 0)
+      .sort((a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime() || a.orderId - b.orderId);
+
+    let left = amount;
     try {
       setReceiveLoading(true);
-      await partyApi.updateParty(party.partyId, {
-        name: party.name,
-        officialAmount: updatedOfficial,
-        offlineAmount: updatedOffline,
-      });
+      for (const order of dueOrders) {
+        if (left <= 0) break;
+        const due = order.paymentSummary?.[mode]?.dueAmount || 0;
+        const portion = Math.round(Math.min(left, due) * 100) / 100;
+        if (portion <= 0) continue;
+        const payment = await paymentApi.getPaymentByOrderAndMode(order.orderId, billingType);
+        await paymentApi.receivePayment(payment.id, { newReceivedAmount: portion, newReceivedDate: today });
+        left = Math.round((left - portion) * 100) / 100;
+      }
+      if (left > 0) {
+        const officialAmount = party.officialAmount || 0;
+        const offlineAmount = party.offlineAmount || 0;
+        await partyApi.updateParty(party.partyId, {
+          name: party.name,
+          officialAmount: mode === 'official' ? Math.round((officialAmount - left) * 100) / 100 : officialAmount,
+          offlineAmount: mode === 'offline' ? Math.round((offlineAmount - left) * 100) / 100 : offlineAmount,
+          floor: party.floor,
+        });
+      }
       setReceivingParty(null);
       setReceiveAmount('');
       setReceiveError(null);
-      await fetchData();
     } catch (err) {
       console.error('Failed to record payment:', err);
-      setReceiveError('Failed to save. Please try again.');
+      setReceiveError(
+        left < amount
+          ? `Recorded ${formatCurrency(amount - left)} only, ${formatCurrency(left)} failed. Please check the ledger.`
+          : 'Failed to save. Please try again.'
+      );
     } finally {
       setReceiveLoading(false);
+      await fetchData();
     }
   };
 
@@ -261,22 +299,22 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                             >
                               <img src={ViewIcon} alt="View" className="view-icon" />
                             </button>
-                            {(row.party.officialAmount || 0) > 0 && (
+                            {!row.loading && dueInMode(row.party, row.ledger, 'official') > 0 && (
                               <button
                                 type="button"
                                 className="receive-payment-btn receive-payment-btn--official"
-                                title={`Receive against Official: ${formatCurrency(row.party.officialAmount)}`}
-                                onClick={(e) => { e.stopPropagation(); setReceivingParty({ party: row.party, mode: 'official' }); setReceiveAmount(''); setReceiveError(null); }}
+                                title={`Receive against Official due: ${formatCurrency(dueInMode(row.party, row.ledger, 'official'))}`}
+                                onClick={(e) => { e.stopPropagation(); setReceivingParty({ party: row.party, ledger: row.ledger, mode: 'official' }); setReceiveAmount(''); setReceiveError(null); }}
                               >
                                 Official
                               </button>
                             )}
-                            {(row.party.offlineAmount || 0) > 0 && (
+                            {!row.loading && dueInMode(row.party, row.ledger, 'offline') > 0 && (
                               <button
                                 type="button"
                                 className="receive-payment-btn receive-payment-btn--offline"
-                                title={`Receive against Offline: ${formatCurrency(row.party.offlineAmount)}`}
-                                onClick={(e) => { e.stopPropagation(); setReceivingParty({ party: row.party, mode: 'offline' }); setReceiveAmount(''); setReceiveError(null); }}
+                                title={`Receive against Offline due: ${formatCurrency(dueInMode(row.party, row.ledger, 'offline'))}`}
+                                onClick={(e) => { e.stopPropagation(); setReceivingParty({ party: row.party, ledger: row.ledger, mode: 'offline' }); setReceiveAmount(''); setReceiveError(null); }}
                               >
                                 Offline
                               </button>
@@ -371,8 +409,8 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
           <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal-title">Receive Payment</h2>
             <p className="receive-modal-subtitle">
-              <strong>{receivingParty.party.name}</strong> — {receivingParty.mode === 'official' ? 'Official' : 'Offline'} Amount:{' '}
-              <strong>{formatCurrency(receivingParty.mode === 'official' ? receivingParty.party.officialAmount : receivingParty.party.offlineAmount)}</strong>
+              <strong>{receivingParty.party.name}</strong> — {receivingParty.mode === 'official' ? 'Official' : 'Offline'} Due:{' '}
+              <strong>{formatCurrency(dueInMode(receivingParty.party, receivingParty.ledger, receivingParty.mode))}</strong>
             </p>
             <div className="modal-form">
               <div className="form-group">

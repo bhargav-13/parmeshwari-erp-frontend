@@ -60,6 +60,7 @@ export const cromeApi = {
     size?: number;
     status?: SubcontractingStatus;
     search?: string;
+    partyId?: number;
   }): Promise<PaginatedResult<Crome>> => {
     const response = await apiClient.get<PaginatedResult<Crome>>('/api/v1/crome', {
       params,
