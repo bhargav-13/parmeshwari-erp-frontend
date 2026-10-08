@@ -1,0 +1,66 @@
+/* Live invoice preview that sits to the left of the order drawer */
+body .drawer-overlay.drawer-overlay > .invoice-preview-panel {
+  --drawer-width: 560px;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #eef3f8;
+  margin-right: 12px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  height: calc(100vh - 24px);
+  align-self: center;
+}
+
+body .drawer-overlay.drawer-overlay > .invoice-preview-panel + .order-modal,
+body .drawer-overlay.drawer-overlay > .order-modal {
+  flex: 0 1 960px;
+}
+
+.invoice-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.invoice-preview-subtitle {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: #8e9fb1;
+  margin: 0 0 2px;
+}
+
+.invoice-preview-title {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  color: var(--brand);
+  margin: 0;
+}
+
+.invoice-preview-paper {
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+}
+
+.invoice-preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 27, 42, 0.12);
+}
+
+/* Not enough room beside the 960px drawer */
+@media (max-width: 1279px) {
+  body .drawer-overlay.drawer-overlay > .invoice-preview-panel {
+    display: none;
+  }
+}

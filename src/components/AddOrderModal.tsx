@@ -4,6 +4,7 @@ import { OrderFloor, QuantityUnit, InventoryFloor } from '../types';
 import { stockItemApi, productApi } from '../api/inventory';
 import { partyApi } from '../api/party';
 import SearchableSelect, { type SearchableOption } from './SearchableSelect';
+import OrderInvoicePreview, { downloadInvoice } from './OrderInvoicePreview';
 import './AddOrderModal.css';
 import DeleteIcon from '../assets/delete.svg';
 
@@ -372,8 +373,15 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
 
   const formattedProductsTotal = useMemo(() => formatCurrency(formData.productsTotal), [formData.productsTotal]);
 
+  const invoiceProps = {
+    order: formData,
+    partyName: parties.find((p) => p.partyId === formData.partyId)?.name || formData.customerName || '',
+    invoiceNumber: initialData?.id ? `PBI-${initialData.id}` : 'Draft',
+  };
+
   return (
     <div className="order-modal-overlay drawer-overlay" onClick={onClose}>
+      <OrderInvoicePreview {...invoiceProps} />
       <div className="order-modal" onClick={(e) => e.stopPropagation()}>
         <div className="order-modal-header">
           <div>
@@ -744,6 +752,9 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
               <>
                 <button type="submit" className="order-btn" data-variant="primary" disabled={isSaving}>
                   {isSaving ? 'Saving…' : isEditMode ? 'Update Order' : 'Save Order'}
+                </button>
+                <button type="button" className="order-btn" data-variant="secondary" onClick={() => downloadInvoice(invoiceProps)}>
+                  Download Invoice
                 </button>
                 <button type="button" className="order-btn" data-variant="secondary" onClick={onClose}>
                   Cancel
