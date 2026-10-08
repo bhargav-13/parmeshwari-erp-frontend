@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import type { OrderRequest } from '../types';
+import './AddOrderModal.css';
 import './OrderInvoicePreview.css';
 
 interface OrderInvoicePreviewProps {
@@ -35,7 +36,7 @@ export const buildInvoiceHtml = ({ order, partyName, invoiceNumber }: OrderInvoi
   const rows = lines.length
     ? lines
         .map((p) => {
-          const isPc = (p.quantityUnit || 'kg') === 'pc';
+          const isPc = p.quantityUnit ? p.quantityUnit === 'pc' : Number(p.quantityPc) > 0;
           return `<tr>
             <td class="name">${escapeHtml(p.productName || '-')}</td>
             <td>${isPc ? '-' : qty(p.quantityKg)}</td>

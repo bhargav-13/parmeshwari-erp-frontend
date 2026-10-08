@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Order } from '../types';
+import { downloadInvoice } from './OrderInvoicePreview';
 import './OrderDetailsModal.css';
 
 interface OrderDetailsModalProps {
@@ -32,9 +33,25 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
             <h2 className="order-details-title">{order.customerName}</h2>
             <p className="order-details-id">Order ID: PBI-{String(order.id).padStart(4, '0')}</p>
           </div>
-          <button type="button" className="order-details-close" onClick={onClose} aria-label="Close">
-            ✕
-          </button>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+            <button
+              type="button"
+              className="order-btn"
+              data-variant="primary"
+              onClick={() =>
+                downloadInvoice({
+                  order: { ...order, customerName: order.party?.name || order.customerName || '' },
+                  partyName: order.party?.name || order.customerName || '',
+                  invoiceNumber: `PBI-${order.id}`,
+                })
+              }
+            >
+              Download Invoice
+            </button>
+            <button type="button" className="order-details-close" onClick={onClose} aria-label="Close">
+              ✕
+            </button>
+          </div>
         </div>
 
         <div className="order-details-summary">
