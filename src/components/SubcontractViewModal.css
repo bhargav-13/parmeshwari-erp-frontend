@@ -332,3 +332,8 @@
     font-size: 11px;
   }
 }
+
+.rejection-amount-sub {
+  font-size: 11px;
+  color: #c0392b;
+}

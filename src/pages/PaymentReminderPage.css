@@ -666,3 +666,6 @@
     min-width: 100px;
   }
 }
+.payment-table td.total-khate-cell {
+  font-weight: 600;
+}

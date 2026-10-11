@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import SubcontractingPage from './pages/SubcontractingPage';
 import SubcontractPage from './pages/SubcontractPage';
+import SubcontractRejectionPage from './pages/SubcontractRejectionPage';
 import CromePage from './pages/CromePage';
 import InventoryGroundFloorPage from './pages/InventoryGroundFloorPage';
 import InventoryFirstFloorPage from './pages/InventoryFirstFloorPage';
@@ -69,6 +70,7 @@ function App() {
             <Route path="orders/first-floor" element={<OrderFirstFloorPage />} />
             <Route path="subcontracting" element={<SubcontractingPage />} />
             <Route path="subcontractor" element={<SubcontractPage />} />
+            <Route path="subcontracting/rejection" element={<SubcontractRejectionPage />} />
             <Route path="crome" element={<CromePage />} />
             <Route path="invoices/ground-floor" element={<InvoiceGroundFloorPage />} />
             <Route path="invoices/first-floor" element={<InvoiceFirstFloorPage />} />

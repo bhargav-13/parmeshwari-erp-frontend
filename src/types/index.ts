@@ -175,6 +175,18 @@ export interface Subcontracting {
   cromeCount?: number;
   availableStockForCrome?: number;
   canCreateCrome?: boolean;
+  returnsRejectionStock?: number; // sum of the rejection on the returns
+  rejectionStock?: number; // kg in effect: set by hand, else the returns' total
+  rejectionStockManual?: boolean;
+  rejectionPrice?: number; // rate in effect: set by hand, else the market price
+  rejectionPriceManual?: boolean;
+  rejectionAmount?: number; // kg x rate, deducted from the job pay
+}
+
+// null puts the kg / rate back to the default (returns' total / market price)
+export interface SubRejectionRequest {
+  rejectionStock: number | null;
+  rejectionPrice: number | null;
 }
 
 export interface SubcontractingStats {
@@ -486,6 +498,8 @@ export interface SubcontractingBySubcontract {
   returnElement: number;
   packagingType: string | null; // all returns' packaging, totalled per type ("2 PETI, 9 FOAM")
   rejectionStock?: number | null;
+  rejectionPrice?: number | null;
+  rejectionAmount?: number | null; // already taken off totalJobPay
   usedStock: number;
   netWeight: number;
   totalJobPay: number;
@@ -500,6 +514,7 @@ export interface SubcontractingBySubcontractList {
   totalSentStock: number;
   totalReturnStock: number;
   totalRejectionStock?: number;
+  totalRejectionAmount?: number; // already taken off totalJobPaidAmount
   totalElements?: string | null;
   totalUsed: number;
 }

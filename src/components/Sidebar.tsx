@@ -118,6 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
     { path: '/subcontracting', label: 'Subcontracting' },
     { path: '/subcontractor', label: 'Subcontractor' },
     { path: '/crome', label: 'Crome' },
+    { path: '/subcontracting/rejection', label: 'Rejection' },
   ];
 
   return (

@@ -5,6 +5,7 @@ import type {
   SubOrderRequest,
   SubReturnRequest,
   SubSendRequest,
+  SubRejectionRequest,
   PaginatedResult,
   SubcontractingBySubcontractInfo,
   SubcontractingBySubcontractList,
@@ -110,6 +111,12 @@ export const subcontractingApi = {
   // Delete one send of a job work (a job work keeps at least one)
   deleteSend: async (id: number, sendId: number): Promise<Subcontracting> => {
     const response = await apiClient.delete<Subcontracting>(`/api/v1/subcontracting/${id}/send/${sendId}`);
+    return response.data;
+  },
+
+  // Set the job work's rejection kg / rate by hand (null = back to the default)
+  updateRejection: async (id: number, data: SubRejectionRequest): Promise<Subcontracting> => {
+    const response = await apiClient.put<Subcontracting>(`/api/v1/subcontracting/${id}/rejection`, data);
     return response.data;
   },
 

@@ -30,7 +30,7 @@ const KIND_LABEL: Record<InwardKind, string> = {
 
 type InwardKind = 'CHHOL' | 'TAIYAR_MAAL' | 'REJECTION' | 'KG';
 type Period = 'all' | 'month' | '3m' | '6m' | 'year' | 'custom';
-type SortKey = 'partyName' | 'opening' | 'outward' | 'inward' | 'net' | 'lastDate' | 'entries';
+type SortKey = 'partyName' | 'opening' | 'outward' | 'inward' | 'net' | 'chalu' | 'lastDate' | 'entries';
 
 interface PartyRow {
     partyName: string;
@@ -42,6 +42,7 @@ interface PartyRow {
     kg: number;
     inward: number;
     net: number;
+    chalu: number; // this calendar month: wire sent − material returned, whatever the period
     lastDate: number;
     entries: number;
 }
@@ -133,18 +134,23 @@ const ForgingPartyStockPage: React.FC = () => {
             const key = name?.trim() || 'Unknown';
             let row = map.get(key);
             if (!row) {
-                row = { partyName: key, opening: 0, outward: 0, chhol: 0, taiyarMaal: 0, rejection: 0, kg: 0, inward: 0, net: 0, lastDate: 0, entries: 0 };
+                row = { partyName: key, opening: 0, outward: 0, chhol: 0, taiyarMaal: 0, rejection: 0, kg: 0, inward: 0, net: 0, chalu: 0, lastDate: 0, entries: 0 };
                 map.set(key, row);
             }
             return row;
         };
         const inPeriod = (t: number) => (from === null || t >= from) && (to === null || t <= to);
         const beforePeriod = (t: number) => from !== null && t < from;
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
+        const inCurrentMonth = (t: number) => t >= monthStart && t < monthEnd;
 
         for (const o of outwards) {
             const t = parseDate(o.date);
             const row = get(o.partyName);
             const w = Number(o.weight) || 0;
+            if (inCurrentMonth(t)) row.chalu += w;
             if (beforePeriod(t)) row.opening += w;
             else if (inPeriod(t)) {
                 row.outward += w;
@@ -156,6 +162,7 @@ const ForgingPartyStockPage: React.FC = () => {
             const t = parseDate(i.date);
             const row = get(i.partyName);
             const w = Number(i.weight) || 0;
+            if (inCurrentMonth(t)) row.chalu -= w;
             if (beforePeriod(t)) row.opening -= w;
             else if (inPeriod(t)) {
                 const kind = inwardKind(i.weightUnit);
@@ -198,14 +205,16 @@ const ForgingPartyStockPage: React.FC = () => {
             kg: acc.kg + r.kg,
             inward: acc.inward + r.inward,
             net: acc.net + r.net,
+            chalu: acc.chalu + r.chalu,
             entries: acc.entries + r.entries,
         }),
-        { opening: 0, outward: 0, chhol: 0, taiyarMaal: 0, rejection: 0, kg: 0, inward: 0, net: 0, entries: 0 }
+        { opening: 0, outward: 0, chhol: 0, taiyarMaal: 0, rejection: 0, kg: 0, inward: 0, net: 0, chalu: 0, entries: 0 }
     ), [visibleRows]);
 
     const minusCount = visibleRows.filter(r => r.net < -0.0001).length;
     const showKg = totals.kg > 0;
     const showOpening = from !== null;
+    const currentMonthLabel = new Date().toLocaleString('en-IN', { month: 'long', year: 'numeric' });
 
     // Charts follow the clicked party, otherwise every visible party
     const chartParties = useMemo(
@@ -464,6 +473,7 @@ const ForgingPartyStockPage: React.FC = () => {
                             {showKg && <th>KG</th>}
                             <th onClick={() => handleSort('inward')}>Total Inward{sortArrow('inward')}</th>
                             <th onClick={() => handleSort('net')}>Net Stock{sortArrow('net')}</th>
+                            <th onClick={() => handleSort('chalu')} title={`${currentMonthLabel}: wire sent − material returned`}>Chalu Khate{sortArrow('chalu')}</th>
                             <th onClick={() => handleSort('lastDate')}>Last Entry{sortArrow('lastDate')}</th>
                             <th onClick={() => handleSort('entries')}>Entries{sortArrow('entries')}</th>
                         </tr>
@@ -471,7 +481,7 @@ const ForgingPartyStockPage: React.FC = () => {
                     <tbody>
                         {visibleRows.length === 0 ? (
                             <tr>
-                                <td colSpan={11} className="ps-empty-row">No parties found</td>
+                                <td colSpan={12} className="ps-empty-row">No parties found</td>
                             </tr>
                         ) : visibleRows.map(r => (
                             <tr
@@ -489,6 +499,7 @@ const ForgingPartyStockPage: React.FC = () => {
                                 {showKg && <td>{fmt(r.kg)}</td>}
                                 <td>{fmt(r.inward)}</td>
                                 <td className={`ps-net ${signClass(r.net)}`}>{fmt(r.net)}</td>
+                                <td className={signClass(r.chalu)}>{fmt(r.chalu)}</td>
                                 <td>{fmtDate(r.lastDate)}</td>
                                 <td>{r.entries}</td>
                             </tr>
@@ -506,6 +517,7 @@ const ForgingPartyStockPage: React.FC = () => {
                                 {showKg && <td>{fmt(totals.kg)}</td>}
                                 <td>{fmt(totals.inward)}</td>
                                 <td className={`ps-net ${signClass(totals.net)}`}>{fmt(totals.net)}</td>
+                                <td className={signClass(totals.chalu)}>{fmt(totals.chalu)}</td>
                                 <td></td>
                                 <td>{totals.entries}</td>
                             </tr>

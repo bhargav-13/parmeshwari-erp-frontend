@@ -394,3 +394,51 @@
     padding: 9px 20px;
   }
 }
+
+/* Rejection modal */
+.rejection-hint {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.rejection-reset {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #1d6fb8;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.rejection-calc {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--surface-muted);
+  font-size: 13px;
+  color: var(--brand);
+}
+
+.rejection-calc-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rejection-calc-row.deduction {
+  color: #c0392b;
+}
+
+.rejection-calc-row.total {
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  font-weight: 600;
+}

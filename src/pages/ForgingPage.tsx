@@ -58,6 +58,10 @@ const ForgingPage: React.FC = () => {
     const [downloadPartiesLoading, setDownloadPartiesLoading] = useState(true);
     const [selectedParty, setSelectedParty] = useState('');
     const [selectedMonth, setSelectedMonth] = useState(getCurrentYearMonth());
+    // A date range (yyyy-mm-dd, either end optional) takes over from the month when set
+    const [rangeFrom, setRangeFrom] = useState('');
+    const [rangeTo, setRangeTo] = useState('');
+    const isRangeActive = rangeFrom !== '' || rangeTo !== '';
     const monthOptions = generateMonthOptions();
 
     // Fetch forging entries and parties for PDF filter dropdown
@@ -187,6 +191,17 @@ const ForgingPage: React.FC = () => {
         return parseInt(mm) === selMonth && parseInt(yyyy) === selYear;
     };
 
+    // dd/mm/yyyy -> yyyy-mm-dd so it compares with the date inputs as a string
+    const toIsoDate = (dateStr: string) => {
+        const [dd, mm, yyyy] = (dateStr || '').split('/');
+        return `${yyyy}-${(mm || '').padStart(2, '0')}-${(dd || '').padStart(2, '0')}`;
+    };
+    const isInPeriod = (dateStr: string) => {
+        if (!isRangeActive) return isSelectedMonth(dateStr);
+        const iso = toIsoDate(dateStr);
+        return (!rangeFrom || iso >= rangeFrom) && (!rangeTo || iso <= rangeTo);
+    };
+
     // A search looks through every month; otherwise show the selected month
     const isSearching = searchQuery.trim() !== '';
     const sortNewestFirst = <T extends { date: string }>(list: T[]) => [...list].sort((a, b) => {
@@ -195,10 +210,10 @@ const ForgingPage: React.FC = () => {
     });
     const filteredInwardEntries = isSearching
         ? sortNewestFirst(filterEntries(inwardEntries) as ForgingInward[])
-        : filterEntries(inwardEntries).filter(e => isSelectedMonth(e.date));
+        : filterEntries(inwardEntries).filter(e => isInPeriod(e.date));
     const filteredOutwardEntries = isSearching
         ? sortNewestFirst(filterEntries(outwardEntries) as ForgingOutward[])
-        : filterEntries(outwardEntries).filter(e => isSelectedMonth(e.date));
+        : filterEntries(outwardEntries).filter(e => isInPeriod(e.date));
 
     const totalInward = calculateTotalWeight(filteredInwardEntries);
     const totalOutward = calculateTotalWeight(filteredOutwardEntries);
@@ -245,9 +260,9 @@ const ForgingPage: React.FC = () => {
             {/* Month selector + Stats Grid */}
             <div className="stats-month-selector">
                 <select
-                    className="month-filter-select"
+                    className={`month-filter-select ${isRangeActive ? 'is-overridden' : ''}`}
                     value={selectedMonth}
-                    onChange={e => setSelectedMonth(e.target.value)}
+                    onChange={e => { setSelectedMonth(e.target.value); setRangeFrom(''); setRangeTo(''); }}
                     title="Select month"
                     disabled={isSearching}
                 >
@@ -255,8 +270,42 @@ const ForgingPage: React.FC = () => {
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                 </select>
+                <div className="date-range-filter">
+                    <span className="date-range-label">or</span>
+                    <input
+                        type="date"
+                        className="month-filter-select"
+                        value={rangeFrom}
+                        max={rangeTo || undefined}
+                        onChange={e => setRangeFrom(e.target.value)}
+                        title="From date"
+                        aria-label="From date"
+                        disabled={isSearching}
+                    />
+                    <span className="date-range-label">to</span>
+                    <input
+                        type="date"
+                        className="month-filter-select"
+                        value={rangeTo}
+                        min={rangeFrom || undefined}
+                        onChange={e => setRangeTo(e.target.value)}
+                        title="To date"
+                        aria-label="To date"
+                        disabled={isSearching}
+                    />
+                    {isRangeActive && (
+                        <button
+                            type="button"
+                            className="date-range-clear"
+                            onClick={() => { setRangeFrom(''); setRangeTo(''); }}
+                            title="Clear date range and go back to the month"
+                        >
+                            Clear
+                        </button>
+                    )}
+                </div>
                 {isSearching && (
-                    <span style={{ marginLeft: '12px', fontSize: '13px', color: 'var(--text-muted)' }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                         Showing search results from all months
                     </span>
                 )}
@@ -322,7 +371,11 @@ const ForgingPage: React.FC = () => {
                 </div>
                 <button
                     className="order-status-filter"
-                    onClick={() => setIsDownloadPopupOpen(true)}
+                    onClick={() => {
+                        if (isRangeActive) { setDownloadFromDate(rangeFrom); setDownloadToDate(rangeTo); }
+                        if (selectedParty) setDownloadPartyName(selectedParty);
+                        setIsDownloadPopupOpen(true);
+                    }}
                     title="Download Forging PDF Report"
                 >
                     <span className="button-text">Download</span>

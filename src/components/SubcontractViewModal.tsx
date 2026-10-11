@@ -149,7 +149,10 @@ const SubcontractViewModal: React.FC<SubcontractViewModalProps> = ({
                         <td>{item.returnItemName || '-'}</td>
                         <td>{formatNumber(item.returnStock, 'kg')}</td>
                         <td>{item.packagingType || '-'}</td>
-                        <td>{item.rejectionStock ? formatNumber(item.rejectionStock, ' Kg') : '-'}</td>
+                        <td>
+                          {item.rejectionStock ? formatNumber(item.rejectionStock, ' Kg') : '-'}
+                          {item.rejectionAmount ? <div className="rejection-amount-sub">(-{formatCurrency(item.rejectionAmount)})</div> : null}
+                        </td>
                         <td className="used-cell">{formatNumber(item.usedStock, ' Kg')}</td>
                         <td className="net-weight-cell">{formatNumber(item.netWeight, ' Kg')}</td>
                         <td>{formatCurrency(item.totalJobPay)}</td>
@@ -166,6 +169,12 @@ const SubcontractViewModal: React.FC<SubcontractViewModalProps> = ({
                     <span className="total-label">Total Paid Rs :-</span>
                     <span className="total-value">{formatCurrency(data.totalPaidRs)}/-</span>
                   </div>
+                  {(data.totalRejectionAmount || 0) > 0 && (
+                    <div className="total-item total-paid">
+                      <span className="total-label">Rejection Deducted :-</span>
+                      <span className="total-value highlight-red">{formatCurrency(data.totalRejectionAmount || 0)}/-</span>
+                    </div>
+                  )}
                   <div className="total-item total-paid">
                     <span className="total-label">Total Job Pay :-</span>
                     <span className="total-value">

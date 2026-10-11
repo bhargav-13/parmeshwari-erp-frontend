@@ -179,10 +179,33 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
   const partyRemaining = (r: PartyLedgerRow) =>
     (r.party.officialAmount || 0) + (r.party.offlineAmount || 0) - (r.ledger?.totalReceivedAmount || 0);
 
+  // Chalu khate: still due on this calendar month's orders. Aaglu khate: everything older that is
+  // still due (earlier orders and the balance from before the ERP). Total khate = aaglu + chalu.
+  const now = new Date();
+  const isCurrentMonth = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  };
+  const partyKhate = (r: PartyLedgerRow) => {
+    const total = partyRemaining(r);
+    const chaluDue = (r.ledger?.orders || [])
+      .filter((o) => isCurrentMonth(o.orderDate))
+      .reduce((sum, o) => sum + (o.paymentSummary?.official?.dueAmount || 0) + (o.paymentSummary?.offline?.dueAmount || 0), 0);
+    const chalu = Math.max(0, Math.min(total, Math.round(chaluDue * 100) / 100));
+    return { aaglu: Math.round((total - chalu) * 100) / 100, chalu, total };
+  };
+  const currentMonthLabel = now.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+
   const totalOfficial = partyRows.reduce((sum, r) => sum + (r.party.officialAmount || 0), 0);
   const totalOffline = partyRows.reduce((sum, r) => sum + (r.party.offlineAmount || 0), 0);
   const totalReceived = partyRows.reduce((sum, r) => sum + (r.ledger?.totalReceivedAmount || 0), 0);
-  const totalRemaining = partyRows.reduce((sum, r) => sum + partyRemaining(r), 0);
+  const khateTotals = partyRows.reduce(
+    (acc, r) => {
+      const k = partyKhate(r);
+      return { aaglu: acc.aaglu + k.aaglu, chalu: acc.chalu + k.chalu, total: acc.total + k.total };
+    },
+    { aaglu: 0, chalu: 0, total: 0 }
+  );
 
   return (
     <div className="payment-reminder-page">
@@ -213,10 +236,24 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
             <span className="stat-value">{formatCurrency(totalReceived)}</span>
           </div>
         </div>
+      </div>
+      <div className="stats-cards">
         <div className="stat-card">
           <div className="stat-content">
-            <span className="stat-label">Total Remaining</span>
-            <span className="stat-value">{formatCurrency(totalRemaining)}</span>
+            <span className="stat-label">Aaglu Khate</span>
+            <span className="stat-value">{formatCurrency(khateTotals.aaglu)}</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-content">
+            <span className="stat-label">Chalu Khate ({currentMonthLabel})</span>
+            <span className="stat-value">{formatCurrency(khateTotals.chalu)}</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-content">
+            <span className="stat-label">Total Khate</span>
+            <span className="stat-value">{formatCurrency(khateTotals.total)}</span>
           </div>
         </div>
       </div>
@@ -246,7 +283,9 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                 <th>Official Amount</th>
                 <th>Offline Amount</th>
                 <th>Received</th>
-                <th>Remaining</th>
+                <th title="Due from before this month">Aaglu Khate</th>
+                <th title={`Due on ${currentMonthLabel} orders`}>Chalu Khate</th>
+                <th>Total Khate</th>
                 <th>Orders</th>
                 <th>Actions</th>
               </tr>
@@ -254,7 +293,7 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
             <tbody>
               {filteredRows.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="no-data">No parties found.</td>
+                  <td colSpan={9} className="no-data">No parties found.</td>
                 </tr>
               ) : (
                 filteredRows.map((row) => {
@@ -283,7 +322,9 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                         <td>{row.loading ? '...' : formatCurrency(row.party.officialAmount)}</td>
                         <td>{row.loading ? '...' : formatCurrency(row.party.offlineAmount)}</td>
                         <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalReceivedAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency(partyRemaining(row))}</td>
+                        <td>{row.loading ? '...' : formatCurrency(partyKhate(row).aaglu)}</td>
+                        <td>{row.loading ? '...' : formatCurrency(partyKhate(row).chalu)}</td>
+                        <td className="total-khate-cell">{row.loading ? '...' : formatCurrency(partyKhate(row).total)}</td>
                         <td>{row.loading ? '...' : orderCount}</td>
                         <td>
                           <div className="action-buttons">
@@ -326,7 +367,7 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                       {/* Party base amount breakdown row */}
                       {isExpanded && (
                         <tr className="expanded-order-row">
-                          <td colSpan={7}>
+                          <td colSpan={9}>
                             <div className="party-base-breakdown">
                               <span className="party-base-label">Includes</span>
                               <span className="party-base-item">Orders Official: <strong>{formatCurrency(row.ledger?.totalOfficialAmount)}</strong></span>
@@ -343,7 +384,7 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                         <React.Fragment key={order.orderId}>
                           {/* Order row */}
                           <tr className="expanded-order-row">
-                            <td colSpan={7}>
+                            <td colSpan={9}>
                               <div className="expanded-order-summary">
                                 <span className="expanded-order-id">Order #{order.orderId}</span>
                                 <span className="expanded-order-detail">{row.party.name}</span>

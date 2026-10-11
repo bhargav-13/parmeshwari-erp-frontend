@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import type { Crome, Subcontracting, SubReturn, SubReturnRequest, SubOrderRequest, SubSend, SubSendRequest } from '../types';
+import type { Crome, Subcontracting, SubReturn, SubReturnRequest, SubOrderRequest, SubRejectionRequest, SubSend, SubSendRequest } from '../types';
 import { SubcontractingStatus } from '../types';
 import { subcontractingApi } from '../api/subcontracting';
 import { cromeApi } from '../api/crome';
 import ReturnRecordModal from './ReturnRecordModal';
 import EditSendModal from './EditSendModal';
+import RejectionModal from './RejectionModal';
 import AddSubcontractingModal from './AddSubcontractingModal';
 import CromeModal from './CromeModal';
 import DeleteImpactDialog from './DeleteImpactDialog';
@@ -23,6 +24,7 @@ interface SubcontractingCardProps {
 
 const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, onDelete, onRefresh }) => {
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingReturn, setEditingReturn] = useState<SubReturn | null>(null);
   const [editingSend, setEditingSend] = useState<SubSend | null>(null);
@@ -83,6 +85,12 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
   const totalAmount = subcontract.totalAmount || 0;
 
+  // Rejection in effect (set by hand, else the returns' total) and what it takes off the job pay
+  const rejectionKg = subcontract.rejectionStock
+    ?? subReturns.reduce((sum, r) => sum + (r.rejectionStock || 0), 0);
+  const rejectionAmount = subcontract.rejectionAmount ?? rejectionKg * (subcontract.price || 0);
+  const grossJobPay = (subcontract.jobWorkPay || 0) * subcontract.sentStock;
+
   const sentToCromeCount = subReturns.filter(r => r.returnId != null && cromesByReturnId.has(r.returnId)).length;
   const totalSentToCrome = Array.from(cromesByReturnId.values())
     .flat()
@@ -123,6 +131,12 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
       console.error('Error returning record:', error);
       throw error;
     }
+  };
+
+  const handleUpdateRejection = async (data: SubRejectionRequest) => {
+    await subcontractingApi.updateRejection(subcontract.subcontractingId, data);
+    setIsRejectionModalOpen(false);
+    onRefresh();
   };
 
   const handleUpdateReturn = async (data: SubReturnRequest) => {
@@ -347,6 +361,25 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <span className="detail-label">Total Value</span>
                 <span className="detail-value">₹{formatMoney(totalAmount)}</span>
               </div>
+              <div className="detail-row">
+                <span className="detail-label">Job Pay</span>
+                <span className="detail-value">₹{formatMoney(grossJobPay)}</span>
+              </div>
+              {rejectionKg > 0 && (
+                <>
+                  <div className="detail-row">
+                    <span className="detail-label">
+                      Rejection {formatQty(rejectionKg)} kg × ₹{formatMoney(subcontract.rejectionPrice ?? subcontract.price)}
+                      {subcontract.rejectionStockManual && <span className="sc-manual-tag" title={`Returns total: ${formatQty(subcontract.returnsRejectionStock || 0)} kg`}>edited</span>}
+                    </span>
+                    <span className="detail-value sc-red">- ₹{formatMoney(rejectionAmount)}</span>
+                  </div>
+                  <div className="detail-row total-row">
+                    <span className="detail-label">Net Job Pay</span>
+                    <span className="detail-value">₹{formatMoney(grossJobPay - rejectionAmount)}</span>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* RETURN Details (List) */}
@@ -464,6 +497,15 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <span>Return Record</span>
               </button>
 
+              <button
+                type="button"
+                className="return-record-button rejection-button"
+                onClick={() => setIsRejectionModalOpen(true)}
+                title="Set the rejected kg and its rate"
+              >
+                <span>Rejection{rejectionKg > 0 ? ` · ${formatQty(rejectionKg)} kg` : ''}</span>
+              </button>
+
             </div>
           </div>
 
@@ -481,6 +523,14 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
           subcontract={subcontract}
           onClose={() => setIsReturnModalOpen(false)}
           onSubmit={handleReturnRecord}
+        />
+      )}
+
+      {isRejectionModalOpen && (
+        <RejectionModal
+          subcontract={subcontract}
+          onClose={() => setIsRejectionModalOpen(false)}
+          onSubmit={handleUpdateRejection}
         />
       )}
 
