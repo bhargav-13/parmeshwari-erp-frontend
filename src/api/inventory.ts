@@ -43,9 +43,12 @@ export const stockItemApi = {
       )
     ),
 
-  // Get all stock items without pagination
+  // Get all stock items without pagination. A stock item whose product was deleted comes back
+  // with no product (the FK is ON DELETE SET NULL); it can't be picked or shown, so drop it here
+  // rather than let every `item.product.…` lookup crash on it.
   getAllStockItems: (): Promise<StockItem[]> =>
-    promisify<StockItem[]>(cb => generatedStockApi.getAllStockItemList(cb)),
+    promisify<StockItem[]>(cb => generatedStockApi.getAllStockItemList(cb))
+      .then(items => (items || []).filter(item => item?.product)),
 
   // Get stock item by ID
   getStockItemById: (stockItemId: number): Promise<StockItem> =>

@@ -163,7 +163,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
         // Items picked for the other floor don't belong to this order any more
         next.products = prev.products.map((line) => {
           const stock = stockItems.find((item) => item.stockItemId === line.itemId);
-          const lineFloor = stock ? productFloor(products.find((p) => p.productId === stock.product.productId) ?? stock.product) : null;
+          const lineFloor = stock?.product ? productFloor(products.find((p) => p.productId === stock.product.productId) ?? stock.product) : null;
           return lineFloor && lineFloor !== value ? createEmptyProduct() : line;
         });
       }
@@ -238,7 +238,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
     // Check if stock item exists for this product
     // Stock items are per floor — use the one on this order's floor
     const existingStockItem = stockItems.find(
-      item => item.product.productId === productId && (item.inventoryFloor ?? InventoryFloor.GROUND_FLOOR) === formData.orderFloor
+      item => item.product?.productId === productId && (item.inventoryFloor ?? InventoryFloor.GROUND_FLOOR) === formData.orderFloor
     );
 
     if (existingStockItem) {
@@ -528,7 +528,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
 
                 // Find selected product ID based on current stockItemId
                 const currentStockItem = stockItems.find(item => item.stockItemId === product.itemId);
-                const currentProductId = currentStockItem?.product.productId || '';
+                const currentProductId = currentStockItem?.product?.productId || '';
 
                 return (
                   <div className="line-item-card" key={`product-${index}`}>
@@ -554,7 +554,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                             ...floorProducts.map((prod) => ({ value: prod.productId, label: prod.productName })),
                             // Keep an older order's product visible even if it's on the other floor
                             ...(currentProductId !== '' && !floorProducts.some((prod) => prod.productId === currentProductId)
-                              ? [{ value: currentProductId, label: currentStockItem?.product.productName ?? '' }]
+                              ? [{ value: currentProductId, label: currentStockItem?.product?.productName ?? '' }]
                               : []),
                           ]}
                           value={currentProductId}
