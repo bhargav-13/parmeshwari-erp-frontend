@@ -21,10 +21,14 @@ const money = (value?: number | null) =>
 
 const qty = (value?: number | null) => (Number(value) > 0 ? Number(value).toLocaleString('en-IN') : '-');
 
-const formatDate = (value?: string | null) => {
+const formatDate = (value?: string | Date | null) => {
   if (!value) return '-';
-  const [y, m, d] = value.slice(0, 10).split('-');
-  return d && m && y ? `${d}/${m}/${y}` : value;
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? '-' : value.toLocaleDateString('en-GB');
+  }
+  const text = String(value);
+  const [y, m, d] = text.slice(0, 10).split('-');
+  return d && m && y ? `${d}/${m}/${y}` : text;
 };
 
 // Plain invoice (no letterhead/logo). The same HTML drives the on-screen preview

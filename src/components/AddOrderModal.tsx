@@ -28,6 +28,18 @@ const createEmptyProduct = (): OrderProductRequest => ({
   totalAmount: 0,
 });
 
+// The generated API client turns date fields into Date objects, but the date
+// inputs and invoice preview work with 'YYYY-MM-DD' strings.
+const toDateInputValue = (value: unknown): string => {
+  if (!value) return '';
+  if (value instanceof Date) {
+    if (isNaN(value.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+  }
+  return String(value).slice(0, 10);
+};
+
 const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloor): OrderRequest => {
   if (!initialData) {
     return {
@@ -55,6 +67,9 @@ const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloo
   const { id, orderStatus, products, ...rest } = initialData;
   return {
     ...rest,
+    orderDate: toDateInputValue(rest.orderDate),
+    expectedDeliveryDate: toDateInputValue(rest.expectedDeliveryDate),
+    paymentDate: toDateInputValue(rest.paymentDate),
     orderFloor: fixedFloor || rest.orderFloor,
     products:
       products && products.length
