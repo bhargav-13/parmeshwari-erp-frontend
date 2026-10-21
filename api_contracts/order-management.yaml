@@ -808,6 +808,10 @@ components:
           format: double
         floor:
           $ref: '#/components/schemas/OrderFloor'
+        whatsappNo:
+          type: string
+        city:
+          type: string
     OrderParty:
       type: object
       properties:
@@ -824,6 +828,10 @@ components:
           format: double
         floor:
           $ref: '#/components/schemas/OrderFloor'
+        whatsappNo:
+          type: string
+        city:
+          type: string
     OrderByPartyResponse:
       type: object
       properties:

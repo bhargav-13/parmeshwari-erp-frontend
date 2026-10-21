@@ -9,6 +9,10 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+        // Proxied calls are same-origin for the backend; a dev-port Origin header would fail its CORS allowlist.
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => proxyReq.removeHeader('origin'));
+        },
       },
     },
   },

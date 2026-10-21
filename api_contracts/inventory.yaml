@@ -1813,6 +1813,10 @@ components:
           format: double
         floor:
           $ref: '#/components/schemas/InventoryFloor'
+        whatsappNo:
+          type: string
+        city:
+          type: string
     PurchaseParty:
       type: object
       properties:
@@ -1829,6 +1833,10 @@ components:
           format: double
         floor:
           $ref: '#/components/schemas/InventoryFloor'
+        whatsappNo:
+          type: string
+        city:
+          type: string
 
     ReturnType:
       type: string

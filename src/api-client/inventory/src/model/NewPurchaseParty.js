@@ -61,6 +61,12 @@ class NewPurchaseParty {
             if (data.hasOwnProperty('floor')) {
                 obj['floor'] = ApiClient.convertToType(data['floor'], 'String');
             }
+            if (data.hasOwnProperty('whatsappNo')) {
+                obj['whatsappNo'] = ApiClient.convertToType(data['whatsappNo'], 'String');
+            }
+            if (data.hasOwnProperty('city')) {
+                obj['city'] = ApiClient.convertToType(data['city'], 'String');
+            }
         }
         return obj;
     }
@@ -109,6 +115,16 @@ NewPurchaseParty.prototype['offlineAmount'] = undefined;
  * @member {module:model/InventoryFloor} floor
  */
 NewPurchaseParty.prototype['floor'] = undefined;
+
+/**
+ * @member {String} whatsappNo
+ */
+NewPurchaseParty.prototype['whatsappNo'] = undefined;
+
+/**
+ * @member {String} city
+ */
+NewPurchaseParty.prototype['city'] = undefined;
 
 
 
