@@ -14,13 +14,17 @@ const convertToParty = (orderParty: any): Party => ({
     officialAmount: orderParty.officialAmount || 0,
     offlineAmount: orderParty.offlineAmount || 0,
     floor: orderParty.floor,
+    whatsappNo: orderParty.whatsappNo || undefined,
+    city: orderParty.city || undefined,
 });
 
-const convertToNewOrderParty = (data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor }): any => ({
+const convertToNewOrderParty = (data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor; whatsappNo?: string; city?: string }): any => ({
     name: data.name,
     officialAmount: data.officialAmount,
     offlineAmount: data.offlineAmount,
     ...(data.floor ? { floor: data.floor } : {}),
+    ...(data.whatsappNo ? { whatsappNo: data.whatsappNo } : {}),
+    ...(data.city ? { city: data.city } : {}),
 });
 
 const convertToOrderByPartyResponse = (response: any): OrderByPartyResponse => ({
@@ -49,13 +53,13 @@ export const partyApi = {
         ).then(convertToParty),
 
     // Create new party
-    createParty: (data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor }): Promise<Party> =>
+    createParty: (data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor; whatsappNo?: string; city?: string }): Promise<Party> =>
         promisify<any>(cb =>
             generatedPartyApi.createParty(convertToNewOrderParty(data), cb)
         ).then(convertToParty),
 
     // Update existing party
-    updateParty: (id: number, data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor }): Promise<Party> =>
+    updateParty: (id: number, data: { name: string; officialAmount: number; offlineAmount: number; floor?: Floor; whatsappNo?: string; city?: string }): Promise<Party> =>
         promisify<any>(cb =>
             generatedPartyApi.updateParty(id, convertToNewOrderParty(data), cb)
         ).then(convertToParty),

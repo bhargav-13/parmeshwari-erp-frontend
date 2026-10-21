@@ -14,6 +14,8 @@ const AddPurchasePartyModal: React.FC<AddPurchasePartyModalProps> = ({ onClose, 
   const [officialAmount, setOfficialAmount] = useState<number | ''>('');
   const [offlineAmount, setOfflineAmount] = useState<number | ''>('');
   const [floor, setFloor] = useState<Floor | ''>('');
+  const [whatsappNo, setWhatsappNo] = useState('');
+  const [city, setCity] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,6 +25,8 @@ const AddPurchasePartyModal: React.FC<AddPurchasePartyModalProps> = ({ onClose, 
       setOfficialAmount(initialData.officialAmount);
       setOfflineAmount(initialData.offlineAmount);
       setFloor(initialData.floor ?? '');
+      setWhatsappNo(initialData.whatsappNo ?? '');
+      setCity(initialData.city ?? '');
     }
   }, [initialData]);
 
@@ -43,6 +47,8 @@ const AddPurchasePartyModal: React.FC<AddPurchasePartyModalProps> = ({ onClose, 
         officialAmount: Number(officialAmount) || 0,
         offlineAmount: Number(offlineAmount) || 0,
         ...(floor ? { floor } : {}),
+        ...(whatsappNo.trim() ? { whatsappNo: whatsappNo.trim() } : {}),
+        ...(city.trim() ? { city: city.trim() } : {}),
       };
 
       if (initialData) {
@@ -115,6 +121,28 @@ const AddPurchasePartyModal: React.FC<AddPurchasePartyModalProps> = ({ onClose, 
               <option value="GROUND_FLOOR">Ground Floor</option>
               <option value="FIRST_FLOOR">First Floor</option>
             </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">WhatsApp No.</label>
+            <input
+              type="text"
+              value={whatsappNo}
+              onChange={(e) => setWhatsappNo(e.target.value)}
+              placeholder="Enter WhatsApp number"
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">City</label>
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="Enter city"
+              className="form-input"
+            />
           </div>
 
           <div className="modal-actions">

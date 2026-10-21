@@ -26,6 +26,8 @@ const toParty = (p: any): PurchaseParty => ({
   officialAmount: p.officialAmount ?? 0,
   offlineAmount: p.offlineAmount ?? 0,
   floor: p.floor,
+  whatsappNo: p.whatsappNo || undefined,
+  city: p.city || undefined,
 });
 
 export const purchasePartyApi = {

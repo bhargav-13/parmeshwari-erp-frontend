@@ -121,7 +121,6 @@ export interface SubReturnRequest {
   returnDate: string; // ISO date format
   returnStock: number; // Gross return stock
   packagings: PackagingDetail[];
-  rejectionStock?: number | null; // Rejected kg, deducted from net with the packaging
   returnRemark?: string | null;
 }
 
@@ -133,7 +132,7 @@ export interface SubReturn {
   packagings?: PackagingDetail[];
   returnType: ReturnType;
   returnRemark?: string | null;
-  rejectionStock?: number | null;
+  rejectionStock?: number | null; // older returns only: rejection deducted from their net
   netReturnStock?: number;
 }
 
@@ -175,18 +174,27 @@ export interface Subcontracting {
   cromeCount?: number;
   availableStockForCrome?: number;
   canCreateCrome?: boolean;
-  returnsRejectionStock?: number; // sum of the rejection on the returns
-  rejectionStock?: number; // kg in effect: set by hand, else the returns' total
-  rejectionStockManual?: boolean;
-  rejectionPrice?: number; // rate in effect: set by hand, else the market price
-  rejectionPriceManual?: boolean;
-  rejectionAmount?: number; // kg x rate, deducted from the job pay
+  subRejections?: SubRejection[];
+  rejectionStock?: number; // total of the rejection entries
+  rejectionAmount?: number; // total kg x rate, deducted from the job pay
 }
 
-// null puts the kg / rate back to the default (returns' total / market price)
+// One dated rejection of a job work; it comes off the job pay in the statement of its period
+export interface SubRejection {
+  rejectionId: number;
+  rejectionDate: string;
+  rejectionStock: number;
+  rejectionPrice: number;
+  rejectionAmount: number;
+  remark?: string | null;
+}
+
+// No rate uses the job work's market price
 export interface SubRejectionRequest {
-  rejectionStock: number | null;
-  rejectionPrice: number | null;
+  rejectionDate: string;
+  rejectionStock: number;
+  rejectionPrice?: number | null;
+  remark?: string | null;
 }
 
 export interface SubcontractingStats {
@@ -496,7 +504,7 @@ export interface SubcontractingBySubcontract {
   returnItemName: string;
   returnStock: number;
   returnElement: number;
-  packagingType: string | null; // all returns' packaging, totalled per type ("2 PETI, 9 FOAM")
+  packagingType: string | null; // the period's returns' packaging, totalled per type ("2 PETI, 9 FOAM")
   rejectionStock?: number | null;
   rejectionPrice?: number | null;
   rejectionAmount?: number | null; // already taken off totalJobPay
@@ -526,6 +534,8 @@ export interface Party {
   officialAmount: number;
   offlineAmount: number;
   floor?: Floor;
+  whatsappNo?: string;
+  city?: string;
 }
 
 export interface PartyRequest {
@@ -533,6 +543,8 @@ export interface PartyRequest {
   officialAmount: number;
   offlineAmount: number;
   floor?: Floor;
+  whatsappNo?: string;
+  city?: string;
 }
 
 export interface OrderByParty {
@@ -753,6 +765,8 @@ export interface PurchaseParty {
   officialAmount: number;
   offlineAmount: number;
   floor?: Floor;
+  whatsappNo?: string;
+  city?: string;
 }
 
 export interface PurchasePartyRequest {
@@ -760,6 +774,8 @@ export interface PurchasePartyRequest {
   officialAmount?: number;
   offlineAmount?: number;
   floor?: Floor;
+  whatsappNo?: string;
+  city?: string;
 }
 
 // Rejection Types

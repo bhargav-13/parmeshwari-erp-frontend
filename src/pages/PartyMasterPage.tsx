@@ -4,6 +4,7 @@ import Loading from '../components/Loading';
 import AddPartyModal from '../components/AddPartyModal';
 import AddPurchasePartyModal from '../components/AddPurchasePartyModal';
 import PartyOrdersModal from '../components/PartyOrdersModal';
+import ImportPartyModal from '../components/ImportPartyModal';
 import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
 import EditIcon from '../assets/edit.svg';
@@ -28,6 +29,7 @@ const PartyMasterPage: React.FC = () => {
     const [salesError, setSalesError] = useState<string | null>(null);
     const [editingParty, setEditingParty] = useState<Party | undefined>(undefined);
     const [viewingParty, setViewingParty] = useState<Party | null>(null);
+    const [isImportSalesOpen, setIsImportSalesOpen] = useState(false);
 
     // Purchase Party state
     const [purchaseParties, setPurchaseParties] = useState<PurchaseParty[]>([]);
@@ -38,6 +40,7 @@ const PartyMasterPage: React.FC = () => {
     const [purchaseDeletingId, setPurchaseDeletingId] = useState<number | null>(null);
     const [purchaseError, setPurchaseError] = useState<string | null>(null);
     const [editingPurchaseParty, setEditingPurchaseParty] = useState<PurchaseParty | undefined>(undefined);
+    const [isImportPurchaseOpen, setIsImportPurchaseOpen] = useState(false);
 
     useEffect(() => {
         fetchParties();
@@ -137,25 +140,47 @@ const PartyMasterPage: React.FC = () => {
                     <p className="page-subtitle">Manage your parties</p>
                 </div>
 
-                <div className="header-actions">
+                <div className="header-actions" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     {activeTab === 'sales' ? (
-                        <button
-                            type="button"
-                            className="action-button primary-button"
-                            onClick={() => { setEditingParty(undefined); setIsSalesModalOpen(true); }}
-                        >
-                            <span className="button-icon">+</span>
-                            <span className="button-text">Add Sales Party</span>
-                        </button>
+                        <>
+                            <button
+                                type="button"
+                                className="action-button secondary-button"
+                                onClick={() => setIsImportSalesOpen(true)}
+                                style={{ background: '#E8F5E9', color: '#1B5E20', border: '1px solid #A5D6A7' }}
+                            >
+                                <span className="button-icon">📥</span>
+                                <span className="button-text">Import from Excel</span>
+                            </button>
+                            <button
+                                type="button"
+                                className="action-button primary-button"
+                                onClick={() => { setEditingParty(undefined); setIsSalesModalOpen(true); }}
+                            >
+                                <span className="button-icon">+</span>
+                                <span className="button-text">Add Sales Party</span>
+                            </button>
+                        </>
                     ) : (
-                        <button
-                            type="button"
-                            className="action-button primary-button"
-                            onClick={() => { setEditingPurchaseParty(undefined); setIsPurchaseModalOpen(true); }}
-                        >
-                            <span className="button-icon">+</span>
-                            <span className="button-text">Add Purchase Party</span>
-                        </button>
+                        <>
+                            <button
+                                type="button"
+                                className="action-button secondary-button"
+                                onClick={() => setIsImportPurchaseOpen(true)}
+                                style={{ background: '#E8F5E9', color: '#1B5E20', border: '1px solid #A5D6A7' }}
+                            >
+                                <span className="button-icon">📥</span>
+                                <span className="button-text">Import from Excel</span>
+                            </button>
+                            <button
+                                type="button"
+                                className="action-button primary-button"
+                                onClick={() => { setEditingPurchaseParty(undefined); setIsPurchaseModalOpen(true); }}
+                            >
+                                <span className="button-icon">+</span>
+                                <span className="button-text">Add Purchase Party</span>
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
@@ -244,6 +269,8 @@ const PartyMasterPage: React.FC = () => {
                                         <th>Floor</th>
                                         <th>Official Amount</th>
                                         <th>Offline Amount</th>
+                                        <th>WhatsApp No.</th>
+                                        <th>City</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -256,6 +283,8 @@ const PartyMasterPage: React.FC = () => {
                                             <td>{party.floor === 'GROUND_FLOOR' ? 'Ground Floor' : party.floor === 'FIRST_FLOOR' ? 'First Floor' : '—'}</td>
                                             <td>₹{party.officialAmount.toLocaleString('en-IN')}</td>
                                             <td>₹{party.offlineAmount.toLocaleString('en-IN')}</td>
+                                            <td>{party.whatsappNo || '—'}</td>
+                                            <td>{party.city || '—'}</td>
                                             <td>
                                                 <div className="action-buttons">
                                                     <button
@@ -293,7 +322,7 @@ const PartyMasterPage: React.FC = () => {
                                     ))}
                                     {filteredParties.length === 0 && (
                                         <tr>
-                                            <td colSpan={7} className="no-data">
+                                            <td colSpan={9} className="no-data">
                                                 No parties found
                                             </td>
                                         </tr>
@@ -371,6 +400,8 @@ const PartyMasterPage: React.FC = () => {
                                         <th>Floor</th>
                                         <th>Official Amount</th>
                                         <th>Offline Amount</th>
+                                        <th>WhatsApp No.</th>
+                                        <th>City</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -383,6 +414,8 @@ const PartyMasterPage: React.FC = () => {
                                             <td>{party.floor === 'GROUND_FLOOR' ? 'Ground Floor' : party.floor === 'FIRST_FLOOR' ? 'First Floor' : '—'}</td>
                                             <td>₹{(party.officialAmount ?? 0).toLocaleString('en-IN')}</td>
                                             <td>₹{(party.offlineAmount ?? 0).toLocaleString('en-IN')}</td>
+                                            <td>{party.whatsappNo || '—'}</td>
+                                            <td>{party.city || '—'}</td>
                                             <td>
                                                 <div className="action-buttons">
                                                     <button
@@ -412,7 +445,7 @@ const PartyMasterPage: React.FC = () => {
                                     ))}
                                     {filteredPurchaseParties.length === 0 && (
                                         <tr>
-                                            <td colSpan={7} className="no-data">
+                                            <td colSpan={9} className="no-data">
                                                 No purchase parties found
                                             </td>
                                         </tr>
@@ -444,6 +477,24 @@ const PartyMasterPage: React.FC = () => {
                 <PartyOrdersModal
                     partyName={viewingParty.name}
                     onClose={() => setViewingParty(null)}
+                />
+            )}
+
+            {isImportSalesOpen && (
+                <ImportPartyModal
+                    partyType="sales"
+                    existingParties={parties}
+                    onClose={() => setIsImportSalesOpen(false)}
+                    onSuccess={async () => { await fetchParties(); }}
+                />
+            )}
+
+            {isImportPurchaseOpen && (
+                <ImportPartyModal
+                    partyType="purchase"
+                    existingParties={purchaseParties}
+                    onClose={() => setIsImportPurchaseOpen(false)}
+                    onSuccess={async () => { await fetchPurchaseParties(); }}
                 />
             )}
         </div>
