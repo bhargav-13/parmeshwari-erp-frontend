@@ -7,6 +7,7 @@ import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
+import { getUserFloor } from '../lib/auth';
 
 const InventoryProductsPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -25,7 +26,9 @@ const InventoryProductsPage: React.FC = () => {
         try {
             setLoading(true);
             const data = await productApi.getProducts();
-            setProducts(data);
+            // Floor staff manage only their own floor's products
+            const ownFloor = getUserFloor();
+            setProducts(ownFloor ? data.filter((p) => (p.floor ?? 'FIRST_FLOOR') === ownFloor) : data);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -98,6 +101,7 @@ const InventoryProductsPage: React.FC = () => {
                     <span className="stat-label">Total Products</span>
                     <span className="stat-value">{products.length} Products</span>
                 </div>
+                {getUserFloor() === null && <>
                 <div className="stat-card">
                     <span className="stat-label">Ground Floor</span>
                     <span className="stat-value">{groundCount} Products</span>
@@ -106,6 +110,7 @@ const InventoryProductsPage: React.FC = () => {
                     <span className="stat-label">First Floor</span>
                     <span className="stat-value">{firstCount} Products</span>
                 </div>
+                </>}
             </div>
 
             <div className="order-filters">
@@ -118,7 +123,7 @@ const InventoryProductsPage: React.FC = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="filter-chips">
+                {getUserFloor() === null && <div className="filter-chips">
                     {([['', 'All'], ['GROUND_FLOOR', 'Ground Floor'], ['FIRST_FLOOR', 'First Floor']] as const).map(([value, label]) => (
                         <button
                             key={label}
@@ -129,7 +134,7 @@ const InventoryProductsPage: React.FC = () => {
                             {label}
                         </button>
                     ))}
-                </div>
+                </div>}
             </div>
 
             <div className="inventory-table-container">

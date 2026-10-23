@@ -24,6 +24,9 @@ export interface ErrorResponse {
 // User Types
 export const UserGroup = {
   Admin: 'Admin',
+  Owner: 'Owner',
+  GroundFloor: 'Ground Floor',
+  FirstFloor: 'First Floor',
 } as const;
 
 export type UserGroup = typeof UserGroup[keyof typeof UserGroup];

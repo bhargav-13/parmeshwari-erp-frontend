@@ -32,6 +32,20 @@ export default class UserGroup {
          */
         "Owner" = "Owner";
 
+
+        /**
+         * value: "Ground Floor"
+         * @const
+         */
+        "Ground Floor" = "Ground Floor";
+
+
+        /**
+         * value: "First Floor"
+         * @const
+         */
+        "First Floor" = "First Floor";
+
     
 
     /**

@@ -21,6 +21,7 @@ import type {
   StockItem,
   RawItem,
 } from '../types';
+import { canPickFloor, type UserFloor } from '../lib/auth';
 
 async function fetchAll<T>(fetchFunction: (page: number) => Promise<{ data: T[], totalPages: number }>): Promise<T[]> {
   let allItems: T[] = [];
@@ -136,6 +137,9 @@ export const dashboardApi = {
   fetchAllData: async () => {
     // Use safe fetch — returns [] on error so one failing endpoint doesn't break the whole dashboard
     const safeArray = <T>(p: Promise<T[]>): Promise<T[]> => p.catch(() => [] as T[]);
+    // Floor staff only load their own floor; the other floor stays empty
+    const floorArray = <T>(floor: UserFloor, load: () => Promise<T[]>): Promise<T[]> =>
+      canPickFloor(floor) ? safeArray(load()) : Promise.resolve([] as T[]);
 
     const [
       groundFloorOrders,
@@ -152,16 +156,16 @@ export const dashboardApi = {
       allRawItems,
       allSubcontracts,
     ] = await Promise.all([
-      safeArray(fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.GROUND_FLOOR, page, size: 100 }))),
-      safeArray(fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.FIRST_FLOOR, page, size: 100 }))),
-      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
-      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
-      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
-      safeArray(fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
-      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
-      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
-      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
-      safeArray(fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      floorArray('GROUND_FLOOR', () => fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.GROUND_FLOOR, page, size: 100 }))),
+      floorArray('FIRST_FLOOR', () => fetchAll<Order>(page => ordersApi.getOrderList({ floor: OrderFloor.FIRST_FLOOR, page, size: 100 }))),
+      floorArray('GROUND_FLOOR', () => fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      floorArray('GROUND_FLOOR', () => fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      floorArray('FIRST_FLOOR', () => fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      floorArray('FIRST_FLOOR', () => fetchAll<Invoice>(page => invoiceApi.getInvoiceList({ floor: InvoiceFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      floorArray('GROUND_FLOOR', () => fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      floorArray('GROUND_FLOOR', () => fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.GROUND_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
+      floorArray('FIRST_FLOOR', () => fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFICIAL, page, size: 100 }))),
+      floorArray('FIRST_FLOOR', () => fetchAll<Payment>(page => paymentApi.getPaymentList({ floor: PaymentFloor.FIRST_FLOOR, mode: BillingType.OFFLINE, page, size: 100 }))),
       stockItemApi.getAllStockItems().catch(() => [] as StockItem[]),
       rawItemApi.getRawItems(0, 1000).then(res => res.data).catch(() => [] as RawItem[]),
       safeArray(fetchAll<Subcontracting>(page => subcontractingApi.getSubcontractingList({ page, size: 100 }))),
@@ -250,7 +254,7 @@ export const dashboardApi = {
         invoices: firstFloorInvoices.length,
         payments: firstFloorPayments.length,
       },
-    ];
+    ].filter((m) => canPickFloor(m.floor === 'Ground Floor' ? 'GROUND_FLOOR' : 'FIRST_FLOOR'));
 
     // Order Status Breakdown
     const orderStatusBreakdown: OrderStatusData[] = [

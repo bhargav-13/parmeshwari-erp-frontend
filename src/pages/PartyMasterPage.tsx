@@ -13,6 +13,7 @@ import ViewIcon from '../assets/view.svg';
 
 import { partyApi } from '../api/party';
 import { purchasePartyApi } from '../api/purchaseParty';
+import { getUserFloor } from '../lib/auth';
 
 type TabType = 'sales' | 'purchase';
 
@@ -231,7 +232,7 @@ const PartyMasterPage: React.FC = () => {
                                 onChange={(e) => setSalesSearchQuery(e.target.value)}
                             />
                         </div>
-                        <div className="filter-chips">
+                        {getUserFloor() === null && <div className="filter-chips">
                             <button
                                 type="button"
                                 className={`filter-chip${salesFloorFilter === '' ? ' active' : ''}`}
@@ -253,7 +254,7 @@ const PartyMasterPage: React.FC = () => {
                             >
                                 First Floor
                             </button>
-                        </div>
+                        </div>}
                     </div>
 
                     {salesLoading ? (
@@ -362,7 +363,7 @@ const PartyMasterPage: React.FC = () => {
                                 onChange={(e) => setPurchaseSearchQuery(e.target.value)}
                             />
                         </div>
-                        <div className="filter-chips">
+                        {getUserFloor() === null && <div className="filter-chips">
                             <button
                                 type="button"
                                 className={`filter-chip${purchaseFloorFilter === '' ? ' active' : ''}`}
@@ -384,7 +385,7 @@ const PartyMasterPage: React.FC = () => {
                             >
                                 First Floor
                             </button>
-                        </div>
+                        </div>}
                     </div>
 
                     {purchaseLoading ? (

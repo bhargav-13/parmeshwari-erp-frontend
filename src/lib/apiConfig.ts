@@ -2,6 +2,7 @@ import ApiClient from '../api-client/inventory/src/ApiClient';
 
 // User Management API
 import AuthenticationApi from '../api-client/user-management/src/api/AuthenticationApi';
+import UserManagementApi from '../api-client/user-management/src/api/UserManagementApi';
 
 // Inventory API
 import StockInventoryApi from '../api-client/inventory/src/api/StockInventoryApi';
@@ -133,6 +134,7 @@ apiClient.callApi = function (
 
 // Export configured API instances
 export const authApi = new AuthenticationApi(apiClient);
+export const userManagementApi = new UserManagementApi(apiClient);
 export const stockInventoryApi = new StockInventoryApi(apiClient);
 export const rawInventoryApi = new RawInventoryApi(apiClient);
 export const categoryApi = new CategoryApi(apiClient);
