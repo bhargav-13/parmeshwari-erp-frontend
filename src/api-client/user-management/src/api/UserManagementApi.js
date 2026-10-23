@@ -260,4 +260,96 @@ export default class UserManagementApi {
     }
 
 
+    /**
+     * Callback function to receive the result of the resetUserPassword operation.
+     * @callback module:api/UserManagementApi~resetUserPasswordCallback
+     * @param {String} error Error message, if any.
+     * @param data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Set a new password for a user (Admin or Owner)
+     * @param {Number} id
+     * @param {Object} resetPasswordRequest
+     * @param {module:api/UserManagementApi~resetUserPasswordCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    resetUserPassword(id, resetPasswordRequest, callback) {
+      let postBody = resetPasswordRequest;
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling resetUserPassword");
+      }
+      // verify the required parameter 'resetPasswordRequest' is set
+      if (resetPasswordRequest === undefined || resetPasswordRequest === null) {
+        throw new Error("Missing the required parameter 'resetPasswordRequest' when calling resetUserPassword");
+      }
+
+      let pathParams = {
+        'id': id
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['oauth2'];
+      let contentTypes = ['application/json'];
+      let accepts = [];
+      let returnType = null;
+      return this.apiClient.callApi(
+        '/api/v1/users/{id}/password', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the setUserEnabled operation.
+     * @callback module:api/UserManagementApi~setUserEnabledCallback
+     * @param {String} error Error message, if any.
+     * @param data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Turn a user's login on or off (Admin or Owner)
+     * @param {Number} id
+     * @param {Object} setUserEnabledRequest
+     * @param {module:api/UserManagementApi~setUserEnabledCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    setUserEnabled(id, setUserEnabledRequest, callback) {
+      let postBody = setUserEnabledRequest;
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling setUserEnabled");
+      }
+      // verify the required parameter 'setUserEnabledRequest' is set
+      if (setUserEnabledRequest === undefined || setUserEnabledRequest === null) {
+        throw new Error("Missing the required parameter 'setUserEnabledRequest' when calling setUserEnabled");
+      }
+
+      let pathParams = {
+        'id': id
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['oauth2'];
+      let contentTypes = ['application/json'];
+      let accepts = ['application/json'];
+      let returnType = User;
+      return this.apiClient.callApi(
+        '/api/v1/users/{id}/enabled', 'PUT',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
 }

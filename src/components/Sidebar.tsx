@@ -11,6 +11,7 @@ import ReminderIcon from '../assets/icon/reminder.svg'
 import SettingIcon from '../assets/icon/settings.svg'
 import SubcontractIcon from '../assets/icon/subcontract.svg'
 import ProfileSVG from '../assets/icon/profile.svg'
+import { canOpen, getRoleLabel } from '../lib/auth';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -67,7 +68,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
   const isScrapActive = location.pathname.startsWith('/scrap');
   const isForgingActive = location.pathname.startsWith('/forging');
 
-  const menuItems = [
+  // Only the pages this user's role may open
+  const visible = <T extends { path: string }>(items: T[]) => items.filter((item) => canOpen(item.path));
+
+  const menuItems = visible([
     { path: '/dashboard', icon: <img src={DashboardSVG} alt='dashboard' />, label: 'Dashboard' },
         { path: '/cashflow', icon: <img src={InvoiceIcon} alt='Cashflow' />, label: 'Cashflow' },
     { path: '/crm', icon: <img src={CRMSSVG} alt='CRM' />, label: 'CRM & Sales' },
@@ -76,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
     { path: '/casting', icon: <img src={SubcontractIcon} alt='Casting' />, label: 'Casting' },
     { path: '/purchase', icon: <img src={OrderIcon} alt='Purchase' />, label: 'Purchase' },
     { path: '/rejection', icon: <img src={SettingIcon} alt='Rejection' />, label: 'Rejection' },
-  ];
+  ]);
 
   const inventorySubItems = [
     { path: '/inventory/ground-floor', label: 'Ground Floor' },
@@ -182,7 +186,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
             <span className={`expand-icon ${inventoryExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
           <div className={`sidebar-subsection ${inventoryExpanded ? 'expanded' : ''}`}>
-            {inventorySubItems.map((subItem) => (
+            {visible(inventorySubItems).map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
@@ -204,7 +208,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
             <span className={`expand-icon ${itemMasterExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
           <div className={`sidebar-subsection ${itemMasterExpanded ? 'expanded' : ''}`}>
-            {itemMasterSubItems.map((subItem) => (
+            {visible(itemMasterSubItems).map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
@@ -226,7 +230,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
             <span className={`expand-icon ${ordersExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
           <div className={`sidebar-subsection ${ordersExpanded ? 'expanded' : ''}`}>
-            {ordersSubItems.map((subItem) => (
+            {visible(ordersSubItems).map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
@@ -248,7 +252,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
             <span className={`expand-icon ${subcontractingExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
           <div className={`sidebar-subsection ${subcontractingExpanded ? 'expanded' : ''}`}>
-            {subcontractingSubItems.map((subItem) => (
+            {visible(subcontractingSubItems).map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
@@ -270,7 +274,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
             <span className={`expand-icon ${invoicesExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
           <div className={`sidebar-subsection ${invoicesExpanded ? 'expanded' : ''}`}>
-            {invoicesSubItems.map((subItem) => (
+            {visible(invoicesSubItems).map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
@@ -292,7 +296,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
             <span className={`expand-icon ${paymentReminderExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
           <div className={`sidebar-subsection ${paymentReminderExpanded ? 'expanded' : ''}`}>
-            {paymentReminderSubItems.map((subItem) => (
+            {visible(paymentReminderSubItems).map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
@@ -314,7 +318,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
             <span className={`expand-icon ${forgingExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
           <div className={`sidebar-subsection ${forgingExpanded ? 'expanded' : ''}`}>
-            {forgingSubItems.map((subItem) => (
+            {visible(forgingSubItems).map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
@@ -336,7 +340,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
             <span className={`expand-icon ${scrapExpanded ? 'expanded' : ''}`}>▼</span>
           </div>
           <div className={`sidebar-subsection ${scrapExpanded ? 'expanded' : ''}`}>
-            {scrapSubItems.map((subItem) => (
+            {visible(scrapSubItems).map((subItem) => (
               <Link key={subItem.path} to={subItem.path}
                 className={`sidebar-subitem ${location.pathname === subItem.path ? 'active' : ''}`}
                 onClick={onClose}>
@@ -347,23 +351,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, collapsed, onToggleC
         </div>
 
         {/* Settings */}
-        <Link
-          to="/settings"
-          className={`sidebar-item ${location.pathname === '/settings' ? 'active' : ''}`}
-          onClick={onClose}
-          title={collapsed ? 'Setting' : undefined}
-        >
-          <span className="sidebar-icon"><img src={SettingIcon} alt='Setting' /></span>
-          <span className="sidebar-label">Setting</span>
-        </Link>
+        {canOpen('/settings') && (
+          <Link
+            to="/settings"
+            className={`sidebar-item ${location.pathname === '/settings' ? 'active' : ''}`}
+            onClick={onClose}
+            title={collapsed ? 'Setting' : undefined}
+          >
+            <span className="sidebar-icon"><img src={SettingIcon} alt='Setting' /></span>
+            <span className="sidebar-label">Setting</span>
+          </Link>
+        )}
       </nav>
 
       <div className="sidebar-footer">
-        <div className="user-profile" title={collapsed ? 'Admin' : undefined}>
+        <div className="user-profile" title={collapsed ? getRoleLabel() : undefined}>
           <div className="user-avatar">
             <span className="avatar-icon"><img src={ProfileSVG} alt="profile" /></span>
           </div>
-          <span className="user-name">Admin</span>
+          <span className="user-name">{getRoleLabel()}</span>
         </div>
       </div>
     </div>

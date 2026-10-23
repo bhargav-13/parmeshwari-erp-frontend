@@ -1,0 +1,115 @@
+.users-page .role-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.users-page .role-legend-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
+}
+
+.users-page .role-legend-text {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #555;
+}
+
+.users-page .role-chip {
+  align-self: flex-start;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.users-page .role-owner { background: #FDF0D5; color: #7A4B00; }
+.users-page .role-admin { background: var(--brand-soft); color: var(--brand); }
+.users-page .role-ground-floor { background: #E3F2E9; color: #1D6B3F; }
+.users-page .role-first-floor { background: #E6EEFB; color: #24508F; }
+
+.users-page .users-banner {
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.users-page .users-banner-error { background: #FFE5E5; color: #8B0000; }
+.users-page .users-banner-ok { background: #E3F2E9; color: #1D6B3F; }
+
+.users-page .users-role-select {
+  min-width: 150px;
+  padding: 6px 8px;
+}
+
+.users-page .users-you {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #F0F0F0;
+  color: #555;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.users-page .users-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.users-page .users-status.on { background: #E3F2E9; color: #1D6B3F; }
+.users-page .users-status.off { background: #F0F0F0; color: #777; }
+
+.users-page .users-row-off td { color: #888; }
+
+.users-page .users-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.users-page .users-action {
+  padding: 5px 10px;
+  border: 1px solid #DADADA;
+  border-radius: 6px;
+  background: white;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.users-page .users-action:hover:not(:disabled) { background: #F6F6F6; }
+.users-page .users-action:disabled { opacity: 0.5; cursor: not-allowed; }
+.users-page .users-action.danger { color: #B42318; border-color: #F3C7C2; }
+.users-page .users-action:focus-visible,
+.users-page .users-role-select:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.users-page .users-muted { color: #888; font-size: 0.8rem; }
+
+.users-page .users-empty {
+  text-align: center;
+  color: #888;
+  padding: 24px;
+}
+
+.users-modal-sub {
+  margin: -6px 0 12px;
+  color: #666;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}

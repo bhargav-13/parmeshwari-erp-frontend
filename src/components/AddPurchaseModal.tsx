@@ -4,6 +4,7 @@ import { productApi, categoryApi } from '../api/inventory';
 import type { Product, Category, PurchaseRequest, PurchaseResponse, ProductRequest, CategoryRequest, PurchaseParty } from '../types';
 import { PurchaseInventoryType, QuantityUnit } from '../types';
 import './AddStockItemModal.css';
+import { canPickFloor } from '../lib/auth';
 
 interface AddPurchaseModalProps {
   onClose: () => void;
@@ -349,8 +350,8 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
                 aria-label="Inventory Type"
               >
                 <option value={PurchaseInventoryType.RAW_MATERIAL}>Raw Material</option>
-                <option value={PurchaseInventoryType.GROUND_FLOOR}>Ground Floor</option>
-                <option value={PurchaseInventoryType.FIRST_FLOOR}>First Floor</option>
+                {canPickFloor('GROUND_FLOOR') && <option value={PurchaseInventoryType.GROUND_FLOOR}>Ground Floor</option>}
+                {canPickFloor('FIRST_FLOOR') && <option value={PurchaseInventoryType.FIRST_FLOOR}>First Floor</option>}
               </select>
             </div>
           </div>

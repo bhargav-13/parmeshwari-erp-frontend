@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
@@ -30,16 +30,23 @@ import ForgingPartyStockPage from './pages/ForgingPartyStockPage';
 import PurchasePage from './pages/PurchasePage';
 import CashflowPage from './pages/CashflowPage';
 import RejectionPage from './pages/RejectionPage';
+import UsersSettingsPage from './pages/UsersSettingsPage';
+import { canOpen } from './lib/auth';
 import './App.css';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return <div className="loading-screen">Loading...</div>;
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  // A page this role may not open (typed in or bookmarked) goes back to the dashboard
+  return canOpen(location.pathname) ? children : <Navigate to="/dashboard" replace />;
 };
 
 function App() {
@@ -86,7 +93,7 @@ function App() {
             <Route path="purchase" element={<PurchasePage />} />
             <Route path="rejection" element={<RejectionPage />} />
             <Route path="cashflow" element={<CashflowPage />} />
-            <Route path="settings" element={<div className="placeholder">Settings Coming Soon</div>} />
+            <Route path="settings" element={<UsersSettingsPage />} />
           </Route>
         </Routes>
       </Router>

@@ -4,6 +4,7 @@ import type { Party, PurchaseParty, Floor } from '../types';
 import { partyApi } from '../api/party';
 import { purchasePartyApi } from '../api/purchaseParty';
 import './ImportPartyModal.css';
+import { canPickFloor, getUserFloor } from '../lib/auth';
 
 type PartyType = 'sales' | 'purchase';
 
@@ -75,7 +76,7 @@ const ImportPartyModal: React.FC<Props> = ({ partyType, existingParties, onClose
   const [parseError, setParseError] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
   const [rows, setRows] = useState<PreviewRow[]>([]);
-  const [defaultFloor, setDefaultFloor] = useState<Floor | ''>('');
+  const [defaultFloor, setDefaultFloor] = useState<Floor | ''>(getUserFloor() ?? '');
   const [globalConflictAction, setGlobalConflictAction] = useState<ConflictAction | 'manual'>('manual');
 
   // Conflict resolution wizard state
@@ -416,10 +417,11 @@ const ImportPartyModal: React.FC<Props> = ({ partyType, existingParties, onClose
                 className="form-input imp-floor-select"
                 value={defaultFloor}
                 onChange={e => setDefaultFloor(e.target.value as Floor | '')}
+                disabled={getUserFloor() !== null}
               >
-                <option value="">— None —</option>
-                <option value="GROUND_FLOOR">Ground Floor</option>
-                <option value="FIRST_FLOOR">First Floor</option>
+                {getUserFloor() === null && <option value="">— None —</option>}
+                {canPickFloor('GROUND_FLOOR') && <option value="GROUND_FLOOR">Ground Floor</option>}
+                {canPickFloor('FIRST_FLOOR') && <option value="FIRST_FLOOR">First Floor</option>}
               </select>
             </div>
 

@@ -83,8 +83,10 @@ paths:
       tags:
         - User Management
       operationId: registerUser
-      summary: Register a new user
-      description: Create a new user account with email, password, and user group
+      summary: Create a user (Admin or Owner)
+      description: |
+        Create a new user account with email, password, and user group. Requires a signed-in
+        Admin or Owner; only an Owner can create Owner accounts.
       requestBody:
         required: true
         content:
@@ -104,13 +106,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Not an Admin or Owner, or an Admin creating an Owner
+      security:
+        - oauth2: [ ]
 
   /api/v1/users:
     get:
       tags:
         - User Management
       operationId: getAllUsers
-      summary: Get all users with pagination (Admin only)
+      summary: Get all users with pagination (Admin or Owner)
       description: Returns a paginated list of all registered users
       parameters:
         - $ref: '#/components/parameters/pageParam'
@@ -141,7 +147,7 @@ paths:
       tags:
         - User Management
       operationId: getUserById
-      summary: Get user by ID (Admin only)
+      summary: Get user by ID (Admin or Owner)
       parameters:
         - name: id
           in: path
@@ -169,7 +175,8 @@ paths:
       tags:
         - User Management
       operationId: deleteUser
-      summary: Delete user by ID (Admin only)
+      summary: Delete user by ID (Admin or Owner)
+      description: Only an Owner can delete an Owner; the last Owner and your own login cannot be deleted.
       parameters:
         - name: id
           in: path
@@ -194,7 +201,10 @@ paths:
       tags:
         - User Management
       operationId: updateUserGroup
-      summary: Update user's group (Admin only)
+      summary: Update user's group (Admin or Owner)
+      description: |
+        Only an Owner can make someone an Owner or change an Owner's role, and the last Owner
+        keeps the Owner role.
       parameters:
         - name: id
           in: path
@@ -221,6 +231,72 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+        '403':
+          description: Forbidden
+      security:
+        - oauth2: [ ]
+
+  /api/v1/users/{id}/password:
+    put:
+      tags:
+        - User Management
+      operationId: resetUserPassword
+      summary: Set a new password for a user (Admin or Owner)
+      description: Only an Owner can reset an Owner's password.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          description: Password changed
+        '400':
+          description: Password too short or user not found
+        '403':
+          description: Forbidden
+      security:
+        - oauth2: [ ]
+
+  /api/v1/users/{id}/enabled:
+    put:
+      tags:
+        - User Management
+      operationId: setUserEnabled
+      summary: Turn a user's login on or off (Admin or Owner)
+      description: |
+        A disabled user cannot sign in. Only an Owner can disable an Owner; your own login and
+        the last enabled Owner cannot be disabled.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetUserEnabledRequest'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Not allowed for this user, or user not found
         '403':
           description: Forbidden
       security:
@@ -349,12 +425,31 @@ components:
       properties:
         userGroup:
           $ref: '#/components/schemas/UserGroup'
+    ResetPasswordRequest:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          type: string
+          description: New plain-text password (min 6 characters)
+
+    SetUserEnabledRequest:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+
     UserGroup:
       type: string
       enum:
         - Admin
         - Owner
-      description: User Group
+        - Ground Floor
+        - First Floor
+      description: User Group; Ground Floor and First Floor users only see their own floor's data
     PaginatedResultUser:
       type: object
       properties:

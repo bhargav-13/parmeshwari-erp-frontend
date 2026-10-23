@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Party, Floor } from '../types';
 import './AddProductModal.css'; // Reuse existing styles
 import { partyApi } from '../api/party';
+import { canPickFloor, getUserFloor } from '../lib/auth';
 
 interface AddPartyModalProps {
   onClose: () => void;
@@ -13,7 +14,8 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
   const [name, setName] = useState('');
   const [officialAmount, setOfficialAmount] = useState<number | ''>('');
   const [offlineAmount, setOfflineAmount] = useState<number | ''>('');
-  const [floor, setFloor] = useState<Floor | ''>('');
+  // Floor staff add parties only to their own floor
+  const [floor, setFloor] = useState<Floor | ''>(getUserFloor() ?? '');
   const [whatsappNo, setWhatsappNo] = useState('');
   const [city, setCity] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
       setName(initialData.name);
       setOfficialAmount(initialData.officialAmount);
       setOfflineAmount(initialData.offlineAmount);
-      setFloor(initialData.floor ?? '');
+      setFloor(initialData.floor ?? getUserFloor() ?? '');
       setWhatsappNo(initialData.whatsappNo ?? '');
       setCity(initialData.city ?? '');
     }
@@ -118,10 +120,11 @@ const AddPartyModal: React.FC<AddPartyModalProps> = ({ onClose, onSuccess, initi
               value={floor}
               onChange={(e) => setFloor(e.target.value as Floor | '')}
               className="form-input"
+              disabled={getUserFloor() !== null}
             >
-              <option value="">-- Select Floor --</option>
-              <option value="GROUND_FLOOR">Ground Floor</option>
-              <option value="FIRST_FLOOR">First Floor</option>
+              {getUserFloor() === null && <option value="">-- Select Floor --</option>}
+              {canPickFloor('GROUND_FLOOR') && <option value="GROUND_FLOOR">Ground Floor</option>}
+              {canPickFloor('FIRST_FLOOR') && <option value="FIRST_FLOOR">First Floor</option>}
             </select>
           </div>
 

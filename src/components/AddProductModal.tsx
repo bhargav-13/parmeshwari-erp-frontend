@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { productApi } from '../api/inventory';
 import type { ProductRequest, Product, Floor } from '../types';
 import './AddProductModal.css';
+import { canPickFloor, getUserFloor } from '../lib/auth';
 
 interface AddProductModalProps {
   onClose: () => void;
@@ -13,7 +14,7 @@ interface AddProductModalProps {
 
 const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess, initialData, defaultFloor }) => {
   const [productName, setProductName] = useState('');
-  const [floor, setFloor] = useState<Floor>(defaultFloor ?? 'FIRST_FLOOR');
+  const [floor, setFloor] = useState<Floor>(getUserFloor() ?? defaultFloor ?? 'FIRST_FLOOR');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,9 +81,10 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose, onSuccess, i
               onChange={(e) => setFloor(e.target.value as Floor)}
               className="form-input"
               title="Floor"
+              disabled={getUserFloor() !== null}
             >
-              <option value="GROUND_FLOOR">Ground Floor</option>
-              <option value="FIRST_FLOOR">First Floor</option>
+              {canPickFloor('GROUND_FLOOR') && <option value="GROUND_FLOOR">Ground Floor</option>}
+              {canPickFloor('FIRST_FLOOR') && <option value="FIRST_FLOOR">First Floor</option>}
             </select>
           </div>
 
