@@ -4,6 +4,7 @@ import { PackagingType, InventoryFloor, SubcontractingStatus, QuantityUnit } fro
 import { cromeApi } from '../api/crome';
 import { stockItemApi, productApi } from '../api/inventory';
 import './CromeReturnModal.css';
+import DateInput from './DateInput';
 
 // Packaging weights in KG
 const PACKAGING_WEIGHTS_KG: Record<PackagingType, number | null> = {
@@ -484,8 +485,7 @@ const CromeReturnModal: React.FC<CromeReturnModalProps> = ({ itemName, crome, on
                             <h3 className="section-subtitle">Return Details</h3>
                             <div className="form-group">
                                 <label className="form-label">Return Date:</label>
-                                <input
-                                    type="date"
+                                <DateInput
                                     name="returnDate"
                                     value={formData.returnDate}
                                     onChange={handleChange}

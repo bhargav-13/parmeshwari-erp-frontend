@@ -13,6 +13,7 @@ import DeleteIcon from '../assets/delete.svg';
 import ViewIcon from '../assets/view.svg';
 import './OrderManagementPage.css';
 import '../styles/StatusDropdown.css';
+import { formatDate } from '../utils/format';
 
 const initialStats: OrderStats = {
   totalOrders: 0,
@@ -279,7 +280,7 @@ const OrderManagementPage: React.FC = () => {
                 <tr key={order.id}>
                   <td>{order.orderDisplayId}</td>
                   <td>{order.party?.name || order.customerName || '—'}</td>
-                  <td>{new Date(order.orderDate).toLocaleDateString('en-IN')}</td>
+                  <td>{formatDate(order.orderDate)}</td>
                   <td>{order.totalItems ?? order.products?.length ?? 0}</td>
                   <td>{formatCurrency(order.grandTotal)}</td>
                   <td>
@@ -316,7 +317,7 @@ const OrderManagementPage: React.FC = () => {
                       </button>
                     )}
                   </td>
-                  <td>{order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toLocaleDateString('en-IN') : '—'}</td>
+                  <td>{order.expectedDeliveryDate ? formatDate(order.expectedDeliveryDate) : '—'}</td>
                   <td>
                     <div className="row-actions">
                       <button type="button" title="Delete" onClick={() => handleDeleteOrder(order)}>

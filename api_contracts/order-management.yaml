@@ -429,6 +429,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: floor
+          in: query
+          required: false
+          description: Only this floor's orders; floor staff always get their own floor
+          schema:
+            $ref: '#/components/schemas/OrderFloor'
       responses:
         '200':
           description: orders by party
@@ -463,6 +469,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: floor
+          in: query
+          required: false
+          description: Only this floor's orders; floor staff always get their own floor
+          schema:
+            $ref: '#/components/schemas/OrderFloor'
       responses:
         '200':
           description: PDF generated successfully
@@ -826,6 +838,18 @@ components:
         offlineAmount:
           type: number
           format: double
+        officialReceived:
+          type: number
+          format: double
+          description: Received so far against the party's orders (official); read-only
+        offlineReceived:
+          type: number
+          format: double
+          description: Received so far against the party's orders (offline); read-only
+        lastPaymentDate:
+          type: string
+          format: date
+          description: Date of the party's latest received payment; read-only
         floor:
           $ref: '#/components/schemas/OrderFloor'
         whatsappNo:
@@ -844,6 +868,8 @@ components:
     OrderByParty:
       type: object
       properties:
+        floor:
+          $ref: '#/components/schemas/OrderFloor'
         orderDate:
           type: string
           format: date

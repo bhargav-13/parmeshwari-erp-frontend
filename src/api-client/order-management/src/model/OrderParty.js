@@ -59,6 +59,15 @@ class OrderParty {
             if (data.hasOwnProperty('offlineAmount')) {
                 obj['offlineAmount'] = ApiClient.convertToType(data['offlineAmount'], 'Number');
             }
+            if (data.hasOwnProperty('officialReceived')) {
+                obj['officialReceived'] = ApiClient.convertToType(data['officialReceived'], 'Number');
+            }
+            if (data.hasOwnProperty('offlineReceived')) {
+                obj['offlineReceived'] = ApiClient.convertToType(data['offlineReceived'], 'Number');
+            }
+            if (data.hasOwnProperty('lastPaymentDate')) {
+                obj['lastPaymentDate'] = ApiClient.convertToType(data['lastPaymentDate'], 'Date');
+            }
             if (data.hasOwnProperty('floor')) {
                 obj['floor'] = ApiClient.convertToType(data['floor'], 'String');
             }
@@ -110,6 +119,24 @@ OrderParty.prototype['officialAmount'] = undefined;
  * @member {Number} offlineAmount
  */
 OrderParty.prototype['offlineAmount'] = undefined;
+
+/**
+ * Received so far against the party's orders (official); read-only
+ * @member {Number} officialReceived
+ */
+OrderParty.prototype['officialReceived'] = undefined;
+
+/**
+ * Received so far against the party's orders (offline); read-only
+ * @member {Number} offlineReceived
+ */
+OrderParty.prototype['offlineReceived'] = undefined;
+
+/**
+ * Date of the party's latest received payment; read-only
+ * @member {Date} lastPaymentDate
+ */
+OrderParty.prototype['lastPaymentDate'] = undefined;
 
 /**
  * @member {module:model/OrderFloor} floor

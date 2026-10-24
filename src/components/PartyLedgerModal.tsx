@@ -4,6 +4,10 @@ import type { PartyLedgerResponse, Payment, PaymentFloor } from '../types';
 import { BillingType } from '../types';
 import PaymentReceivedModal from './PaymentReceivedModal';
 import './PartyLedgerModal.css';
+import StatementFloorSelect from './StatementFloorSelect';
+import type { UserFloor } from '../lib/auth';
+import DateInput from './DateInput';
+import { formatDate as formatDmy } from '../utils/format';
 
 interface PartyLedgerModalProps {
   ledger: PartyLedgerResponse;
@@ -26,6 +30,12 @@ const currency = (value?: number | null) => {
   return `₹ ${value.toLocaleString('en-IN')}`;
 };
 
+// Date of the latest payment, shown when an order is fully or partly paid
+const receivedOn = (side?: { receivedAmount?: number; receivedDate?: string | Date | null }) =>
+  side?.receivedDate && (side.receivedAmount ?? 0) > 0 ? (
+    <span className="ledger-received-on">on {formatDmy(side.receivedDate)}</span>
+  ) : null;
+
 const getDefaultDates = () => ({
   start: '2020-01-01',
   end: '2099-12-31',
@@ -39,6 +49,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [statementFloor, setStatementFloor] = useState<UserFloor | ''>('');
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [paymentFetchError, setPaymentFetchError] = useState<string | null>(null);
 
@@ -72,7 +83,9 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
     try {
       setDownloading(true);
       setDownloadError(null);
-      const blob = await paymentApi.getPartyLedgerPdf(ledger.partyId, defaults.start, defaults.end);
+      const blob = await paymentApi.getPartyLedgerPdf(
+        ledger.partyId, defaults.start, defaults.end, statementFloor || undefined,
+      );
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -145,6 +158,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
               <h2 className="ledger-title">{ledger.partyName}</h2>
             </div>
             <div className="ledger-header-actions">
+              <StatementFloorSelect value={statementFloor} onChange={setStatementFloor} disabled={downloading} />
               <button
                 type="button"
                 className="ledger-download-btn"
@@ -170,9 +184,8 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
           <div className="ledger-filters">
             <div className="ledger-date-group">
               <label htmlFor="ledger-start-date">Start Date</label>
-              <input
+              <DateInput
                 id="ledger-start-date"
-                type="date"
                 value={startDate}
                 max={endDate || undefined}
                 onChange={(e) => setStartDate(e.target.value)}
@@ -180,9 +193,8 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
             </div>
             <div className="ledger-date-group">
               <label htmlFor="ledger-end-date">End Date</label>
-              <input
+              <DateInput
                 id="ledger-end-date"
-                type="date"
                 value={endDate}
                 min={startDate || undefined}
                 onChange={(e) => setEndDate(e.target.value)}
@@ -367,6 +379,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
                                 <div>
                                   <span className="ledger-detail-label">Received</span>
                                   <span className="ledger-detail-value">{currency(order.paymentSummary?.official?.receivedAmount)}</span>
+                                  {receivedOn(order.paymentSummary?.official)}
                                 </div>
                                 <div>
                                   <span className="ledger-detail-label">Due</span>
@@ -386,6 +399,7 @@ const PartyLedgerModal: React.FC<PartyLedgerModalProps> = ({ ledger: initialLedg
                                 <div>
                                   <span className="ledger-detail-label">Received</span>
                                   <span className="ledger-detail-value">{currency(order.paymentSummary?.offline?.receivedAmount)}</span>
+                                  {receivedOn(order.paymentSummary?.offline)}
                                 </div>
                                 <div>
                                   <span className="ledger-detail-label">Due</span>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './AddProductModal.css';
 import type { ElectricOutward } from '../types';
+import DateInput from './DateInput';
 
 interface AddElectricOutwardModalProps {
     onClose: () => void;
@@ -81,8 +82,7 @@ const AddElectricOutwardModal: React.FC<AddElectricOutwardModalProps> = ({
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">Date</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                                 className="form-input"

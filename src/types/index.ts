@@ -528,6 +528,10 @@ export interface Party {
   name: string;
   officialAmount: number;
   offlineAmount: number;
+  /** Received so far against the party's orders; amount minus this is what is still due */
+  officialReceived?: number;
+  offlineReceived?: number;
+  lastPaymentDate?: string | Date | null;
   floor?: Floor;
   whatsappNo?: string;
   city?: string;
@@ -835,6 +839,8 @@ export type InventoryExistStatus = typeof InventoryExistStatus[keyof typeof Inve
 
 export interface PurchaseRequest {
   chNo: string;
+  /** yyyy-mm-dd; the server uses today when it is missing */
+  purchaseDate?: string;
   partyId: number;
   productId: number;
   qty: number;
@@ -851,6 +857,7 @@ export interface PurchaseRequest {
 export interface PurchaseResponse {
   purchaseId: number;
   chNo: string;
+  purchaseDate?: string | Date | null;
   partyId: number;
   product: Product;
   qty: number;

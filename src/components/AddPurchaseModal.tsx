@@ -5,6 +5,8 @@ import type { Product, Category, PurchaseRequest, PurchaseResponse, ProductReque
 import { PurchaseInventoryType, QuantityUnit } from '../types';
 import './AddStockItemModal.css';
 import { canPickFloor } from '../lib/auth';
+import DateInput from './DateInput';
+import { todayLocal, toIsoDate } from '../utils/format';
 
 interface AddPurchaseModalProps {
   onClose: () => void;
@@ -18,6 +20,7 @@ interface AddPurchaseModalProps {
 
 const defaultFormData: PurchaseRequest = {
   chNo: '',
+  purchaseDate: todayLocal(),
   partyId: 0,
   productId: 0,
   qty: 0,
@@ -45,6 +48,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
   const initialFormData: PurchaseRequest = editingPurchase
     ? {
         chNo: editingPurchase.chNo,
+        purchaseDate: toIsoDate(editingPurchase.purchaseDate) || todayLocal(),
         partyId: editingPurchase.partyId,
         productId: editingPurchase.product?.productId ?? 0,
         qty: editingPurchase.qty,
@@ -57,7 +61,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
         weightPerPc: editingPurchase.stockInventory?.weightPerPc,
         quantityUnit: editingPurchase.stockInventory?.quantityUnit as any ?? undefined,
       }
-    : { ...defaultFormData };
+    : { ...defaultFormData, purchaseDate: todayLocal() };
 
   const [formData, setFormData] = useState<PurchaseRequest>(initialFormData);
   const [loading, setLoading] = useState(false);
@@ -212,6 +216,7 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
 
       const payload: PurchaseRequest = {
         chNo: formData.chNo,
+        purchaseDate: formData.purchaseDate,
         partyId: formData.partyId,
         productId: formData.productId,
         qty: formData.qty,
@@ -257,6 +262,22 @@ const AddPurchaseModal: React.FC<AddPurchaseModalProps> = ({
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="modal-form">
+          {/* Row 0: Purchase Date */}
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label" htmlFor="purchase-date">Purchase Date*</label>
+              <DateInput
+                id="purchase-date"
+                name="purchaseDate"
+                value={formData.purchaseDate}
+                onChange={handleChange}
+                className="form-input"
+                max={todayLocal()}
+                required
+              />
+            </div>
+          </div>
+
           {/* Row 1: Challan No + Party */}
           <div className="form-row">
             <div className="form-group">

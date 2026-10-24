@@ -103,7 +103,7 @@
     flex-shrink: 0;
 }
 
-.cashflow-date-input-wrap input[type="date"] {
+.cashflow-date-input-wrap input {
     font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 500;

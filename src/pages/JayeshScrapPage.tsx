@@ -9,6 +9,7 @@ import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import ViewIcon from '../assets/view.svg';
 import './JayeshScrapPage.css';
+import DateInput from '../components/DateInput';
 
 const getCurrentYearMonth = () => {
     const now = new Date();
@@ -462,9 +463,8 @@ const JayeshScrapPage: React.FC = () => {
                             </div>
                             <div className="form-group">
                                 <label className="form-label" htmlFor="jayesh-from-date">From Date <span className="optional-label">(optional)</span></label>
-                                <input
+                                <DateInput
                                     id="jayesh-from-date"
-                                    type="date"
                                     className="form-input"
                                     value={downloadFromDate}
                                     onChange={e => setDownloadFromDate(e.target.value)}
@@ -473,9 +473,8 @@ const JayeshScrapPage: React.FC = () => {
                             </div>
                             <div className="form-group">
                                 <label className="form-label" htmlFor="jayesh-to-date">To Date <span className="optional-label">(optional)</span></label>
-                                <input
+                                <DateInput
                                     id="jayesh-to-date"
-                                    type="date"
                                     className="form-input"
                                     value={downloadToDate}
                                     onChange={e => setDownloadToDate(e.target.value)}
@@ -529,8 +528,7 @@ const JayeshScrapPage: React.FC = () => {
                         <div className="modal-form">
                             <div className="form-group">
                                 <label className="form-label">Withdrawal Date</label>
-                                <input
-                                    type="date"
+                                <DateInput
                                     className="form-input"
                                     value={withdrawDateInput}
                                     onChange={(e) => setWithdrawDateInput(e.target.value)}

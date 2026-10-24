@@ -58,6 +58,9 @@ class PurchaseResponse {
             if (data.hasOwnProperty('chNo')) {
                 obj['chNo'] = ApiClient.convertToType(data['chNo'], 'String');
             }
+            if (data.hasOwnProperty('purchaseDate')) {
+                obj['purchaseDate'] = ApiClient.convertToType(data['purchaseDate'], 'Date');
+            }
             if (data.hasOwnProperty('partyId')) {
                 obj['partyId'] = ApiClient.convertToType(data['partyId'], 'Number');
             }
@@ -132,6 +135,12 @@ PurchaseResponse.prototype['purchaseId'] = undefined;
  * @member {String} chNo
  */
 PurchaseResponse.prototype['chNo'] = undefined;
+
+/**
+ * Date of the purchase
+ * @member {Date} purchaseDate
+ */
+PurchaseResponse.prototype['purchaseDate'] = undefined;
 
 /**
  * @member {Number} partyId

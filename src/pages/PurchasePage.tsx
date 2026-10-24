@@ -11,6 +11,7 @@ import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
+import { formatDate } from '../utils/format';
 
 const PurchasePage: React.FC = () => {
   const [purchases, setPurchases] = useState<PurchaseResponse[]>([]);
@@ -168,6 +169,7 @@ const PurchasePage: React.FC = () => {
           <thead>
             <tr>
               <th>Sr. No</th>
+              <th>Date</th>
               <th>Challan No.</th>
               <th>Party ID</th>
               <th>Party</th>
@@ -184,6 +186,7 @@ const PurchasePage: React.FC = () => {
             {purchases.map((purchase, index) => (
               <tr key={purchase.purchaseId}>
                 <td>{String(index + 1).padStart(2, '0')}</td>
+                <td>{formatDate(purchase.purchaseDate)}</td>
                 <td>{purchase.chNo}</td>
                 <td>{purchase.partyId}</td>
                 <td>{getPartyName(purchase.partyId)}</td>
@@ -221,7 +224,7 @@ const PurchasePage: React.FC = () => {
             ))}
             {purchases.length === 0 && (
               <tr>
-                <td colSpan={11} className="no-data">
+                <td colSpan={12} className="no-data">
                   No purchases found
                 </td>
               </tr>

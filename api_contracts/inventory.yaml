@@ -1706,6 +1706,10 @@ components:
         chNo:
           type: string
           description: Challan number
+        purchaseDate:
+          type: string
+          format: date
+          description: Date of the purchase; today when left out
         partyId:
           type: integer
           description: Party ID from party master
@@ -1751,6 +1755,9 @@ components:
           type: integer
         chNo:
           type: string
+        purchaseDate:
+          type: string
+          format: date
         partyId:
           type: integer
         product:

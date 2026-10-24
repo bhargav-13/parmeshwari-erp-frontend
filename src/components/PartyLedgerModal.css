@@ -627,3 +627,12 @@
     gap: 8px;
   }
 }
+
+/* "on 24/10/2026" under a received amount */
+.ledger-received-on {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-muted);
+}

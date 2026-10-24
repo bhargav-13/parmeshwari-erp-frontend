@@ -3,6 +3,7 @@ import type { SubOrderRequest, Contractor, SubItem } from '../types';
 import { Unit, SubcontractingStatus } from '../types';
 import { subcontractingApi } from '../api/subcontracting';
 import './AddSubcontractingModal.css';
+import DateInput from './DateInput';
 
 interface AddSubcontractingModalProps {
   onClose: () => void;
@@ -310,8 +311,7 @@ const AddSubcontractingModal: React.FC<AddSubcontractingModalProps> = ({
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Order Date:</label>
-              <input
-                type="date"
+              <DateInput
                 name="orderDate"
                 value={formData.orderDate}
                 onChange={handleChange}

@@ -9,6 +9,7 @@ import AddElectricCreditModal from '../components/AddElectricCreditModal';
 import AddElectricOutwardModal from '../components/AddElectricOutwardModal';
 import type { ElectricOutward, ElectricCredit } from '../types';
 import { electricOutwardApi, electricCreditApi } from '../api/electric';
+import DateInput from '../components/DateInput';
 
 type ElectricTab = 'OUTWARDS' | 'CREDIT';
 
@@ -367,8 +368,7 @@ const ElectricPage: React.FC = () => {
                         <div className="modal-form">
                             <div className="form-group">
                                 <label className="form-label">From Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
-                                <input
-                                    type="date"
+                                <DateInput
                                     className="form-input"
                                     value={downloadFromDate}
                                     onChange={e => setDownloadFromDate(e.target.value)}
@@ -376,8 +376,7 @@ const ElectricPage: React.FC = () => {
                             </div>
                             <div className="form-group">
                                 <label className="form-label">To Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
-                                <input
-                                    type="date"
+                                <DateInput
                                     className="form-input"
                                     value={downloadToDate}
                                     onChange={e => setDownloadToDate(e.target.value)}

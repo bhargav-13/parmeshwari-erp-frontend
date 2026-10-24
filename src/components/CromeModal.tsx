@@ -4,6 +4,7 @@ import { PackagingType } from '../types';
 import { cromeApi } from '../api/crome';
 import './AddSubcontractingModal.css';
 import './CromeModal.css';
+import DateInput from './DateInput';
 
 // Packaging weights in KG
 const PACKAGING_WEIGHTS_KG: Record<PackagingType, number | null> = {
@@ -331,8 +332,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractin
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Crome Date:</label>
-              <input
-                type="date"
+              <DateInput
                 name="cromeDate"
                 value={formData.cromeDate}
                 onChange={handleChange}

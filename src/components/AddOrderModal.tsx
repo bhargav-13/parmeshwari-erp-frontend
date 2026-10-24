@@ -7,6 +7,7 @@ import SearchableSelect, { type SearchableOption } from './SearchableSelect';
 import OrderInvoicePreview, { downloadInvoice } from './OrderInvoicePreview';
 import './AddOrderModal.css';
 import DeleteIcon from '../assets/delete.svg';
+import DateInput from './DateInput';
 
 interface AddOrderModalProps {
   onClose: () => void;
@@ -449,8 +450,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
               </div>
               <div className="order-form-group">
                 <label>Order Date*</label>
-                <input
-                  type="date"
+                <DateInput
                   value={formData.orderDate}
                   max={formData.expectedDeliveryDate || undefined}
                   onChange={(e) => handleFieldChange('orderDate', e.target.value)}
@@ -479,8 +479,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
               </div>
               <div className="order-form-group">
                 <label>Expected Delivery Date*</label>
-                <input
-                  type="date"
+                <DateInput
                   value={formData.expectedDeliveryDate}
                   onChange={(e) => handleFieldChange('expectedDeliveryDate', e.target.value)}
                   required
@@ -504,8 +503,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
               </div>
               <div className="order-form-group">
                 <label>Payment Date*</label>
-                <input
-                  type="date"
+                <DateInput
                   value={formData.paymentDate || ''}
                   onChange={(e) => handleFieldChange('paymentDate', e.target.value)}
                   required

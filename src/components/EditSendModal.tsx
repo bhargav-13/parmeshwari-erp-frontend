@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { SubSend, SubSendRequest, Unit } from '../types';
 import './AddSubcontractingModal.css';
+import DateInput from './DateInput';
 
 interface EditSendModalProps {
   send: SubSend;
@@ -63,9 +64,8 @@ const EditSendModal: React.FC<EditSendModalProps> = ({ send, unit, onClose, onSu
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="sendDate">Send Date:</label>
-              <input
+              <DateInput
                 id="sendDate"
-                type="date"
                 name="sendDate"
                 value={formData.sendDate}
                 onChange={handleChange}

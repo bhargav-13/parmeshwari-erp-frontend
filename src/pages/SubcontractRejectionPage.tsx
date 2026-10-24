@@ -9,6 +9,7 @@ import EditIcon from '../assets/edit.svg';
 import { formatQty } from '../utils/format';
 import './SubcontractingPage.css';
 import './SubcontractPage.css';
+import DateInput from '../components/DateInput';
 
 // One job work with rejected material
 interface RejectionRow {
@@ -164,9 +165,9 @@ const SubcontractRejectionPage: React.FC = () => {
           </select>
         </div>
         <div className="rejection-date-range" title="Order date">
-          <input type="date" value={fromDate} max={toDate || undefined} onChange={(e) => setFromDate(e.target.value)} title="Order date from" aria-label="Order date from" />
+          <DateInput value={fromDate} max={toDate || undefined} onChange={(e) => setFromDate(e.target.value)} title="Order date from" aria-label="Order date from" />
           <span>to</span>
-          <input type="date" value={toDate} min={fromDate || undefined} onChange={(e) => setToDate(e.target.value)} title="Order date to" aria-label="Order date to" />
+          <DateInput value={toDate} min={fromDate || undefined} onChange={(e) => setToDate(e.target.value)} title="Order date to" aria-label="Order date to" />
         </div>
         {hasFilters && (
           <button

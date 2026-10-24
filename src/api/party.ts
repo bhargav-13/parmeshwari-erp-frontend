@@ -13,6 +13,9 @@ const convertToParty = (orderParty: any): Party => ({
     name: orderParty.name || '',
     officialAmount: orderParty.officialAmount || 0,
     offlineAmount: orderParty.offlineAmount || 0,
+    officialReceived: orderParty.officialReceived || 0,
+    offlineReceived: orderParty.offlineReceived || 0,
+    lastPaymentDate: orderParty.lastPaymentDate ?? null,
     floor: orderParty.floor,
     whatsappNo: orderParty.whatsappNo || undefined,
     city: orderParty.city || undefined,
@@ -86,12 +89,13 @@ export const partyApi = {
         }).catch(() => ({ name: partyName, orders: [] })),
 
     // Download PDF for specific party
-    downloadPartyPdf: async (partyName: string): Promise<Blob> => {
+    downloadPartyPdf: async (partyName: string, floor?: string): Promise<Blob> => {
         // Use fetch directly for PDF download to handle binary response properly
         const token = localStorage.getItem('accessToken');
         const baseUrl = apiClient.basePath || 'http://localhost:8080';
 
-        const response = await fetch(`${baseUrl}/api/v1/order/getByParty/${encodeURIComponent(partyName)}/pdf`, {
+        const floorParam = floor ? `?floor=${floor}` : '';
+        const response = await fetch(`${baseUrl}/api/v1/order/getByParty/${encodeURIComponent(partyName)}/pdf${floorParam}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

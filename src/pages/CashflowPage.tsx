@@ -17,6 +17,7 @@ import type {
     CashflowPaymentType,
 } from '../types';
 import Loading from '../components/Loading';
+import DateInput from '../components/DateInput';
 
 const todayStr = () => new Date().toISOString().split('T')[0];
 
@@ -390,8 +391,7 @@ const CashflowPage: React.FC = () => {
                             <line x1="8" y1="2" x2="8" y2="6" />
                             <line x1="3" y1="10" x2="21" y2="10" />
                         </svg>
-                        <input
-                            type="date"
+                        <DateInput
                             value={selectedDate}
                             onChange={e => setSelectedDate(e.target.value)}
                             max={todayStr()}

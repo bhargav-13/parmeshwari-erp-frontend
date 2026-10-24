@@ -9,6 +9,7 @@ import Loading from '../components/Loading';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import './RejectionPage.css';
+import DateInput from '../components/DateInput';
 
 const RejectionPage: React.FC = () => {
   const [rejections, setRejections] = useState<RejectionResponse[]>([]);
@@ -283,9 +284,8 @@ const RejectionPage: React.FC = () => {
                 <label className="form-label" htmlFor="pdf-from-date">
                   From Date <span className="optional-label">(optional)</span>
                 </label>
-                <input
+                <DateInput
                   id="pdf-from-date"
-                  type="date"
                   className="form-input"
                   value={pdfFromDate}
                   onChange={e => setPdfFromDate(e.target.value)}
@@ -296,9 +296,8 @@ const RejectionPage: React.FC = () => {
                 <label className="form-label" htmlFor="pdf-to-date">
                   To Date <span className="optional-label">(optional)</span>
                 </label>
-                <input
+                <DateInput
                   id="pdf-to-date"
-                  type="date"
                   className="form-input"
                   value={pdfToDate}
                   onChange={e => setPdfToDate(e.target.value)}

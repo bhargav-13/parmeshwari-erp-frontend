@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './AddProductModal.css';
 import './AddCastingSellModal.css';
 import type { CastingSale } from '../types';
+import DateInput from './DateInput';
 
 interface AddCastingSellModalProps {
     onClose: () => void;
@@ -81,8 +82,7 @@ const AddCastingSellModal: React.FC<AddCastingSellModalProps> = ({ onClose, onSu
                     <div className="form-row full-width">
                         <div className="form-group full-width">
                             <label className="form-label">Date</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                                 className="form-input"

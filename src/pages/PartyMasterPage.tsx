@@ -14,6 +14,7 @@ import ViewIcon from '../assets/view.svg';
 import { partyApi } from '../api/party';
 import { purchasePartyApi } from '../api/purchaseParty';
 import { getUserFloor } from '../lib/auth';
+import { formatDate } from '../utils/format';
 
 type TabType = 'sales' | 'purchase';
 
@@ -268,8 +269,9 @@ const PartyMasterPage: React.FC = () => {
                                         <th>Party ID</th>
                                         <th>Party Name</th>
                                         <th>Floor</th>
-                                        <th>Official Amount</th>
-                                        <th>Offline Amount</th>
+                                        <th title="Still due after payments received">Official Amount</th>
+                                        <th title="Still due after payments received">Offline Amount</th>
+                                        <th>Last Payment</th>
                                         <th>WhatsApp No.</th>
                                         <th>City</th>
                                         <th>Actions</th>
@@ -282,8 +284,9 @@ const PartyMasterPage: React.FC = () => {
                                             <td>{party.partyId}</td>
                                             <td>{party.name}</td>
                                             <td>{party.floor === 'GROUND_FLOOR' ? 'Ground Floor' : party.floor === 'FIRST_FLOOR' ? 'First Floor' : '—'}</td>
-                                            <td>₹{party.officialAmount.toLocaleString('en-IN')}</td>
-                                            <td>₹{party.offlineAmount.toLocaleString('en-IN')}</td>
+                                            <td title={paidTitle(party.officialAmount, party.officialReceived)}>₹{dueAfterPayments(party.officialAmount, party.officialReceived).toLocaleString('en-IN')}</td>
+                                            <td title={paidTitle(party.offlineAmount, party.offlineReceived)}>₹{dueAfterPayments(party.offlineAmount, party.offlineReceived).toLocaleString('en-IN')}</td>
+                                            <td>{formatDate(party.lastPaymentDate)}</td>
                                             <td>{party.whatsappNo || '—'}</td>
                                             <td>{party.city || '—'}</td>
                                             <td>
@@ -323,7 +326,7 @@ const PartyMasterPage: React.FC = () => {
                                     ))}
                                     {filteredParties.length === 0 && (
                                         <tr>
-                                            <td colSpan={9} className="no-data">
+                                            <td colSpan={10} className="no-data">
                                                 No parties found
                                             </td>
                                         </tr>
@@ -501,5 +504,12 @@ const PartyMasterPage: React.FC = () => {
         </div>
     );
 };
+
+// The stored amount includes every order; payments received on those orders are taken off here
+const dueAfterPayments = (amount: number, received?: number) =>
+    Math.round(((amount || 0) - (received || 0)) * 100) / 100;
+
+const paidTitle = (amount: number, received?: number) =>
+    `Billed ₹${(amount || 0).toLocaleString('en-IN')}, received ₹${(received || 0).toLocaleString('en-IN')}`;
 
 export default PartyMasterPage;

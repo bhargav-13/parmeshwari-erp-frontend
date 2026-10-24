@@ -3,6 +3,7 @@ import { paymentApi } from '../api/payment';
 import type { Payment, PaymentReceiveRequest } from '../types';
 import './PaymentReceivedModal.css';
 import { todayLocal } from '../utils/format';
+import DateInput from './DateInput';
 
 interface PaymentReceivedModalProps {
   payment: Payment;
@@ -133,8 +134,7 @@ const PaymentReceivedModal: React.FC<PaymentReceivedModalProps> = ({
 
             <div className="form-group">
               <label className="form-label">Date of Receipt</label>
-              <input
-                type="date"
+              <DateInput
                 name="newReceivedDate"
                 value={formData.newReceivedDate}
                 onChange={handleChange}
