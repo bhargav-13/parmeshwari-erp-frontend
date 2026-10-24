@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { cromeApi } from '../api/crome';
 import type { Party } from '../types';
 import './CromeReportModal.css';
+import DateInput from './DateInput';
 
 interface CromeReportModalProps {
     onClose: () => void;
@@ -85,8 +86,7 @@ const CromeReportModal: React.FC<CromeReportModalProps> = ({ onClose }) => {
                     <div className="date-row">
                         <div className="form-group">
                             <label className="form-label">Start Date</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 className="form-input"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
@@ -95,8 +95,7 @@ const CromeReportModal: React.FC<CromeReportModalProps> = ({ onClose }) => {
                         </div>
                         <div className="form-group">
                             <label className="form-label">End Date</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 className="form-input"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}

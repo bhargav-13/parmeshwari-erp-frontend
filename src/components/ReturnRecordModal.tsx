@@ -3,6 +3,7 @@ import type { Subcontracting, SubReturn, SubReturnRequest, PackagingDetail } fro
 import { PackagingType, ReturnType } from '../types';
 import { todayLocal } from '../utils/format';
 import './ReturnRecordModal.css';
+import DateInput from './DateInput';
 
 interface ReturnRecordModalProps {
   subcontract: Subcontracting;
@@ -395,8 +396,7 @@ const ReturnRecordModal: React.FC<ReturnRecordModalProps> = ({ subcontract, init
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Return Date:</label>
-              <input
-                type="date"
+              <DateInput
                 name="returnDate"
                 value={formData.returnDate}
                 onChange={handleChange}

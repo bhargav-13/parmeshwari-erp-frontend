@@ -9,6 +9,7 @@ import AddForgingOutwardModal from '../components/AddForgingOutwardModal';
 import { forgingInwardApi, forgingInwardItemsApi, forgingOutwardApi, forgingPartyApi, forgingReportApi } from '../api/forging';
 import type { ForgingInward, ForgingOutward, ForgingParty } from '../types';
 import Loading from '../components/Loading';
+import DateInput from '../components/DateInput';
 
 // Download Icon
 const DownloadIcon = () => (
@@ -272,8 +273,7 @@ const ForgingPage: React.FC = () => {
                 </select>
                 <div className="date-range-filter">
                     <span className="date-range-label">or</span>
-                    <input
-                        type="date"
+                    <DateInput
                         className="month-filter-select"
                         value={rangeFrom}
                         max={rangeTo || undefined}
@@ -283,8 +283,7 @@ const ForgingPage: React.FC = () => {
                         disabled={isSearching}
                     />
                     <span className="date-range-label">to</span>
-                    <input
-                        type="date"
+                    <DateInput
                         className="month-filter-select"
                         value={rangeTo}
                         min={rangeFrom || undefined}
@@ -539,8 +538,7 @@ const ForgingPage: React.FC = () => {
 
                             <div className="form-group">
                                 <label className="form-label">From Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
-                                <input
-                                    type="date"
+                                <DateInput
                                     className="form-input"
                                     value={downloadFromDate}
                                     onChange={e => setDownloadFromDate(e.target.value)}
@@ -550,8 +548,7 @@ const ForgingPage: React.FC = () => {
 
                             <div className="form-group">
                                 <label className="form-label">To Date <span style={{ opacity: 0.5 }}>(optional)</span></label>
-                                <input
-                                    type="date"
+                                <DateInput
                                     className="form-input"
                                     value={downloadToDate}
                                     onChange={e => setDownloadToDate(e.target.value)}

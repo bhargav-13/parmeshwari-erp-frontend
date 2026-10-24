@@ -4,6 +4,7 @@ import { RejectionReturnType as ReturnTypeEnum } from '../types';
 import { getRejectionPartyOptions, rejectionPartyKey, type RejectionPartyOption } from '../api/rejection';
 import { stockItemApi } from '../api/inventory';
 import './AddRejectionModal.css';
+import DateInput from './DateInput';
 
 interface AddRejectionModalProps {
   onClose: () => void;
@@ -174,9 +175,8 @@ const AddRejectionModal: React.FC<AddRejectionModalProps> = ({
               <label className="rejection-form-label" htmlFor="rejection-date">
                 Date <span className="required-star">*</span>
               </label>
-              <input
+              <DateInput
                 id="rejection-date"
-                type="date"
                 className="rejection-form-input"
                 value={form.date}
                 onChange={e => set('date', e.target.value)}

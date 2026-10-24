@@ -7,6 +7,7 @@ import SearchIcon from '../assets/search.svg';
 import DownloadIcon from '../assets/download.svg';
 import ViewIcon from '../assets/view.svg';
 import './SubcontractPage.css';
+import DateInput from '../components/DateInput';
 
 const SubcontractPage: React.FC = () => {
   const [subcontractors, setSubcontractors] = useState<SubcontractingBySubcontractInfo[]>([]);
@@ -211,11 +212,11 @@ const SubcontractPage: React.FC = () => {
             <div className="pdf-range-fields">
               <label className="pdf-range-field">
                 <span>Start Date</span>
-                <input type="date" value={pdfStartDate} max={pdfEndDate || undefined} onChange={(e) => setPdfStartDate(e.target.value)} />
+                <DateInput value={pdfStartDate} max={pdfEndDate || undefined} onChange={(e) => setPdfStartDate(e.target.value)} />
               </label>
               <label className="pdf-range-field">
                 <span>End Date</span>
-                <input type="date" value={pdfEndDate} min={pdfStartDate || undefined} onChange={(e) => setPdfEndDate(e.target.value)} />
+                <DateInput value={pdfEndDate} min={pdfStartDate || undefined} onChange={(e) => setPdfEndDate(e.target.value)} />
               </label>
             </div>
             {pdfStartDate && pdfEndDate && pdfStartDate > pdfEndDate && (

@@ -3,6 +3,7 @@ import { subcontractingApi } from '../api/subcontracting';
 import type { SubcontractingBySubcontractList } from '../types';
 import Loading from './Loading';
 import './SubcontractViewModal.css';
+import DateInput from './DateInput';
 
 interface SubcontractViewModalProps {
   contractorName: string;
@@ -92,16 +93,14 @@ const SubcontractViewModal: React.FC<SubcontractViewModalProps> = ({
         <div className="subcontract-view-date-filters">
           <div className="date-filter-group">
             <label>Start Date:</label>
-            <input
-              type="date"
+            <DateInput
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
           </div>
           <div className="date-filter-group">
             <label>End Date:</label>
-            <input
-              type="date"
+            <DateInput
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />

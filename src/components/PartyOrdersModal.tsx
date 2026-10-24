@@ -3,6 +3,8 @@ import { partyApi } from '../api/party';
 import type { OrderByPartyResponse } from '../types';
 import Loading from './Loading';
 import './SubcontractViewModal.css'; // Reuse existing styles
+import StatementFloorSelect from './StatementFloorSelect';
+import type { UserFloor } from '../lib/auth';
 
 interface PartyOrdersModalProps {
     partyName: string;
@@ -17,6 +19,7 @@ const PartyOrdersModal: React.FC<PartyOrdersModalProps> = ({
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [downloading, setDownloading] = useState(false);
+    const [statementFloor, setStatementFloor] = useState<UserFloor | ''>('');
 
     useEffect(() => {
         fetchData();
@@ -41,7 +44,7 @@ const PartyOrdersModal: React.FC<PartyOrdersModalProps> = ({
         try {
             setDownloading(true);
             setError(null);
-            const blob = await partyApi.downloadPartyPdf(partyName);
+            const blob = await partyApi.downloadPartyPdf(partyName, statementFloor || undefined);
 
             // Create download link
             const url = window.URL.createObjectURL(blob);
@@ -99,6 +102,7 @@ const PartyOrdersModal: React.FC<PartyOrdersModalProps> = ({
                         <p className="subcontract-view-date-range">Party Orders</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <StatementFloorSelect value={statementFloor} onChange={setStatementFloor} disabled={downloading} />
                         <button
                             type="button"
                             className="action-button primary-button"

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './AddProductModal.css';
 import type { ForgingOutward, ForgingParty, OutwardWeightUnit } from '../types';
 import { forgingPartyApi } from '../api/forging';
+import DateInput from './DateInput';
 
 interface AddForgingOutwardModalProps {
     onClose: () => void;
@@ -120,8 +121,7 @@ const AddForgingOutwardModal: React.FC<AddForgingOutwardModalProps> = ({ onClose
                 <form onSubmit={handleSubmit} className="modal-form">
                     <div className="form-group">
                         <label className="form-label">Date*</label>
-                        <input
-                            type="date"
+                        <DateInput
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
                             className="form-input"

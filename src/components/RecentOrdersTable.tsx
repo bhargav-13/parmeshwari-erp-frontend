@@ -1,6 +1,7 @@
 import React from 'react';
 import './RecentOrdersTable.css';
 import type { Order } from '../types';
+import { formatDate } from '../utils/format';
 
 interface RecentOrdersTableProps {
   orders: Order[];
@@ -25,7 +26,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders }) => {
             <tr key={order.id}>
               <td>{order.id}</td>
               <td>{order.customerName}</td>
-              <td>{order.orderDate}</td>
+              <td>{formatDate(order.orderDate)}</td>
               <td>₹{order.grandTotal}</td>
               <td>
                 <span className={`status-badge status-${order.orderStatus?.toLowerCase()}`}>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './AddProductModal.css'; // Reusing existing styles
+import DateInput from './DateInput';
 
 export interface ForginInwardEntry {
     date: string;
@@ -110,8 +111,7 @@ const AddForginInwardModal: React.FC<AddForginInwardModalProps> = ({ onClose, on
                         </div>
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">Date</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                                 className="form-input"

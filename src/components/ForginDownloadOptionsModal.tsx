@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './AddProductModal.css'; // Reusing existing modal styles
+import DateInput from './DateInput';
 
 interface ForginDownloadOptionsModalProps {
     onClose: () => void;
@@ -67,8 +68,7 @@ const ForginDownloadOptionsModal: React.FC<ForginDownloadOptionsModalProps> = ({
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">Start Date</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
                                 className="form-input"
@@ -77,8 +77,7 @@ const ForginDownloadOptionsModal: React.FC<ForginDownloadOptionsModalProps> = ({
                         </div>
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">End Date</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 className="form-input"

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './AddProductModal.css';
 import type { ElectricCredit } from '../types';
+import DateInput from './DateInput';
 
 interface AddElectricCreditModalProps {
     onClose: () => void;
@@ -73,8 +74,7 @@ const AddElectricCreditModal: React.FC<AddElectricCreditModalProps> = ({
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">Date</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                                 className="form-input"

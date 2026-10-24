@@ -9,6 +9,7 @@ import SearchIcon from '../assets/search.svg';
 import Loading from '../components/Loading';
 import { forgingInwardApi, forgingOutwardApi } from '../api/forging';
 import type { ForgingInward, ForgingOutward } from '../types';
+import DateInput from '../components/DateInput';
 
 // Chart colours (validated categorical slots); net stock uses its own sign colours
 const COLOR_OUTWARD = '#2a78d6';
@@ -319,8 +320,8 @@ const ForgingPartyStockPage: React.FC = () => {
                 </select>
                 {period === 'custom' && (
                     <>
-                        <input type="date" className="month-filter-select" value={customFrom} onChange={e => setCustomFrom(e.target.value)} aria-label="From date" />
-                        <input type="date" className="month-filter-select" value={customTo} onChange={e => setCustomTo(e.target.value)} aria-label="To date" />
+                        <DateInput className="month-filter-select" value={customFrom} onChange={e => setCustomFrom(e.target.value)} aria-label="From date" />
+                        <DateInput className="month-filter-select" value={customTo} onChange={e => setCustomTo(e.target.value)} aria-label="To date" />
                     </>
                 )}
                 <label className="ps-toggle">

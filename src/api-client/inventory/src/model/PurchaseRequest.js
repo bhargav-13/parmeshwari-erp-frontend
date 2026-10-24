@@ -68,6 +68,9 @@ class PurchaseRequest {
             if (data.hasOwnProperty('chNo')) {
                 obj['chNo'] = ApiClient.convertToType(data['chNo'], 'String');
             }
+            if (data.hasOwnProperty('purchaseDate')) {
+                obj['purchaseDate'] = ApiClient.convertToType(data['purchaseDate'], 'Date');
+            }
             if (data.hasOwnProperty('partyId')) {
                 obj['partyId'] = ApiClient.convertToType(data['partyId'], 'Number');
             }
@@ -135,6 +138,12 @@ PurchaseRequest.RequiredProperties = ["chNo", "partyId", "productId", "qty", "ra
  * @member {String} chNo
  */
 PurchaseRequest.prototype['chNo'] = undefined;
+
+/**
+ * Date of the purchase
+ * @member {Date} purchaseDate
+ */
+PurchaseRequest.prototype['purchaseDate'] = undefined;
 
 /**
  * Party ID from party master

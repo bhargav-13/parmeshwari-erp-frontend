@@ -4,6 +4,7 @@ import type { ForgingInward, ForgingInwardItem, ForgingParty, InwardWeightUnit, 
 import { InventoryFloor, QuantityUnit } from '../types';
 import { forgingPartyApi, forgingInwardItemsApi } from '../api/forging';
 import { stockItemApi } from '../api/inventory';
+import DateInput from './DateInput';
 
 const INWARD_WEIGHT_UNITS: { value: InwardWeightUnit; label: string }[] = [
     { value: 'KG', label: 'KG' },
@@ -301,8 +302,7 @@ const AddForgingInwardModal: React.FC<AddForgingInwardModalProps> = ({ onClose, 
                     <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">Date*</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
                                 className="form-input"

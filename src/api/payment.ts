@@ -59,11 +59,12 @@ export const paymentApi = {
 
   // Download party ledger PDF — use native fetch for a clean binary blob.
   // The superagent-based generated client can corrupt binary responses in browsers.
-  getPartyLedgerPdf: async (partyId: number, startDate: string, endDate: string): Promise<Blob> => {
+  getPartyLedgerPdf: async (partyId: number, startDate: string, endDate: string, floor?: string): Promise<Blob> => {
     const BASE_URL =
       (import.meta as any).env?.VITE_API_BASE_URL?.trim() || 'http://localhost:8080';
     const token = localStorage.getItem('accessToken');
-    const url = `${BASE_URL}/api/v1/payments/party-ledger/${partyId}/pdf?startDate=${startDate}&endDate=${endDate}`;
+    const url = `${BASE_URL}/api/v1/payments/party-ledger/${partyId}/pdf?startDate=${startDate}&endDate=${endDate}`
+      + (floor ? `&floor=${floor}` : '');
 
     const response = await fetch(url, {
       method: 'GET',

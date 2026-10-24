@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { KevinScrapRequest, JayeshScrapRequest, KevinScrapContractor, JayeshScrapContractor } from '../api/scrap';
 import { kevinScrapApi, jayeshScrapApi } from '../api/scrap';
 import './ScrapEntryModal.css';
+import DateInput from './DateInput';
 
 interface ScrapEntryModalProps {
     onClose: () => void;
@@ -211,8 +212,7 @@ const ScrapEntryModal: React.FC<ScrapEntryModalProps> = ({
 
                         <div className="scrap-form-group">
                             <label className="scrap-form-label">Order Date:</label>
-                            <input
-                                type="date"
+                            <DateInput
                                 name="orderDate"
                                 value={formData.orderDate}
                                 onChange={handleChange}

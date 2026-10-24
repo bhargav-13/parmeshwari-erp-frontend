@@ -12,7 +12,7 @@ import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
-import { formatQty } from '../utils/format';
+import { formatQty, formatDate } from '../utils/format';
 
 const InventoryPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'stock' | 'raw'>('stock');
@@ -158,7 +158,7 @@ const InventoryPage: React.FC = () => {
     if (diffMinutes < 1) return 'Just now';
     if (diffMinutes < 60) return `${diffMinutes} min ago`;
     if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? 's' : ''} ago`;
-    return updatedDate.toLocaleDateString('en-IN');
+    return formatDate(updatedDate);
   };
 
   // Calculate actual status based on quantity in pieces vs low stock alert (for stock items)

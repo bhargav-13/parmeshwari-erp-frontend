@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './AddProductModal.css';
 import type { CastingEntry } from '../types';
+import DateInput from './DateInput';
 
 interface AddCastingEntryModalProps {
     onClose: () => void;
@@ -63,8 +64,7 @@ const AddCastingEntryModal: React.FC<AddCastingEntryModalProps> = ({ onClose, on
                 <form onSubmit={handleSubmit} className="modal-form">
                     <div className="form-group">
                         <label className="form-label">Date*</label>
-                        <input
-                            type="date"
+                        <DateInput
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
                             className="form-input"

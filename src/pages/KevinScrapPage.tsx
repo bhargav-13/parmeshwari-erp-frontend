@@ -7,6 +7,7 @@ import SearchIcon from '../assets/search.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import './KevinScrapPage.css';
+import DateInput from '../components/DateInput';
 
 const getCurrentYearMonth = () => {
     const now = new Date();
@@ -371,9 +372,8 @@ const KevinScrapPage: React.FC = () => {
                             </div>
                             <div className="form-group">
                                 <label className="form-label" htmlFor="kevin-from-date">From Date <span className="optional-label">(optional)</span></label>
-                                <input
+                                <DateInput
                                     id="kevin-from-date"
-                                    type="date"
                                     className="form-input"
                                     value={downloadFromDate}
                                     onChange={e => setDownloadFromDate(e.target.value)}
@@ -382,9 +382,8 @@ const KevinScrapPage: React.FC = () => {
                             </div>
                             <div className="form-group">
                                 <label className="form-label" htmlFor="kevin-to-date">To Date <span className="optional-label">(optional)</span></label>
-                                <input
+                                <DateInput
                                     id="kevin-to-date"
-                                    type="date"
                                     className="form-input"
                                     value={downloadToDate}
                                     onChange={e => setDownloadToDate(e.target.value)}
