@@ -4,10 +4,12 @@ import { partyApi } from '../api/party';
 import type { Party, PartyLedgerResponse, PaymentFloor } from '../types';
 import { BillingType } from '../types';
 import { todayLocal } from '../utils/format';
+import { isOwner } from '../lib/auth';
 import PartyLedgerModal from '../components/PartyLedgerModal';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
 import ViewIcon from '../assets/view.svg';
+import EditIcon from '../assets/edit.svg';
 import './PaymentReminderPage.css';
 
 interface PaymentReminderPageProps {
@@ -45,6 +47,13 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
   const [receiveAmount, setReceiveAmount] = useState<number | ''>('');
   const [receiveLoading, setReceiveLoading] = useState(false);
   const [receiveError, setReceiveError] = useState<string | null>(null);
+  // Only the Owner may change a party's Official / Offline amounts
+  const canEditAmounts = isOwner();
+  const [editingParty, setEditingParty] = useState<Party | null>(null);
+  const [editOfficial, setEditOfficial] = useState<number | ''>('');
+  const [editOffline, setEditOffline] = useState<number | ''>('');
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   // Date range: all payments (past and future)
   const startDate = '2020-01-01';
@@ -163,6 +172,35 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
     } finally {
       setReceiveLoading(false);
       await fetchData();
+    }
+  };
+
+  const openEditAmounts = (party: Party) => {
+    setEditingParty(party);
+    setEditOfficial(party.officialAmount || 0);
+    setEditOffline(party.offlineAmount || 0);
+    setEditError(null);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!canEditAmounts || !editingParty || editOfficial === '' || editOffline === '') return;
+    try {
+      setEditLoading(true);
+      await partyApi.updateParty(editingParty.partyId, {
+        name: editingParty.name,
+        officialAmount: Math.round(Number(editOfficial) * 100) / 100,
+        offlineAmount: Math.round(Number(editOffline) * 100) / 100,
+        floor: editingParty.floor,
+        whatsappNo: editingParty.whatsappNo,
+        city: editingParty.city,
+      });
+      setEditingParty(null);
+      await fetchData();
+    } catch (err) {
+      console.error('Failed to update amounts:', err);
+      setEditError('Failed to save. Please try again.');
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -340,6 +378,17 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                             >
                               <img src={ViewIcon} alt="View" className="view-icon" />
                             </button>
+                            {canEditAmounts && (
+                              <button
+                                type="button"
+                                className="view-ledger-btn"
+                                title="Edit Official / Offline Amount"
+                                onClick={(e) => { e.stopPropagation(); openEditAmounts(row.party); }}
+                                disabled={row.loading}
+                              >
+                                <img src={EditIcon} alt="Edit" className="view-icon" />
+                              </button>
+                            )}
                             {!row.loading && dueInMode(row.party, row.ledger, 'official') > 0 && (
                               <button
                                 type="button"
@@ -478,6 +527,55 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
                   {receiveLoading ? 'Saving...' : 'Confirm'}
                 </button>
                 <button type="button" className="cancel-button" onClick={() => setReceivingParty(null)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit party amounts modal (Owner only) */}
+      {canEditAmounts && editingParty && (
+        <div className="modal-overlay" onClick={() => setEditingParty(null)}>
+          <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Edit Amounts</h2>
+            <p className="receive-modal-subtitle">
+              <strong>{editingParty.name}</strong>
+            </p>
+            <div className="modal-form">
+              <div className="form-group">
+                <label className="form-label">Official Amount*</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={editOfficial}
+                  onChange={(e) => { setEditError(null); setEditOfficial(e.target.value === '' ? '' : Number(e.target.value)); }}
+                  step="0.01"
+                  autoFocus
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Offline Amount*</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={editOffline}
+                  onChange={(e) => { setEditError(null); setEditOffline(e.target.value === '' ? '' : Number(e.target.value)); }}
+                  step="0.01"
+                />
+                {editError && <span className="receive-field-error">{editError}</span>}
+              </div>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="save-button"
+                  onClick={handleEditSubmit}
+                  disabled={editLoading || editOfficial === '' || editOffline === ''}
+                >
+                  {editLoading ? 'Saving...' : 'Save'}
+                </button>
+                <button type="button" className="cancel-button" onClick={() => setEditingParty(null)}>
                   Cancel
                 </button>
               </div>
