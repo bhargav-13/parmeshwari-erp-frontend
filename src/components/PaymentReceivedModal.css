@@ -1,4 +1,6 @@
-.payment-received-modal-overlay {
+/* Opens from inside the party ledger popup (z-index 1100), so it has to sit above it. Matches the
+   shared drawer rule's specificity, which would otherwise pull it down to 1000, behind the popup. */
+body .drawer-overlay.drawer-overlay.payment-received-modal-overlay {
   z-index: 1200;
 }
 
