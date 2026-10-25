@@ -809,3 +809,36 @@
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* Party Master: due amounts open the party's payment history */
+.party-due-link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.party-due-link:hover {
+  color: var(--brand);
+}
+
+.party-payments-button {
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--brand);
+  border-radius: var(--radius);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.party-payments-button:hover {
+  background: var(--brand-soft-hover);
+}

@@ -219,3 +219,39 @@
     gap: 12px;
   }
 }
+
+.invoice-list-count {
+  margin-bottom: 10px;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.invoice-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.invoice-page-button {
+  height: var(--control-height-sm);
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.invoice-page-button:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+
+.invoice-page-button:disabled {
+  opacity: 0.5;
+}

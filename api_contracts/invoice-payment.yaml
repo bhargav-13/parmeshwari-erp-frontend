@@ -477,6 +477,182 @@ paths:
         - oauth2: [ ]
 
 
+  /api/v1/payments/accounts:
+    get:
+      tags:
+        - Payments
+      operationId: getPartyAccounts
+      summary: Every party's balance (opening balance, billed, received, due) in one list
+      parameters:
+        - name: floor
+          in: query
+          required: false
+          description: Only this floor; floor staff always get their own floor
+          schema:
+            $ref: '#/components/schemas/FloorEnum'
+      responses:
+        '200':
+          description: Party balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PartyAccountSummary'
+      security:
+        - oauth2: [ ]
+
+  /api/v1/payments/accounts/statement/pdf:
+    get:
+      tags:
+        - Payments
+      operationId: getAllPartiesStatementPdf
+      summary: One PDF with every party's statement for the period
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: floor
+          in: query
+          required: false
+          description: Only this floor; floor staff always get their own floor
+          schema:
+            $ref: '#/components/schemas/FloorEnum'
+        - name: onlyDue
+          in: query
+          required: false
+          description: Leave out parties with nothing due at the end of the period
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: PDF generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+      security:
+        - oauth2: [ ]
+
+  /api/v1/payments/accounts/{partyId}:
+    get:
+      tags:
+        - Payments
+      operationId: getPartyAccount
+      summary: One party's balance with its orders and every payment received
+      parameters:
+        - name: partyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: floor
+          in: query
+          required: false
+          description: Only this floor; floor staff always get their own floor
+          schema:
+            $ref: '#/components/schemas/FloorEnum'
+      responses:
+        '200':
+          description: Party account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartyAccount'
+        '404':
+          description: Party not found
+      security:
+        - oauth2: [ ]
+
+  /api/v1/payments/accounts/{partyId}/receipts:
+    post:
+      tags:
+        - Payments
+      operationId: recordReceipt
+      summary: Record a payment received from a party and apply it to its dues
+      parameters:
+        - name: partyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentReceiptRequest'
+      responses:
+        '201':
+          description: Payment recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentReceipt'
+        '400':
+          description: Amount or allocation not valid
+      security:
+        - oauth2: [ ]
+
+  /api/v1/payments/accounts/{partyId}/opening-balance:
+    put:
+      tags:
+        - Payments
+      operationId: setOpeningBalance
+      summary: Set the party's balance from before the ERP (Owner only)
+      parameters:
+        - name: partyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpeningBalanceRequest'
+      responses:
+        '204':
+          description: Opening balance saved
+      security:
+        - oauth2: [ ]
+
+  /api/v1/payments/receipts/{receiptId}:
+    delete:
+      tags:
+        - Payments
+      operationId: deleteReceipt
+      summary: Delete a payment recorded by mistake and put its amount back on the dues (Owner only)
+      parameters:
+        - name: receiptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Payment deleted
+        '404':
+          description: Payment not found
+      security:
+        - oauth2: [ ]
+
+
 components:
   securitySchemes:
     oauth2:
@@ -830,3 +1006,183 @@ components:
         page:
           type: integer
 
+    PartyAccountSummary:
+      type: object
+      properties:
+        partyId:
+          type: integer
+          format: int64
+        partyName:
+          type: string
+        partyFloor:
+          $ref: '#/components/schemas/FloorEnum'
+        orderCount:
+          type: integer
+        official:
+          $ref: '#/components/schemas/AccountSide'
+        offline:
+          $ref: '#/components/schemas/AccountSide'
+        totalDue:
+          type: number
+          format: double
+        aagluDue:
+          type: number
+          format: double
+          description: Still due from before this month (older orders and the opening balance)
+        chaluDue:
+          type: number
+          format: double
+          description: Still due on this month's orders
+        lastPaymentDate:
+          type: string
+          format: date
+        lastPaymentAmount:
+          type: number
+          format: double
+    AccountSide:
+      type: object
+      properties:
+        opening:
+          type: number
+          format: double
+          description: Balance from before the ERP
+        openingDue:
+          type: number
+          format: double
+          description: What is still due on the opening balance
+        billed:
+          type: number
+          format: double
+          description: Opening balance plus every order
+        received:
+          type: number
+          format: double
+        due:
+          type: number
+          format: double
+    PartyAccount:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/PartyAccountSummary'
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountOrder'
+        receipts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentReceipt'
+    AccountOrder:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          format: int64
+        orderDate:
+          type: string
+          format: date
+        floor:
+          $ref: '#/components/schemas/FloorEnum'
+        official:
+          $ref: '#/components/schemas/AccountOrderSide'
+        offline:
+          $ref: '#/components/schemas/AccountOrderSide'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderProductReplica'
+    AccountOrderSide:
+      type: object
+      properties:
+        total:
+          type: number
+          format: double
+        received:
+          type: number
+          format: double
+        due:
+          type: number
+          format: double
+    PaymentReceipt:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        partyId:
+          type: integer
+          format: int64
+        mode:
+          $ref: '#/components/schemas/BillingType'
+        amount:
+          type: number
+          format: double
+        receivedDate:
+          type: string
+          format: date
+        note:
+          type: string
+        floor:
+          $ref: '#/components/schemas/FloorEnum'
+        recordedBy:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceiptAllocation'
+    ReceiptAllocation:
+      type: object
+      required:
+        - amount
+      properties:
+        orderId:
+          type: integer
+          format: int64
+          description: The order this part paid; empty for the opening balance
+        orderDate:
+          type: string
+          format: date
+        amount:
+          type: number
+          format: double
+    PaymentReceiptRequest:
+      type: object
+      required:
+        - mode
+        - amount
+        - receivedDate
+      properties:
+        mode:
+          $ref: '#/components/schemas/BillingType'
+        amount:
+          type: number
+          format: double
+        receivedDate:
+          type: string
+          format: date
+        note:
+          type: string
+          maxLength: 255
+        floor:
+          $ref: '#/components/schemas/FloorEnum'
+        allocations:
+          type: array
+          description: What this payment pays; left out, it pays the oldest dues first
+          items:
+            $ref: '#/components/schemas/ReceiptAllocation'
+    OpeningBalanceRequest:
+      type: object
+      required:
+        - official
+        - offline
+      properties:
+        official:
+          type: number
+          format: double
+        offline:
+          type: number
+          format: double

@@ -1,480 +1,253 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { paymentApi } from '../api/payment';
-import { partyApi } from '../api/party';
-import type { Party, PartyLedgerResponse, PaymentFloor } from '../types';
-import { BillingType } from '../types';
-import { todayLocal } from '../utils/format';
-import { isOwner } from '../lib/auth';
-import PartyLedgerModal from '../components/PartyLedgerModal';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { accountsApi, errorMessage } from '../api/accounts';
+import type { PartyAccountSummary, PaymentFloor } from '../types';
+import { formatDate, formatMoney } from '../utils/format';
+import PartyAccountPanel from '../components/PartyAccountPanel';
+import StatementDownloadModal from '../components/StatementDownloadModal';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
-import ViewIcon from '../assets/view.svg';
-import EditIcon from '../assets/edit.svg';
 import './PaymentReminderPage.css';
 
 interface PaymentReminderPageProps {
   floor: PaymentFloor;
 }
 
-const formatCurrency = (amount: number | null | undefined): string => {
-  if (amount === null || amount === undefined) return '₹ 0';
-  return `₹ ${amount.toLocaleString('en-IN')}`;
-};
+type Show = 'due' | 'all' | 'settled';
+type Sort = 'due' | 'name' | 'oldestPayment';
 
-const formatDate = (dateStr: string | null | undefined): string => {
-  if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-};
+const sum = (rows: PartyAccountSummary[], pick: (r: PartyAccountSummary) => number) =>
+  rows.reduce((total, r) => total + pick(r), 0);
 
-interface PartyLedgerRow {
-  party: Party;
-  ledger: PartyLedgerResponse | null;
-  loading: boolean;
-  error: boolean;
-}
+/** Days since the party last paid, or null when it never has. */
+const daysSince = (date?: string | null) => {
+  if (!date) return null;
+  const [y, m, d] = date.split('-').map(Number);
+  const then = new Date(y, m - 1, d).getTime();
+  const today = new Date();
+  return Math.round((new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime() - then) / 86400000);
+};
 
 const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
-  const [partyRows, setPartyRows] = useState<PartyLedgerRow[]>([]);
+  const [rows, setRows] = useState<PartyAccountSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [expandedPartyId, setExpandedPartyId] = useState<number | null>(null);
-  const [detailLedger, setDetailLedger] = useState<PartyLedgerResponse | null>(null);
-  const [receivingParty, setReceivingParty] = useState<{ party: Party; ledger: PartyLedgerResponse | null; mode: 'official' | 'offline' } | null>(null);
-  const [receiveAmount, setReceiveAmount] = useState<number | ''>('');
-  const [receiveLoading, setReceiveLoading] = useState(false);
-  const [receiveError, setReceiveError] = useState<string | null>(null);
-  // Only the Owner may change a party's Official / Offline amounts
-  const canEditAmounts = isOwner();
-  const [editingParty, setEditingParty] = useState<Party | null>(null);
-  const [editOfficial, setEditOfficial] = useState<number | ''>('');
-  const [editOffline, setEditOffline] = useState<number | ''>('');
-  const [editLoading, setEditLoading] = useState(false);
-  const [editError, setEditError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [show, setShow] = useState<Show>('due');
+  const [sort, setSort] = useState<Sort>('due');
+  const [openParty, setOpenParty] = useState<{ partyId: number; name: string; receive: boolean } | null>(null);
+  const [allStatementsOpen, setAllStatementsOpen] = useState(false);
 
-  // Date range: all payments (past and future)
-  const startDate = '2020-01-01';
-  const endDate = '2099-12-31';
-
-  const fetchData = useCallback(async () => {
+  const load = useCallback(async () => {
     try {
-      setLoading(true);
-      const parties = await partyApi.getAllParties();
-
-      // Initialize rows with loading state
-      const initialRows: PartyLedgerRow[] = parties.map((p) => ({
-        party: p,
-        ledger: null,
-        loading: true,
-        error: false,
-      }));
-      setPartyRows(initialRows);
-
-      // Fetch ledger for each party in parallel
-      const ledgerPromises = parties.map(async (p) => {
-        try {
-          const ledger = await paymentApi.getPartyLedger(p.partyId, startDate, endDate);
-          return { partyId: p.partyId, ledger, error: false };
-        } catch {
-          return { partyId: p.partyId, ledger: null, error: true };
-        }
-      });
-
-      const results = await Promise.all(ledgerPromises);
-
-      setPartyRows((prev) =>
-        prev.map((row) => {
-          const result = results.find((r) => r.partyId === row.party.partyId);
-          if (result) {
-            return { ...row, ledger: result.ledger, loading: false, error: result.error };
-          }
-          return { ...row, loading: false };
-        })
-      );
-    } catch (error) {
-      console.error('Error fetching data:', error);
+      setError(null);
+      setRows(await accountsApi.getAccounts(floor));
+    } catch (err) {
+      setError(errorMessage(err, 'Could not load party balances. Please try again.'));
     } finally {
       setLoading(false);
     }
-  }, [startDate, endDate]);
+  }, [floor]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    setLoading(true);
+    load();
+  }, [load]);
 
-  const toggleExpand = (partyId: number) => {
-    setExpandedPartyId((prev) => (prev === partyId ? null : partyId));
-  };
+  const monthLabel = new Date().toLocaleString('en-IN', { month: 'long', year: 'numeric' });
 
-  // Received so far against the party's orders in one mode
-  const receivedInMode = (ledger: PartyLedgerResponse | null, mode: 'official' | 'offline') =>
-    (ledger?.orders || []).reduce((sum, o) => sum + (o.paymentSummary?.[mode]?.receivedAmount || 0), 0);
-
-  // What the party still owes in one mode: its running balance less what was received on its orders
-  const dueInMode = (party: Party, ledger: PartyLedgerResponse | null, mode: 'official' | 'offline') => {
-    const balance = mode === 'official' ? (party.officialAmount || 0) : (party.offlineAmount || 0);
-    return Math.max(0, Math.round((balance - receivedInMode(ledger, mode)) * 100) / 100);
-  };
-
-  // A party-level receipt is recorded against the party's orders, oldest due first, so it shows
-  // as Received and in the ledger. Only what is left after every order is paid comes off the
-  // party's stored balance (the balance from before the ERP, which has no order to pay against).
-  const handleReceiveSubmit = async () => {
-    if (!receivingParty || receiveAmount === '' || Number(receiveAmount) <= 0) return;
-    const { party, ledger, mode } = receivingParty;
-    const amount = Math.round(Number(receiveAmount) * 100) / 100;
-    const available = dueInMode(party, ledger, mode);
-    if (amount > available + 0.01) {
-      setReceiveError(`Amount cannot exceed ${mode} due of ${formatCurrency(available)}`);
-      return;
-    }
-    const billingType = mode === 'official' ? BillingType.OFFICIAL : BillingType.OFFLINE;
-    const today = todayLocal();
-    const dueOrders = [...(ledger?.orders || [])]
-      .filter((o) => (o.paymentSummary?.[mode]?.dueAmount || 0) > 0)
-      .sort((a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime() || a.orderId - b.orderId);
-
-    let left = amount;
-    try {
-      setReceiveLoading(true);
-      for (const order of dueOrders) {
-        if (left <= 0) break;
-        const due = order.paymentSummary?.[mode]?.dueAmount || 0;
-        const portion = Math.round(Math.min(left, due) * 100) / 100;
-        if (portion <= 0) continue;
-        const payment = await paymentApi.getPaymentByOrderAndMode(order.orderId, billingType);
-        await paymentApi.receivePayment(payment.id, { newReceivedAmount: portion, newReceivedDate: today });
-        left = Math.round((left - portion) * 100) / 100;
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const filtered = rows.filter((r) => {
+      if (q && !r.partyName.toLowerCase().includes(q)) return false;
+      if (show === 'due') return r.totalDue > 0.004;
+      if (show === 'settled') return r.totalDue <= 0.004;
+      return true;
+    });
+    return [...filtered].sort((a, b) => {
+      if (sort === 'name') return a.partyName.localeCompare(b.partyName);
+      if (sort === 'oldestPayment') {
+        // Never paid first, then the longest since the last payment
+        const da = daysSince(a.lastPaymentDate) ?? Number.MAX_SAFE_INTEGER;
+        const db = daysSince(b.lastPaymentDate) ?? Number.MAX_SAFE_INTEGER;
+        return db - da || b.totalDue - a.totalDue;
       }
-      if (left > 0) {
-        const officialAmount = party.officialAmount || 0;
-        const offlineAmount = party.offlineAmount || 0;
-        await partyApi.updateParty(party.partyId, {
-          name: party.name,
-          officialAmount: mode === 'official' ? Math.round((officialAmount - left) * 100) / 100 : officialAmount,
-          offlineAmount: mode === 'offline' ? Math.round((offlineAmount - left) * 100) / 100 : offlineAmount,
-          floor: party.floor,
-        });
-      }
-      setReceivingParty(null);
-      setReceiveAmount('');
-      setReceiveError(null);
-    } catch (err) {
-      console.error('Failed to record payment:', err);
-      setReceiveError(
-        left < amount
-          ? `Recorded ${formatCurrency(amount - left)} only, ${formatCurrency(left)} failed. Please check the ledger.`
-          : 'Failed to save. Please try again.'
-      );
-    } finally {
-      setReceiveLoading(false);
-      await fetchData();
-    }
+      return b.totalDue - a.totalDue || a.partyName.localeCompare(b.partyName);
+    });
+  }, [rows, search, show, sort]);
+
+  const totals = {
+    official: sum(rows, (r) => Math.max(0, r.official.due)),
+    offline: sum(rows, (r) => Math.max(0, r.offline.due)),
+    aaglu: sum(rows, (r) => r.aagluDue),
+    chalu: sum(rows, (r) => r.chaluDue),
+    withDue: rows.filter((r) => r.totalDue > 0.004).length,
   };
-
-  const openEditAmounts = (party: Party) => {
-    setEditingParty(party);
-    setEditOfficial(party.officialAmount || 0);
-    setEditOffline(party.offlineAmount || 0);
-    setEditError(null);
+  const counts = {
+    due: totals.withDue,
+    all: rows.length,
+    settled: rows.length - totals.withDue,
   };
-
-  const handleEditSubmit = async () => {
-    if (!canEditAmounts || !editingParty || editOfficial === '' || editOffline === '') return;
-    try {
-      setEditLoading(true);
-      await partyApi.updateParty(editingParty.partyId, {
-        name: editingParty.name,
-        officialAmount: Math.round(Number(editOfficial) * 100) / 100,
-        offlineAmount: Math.round(Number(editOffline) * 100) / 100,
-        floor: editingParty.floor,
-        whatsappNo: editingParty.whatsappNo,
-        city: editingParty.city,
-      });
-      setEditingParty(null);
-      await fetchData();
-    } catch (err) {
-      console.error('Failed to update amounts:', err);
-      setEditError('Failed to save. Please try again.');
-    } finally {
-      setEditLoading(false);
-    }
-  };
-
-  // Filter by search
-  const filteredRows = partyRows.filter((row) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return row.party.name.toLowerCase().includes(q);
-  });
-
-  // The party's stored amounts are its running balance: the balance from before the ERP plus
-  // every order (official bill + GST / offline total) minus what was received here. Orders are
-  // already inside it, so the ledger's order totals must not be added on top.
-  const partyRemaining = (r: PartyLedgerRow) =>
-    (r.party.officialAmount || 0) + (r.party.offlineAmount || 0) - (r.ledger?.totalReceivedAmount || 0);
-
-  // Chalu khate: still due on this calendar month's orders. Aaglu khate: everything older that is
-  // still due (earlier orders and the balance from before the ERP). Total khate = aaglu + chalu.
-  const now = new Date();
-  const isCurrentMonth = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  };
-  const partyKhate = (r: PartyLedgerRow) => {
-    const total = partyRemaining(r);
-    const chaluDue = (r.ledger?.orders || [])
-      .filter((o) => isCurrentMonth(o.orderDate))
-      .reduce((sum, o) => sum + (o.paymentSummary?.official?.dueAmount || 0) + (o.paymentSummary?.offline?.dueAmount || 0), 0);
-    const chalu = Math.max(0, Math.min(total, Math.round(chaluDue * 100) / 100));
-    return { aaglu: Math.round((total - chalu) * 100) / 100, chalu, total };
-  };
-  const currentMonthLabel = now.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
-
-  const totalOfficial = partyRows.reduce((sum, r) => sum + (r.party.officialAmount || 0), 0);
-  const totalOffline = partyRows.reduce((sum, r) => sum + (r.party.offlineAmount || 0), 0);
-  const totalReceived = partyRows.reduce((sum, r) => sum + (r.ledger?.totalReceivedAmount || 0), 0);
-  const khateTotals = partyRows.reduce(
-    (acc, r) => {
-      const k = partyKhate(r);
-      return { aaglu: acc.aaglu + k.aaglu, chalu: acc.chalu + k.chalu, total: acc.total + k.total };
-    },
-    { aaglu: 0, chalu: 0, total: 0 }
-  );
 
   return (
     <div className="payment-reminder-page">
       <div className="page-header">
         <div className="page-title-section">
           <h1 className="page-title">Payment Reminder</h1>
-          <p className="page-subtitle">Track party ledgers and payment details</p>
+          <p className="page-subtitle">What each party owes, and every payment received</p>
+        </div>
+        <div className="page-header-actions">
+          <button type="button" className="pr-secondary-button" onClick={() => setAllStatementsOpen(true)}>
+            Download all statements
+          </button>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="stats-cards">
-        <div className="stat-card">
-          <div className="stat-content">
-            <span className="stat-label">Total Official</span>
-            <span className="stat-value">{formatCurrency(totalOfficial)}</span>
-          </div>
+      <div className="pr-stats">
+        <div className="stat-card pr-stat pr-stat-main">
+          <span className="stat-label">Total due</span>
+          <span className="stat-value">{formatMoney(totals.official + totals.offline)}</span>
+          <span className="pr-stat-sub">Official {formatMoney(totals.official)} · Offline {formatMoney(totals.offline)}</span>
         </div>
-        <div className="stat-card">
-          <div className="stat-content">
-            <span className="stat-label">Total Offline</span>
-            <span className="stat-value">{formatCurrency(totalOffline)}</span>
-          </div>
+        <div className="stat-card pr-stat">
+          <span className="stat-label" title="Still due from before this month">Aaglu khate</span>
+          <span className="stat-value">{formatMoney(totals.aaglu)}</span>
+          <span className="pr-stat-sub">Due from before {monthLabel}</span>
         </div>
-        <div className="stat-card">
-          <div className="stat-content">
-            <span className="stat-label">Total Received</span>
-            <span className="stat-value">{formatCurrency(totalReceived)}</span>
-          </div>
+        <div className="stat-card pr-stat">
+          <span className="stat-label" title={`Still due on ${monthLabel} orders`}>Chalu khate</span>
+          <span className="stat-value">{formatMoney(totals.chalu)}</span>
+          <span className="pr-stat-sub">Due on {monthLabel} orders</span>
         </div>
-      </div>
-      <div className="stats-cards">
-        <div className="stat-card">
-          <div className="stat-content">
-            <span className="stat-label">Aaglu Khate</span>
-            <span className="stat-value">{formatCurrency(khateTotals.aaglu)}</span>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-content">
-            <span className="stat-label">Chalu Khate ({currentMonthLabel})</span>
-            <span className="stat-value">{formatCurrency(khateTotals.chalu)}</span>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-content">
-            <span className="stat-label">Total Khate</span>
-            <span className="stat-value">{formatCurrency(khateTotals.total)}</span>
-          </div>
+        <div className="stat-card pr-stat">
+          <span className="stat-label">Parties with due</span>
+          <span className="stat-value">{totals.withDue}</span>
+          <span className="pr-stat-sub">of {rows.length} {rows.length === 1 ? 'party' : 'parties'}</span>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="order-filters">
-        <div className="order-search">
-          <img src={SearchIcon} alt="Search" />
+      <div className="pr-toolbar">
+        <div className="order-search pr-search">
+          <img src={SearchIcon} alt="" />
           <input
             type="text"
-            placeholder="Search by party name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search party"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search party"
           />
         </div>
+        <div className="pr-chips" role="group" aria-label="Show">
+          {([
+            ['due', 'With due'],
+            ['all', 'All'],
+            ['settled', 'Settled'],
+          ] as [Show, string][]).map(([key, label]) => (
+            <button key={key} type="button" className={`filter-chip${show === key ? ' active' : ''}`} onClick={() => setShow(key)}>
+              {label} <span className="pr-chip-count">{counts[key]}</span>
+            </button>
+          ))}
+        </div>
+        <label className="pr-sort">
+          Sort
+          <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+            <option value="due">Highest due</option>
+            <option value="oldestPayment">Longest since payment</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </label>
       </div>
 
-      {/* Table */}
       <div className="payment-table-container">
         {loading ? (
-          <Loading message="Loading party ledgers..." size="large" />
+          <Loading message="Loading party balances..." size="large" />
+        ) : error ? (
+          <div className="pr-error">
+            {error}
+            <button type="button" className="pr-secondary-button" onClick={() => { setLoading(true); load(); }}>Try again</button>
+          </div>
         ) : (
-          <table className="payment-table">
+          <table className="pr-table">
             <thead>
               <tr>
-                <th>Party Name</th>
-                <th>Official Amount</th>
-                <th>Offline Amount</th>
-                <th>Received</th>
-                <th title="Due from before this month">Aaglu Khate</th>
-                <th title={`Due on ${currentMonthLabel} orders`}>Chalu Khate</th>
-                <th>Total Khate</th>
-                <th>Orders</th>
-                <th>Actions</th>
+                <th>Party</th>
+                <th className="num">Official due</th>
+                <th className="num">Offline due</th>
+                <th className="num">Total due</th>
+                <th className="num" title="Due from before this month">Aaglu</th>
+                <th className="num" title={`Due on ${monthLabel} orders`}>Chalu</th>
+                <th>Last payment</th>
+                <th aria-label="Actions"></th>
               </tr>
             </thead>
             <tbody>
-              {filteredRows.length === 0 ? (
+              {visible.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="no-data">No parties found.</td>
+                  <td colSpan={8} className="pr-empty">
+                    {rows.length === 0
+                      ? 'No parties on this floor yet.'
+                      : search
+                        ? `No party matches “${search}”.`
+                        : show === 'due'
+                          ? 'Nothing is due. Every party is settled.'
+                          : 'No parties to show.'}
+                  </td>
                 </tr>
               ) : (
-                filteredRows.map((row) => {
-                  const isExpanded = expandedPartyId === row.party.partyId;
-                  const orderCount = row.ledger?.orders?.length || 0;
-
+                visible.map((r) => {
+                  const days = daysSince(r.lastPaymentDate);
+                  const settled = r.totalDue <= 0.004;
                   return (
-                    <React.Fragment key={row.party.partyId}>
-                      {/* Party summary row */}
-                      <tr
-                        className={`payment-row ${orderCount > 0 ? 'clickable' : ''}`}
-                        onClick={() => orderCount > 0 && toggleExpand(row.party.partyId)}
-                      >
-                        <td className="party-name-cell">
-                          <div className="party-name-inner">
-                            <span>{row.party.name}</span>
-                            {orderCount > 0 && (
-                              <span className={`collapse-chevron ${isExpanded ? 'expanded' : ''}`}>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                  <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                              </span>
-                            )}
+                    <tr
+                      key={r.partyId}
+                      className="pr-row"
+                      onClick={() => setOpenParty({ partyId: r.partyId, name: r.partyName, receive: false })}
+                    >
+                      <td>
+                        <div className="pr-party">
+                          <span className="pr-party-name">{r.partyName}</span>
+                          <span className="pr-party-sub">
+                            {r.orderCount} {r.orderCount === 1 ? 'order' : 'orders'}
+                            {r.official.openingDue + r.offline.openingDue > 0.004 && ' · opening balance due'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className={`num${r.official.due > 0.004 ? ' due' : ''}`}>{formatMoney(r.official.due)}</td>
+                      <td className={`num${r.offline.due > 0.004 ? ' due' : ''}`}>{formatMoney(r.offline.due)}</td>
+                      <td className="num">
+                        {settled ? <span className="pr-settled">Settled</span> : <strong>{formatMoney(r.totalDue)}</strong>}
+                      </td>
+                      <td className="num muted">{formatMoney(r.aagluDue)}</td>
+                      <td className="num muted">{formatMoney(r.chaluDue)}</td>
+                      <td>
+                        {r.lastPaymentDate ? (
+                          <div className="pr-last">
+                            <span>{formatMoney(r.lastPaymentAmount)} on {formatDate(r.lastPaymentDate)}</span>
+                            {days !== null && <span className={`pr-last-sub${days > 60 && !settled ? ' late' : ''}`}>{days === 0 ? 'today' : `${days} days ago`}</span>}
                           </div>
-                        </td>
-                        <td>{row.loading ? '...' : formatCurrency(row.party.officialAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency(row.party.offlineAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency(row.ledger?.totalReceivedAmount)}</td>
-                        <td>{row.loading ? '...' : formatCurrency(partyKhate(row).aaglu)}</td>
-                        <td>{row.loading ? '...' : formatCurrency(partyKhate(row).chalu)}</td>
-                        <td className="total-khate-cell">{row.loading ? '...' : formatCurrency(partyKhate(row).total)}</td>
-                        <td>{row.loading ? '...' : orderCount}</td>
-                        <td>
-                          <div className="action-buttons">
-                            <button
-                              type="button"
-                              className="view-ledger-btn"
-                              title="View Full Ledger"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (row.ledger) setDetailLedger(row.ledger);
-                              }}
-                              disabled={!row.ledger}
-                            >
-                              <img src={ViewIcon} alt="View" className="view-icon" />
-                            </button>
-                            {canEditAmounts && (
-                              <button
-                                type="button"
-                                className="view-ledger-btn"
-                                title="Edit Official / Offline Amount"
-                                onClick={(e) => { e.stopPropagation(); openEditAmounts(row.party); }}
-                                disabled={row.loading}
-                              >
-                                <img src={EditIcon} alt="Edit" className="view-icon" />
-                              </button>
-                            )}
-                            {!row.loading && dueInMode(row.party, row.ledger, 'official') > 0 && (
-                              <button
-                                type="button"
-                                className="receive-payment-btn receive-payment-btn--official"
-                                title={`Receive against Official due: ${formatCurrency(dueInMode(row.party, row.ledger, 'official'))}`}
-                                onClick={(e) => { e.stopPropagation(); setReceivingParty({ party: row.party, ledger: row.ledger, mode: 'official' }); setReceiveAmount(''); setReceiveError(null); }}
-                              >
-                                Official
-                              </button>
-                            )}
-                            {!row.loading && dueInMode(row.party, row.ledger, 'offline') > 0 && (
-                              <button
-                                type="button"
-                                className="receive-payment-btn receive-payment-btn--offline"
-                                title={`Receive against Offline due: ${formatCurrency(dueInMode(row.party, row.ledger, 'offline'))}`}
-                                onClick={(e) => { e.stopPropagation(); setReceivingParty({ party: row.party, ledger: row.ledger, mode: 'offline' }); setReceiveAmount(''); setReceiveError(null); }}
-                              >
-                                Offline
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-
-                      {/* Party base amount breakdown row */}
-                      {isExpanded && (
-                        <tr className="expanded-order-row">
-                          <td colSpan={9}>
-                            <div className="party-base-breakdown">
-                              <span className="party-base-label">Includes</span>
-                              <span className="party-base-item">Orders Official: <strong>{formatCurrency(row.ledger?.totalOfficialAmount)}</strong></span>
-                              <span className="party-base-item">Orders Offline: <strong>{formatCurrency(row.ledger?.totalOfflineAmount)}</strong></span>
-                              <span className="party-base-item">Previous Official: <strong>{formatCurrency((row.party.officialAmount || 0) - (row.ledger?.totalOfficialAmount || 0))}</strong></span>
-                              <span className="party-base-item">Previous Offline: <strong>{formatCurrency((row.party.offlineAmount || 0) - (row.ledger?.totalOfflineAmount || 0))}</strong></span>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-
-                      {/* Expanded orders */}
-                      {isExpanded && row.ledger?.orders && row.ledger.orders.map((order) => (
-                        <React.Fragment key={order.orderId}>
-                          {/* Order row */}
-                          <tr className="expanded-order-row">
-                            <td colSpan={9}>
-                              <div className="expanded-order-summary">
-                                <span className="expanded-order-id">Order #{order.orderId}</span>
-                                <span className="expanded-order-detail">{row.party.name}</span>
-                                <span className="expanded-order-detail">Date: {formatDate(order.orderDate)}</span>
-                                <span className="expanded-order-detail">Official: {formatCurrency(order.paymentSummary?.official?.totalAmount)}</span>
-                                <span className="expanded-order-detail">Offline: {formatCurrency(order.paymentSummary?.offline?.totalAmount)}</span>
-                                <span className="expanded-order-detail">Products: {order.products?.length || 0}</span>
-                              </div>
-
-                              {/* Products sub-table */}
-                              {order.products && order.products.length > 0 && (
-                                <table className="expanded-products-table">
-                                  <thead>
-                                    <tr>
-                                      <th>Product</th>
-                                      <th>Qty (Kg)</th>
-                                      <th>Qty (Pc)</th>
-                                      <th>Market Rate</th>
-                                      <th>Rate Diff</th>
-                                      <th>Total</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {order.products.map((p) => (
-                                      <tr key={p.id}>
-                                        <td>{p.productName}</td>
-                                        <td>{p.quantityKg || '—'}</td>
-                                        <td>{p.quantityPc || '—'}</td>
-                                        <td>{formatCurrency(p.marketRate)}</td>
-                                        <td>{formatCurrency(p.rateDifference)}</td>
-                                        <td>{formatCurrency(p.totalAmount)}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              )}
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      ))}
-                    </React.Fragment>
+                        ) : (
+                          <span className={`pr-last-sub${settled ? '' : ' late'}`}>Never paid</span>
+                        )}
+                      </td>
+                      <td>
+                        <div className="pr-actions" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            className="pr-receive"
+                            disabled={settled}
+                            onClick={() => setOpenParty({ partyId: r.partyId, name: r.partyName, receive: true })}
+                          >
+                            Receive
+                          </button>
+                          <button
+                            type="button"
+                            className="pr-open"
+                            onClick={() => setOpenParty({ partyId: r.partyId, name: r.partyName, receive: false })}
+                          >
+                            Details
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })
               )}
@@ -483,105 +256,19 @@ const PaymentReminderPage: React.FC<PaymentReminderPageProps> = ({ floor }) => {
         )}
       </div>
 
-      {/* Full detail modal (eye icon click) */}
-      {detailLedger && (
-        <PartyLedgerModal
-          ledger={detailLedger}
+      {openParty && (
+        <PartyAccountPanel
+          partyId={openParty.partyId}
+          partyName={openParty.name}
           floor={floor}
-          onClose={() => setDetailLedger(null)}
-          onFullPaymentSuccess={() => fetchData()}
+          startReceiving={openParty.receive}
+          onClose={() => setOpenParty(null)}
+          onChanged={load}
         />
       )}
 
-      {/* Receive payment modal for party base amounts */}
-      {receivingParty && (
-        <div className="modal-overlay" onClick={() => setReceivingParty(null)}>
-          <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Receive Payment</h2>
-            <p className="receive-modal-subtitle">
-              <strong>{receivingParty.party.name}</strong> — {receivingParty.mode === 'official' ? 'Official' : 'Offline'} Due:{' '}
-              <strong>{formatCurrency(dueInMode(receivingParty.party, receivingParty.ledger, receivingParty.mode))}</strong>
-            </p>
-            <div className="modal-form">
-              <div className="form-group">
-                <label className="form-label">Amount Received*</label>
-                <input
-                  type="number"
-                  className={`form-input${receiveError ? ' input-error' : ''}`}
-                  placeholder="Enter amount"
-                  value={receiveAmount}
-                  onChange={(e) => { setReceiveError(null); setReceiveAmount(e.target.value === '' ? '' : Number(e.target.value)); }}
-                  min="0"
-                  step="0.01"
-                  autoFocus
-                />
-                {receiveError && <span className="receive-field-error">{receiveError}</span>}
-              </div>
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="save-button"
-                  onClick={handleReceiveSubmit}
-                  disabled={receiveLoading || receiveAmount === '' || Number(receiveAmount) <= 0}
-                >
-                  {receiveLoading ? 'Saving...' : 'Confirm'}
-                </button>
-                <button type="button" className="cancel-button" onClick={() => setReceivingParty(null)}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit party amounts modal (Owner only) */}
-      {canEditAmounts && editingParty && (
-        <div className="modal-overlay" onClick={() => setEditingParty(null)}>
-          <div className="modal-content small-modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Edit Amounts</h2>
-            <p className="receive-modal-subtitle">
-              <strong>{editingParty.name}</strong>
-            </p>
-            <div className="modal-form">
-              <div className="form-group">
-                <label className="form-label">Official Amount*</label>
-                <input
-                  type="number"
-                  className="form-input"
-                  value={editOfficial}
-                  onChange={(e) => { setEditError(null); setEditOfficial(e.target.value === '' ? '' : Number(e.target.value)); }}
-                  step="0.01"
-                  autoFocus
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Offline Amount*</label>
-                <input
-                  type="number"
-                  className="form-input"
-                  value={editOffline}
-                  onChange={(e) => { setEditError(null); setEditOffline(e.target.value === '' ? '' : Number(e.target.value)); }}
-                  step="0.01"
-                />
-                {editError && <span className="receive-field-error">{editError}</span>}
-              </div>
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="save-button"
-                  onClick={handleEditSubmit}
-                  disabled={editLoading || editOfficial === '' || editOffline === ''}
-                >
-                  {editLoading ? 'Saving...' : 'Save'}
-                </button>
-                <button type="button" className="cancel-button" onClick={() => setEditingParty(null)}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {allStatementsOpen && (
+        <StatementDownloadModal floor={floor} onClose={() => setAllStatementsOpen(false)} />
       )}
     </div>
   );
