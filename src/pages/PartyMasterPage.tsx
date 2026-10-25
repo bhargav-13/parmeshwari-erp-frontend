@@ -4,6 +4,7 @@ import Loading from '../components/Loading';
 import AddPartyModal from '../components/AddPartyModal';
 import AddPurchasePartyModal from '../components/AddPurchasePartyModal';
 import PartyOrdersModal from '../components/PartyOrdersModal';
+import PartyAccountPanel from '../components/PartyAccountPanel';
 import ImportPartyModal from '../components/ImportPartyModal';
 import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
@@ -31,6 +32,7 @@ const PartyMasterPage: React.FC = () => {
     const [salesError, setSalesError] = useState<string | null>(null);
     const [editingParty, setEditingParty] = useState<Party | undefined>(undefined);
     const [viewingParty, setViewingParty] = useState<Party | null>(null);
+    const [accountParty, setAccountParty] = useState<Party | null>(null);
     const [isImportSalesOpen, setIsImportSalesOpen] = useState(false);
 
     // Purchase Party state
@@ -269,8 +271,8 @@ const PartyMasterPage: React.FC = () => {
                                         <th>Party ID</th>
                                         <th>Party Name</th>
                                         <th>Floor</th>
-                                        <th title="Still due after payments received">Official Amount</th>
-                                        <th title="Still due after payments received">Offline Amount</th>
+                                        <th title="Opening balance and orders, less payments received">Official Due</th>
+                                        <th title="Opening balance and orders, less payments received">Offline Due</th>
                                         <th>Last Payment</th>
                                         <th>WhatsApp No.</th>
                                         <th>City</th>
@@ -284,13 +286,29 @@ const PartyMasterPage: React.FC = () => {
                                             <td>{party.partyId}</td>
                                             <td>{party.name}</td>
                                             <td>{party.floor === 'GROUND_FLOOR' ? 'Ground Floor' : party.floor === 'FIRST_FLOOR' ? 'First Floor' : '—'}</td>
-                                            <td title={paidTitle(party.officialAmount, party.officialReceived)}>₹{dueAfterPayments(party.officialAmount, party.officialReceived).toLocaleString('en-IN')}</td>
-                                            <td title={paidTitle(party.offlineAmount, party.offlineReceived)}>₹{dueAfterPayments(party.offlineAmount, party.offlineReceived).toLocaleString('en-IN')}</td>
+                                            <td>
+                                                <button type="button" className="party-due-link" onClick={() => setAccountParty(party)} title={`${paidTitle(party.officialAmount, party.officialReceived)}. Click for payment history.`}>
+                                                    ₹{dueAfterPayments(party.officialAmount, party.officialReceived).toLocaleString('en-IN')}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="button" className="party-due-link" onClick={() => setAccountParty(party)} title={`${paidTitle(party.offlineAmount, party.offlineReceived)}. Click for payment history.`}>
+                                                    ₹{dueAfterPayments(party.offlineAmount, party.offlineReceived).toLocaleString('en-IN')}
+                                                </button>
+                                            </td>
                                             <td>{formatDate(party.lastPaymentDate)}</td>
                                             <td>{party.whatsappNo || '—'}</td>
                                             <td>{party.city || '—'}</td>
                                             <td>
                                                 <div className="action-buttons">
+                                                    <button
+                                                        type="button"
+                                                        className="party-payments-button"
+                                                        onClick={() => setAccountParty(party)}
+                                                        title="Payments, balance and statement"
+                                                    >
+                                                        Payments
+                                                    </button>
                                                     <button
                                                         type="button"
                                                         className="icon-button"
@@ -484,6 +502,15 @@ const PartyMasterPage: React.FC = () => {
                 />
             )}
 
+            {accountParty && (
+                <PartyAccountPanel
+                    partyId={accountParty.partyId}
+                    partyName={accountParty.name}
+                    onClose={() => setAccountParty(null)}
+                    onChanged={fetchParties}
+                />
+            )}
+
             {isImportSalesOpen && (
                 <ImportPartyModal
                     partyType="sales"
@@ -510,6 +537,6 @@ const dueAfterPayments = (amount: number, received?: number) =>
     Math.round(((amount || 0) - (received || 0)) * 100) / 100;
 
 const paidTitle = (amount: number, received?: number) =>
-    `Billed ₹${(amount || 0).toLocaleString('en-IN')}, received ₹${(received || 0).toLocaleString('en-IN')}`;
+    `Opening balance and orders ₹${(amount || 0).toLocaleString('en-IN')}, received ₹${(received || 0).toLocaleString('en-IN')}`;
 
 export default PartyMasterPage;

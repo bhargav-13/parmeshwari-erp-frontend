@@ -39,3 +39,15 @@ export const toIsoDate = (value: string | Date | null | undefined): string => {
   if (typeof value === 'string') return value.slice(0, 10);
   return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
 };
+
+/** Rupees the Indian way, paise only when there are any: ₹12,34,567 or ₹1,234.50 */
+export const formatMoney = (amount: number | null | undefined): string => {
+  const value = Math.round((Number(amount) || 0) * 100) / 100;
+  return `${value < 0 ? '-' : ''}₹${Math.abs(value).toLocaleString('en-IN', {
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })}`;
+};
+
+/** Rounds to paise, so sums of rupee amounts compare cleanly. */
+export const roundMoney = (amount: number): number => Math.round(amount * 100) / 100;

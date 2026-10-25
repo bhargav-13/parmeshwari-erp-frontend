@@ -983,3 +983,81 @@ export interface CashflowCloseDayResponse {
   carryForwardAmount: number;
   carryForwardType: string | null;
 }
+
+// Party accounts: opening balance, orders and every payment received
+export interface AccountSide {
+  /** Balance from before the ERP */
+  opening: number;
+  openingDue: number;
+  /** Opening balance plus every order */
+  billed: number;
+  received: number;
+  due: number;
+}
+
+export interface PartyAccountSummary {
+  partyId: number;
+  partyName: string;
+  partyFloor?: PaymentFloor | null;
+  orderCount: number;
+  official: AccountSide;
+  offline: AccountSide;
+  totalDue: number;
+  /** Still due from before this month */
+  aagluDue: number;
+  /** Still due on this month's orders */
+  chaluDue: number;
+  lastPaymentDate?: string | null;
+  lastPaymentAmount?: number | null;
+}
+
+export interface AccountOrderSide {
+  total: number;
+  received: number;
+  due: number;
+}
+
+export interface AccountOrder {
+  orderId: number;
+  orderDate: string;
+  floor?: PaymentFloor | null;
+  official: AccountOrderSide;
+  offline: AccountOrderSide;
+  products: PartyLedgerProduct[];
+}
+
+export interface ReceiptAllocation {
+  /** Empty for the opening balance */
+  orderId?: number | null;
+  orderDate?: string | null;
+  amount: number;
+}
+
+export interface PaymentReceipt {
+  id: number;
+  partyId: number;
+  mode: BillingType;
+  amount: number;
+  receivedDate: string;
+  note?: string | null;
+  floor?: PaymentFloor | null;
+  recordedBy?: string | null;
+  recordedAt?: string | null;
+  allocations: ReceiptAllocation[];
+}
+
+export interface PartyAccount {
+  summary: PartyAccountSummary;
+  orders: AccountOrder[];
+  receipts: PaymentReceipt[];
+}
+
+export interface PaymentReceiptRequest {
+  mode: BillingType;
+  amount: number;
+  receivedDate: string;
+  note?: string;
+  floor?: PaymentFloor;
+  /** Left out, the payment clears the oldest dues first */
+  allocations?: ReceiptAllocation[];
+}
