@@ -50,6 +50,9 @@ class DispatchRequest {
         if (data) {
             obj = obj || new DispatchRequest();
 
+            if (data.hasOwnProperty('dispatchDate')) {
+                obj['dispatchDate'] = ApiClient.convertToType(data['dispatchDate'], 'String');
+            }
             if (data.hasOwnProperty('items')) {
                 obj['items'] = ApiClient.convertToType(data['items'], [DispatchItem]);
             }
@@ -92,6 +95,12 @@ DispatchRequest.RequiredProperties = ["items"];
  * @member {Array.<module:model/DispatchItem>} items
  */
 DispatchRequest.prototype['items'] = undefined;
+
+/**
+ * Day of dispatch (yyyy-mm-dd); today when left out
+ * @member {String} dispatchDate
+ */
+DispatchRequest.prototype['dispatchDate'] = undefined;
 
 
 

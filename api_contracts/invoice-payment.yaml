@@ -1082,6 +1082,10 @@ components:
         orderDate:
           type: string
           format: date
+        dispatchDate:
+          type: string
+          format: date
+          nullable: true
         floor:
           $ref: '#/components/schemas/FloorEnum'
         official:

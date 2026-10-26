@@ -341,6 +341,8 @@ export interface DispatchItem {
 }
 
 export interface DispatchRequest {
+  /** yyyy-mm-dd; the backend uses today when left out */
+  dispatchDate?: string;
   items: DispatchItem[];
 }
 
@@ -391,6 +393,7 @@ export interface Order extends Omit<OrderRequest, 'products' | 'customerName'> {
   customerName?: string; // kept for backwards compat with old data
   orderStatus: OrderStatus;
   orderFloor?: OrderFloor;
+  dispatchDate?: string | null;
   products: OrderProduct[];
 }
 
@@ -1020,6 +1023,8 @@ export interface AccountOrderSide {
 export interface AccountOrder {
   orderId: number;
   orderDate: string;
+  /** Empty for orders dispatched before the dispatch date was kept */
+  dispatchDate?: string | null;
   floor?: PaymentFloor | null;
   official: AccountOrderSide;
   offline: AccountOrderSide;

@@ -284,7 +284,7 @@ const PartyAccountPanel: React.FC<PartyAccountPanelProps> = ({
                     <thead>
                       <tr>
                         <th>Order</th>
-                        <th>Date</th>
+                        <th>Dispatch date</th>
                         <th className="num">Official</th>
                         <th className="num">Offline</th>
                         <th className="num">Still due</th>
@@ -304,7 +304,12 @@ const PartyAccountPanel: React.FC<PartyAccountPanelProps> = ({
                                 #{o.orderId}
                                 {!floor && floorName(o.floor) && <span className="pap-floor-tag">{floorName(o.floor)}</span>}
                               </td>
-                              <td className="nowrap">{formatDate(o.orderDate)}</td>
+                              <td
+                                className="nowrap"
+                                title={o.dispatchDate ? `Ordered ${formatDate(o.orderDate)}` : 'Dispatch date not recorded; showing order date'}
+                              >
+                                {formatDate(o.dispatchDate || o.orderDate)}
+                              </td>
                               <td className="num" title={`Received ${formatMoney(o.official.received)}`}>{formatMoney(o.official.total)}</td>
                               <td className="num" title={`Received ${formatMoney(o.offline.received)}`}>{formatMoney(o.offline.total)}</td>
                               <td className={`num${due > 0 ? ' due' : ''}`}>{formatMoney(due)}</td>
