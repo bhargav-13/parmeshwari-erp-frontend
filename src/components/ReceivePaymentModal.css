@@ -106,10 +106,12 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
+  pointer-events: none;
 }
 
-.receive-amount-input input {
-  padding-left: 26px;
+/* Beats the global `body .form-input` padding so the ₹ never overlaps the value */
+.receive-amount-input input.form-input {
+  padding-left: 28px;
   font-weight: 600;
 }
 

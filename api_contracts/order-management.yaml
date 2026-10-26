@@ -666,6 +666,11 @@ components:
         orderDate:
           type: string
           format: date
+        dispatchDate:
+          type: string
+          format: date
+          nullable: true
+          description: Day the order was dispatched
         expectedDeliveryDate:
           type: string
           format: date
@@ -746,6 +751,10 @@ components:
       required:
         - items
       properties:
+        dispatchDate:
+          type: string
+          format: date
+          description: Day of dispatch; today when left out
         items:
           type: array
           items:

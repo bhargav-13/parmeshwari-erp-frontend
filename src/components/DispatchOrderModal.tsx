@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import type { Order, StockItem, DispatchRequest, DispatchItem } from '../types';
 import { stockItemApi } from '../api/inventory';
 import { ordersApi } from '../api/orders';
+import { todayLocal } from '../utils/format';
+import DateInput from './DateInput';
 import './DispatchOrderModal.css';
 
 interface DispatchOrderModalProps {
@@ -29,6 +31,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [stockItemsLoading, setStockItemsLoading] = useState(false);
   const [dispatchItems, setDispatchItems] = useState<DispatchItemState[]>([]);
+  const [dispatchDate, setDispatchDate] = useState(todayLocal());
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -180,7 +183,13 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
       return;
     }
 
+    if (!isRevoke && !dispatchDate) {
+      setError('Please enter the dispatch date.');
+      return;
+    }
+
     const payload: DispatchRequest = {
+      ...(isRevoke ? {} : { dispatchDate }),
       items: dispatchRequestItems,
     };
 
@@ -211,6 +220,18 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
         </div>
 
         <div className="dispatch-modal-body">
+          {!isRevoke && (
+            <div className="dispatch-date-field">
+              <label htmlFor="dispatch-date">Dispatch date*</label>
+              <DateInput
+                id="dispatch-date"
+                className="form-input"
+                value={dispatchDate}
+                max={todayLocal()}
+                onChange={(e) => { setDispatchDate(e.target.value); setError(null); }}
+              />
+            </div>
+          )}
           {stockItemsLoading ? (
             <div className="dispatch-loading">Loading stock items...</div>
           ) : (

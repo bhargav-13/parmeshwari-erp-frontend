@@ -66,6 +66,9 @@ class Order {
             if (data.hasOwnProperty('orderDate')) {
                 obj['orderDate'] = ApiClient.convertToType(data['orderDate'], 'Date');
             }
+            if (data.hasOwnProperty('dispatchDate')) {
+                obj['dispatchDate'] = ApiClient.convertToType(data['dispatchDate'], 'Date');
+            }
             if (data.hasOwnProperty('expectedDeliveryDate')) {
                 obj['expectedDeliveryDate'] = ApiClient.convertToType(data['expectedDeliveryDate'], 'Date');
             }
@@ -181,6 +184,12 @@ Order.prototype['customerEmail'] = undefined;
  * @member {Date} orderDate
  */
 Order.prototype['orderDate'] = undefined;
+
+/**
+ * Day the order was dispatched
+ * @member {Date} dispatchDate
+ */
+Order.prototype['dispatchDate'] = undefined;
 
 /**
  * @member {Date} expectedDeliveryDate
