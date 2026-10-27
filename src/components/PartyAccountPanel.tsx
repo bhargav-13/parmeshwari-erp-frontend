@@ -306,7 +306,7 @@ const PartyAccountPanel: React.FC<PartyAccountPanelProps> = ({
                               </td>
                               <td
                                 className="nowrap"
-                                title={o.dispatchDate ? `Ordered ${formatDate(o.orderDate)}` : 'Dispatch date not recorded; showing order date'}
+                                title={`Ordered ${formatDate(o.orderDate)}`}
                               >
                                 {formatDate(o.dispatchDate || o.orderDate)}
                               </td>

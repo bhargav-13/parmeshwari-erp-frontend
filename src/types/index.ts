@@ -1023,7 +1023,7 @@ export interface AccountOrderSide {
 export interface AccountOrder {
   orderId: number;
   orderDate: string;
-  /** Empty for orders dispatched before the dispatch date was kept */
+  /** Day of dispatch; the delivery date when none was recorded */
   dispatchDate?: string | null;
   floor?: PaymentFloor | null;
   official: AccountOrderSide;
