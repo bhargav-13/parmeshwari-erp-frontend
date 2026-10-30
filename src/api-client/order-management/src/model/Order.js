@@ -57,6 +57,9 @@ class Order {
             if (data.hasOwnProperty('party')) {
                 obj['party'] = OrderParty.constructFromObject(data['party']);
             }
+            if (data.hasOwnProperty('challanNumber')) {
+                obj['challanNumber'] = ApiClient.convertToType(data['challanNumber'], 'String');
+            }
             if (data.hasOwnProperty('customerMobileNo')) {
                 obj['customerMobileNo'] = ApiClient.convertToType(data['customerMobileNo'], 'String');
             }
@@ -126,6 +129,10 @@ class Order {
           OrderParty.validateJSON(data['party']);
         }
         // ensure the json data is a string
+        if (data['challanNumber'] && !(typeof data['challanNumber'] === 'string' || data['challanNumber'] instanceof String)) {
+            throw new Error("Expected the field `challanNumber` to be a primitive type in the JSON string but got " + data['challanNumber']);
+        }
+        // ensure the json data is a string
         if (data['customerMobileNo'] && !(typeof data['customerMobileNo'] === 'string' || data['customerMobileNo'] instanceof String)) {
             throw new Error("Expected the field `customerMobileNo` to be a primitive type in the JSON string but got " + data['customerMobileNo']);
         }
@@ -169,6 +176,11 @@ Order.prototype['id'] = undefined;
  * @member {module:model/OrderParty} party
  */
 Order.prototype['party'] = undefined;
+
+/**
+ * @member {String} challanNumber
+ */
+Order.prototype['challanNumber'] = undefined;
 
 /**
  * @member {String} customerMobileNo

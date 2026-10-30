@@ -187,7 +187,8 @@ const OrderFirstFloorPage: React.FC = () => {
     if (!orders.length) return [];
     return orders.map((order) => ({
       ...order,
-      orderDisplayId: `Order - ${String(order.id).padStart(5, '0')}`,
+      // The challan number when one was entered, else the padded order number
+      orderDisplayId: `Order - ${order.challanNumber?.trim() || String(order.id).padStart(5, '0')}`,
     }));
   }, [orders]);
 

@@ -563,6 +563,10 @@ components:
       properties:
         partyId:
           type: integer
+        challanNumber:
+          type: string
+          nullable: true
+          description: Challan number typed in by hand
         customerMobileNo:
           type: string
           nullable: true
@@ -657,6 +661,10 @@ components:
           type: integer
         party:
           $ref: '#/components/schemas/OrderParty'
+        challanNumber:
+          type: string
+          nullable: true
+          description: Challan number typed in by hand
         customerMobileNo:
           type: string
           nullable: true

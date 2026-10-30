@@ -45,6 +45,7 @@ const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloo
   if (!initialData) {
     return {
       partyId: 0,
+      challanNumber: '',
       customerName: '',
       customerMobileNo: '',
       customerEmail: '',
@@ -65,9 +66,11 @@ const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloo
     };
   }
 
-  const { id, orderStatus, products, ...rest } = initialData;
+  const { id, orderStatus, products, party, ...rest } = initialData;
   return {
     ...rest,
+    // A saved order carries its party as an object, not a partyId
+    partyId: rest.partyId || party?.id || 0,
     orderDate: toDateInputValue(rest.orderDate),
     expectedDeliveryDate: toDateInputValue(rest.expectedDeliveryDate),
     paymentDate: toDateInputValue(rest.paymentDate),
@@ -347,14 +350,15 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
       if (unit === 'pc') {
         return Number(product.quantityPc) <= 0 || Number(product.marketRate) <= 0;
       }
-      return Number(product.quantityKg) <= 0 || Number(product.marketRate) <= 0;
+      // A market rate of 0 is allowed; only a negative one is wrong
+      return Number(product.quantityKg) <= 0 || Number(product.marketRate) < 0;
     });
 
     if (invalidProduct) {
       const unit = invalidProduct.quantityUnit || 'kg';
       const msg = unit === 'pc'
         ? 'Each product requires a selected item, quantity (Pc), and price per pc.'
-        : 'Each product requires a selected item, quantity (Kg), and market rate.';
+        : 'Each product requires a selected item and quantity (Kg); the market rate cannot be negative.';
       setError(msg);
       setActiveTab('lineItems');
       return false;
@@ -373,6 +377,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
       const payload: OrderRequest = {
         ...formData,
         note: formData.note?.trim() ? formData.note.trim() : undefined,
+        challanNumber: formData.challanNumber?.trim() ? formData.challanNumber.trim() : null,
       };
       await onSubmit(payload);
     } catch (submitError: any) {
@@ -446,6 +451,16 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                   searchPlaceholder="Search party…"
                   disabled={isLoadingData}
                   ariaLabel="Party"
+                />
+              </div>
+              <div className="order-form-group">
+                <label>Challan Number</label>
+                <input
+                  type="text"
+                  value={formData.challanNumber || ''}
+                  onChange={(e) => handleFieldChange('challanNumber', e.target.value)}
+                  placeholder="e.g. 1245"
+                  maxLength={100}
                 />
               </div>
               <div className="order-form-group">
