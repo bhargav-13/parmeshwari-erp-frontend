@@ -14,9 +14,11 @@ interface InvoiceCardProps {
   billingType: BillingType;
   onDelete: (id: number) => void;
   onRefresh: () => void;
+  /** Opens the invoice's order for editing; the invoice follows the order */
+  onEdit: (invoice: Invoice) => void;
 }
 
-const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelete, onRefresh }) => {
+const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelete, onRefresh, onEdit }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [status, setStatus] = useState(invoice.invoiceStatus);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -120,7 +122,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, billingType, onDelet
               <button
                 type="button"
                 className="icon-button edit-button"
-                onClick={() => { }}
+                onClick={() => onEdit(invoice)}
                 title="Edit"
               >
                 <img src={EditIcon} alt="Edit" className="icon-img" />

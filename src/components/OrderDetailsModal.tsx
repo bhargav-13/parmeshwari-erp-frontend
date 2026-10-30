@@ -57,6 +57,10 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
         <div className="order-details-summary">
           <div className="summary-row">
             <div>
+              <p className="summary-label">Challan No.</p>
+              <p className="summary-value">{order.challanNumber?.trim() || '—'}</p>
+            </div>
+            <div>
               <p className="summary-label">Contact No.</p>
               <p className="summary-value">{order.customerMobileNo || '—'}</p>
             </div>

@@ -349,6 +349,8 @@ export interface DispatchRequest {
 //orderrequest
 export interface OrderRequest {
   partyId: number;
+  /** Challan number typed in by hand */
+  challanNumber?: string | null;
   customerName?: string;
   customerMobileNo?: string | null;
   customerEmail?: string | null;

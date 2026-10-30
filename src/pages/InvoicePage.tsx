@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { invoiceApi } from '../api/invoice';
-import type { Invoice, InvoiceStats } from '../types';
+import { ordersApi } from '../api/orders';
+import type { Invoice, InvoiceStats, Order, OrderRequest } from '../types';
 import { InvoiceStatus, InvoiceFloor, BillingType } from '../types';
 import InvoiceCard from '../components/InvoiceCard';
+import AddOrderModal from '../components/AddOrderModal';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
@@ -31,6 +33,9 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor }) => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [selectedMode, setSelectedMode] = useState<BillingType>(BillingType.OFFICIAL);
+  // An invoice is made from its order, so editing an invoice edits that order
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
   // Only the latest request may update the list, so fast typing cannot show stale results
   const requestId = useRef(0);
 
@@ -94,6 +99,23 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor }) => {
       totalOfflineBill,
       totalBilledAmount,
     });
+  };
+
+  const handleEditInvoice = async (invoice: Invoice) => {
+    try {
+      setEditError(null);
+      setEditingOrder(await ordersApi.getOrderById(invoice.order.id));
+    } catch (error) {
+      console.error('Error loading order for invoice:', error);
+      setEditError(`Could not open PBI-${invoice.order.id} for editing. Please try again.`);
+    }
+  };
+
+  const handleSubmitEdit = async (payload: OrderRequest) => {
+    if (!editingOrder) return;
+    await ordersApi.updateOrder(editingOrder.id, payload);
+    setEditingOrder(null);
+    fetchInvoices();
   };
 
   const handleDeleteInvoice = async (id: number) => {
@@ -185,6 +207,7 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor }) => {
           <div className="no-data">No invoices found.</div>
         ) : (
           <>
+          {editError && <div className="no-data">{editError}</div>}
           <div className="invoice-list-count">
             Showing {currentPage * PAGE_SIZE + 1}–{currentPage * PAGE_SIZE + pageInvoices.length} of {invoices.length} invoices
           </div>
@@ -196,6 +219,7 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor }) => {
                 billingType={selectedMode}
                 onDelete={handleDeleteInvoice}
                 onRefresh={fetchInvoices}
+                onEdit={handleEditInvoice}
               />
             ))}
           </div>
@@ -213,6 +237,13 @@ const InvoicePage: React.FC<InvoicePageProps> = ({ floor }) => {
           </>
         )}
       </div>
+      {editingOrder && (
+        <AddOrderModal
+          onClose={() => setEditingOrder(null)}
+          onSubmit={handleSubmitEdit}
+          initialData={editingOrder}
+        />
+      )}
     </div>
   );
 };

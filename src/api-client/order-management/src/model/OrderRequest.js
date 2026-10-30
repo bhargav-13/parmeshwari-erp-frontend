@@ -58,6 +58,9 @@ class OrderRequest {
             if (data.hasOwnProperty('partyId')) {
                 obj['partyId'] = ApiClient.convertToType(data['partyId'], 'Number');
             }
+            if (data.hasOwnProperty('challanNumber')) {
+                obj['challanNumber'] = ApiClient.convertToType(data['challanNumber'], 'String');
+            }
             if (data.hasOwnProperty('customerMobileNo')) {
                 obj['customerMobileNo'] = ApiClient.convertToType(data['customerMobileNo'], 'String');
             }
@@ -123,6 +126,10 @@ class OrderRequest {
             }
         }
         // ensure the json data is a string
+        if (data['challanNumber'] && !(typeof data['challanNumber'] === 'string' || data['challanNumber'] instanceof String)) {
+            throw new Error("Expected the field `challanNumber` to be a primitive type in the JSON string but got " + data['challanNumber']);
+        }
+        // ensure the json data is a string
         if (data['customerMobileNo'] && !(typeof data['customerMobileNo'] === 'string' || data['customerMobileNo'] instanceof String)) {
             throw new Error("Expected the field `customerMobileNo` to be a primitive type in the JSON string but got " + data['customerMobileNo']);
         }
@@ -161,6 +168,11 @@ OrderRequest.RequiredProperties = ["partyId", "orderDate", "expectedDeliveryDate
  * @member {Number} partyId
  */
 OrderRequest.prototype['partyId'] = undefined;
+
+/**
+ * @member {String} challanNumber
+ */
+OrderRequest.prototype['challanNumber'] = undefined;
 
 /**
  * @member {String} customerMobileNo
