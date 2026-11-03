@@ -332,6 +332,10 @@ export interface OrderProductRequest {
   marketRate: number;
   rateDifference: number;
   totalAmount: number;
+  /** Quantity the party rejected, in the line's unit (Kg or Pc) */
+  rejectedQuantity?: number | null;
+  /** Rejected quantity at the line's rate */
+  rejectionAmount?: number | null;
 }
 
 export interface DispatchItem {
@@ -367,6 +371,8 @@ export interface OrderRequest {
   note?: string | null;
   grandTotal: number;
   productsTotal: number;
+  /** Sum of the lines' rejection, taken off the offline total */
+  rejectionTotal?: number | null;
   products: OrderProductRequest[];
 }
 
@@ -380,6 +386,8 @@ export interface OrderProduct {
   marketRate: number;
   rateDifference: number;
   totalAmount: number;
+  rejectedQuantity?: number | null;
+  rejectionAmount?: number | null;
 }
 
 export interface OrderParty {
@@ -907,6 +915,8 @@ export interface PartyLedgerProduct {
   marketRate: number;
   rateDifference: number;
   totalAmount: number;
+  rejectedQuantity?: number | null;
+  rejectionAmount?: number | null;
 }
 
 export interface PartyLedgerOrder {
@@ -1025,7 +1035,7 @@ export interface AccountOrderSide {
 export interface AccountOrder {
   orderId: number;
   orderDate: string;
-  /** Day of dispatch; the delivery date when none was recorded */
+  /** Day of dispatch; the order date when none was recorded */
   dispatchDate?: string | null;
   floor?: PaymentFloor | null;
   official: AccountOrderSide;

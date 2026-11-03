@@ -337,6 +337,15 @@ const PartyAccountPanel: React.FC<PartyAccountPanelProps> = ({
                                             <td className="num">{formatMoney(p.totalAmount)}</td>
                                           </tr>
                                         ))}
+                                        {o.products.filter((p) => Number(p.rejectionAmount) > 0).map((p) => (
+                                          <tr key={`rej-${p.id}`}>
+                                            <td>Less rejection · {p.productName}</td>
+                                            <td className="num">{p.quantityKg ? p.rejectedQuantity : '—'}</td>
+                                            <td className="num">{p.quantityKg ? '—' : p.rejectedQuantity}</td>
+                                            <td className="num" />
+                                            <td className="num">− {formatMoney(p.rejectionAmount ?? 0)}</td>
+                                          </tr>
+                                        ))}
                                       </tbody>
                                     </table>
                                   )}

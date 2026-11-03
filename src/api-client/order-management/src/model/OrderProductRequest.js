@@ -73,6 +73,12 @@ class OrderProductRequest {
             if (data.hasOwnProperty('totalAmount')) {
                 obj['totalAmount'] = ApiClient.convertToType(data['totalAmount'], 'Number');
             }
+            if (data.hasOwnProperty('rejectedQuantity')) {
+                obj['rejectedQuantity'] = ApiClient.convertToType(data['rejectedQuantity'], 'Number');
+            }
+            if (data.hasOwnProperty('rejectionAmount')) {
+                obj['rejectionAmount'] = ApiClient.convertToType(data['rejectionAmount'], 'Number');
+            }
         }
         return obj;
     }
@@ -128,6 +134,16 @@ OrderProductRequest.prototype['rateDifference'] = undefined;
  * @member {Number} totalAmount
  */
 OrderProductRequest.prototype['totalAmount'] = undefined;
+
+/**
+ * @member {Number} rejectedQuantity
+ */
+OrderProductRequest.prototype['rejectedQuantity'] = undefined;
+
+/**
+ * @member {Number} rejectionAmount
+ */
+OrderProductRequest.prototype['rejectionAmount'] = undefined;
 
 
 
