@@ -868,6 +868,14 @@ components:
         totalAmount:
           type: number
           format: double
+        rejectedQuantity:
+          type: number
+          format: double
+          nullable: true
+        rejectionAmount:
+          type: number
+          format: double
+          nullable: true
     InvoiceStatus:
       type: string
       enum:

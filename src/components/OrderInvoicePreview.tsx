@@ -48,7 +48,15 @@ export const buildInvoiceHtml = ({ order, partyName, invoiceNumber }: OrderInvoi
             <td>${Number(p.marketRate) || 0}${isPc ? ' /pc' : ''}</td>
             <td>${isPc ? '-' : Number(p.rateDifference) || 0}</td>
             <td class="amt">${money(p.totalAmount)}</td>
-          </tr>`;
+          </tr>${Number(p.rejectionAmount) > 0
+            ? `<tr class="rejection">
+            <td class="name">Less rejection</td>
+            <td>${isPc ? '-' : qty(p.rejectedQuantity)}</td>
+            <td>${isPc ? qty(p.rejectedQuantity) : '-'}</td>
+            <td></td><td></td>
+            <td class="amt">- ${money(p.rejectionAmount)}</td>
+          </tr>`
+            : ''}`;
         })
         .join('')
     : '<tr><td colspan="6" class="empty">No items added yet</td></tr>';
@@ -57,6 +65,9 @@ export const buildInvoiceHtml = ({ order, partyName, invoiceNumber }: OrderInvoi
     ['Items Total', money(order.productsTotal)],
     [`Official Bill (${onlinePercent}%)`, money(order.officialBillAmount)],
     ['GST (18%)', money(order.gst)],
+    ...(Number(order.rejectionTotal) > 0
+      ? [['Less Rejection', `- ${money(order.rejectionTotal)}`] as [string, string]]
+      : []),
     [`Offline Total (${Math.round((100 - onlinePercent) * 100) / 100}%)`, money(order.offlineTotal)],
   ];
   if (Number(order.transport) > 0) summary.push(['Transport', money(order.transport)]);
@@ -85,6 +96,7 @@ export const buildInvoiceHtml = ({ order, partyName, invoiceNumber }: OrderInvoi
   td.name { text-align: left; font-weight: 500; }
   td.amt { text-align: right; font-weight: 500; white-space: nowrap; }
   td.empty { color: #a0aec0; padding: 18px; }
+  tr.rejection td { color: #c53030; font-size: 11px; padding-top: 4px; }
   .summary { margin-left: auto; width: min(320px, 100%); }
   .summary div { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; }
   .summary div span:last-child { font-weight: 600; white-space: nowrap; }

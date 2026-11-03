@@ -100,6 +100,9 @@ class OrderRequest {
             if (data.hasOwnProperty('productsTotal')) {
                 obj['productsTotal'] = ApiClient.convertToType(data['productsTotal'], 'Number');
             }
+            if (data.hasOwnProperty('rejectionTotal')) {
+                obj['rejectionTotal'] = ApiClient.convertToType(data['rejectionTotal'], 'Number');
+            }
             if (data.hasOwnProperty('transport')) {
                 obj['transport'] = ApiClient.convertToType(data['transport'], 'String');
             }
@@ -238,6 +241,11 @@ OrderRequest.prototype['grandTotal'] = undefined;
  * @member {Number} productsTotal
  */
 OrderRequest.prototype['productsTotal'] = undefined;
+
+/**
+ * @member {Number} rejectionTotal
+ */
+OrderRequest.prototype['rejectionTotal'] = undefined;
 
 /**
  * @member {String} transport

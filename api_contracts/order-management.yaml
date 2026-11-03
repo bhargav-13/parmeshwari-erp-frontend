@@ -607,6 +607,11 @@ components:
         productsTotal:
           type: number
           format: double
+        rejectionTotal:
+          type: number
+          format: double
+          nullable: true
+          description: Amount of the rejected goods, taken off the offline total
 
         transport:
           type: string
@@ -650,6 +655,16 @@ components:
         totalAmount:
           type: number
           format: double
+        rejectedQuantity:
+          type: number
+          format: double
+          nullable: true
+          description: Quantity rejected by the party, in the line's unit (Kg or Pc)
+        rejectionAmount:
+          type: number
+          format: double
+          nullable: true
+          description: Rejected quantity at the line's rate
 
     # ------------------------------------------------------------
     # Order Response
@@ -705,6 +720,10 @@ components:
           type: number
         productsTotal:
           type: number
+        rejectionTotal:
+          type: number
+          nullable: true
+          description: Amount of the rejected goods, taken off the offline total
         transport:
           type: string
           nullable: true
@@ -744,6 +763,16 @@ components:
         totalAmount:
           type: number
           format: double
+        rejectedQuantity:
+          type: number
+          format: double
+          nullable: true
+          description: Quantity rejected by the party, in the line's unit (Kg or Pc)
+        rejectionAmount:
+          type: number
+          format: double
+          nullable: true
+          description: Rejected quantity at the line's rate
 
     OrderStatus:
       type: string

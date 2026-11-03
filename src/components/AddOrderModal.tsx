@@ -27,7 +27,17 @@ const createEmptyProduct = (): OrderProductRequest => ({
   marketRate: 0,
   rateDifference: 0,
   totalAmount: 0,
+  rejectedQuantity: 0,
+  rejectionAmount: 0,
 });
+
+// Rejected quantity at the line's own rate (its total over its quantity, so a typed-in total counts)
+const rejectionFor = (product: OrderProductRequest): number => {
+  const qty = Number(product.quantityUnit === 'pc' ? product.quantityPc : product.quantityKg) || 0;
+  const rejected = Math.min(Number(product.rejectedQuantity) || 0, qty);
+  if (qty <= 0 || rejected <= 0) return 0;
+  return Number((((Number(product.totalAmount) || 0) / qty) * rejected).toFixed(2));
+};
 
 // The generated API client turns date fields into Date objects, but the date
 // inputs and invoice preview work with 'YYYY-MM-DD' strings.
@@ -79,6 +89,8 @@ const normalizeInitialData = (initialData?: Order | null, fixedFloor?: OrderFloo
       products && products.length
         ? products.map(({ id: productId, ...item }) => ({
           ...item,
+          // The unit isn't saved; a line with pieces and no kg was entered in pieces
+          quantityUnit: (!Number(item.quantityKg) && Number(item.quantityPc) > 0 ? 'pc' : 'kg') as OrderQuantityUnit,
         }))
         : [createEmptyProduct()],
   };
@@ -92,7 +104,9 @@ const recalculateTotals = (data: OrderRequest): OrderRequest => {
   const offlineBillPercent = Number(data.offlineBillPercent) || 0;
   const onlinePercent = Math.min(Math.max(100 - offlineBillPercent, 0), 100);
   const officialBillAmount = (onlinePercent / 100) * productsTotal;
-  const offlineTotal = Math.max(productsTotal - officialBillAmount, 0);
+  // Rejected goods come off the offline bill only
+  const rejectionTotal = data.products.reduce((sum, product) => sum + (Number(product.rejectionAmount) || 0), 0);
+  const offlineTotal = Math.max(productsTotal - officialBillAmount - rejectionTotal, 0);
   const gst = officialBillAmount * 0.18;
   const transport = Number(data.transport) || 0;
   const grandTotal = offlineTotal + officialBillAmount + gst + transport;
@@ -100,6 +114,7 @@ const recalculateTotals = (data: OrderRequest): OrderRequest => {
   return {
     ...data,
     productsTotal: Number(productsTotal.toFixed(2)),
+    rejectionTotal: Number(rejectionTotal.toFixed(2)),
     offlineTotal: Number(offlineTotal.toFixed(2)),
     officialBillAmount: Number(officialBillAmount.toFixed(2)),
     gst: Number(gst.toFixed(2)),
@@ -243,6 +258,7 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
           updated.totalAmount = Number(value) || 0;
         }
 
+        updated.rejectionAmount = rejectionFor(updated);
         return updated;
       });
 
@@ -695,6 +711,27 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                           </div>
                         </>
                       )}
+                      <div className="line-item-field">
+                        <label>Rejection ({isPc ? 'Pc' : 'Kg'})</label>
+                        <input
+                          type="number"
+                          min="0"
+                          step={isPc ? '1' : '0.01'}
+                          value={product.rejectedQuantity || ''}
+                          onChange={(e) => handleProductChange(index, 'rejectedQuantity', Number(e.target.value))}
+                          placeholder="0"
+                        />
+                      </div>
+                      <div className="line-item-field">
+                        <label>Rejection ₹</label>
+                        <input
+                          type="number"
+                          value={product.rejectionAmount || ''}
+                          readOnly
+                          placeholder="0"
+                          className="bg-gray-100 cursor-not-allowed"
+                        />
+                      </div>
                     </div>
                   </div>
                 );
@@ -730,6 +767,10 @@ const AddOrderModal: React.FC<AddOrderModalProps> = ({ onClose, onSubmit, initia
                   <div className="order-form-group">
                     <label>Items Total*</label>
                     <input type="text" value={formatCurrency(formData.productsTotal)} readOnly />
+                  </div>
+                  <div className="order-form-group">
+                    <label>Less Rejection</label>
+                    <input type="text" value={formatCurrency(formData.rejectionTotal ?? 0)} readOnly />
                   </div>
                   <div className="order-form-group">
                     <label>Offline Total*</label>
