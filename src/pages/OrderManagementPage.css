@@ -346,3 +346,11 @@
   color: #b91c1c;
   white-space: nowrap;
 }
+
+.order-number-note {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}

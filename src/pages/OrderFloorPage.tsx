@@ -307,7 +307,11 @@ const OrderFloorPage: React.FC<OrderFloorPageProps> = ({ floor, floorLabel }) =>
             <tbody>
               {pageRows.map((order) => (
                 <tr key={order.id}>
-                  <td>{order.orderDisplayId}</td>
+                  <td>
+                    {order.orderDisplayId}
+                    {/* The order number, as the Rejection page tags it */}
+                    <span className="order-number-note">Order No. {order.id}</span>
+                  </td>
                   <td>{order.customerName}</td>
                   <td>{formatDate(order.orderDate)}</td>
                   <td>{order.totalItems ?? order.products?.length ?? 0}</td>
