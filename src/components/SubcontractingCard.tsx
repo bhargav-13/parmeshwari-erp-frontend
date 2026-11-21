@@ -13,16 +13,19 @@ import DeleteImpactDialog from './DeleteImpactDialog';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import ReturnIcon from '../assets/return.svg';
+import { subcontractTotals, type MonthRange } from '../utils/subcontractPeriod';
 import './SubcontractingCard.css';
 import '../styles/StatusDropdown.css';
 
 interface SubcontractingCardProps {
   subcontract: Subcontracting;
+  /** Month range the card's figures cover; null = all time */
+  period: MonthRange | null;
   onDelete: (id: number) => Promise<void>;
   onRefresh: () => void;
 }
 
-const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, onDelete, onRefresh }) => {
+const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, period, onDelete, onRefresh }) => {
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -34,7 +37,6 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSentExpanded, setIsSentExpanded] = useState(false);
-  const [showOlderSends, setShowOlderSends] = useState(false);
   // Crome records grouped by the return chunk they were sent from.
   // A chunk with any Crome record hides its "Send to Crome" button.
   const [cromesByReturnId, setCromesByReturnId] = useState<Map<number, Crome[]>>(new Map());
@@ -64,46 +66,29 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
     };
   }, [subcontract.subcontractingId, subcontract.cromeCount]);
 
-  // Calculate Sent, Return, and Used values
-  const subSends = subcontract.subSends || [];
-  const hasMultipleSends = subSends.length > 1;
-  // The sent list shows this month's lots; older lots stay one click away. Totals cover every lot.
-  const monthKey = (d?: string) => (d || '').slice(0, 7);
-  const thisMonth = format(new Date(), 'yyyy-MM');
-  const currentMonthSends = subSends.filter((send) => monthKey(send.sendDate) === thisMonth);
-  const olderSendCount = subSends.length - currentMonthSends.length;
-  const visibleSends = showOlderSends ? subSends : currentMonthSends;
-  const subReturns = subcontract.subReturns || [];
-
-  // Calculate Total Net Return
-  // Use backend totalNetReturnStock OR sum of netReturnStock from items OR calculate
-  const totalNetReturn = subcontract.totalNetReturnStock ?? subReturns.reduce((sum, r) => {
-    if (r.netReturnStock != null) return sum + r.netReturnStock;
-    const deduction = (r.packagings || []).reduce((d, p) => d + (p.packagingWeight || 0) * (p.packagingCount || 0), 0);
-    return sum + (r.returnStock - deduction);
-  }, 0);
-
-  // Round to 3 decimal places
-  const totalNetReturnRounded = Math.round(totalNetReturn * 1000) / 1000;
-
-  // Used Stock = Sent - Total Net Return
-  // User requested to force frontend calculation to ensure match with displayed Net Return
-  const usedStock = Math.round((subcontract.sentStock - totalNetReturnRounded) * 1000) / 1000;
-
-  const totalAmount = subcontract.totalAmount || 0;
-
-  // Rejection in effect (set by hand, else the returns' total) and what it takes off the job pay
-  const rejectionKg = subcontract.rejectionStock
-    ?? subReturns.reduce((sum, r) => sum + (r.rejectionStock || 0), 0);
-  const rejectionAmount = subcontract.rejectionAmount ?? rejectionKg * (subcontract.price || 0);
-  const grossJobPay = (subcontract.jobWorkPay || 0) * subcontract.sentStock;
+  // Everything on the card is worked out for the period picked on the page (all time = the order's totals)
+  const totals = subcontractTotals(subcontract, period);
+  const allSubReturns = subcontract.subReturns || [];
+  const hasMultipleSends = (subcontract.subSends || []).length > 1;
+  const visibleSends = totals.sends;
+  const subReturns = totals.returns;
+  const periodSent = totals.sentStock;
+  const totalNetReturnRounded = totals.netReturned;
+  const usedStock = totals.usedStock;
+  const totalAmount = totals.totalValue;
+  const rejectionKg = totals.rejectionKg;
+  // The Rejection button edits the order's rejection, so it shows the order's total
+  const orderRejectionKg = subcontract.rejectionStock
+    ?? allSubReturns.reduce((sum, r) => sum + (r.rejectionStock || 0), 0);
+  const rejectionAmount = totals.rejectionAmount;
+  const grossJobPay = totals.grossJobPay;
 
   const sentToCromeCount = subReturns.filter(r => r.returnId != null && cromesByReturnId.has(r.returnId)).length;
-  const totalSentToCrome = Array.from(cromesByReturnId.values())
-    .flat()
+  const totalSentToCrome = subReturns
+    .flatMap(r => (r.returnId != null ? cromesByReturnId.get(r.returnId) || [] : []))
     .reduce((sum, c) => sum + (c.sentStock || 0), 0);
-  const returnedPercent = subcontract.sentStock > 0
-    ? Math.min(100, (totalNetReturnRounded / subcontract.sentStock) * 100)
+  const returnedPercent = periodSent > 0
+    ? Math.min(100, Math.max(0, (totalNetReturnRounded / periodSent) * 100))
     : 0;
 
   const formatDate = (dateString: string) => {
@@ -253,8 +238,8 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
         <div className="card-dates">
           <span className="card-date">Order Date : {formatDate(subcontract.orderDate)}</span>
-          {subReturns.length > 0 && (
-            <span className="card-date">Last Return : {formatDate(subReturns[subReturns.length - 1].returnDate)}</span>
+          {allSubReturns.length > 0 && (
+            <span className="card-date">Last Return : {formatDate(allSubReturns[allSubReturns.length - 1].returnDate)}</span>
           )}
         </div>
       </div>
@@ -267,7 +252,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
           <div className="sc-summary">
             <div className="sc-stat">
               <span className="sc-stat-label">Sent</span>
-              <span className="sc-stat-value">{formatQty(subcontract.sentStock)} <small>{subcontract.unit}</small></span>
+              <span className="sc-stat-value">{formatQty(periodSent)} <small>{subcontract.unit}</small></span>
             </div>
             <div className="sc-stat">
               <span className="sc-stat-label">Net Returned</span>
@@ -302,7 +287,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                     onClick={() => setIsSentExpanded(!isSentExpanded)}
                     aria-expanded={isSentExpanded}
                   >
-                    <span className="sc-return-title">Sent Details ({subSends.length})</span>
+                    <span className="sc-return-title">Sent Details ({visibleSends.length})</span>
                     <span className="sc-expand-toggle">
                       {isSentExpanded ? 'Collapse' : 'Expand'}
                       <span className={`sc-chevron ${isSentExpanded ? 'expanded' : ''}`}>▾</span>
@@ -312,7 +297,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                   {isSentExpanded && (
                     <div className="sc-return-list sc-sent-list">
                       {visibleSends.length === 0 && (
-                        <div className="sc-return-row sc-muted sc-sent-empty">No lots sent this month.</div>
+                        <div className="sc-return-row sc-muted sc-sent-empty">No lots sent in this period.</div>
                       )}
                       {visibleSends.map((send, index) => (
                         <div key={send.sendId ?? index} className="sc-return-row">
@@ -345,17 +330,6 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                           )}
                         </div>
                       ))}
-                      {olderSendCount > 0 && (
-                        <button
-                          type="button"
-                          className="sc-older-toggle"
-                          onClick={() => setShowOlderSends(!showOlderSends)}
-                        >
-                          {showOlderSends
-                            ? 'Show this month only'
-                            : `Show ${olderSendCount} older lot${olderSendCount === 1 ? '' : 's'}`}
-                        </button>
-                      )}
                     </div>
                   )}
                 </>
@@ -364,19 +338,19 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
               )}
               <div className="detail-row">
                 <span className="detail-label">Sent Stock</span>
-                <span className="detail-value">{formatQty(subcontract.sentStock)} {subcontract.unit}</span>
+                <span className="detail-value">{formatQty(periodSent)} {subcontract.unit}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Total Pieces</span>
-                <span className="detail-value">{(subcontract.sentStock * 25).toLocaleString('en-IN')} Pc</span>
+                <span className="detail-value">{(periodSent * 25).toLocaleString('en-IN')} Pc</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">{hasMultipleSends ? 'Avg Rate' : 'Rate'}</span>
-                <span className="detail-value">₹{formatMoney(subcontract.price)} / {subcontract.unit}</span>
+                <span className="detail-value">₹{formatMoney(totals.avgPrice)} / {subcontract.unit}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">{hasMultipleSends ? 'Avg Job Work' : 'Job Work'}</span>
-                <span className="detail-value">₹{formatMoney(subcontract.jobWorkPay)} / {subcontract.unit}</span>
+                <span className="detail-value">₹{formatMoney(totals.avgJobWork)} / {subcontract.unit}</span>
               </div>
               <div className="detail-row total-row">
                 <span className="detail-label">Total Value</span>
@@ -390,8 +364,8 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 <>
                   <div className="detail-row">
                     <span className="detail-label">
-                      Rejection {formatQty(rejectionKg)} kg × ₹{formatMoney(subcontract.rejectionPrice ?? subcontract.price)}
-                      {subcontract.rejectionStockManual && <span className="sc-manual-tag" title={`Returns total: ${formatQty(subcontract.returnsRejectionStock || 0)} kg`}>edited</span>}
+                      Rejection {formatQty(rejectionKg)} kg × ₹{formatMoney(totals.rejectionRate)}
+                      {totals.rejectionManual && <span className="sc-manual-tag" title={`Returns total: ${formatQty(subcontract.returnsRejectionStock || 0)} kg`}>edited</span>}
                     </span>
                     <span className="detail-value sc-red">- ₹{formatMoney(rejectionAmount)}</span>
                   </div>
@@ -486,7 +460,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
               </div>
             ) : (
               <div className="crome-detail-block pending-block">
-                <span className="pending-text">Pending Return</span>
+                <span className="pending-text">{period && allSubReturns.length > 0 ? 'No returns in this period' : 'Pending Return'}</span>
               </div>
             )}
           </div>
@@ -524,7 +498,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                 onClick={() => setIsRejectionModalOpen(true)}
                 title="Set the rejected kg and its rate"
               >
-                <span>Rejection{rejectionKg > 0 ? ` · ${formatQty(rejectionKg)} kg` : ''}</span>
+                <span>Rejection{orderRejectionKg > 0 ? ` · ${formatQty(orderRejectionKg)} kg` : ''}</span>
               </button>
 
             </div>

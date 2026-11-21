@@ -219,3 +219,78 @@
     line-height: 24px;
   }
 }
+
+.stat-period {
+  margin-top: -8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sc-period-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.sc-period-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sc-period-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border, #d9e1ea);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.sc-period-btn {
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--brand);
+  cursor: pointer;
+}
+
+.sc-period-btn + .sc-period-btn {
+  border-left: 1px solid var(--border, #d9e1ea);
+}
+
+.sc-period-btn.active {
+  background: var(--brand);
+  color: #fff;
+}
+
+.sc-period-range {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sc-period-range label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sc-period-range input {
+  padding: 6px 8px;
+  border: 1px solid var(--border, #d9e1ea);
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--brand);
+}
+
+.sc-period-current {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand);
+}
