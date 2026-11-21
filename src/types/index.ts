@@ -822,6 +822,8 @@ export interface RejectionResponse {
   amount?: number;
   stockItem?: StockItem;
   returnQty?: number;
+  /** Set when the rejection came from a sales order; it is changed on the order */
+  orderId?: number;
 }
 
 export interface PaginatedResultRejection {

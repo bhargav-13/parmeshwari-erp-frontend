@@ -11,6 +11,8 @@ import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import { formatQty, formatDate } from '../utils/format';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 const RawInventoryPage: React.FC = () => {
   const [rawItems, setRawItems] = useState<RawItem[]>([]);
@@ -122,6 +124,7 @@ const RawInventoryPage: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const pagedRawItems = usePagedRows(filteredRawItems);
   if (loading) {
     return <Loading message="Loading raw inventory..." />;
   }
@@ -204,9 +207,9 @@ const RawInventoryPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredRawItems.map((item, index) => (
+            {pagedRawItems.rows.map((item, index) => (
               <tr key={item.rawItemId}>
-                <td>{String(index + 1).padStart(2, '0')}</td>
+                <td>{String(pagedRawItems.offset + index + 1).padStart(2, '0')}</td>
                 <td>{item.product?.productName || 'N/A'}</td>
                 <td>{formatQty(item.quantityInKg)} Kg</td>
                 <td>{formatLastUpdated(item.lastUpdatedAt)}</td>
@@ -259,6 +262,7 @@ const RawInventoryPage: React.FC = () => {
             )}
           </tbody>
         </table>
+        <Pagination {...pagedRawItems.pagination} />
       </div>
 
       {isRawModalOpen && (

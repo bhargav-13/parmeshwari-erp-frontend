@@ -191,6 +191,11 @@ const RejectionPage: React.FC = () => {
                         {r.partyType === 'SALES' ? 'Sales' : 'Purchase'}
                       </span>
                     )}
+                    {r.orderId != null && (
+                      <span className="party-type-badge order" title="Entered on the order">
+                        Order - {r.orderId}
+                      </span>
+                    )}
                   </td>
                   <td>{r.weight.toFixed(3)}</td>
                   <td>
@@ -209,6 +214,11 @@ const RejectionPage: React.FC = () => {
                       : '—'}
                   </td>
                   <td>
+                    {r.orderId != null ? (
+                      <span className="order-managed-note" title="Change or remove this rejection on the order">
+                        Edit on order
+                      </span>
+                    ) : (
                     <div className="action-buttons">
                       <button
                         type="button"
@@ -227,6 +237,7 @@ const RejectionPage: React.FC = () => {
                         <img src={DeleteIcon} alt="Delete" className="icon-img" />
                       </button>
                     </div>
+                    )}
                   </td>
                 </tr>
               ))}

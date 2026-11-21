@@ -240,6 +240,20 @@
   color: var(--text-muted);
 }
 
+.item-stock {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+.item-stock.short {
+  color: #dc2626;
+  opacity: 1;
+  font-weight: 500;
+}
+
 .item-controls {
   display: flex;
   flex-direction: row;

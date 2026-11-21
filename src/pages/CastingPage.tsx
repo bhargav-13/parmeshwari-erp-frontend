@@ -8,6 +8,8 @@ import AddCastingSellModal from '../components/AddCastingSellModal';
 import { castingApi, castingSaleApi } from '../api/casting';
 import type { CastingEntry, CastingSale } from '../types';
 import Loading from '../components/Loading';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 // Inline Download Icon for now
 const DownloadIcon = () => (
@@ -157,6 +159,9 @@ const CastingPage: React.FC = () => {
         return e.date.toLowerCase().includes(query);
     });
 
+    const pagedEntries = usePagedRows(filteredEntries);
+
+    const pagedSellEntries = usePagedRows(filteredSellEntries);
     if (loading) {
         return <Loading message="Loading casting data..." />;
     }
@@ -248,7 +253,7 @@ const CastingPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredEntries.map((row) => (
+                                    {pagedEntries.rows.map((row) => (
                                         <tr key={row.id}>
                                             <td>{row.date}</td>
                                             <td>{row.mell.toFixed(3)}</td>
@@ -282,6 +287,7 @@ const CastingPage: React.FC = () => {
                                     )}
                                 </tbody>
                             </table>
+                            <Pagination {...pagedEntries.pagination} />
                         </div>
                     </>
                 )}
@@ -342,7 +348,7 @@ const CastingPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredSellEntries.map((row) => (
+                                    {pagedSellEntries.rows.map((row) => (
                                         <tr key={row.id}>
                                             <td>{row.date}</td>
                                             <td>{row.brass != null ? row.brass.toFixed(3) : ''}</td>
@@ -382,6 +388,7 @@ const CastingPage: React.FC = () => {
                                     )}
                                 </tbody>
                             </table>
+                            <Pagination {...pagedSellEntries.pagination} />
                         </div>
                     </>
                 )}

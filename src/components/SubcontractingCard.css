@@ -865,3 +865,25 @@
 .subcontracting-card .return-record-button.rejection-button:hover {
   background: #fbd5d0;
 }
+
+.sc-older-toggle {
+  display: block;
+  width: 100%;
+  padding: 8px 0 2px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brand, #1e3a5f);
+  text-align: left;
+  cursor: pointer;
+}
+
+.sc-older-toggle:hover {
+  text-decoration: underline;
+}
+
+.sc-sent-empty {
+  font-size: 13px;
+  padding: 6px 0;
+}

@@ -10,6 +10,8 @@ import AddElectricOutwardModal from '../components/AddElectricOutwardModal';
 import type { ElectricOutward, ElectricCredit } from '../types';
 import { electricOutwardApi, electricCreditApi } from '../api/electric';
 import DateInput from '../components/DateInput';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 type ElectricTab = 'OUTWARDS' | 'CREDIT';
 
@@ -144,6 +146,9 @@ const ElectricPage: React.FC = () => {
 
     const fmt = (n: number) => n?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+    const pagedOutward = usePagedRows(filteredOutward);
+
+    const pagedCredit = usePagedRows(filteredCredit);
     return (
         <div className="subcontracting-page">
             {/* Tab Toggle */}
@@ -261,7 +266,7 @@ const ElectricPage: React.FC = () => {
                             </tr>
                         ) : activeTab === 'OUTWARDS' ? (
                             <>
-                                {filteredOutward.map((entry) => (
+                                {pagedOutward.rows.map((entry) => (
                                     <tr key={entry.id}>
                                         <td style={{ textAlign: 'center' }}>{entry.date}</td>
                                         <td style={{ textAlign: 'center' }}>{entry.challanNo}</td>
@@ -301,7 +306,7 @@ const ElectricPage: React.FC = () => {
                             </>
                         ) : (
                             <>
-                                {filteredCredit.map((entry) => (
+                                {pagedCredit.rows.map((entry) => (
                                     <tr key={entry.id}>
                                         <td style={{ textAlign: 'center' }}>{entry.date}</td>
                                         <td style={{ textAlign: 'center' }}>{entry.challanNo}</td>
@@ -336,6 +341,7 @@ const ElectricPage: React.FC = () => {
                         )}
                     </tbody>
                 </table>
+                <Pagination {...(activeTab === 'CREDIT' ? pagedCredit : pagedOutward).pagination} />
             </div>
 
             {/* Modals */}

@@ -152,6 +152,19 @@
   color: #6D28D9;
 }
 
+.party-type-badge.order {
+  background: #E0F2FE;
+  color: #075985;
+}
+
+.order-managed-note {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .actions-header {
   text-align: center;
 }

@@ -7,6 +7,8 @@ import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 const CategoryPage: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -61,6 +63,7 @@ const CategoryPage: React.FC = () => {
         category.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const pagedCategories = usePagedRows(filteredCategories);
     if (loading) {
         return <Loading message="Loading categories..." />;
     }
@@ -119,9 +122,9 @@ const CategoryPage: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredCategories.map((category, index) => (
+                        {pagedCategories.rows.map((category, index) => (
                             <tr key={category.categoryId}>
-                                <td>{String(index + 1).padStart(2, '0')}</td>
+                                <td>{String(pagedCategories.offset + index + 1).padStart(2, '0')}</td>
                                 <td>{category.categoryId}</td>
                                 <td>{category.categoryName}</td>
                                 <td>
@@ -160,6 +163,7 @@ const CategoryPage: React.FC = () => {
                         )}
                     </tbody>
                 </table>
+                <Pagination {...pagedCategories.pagination} />
             </div>
 
             {isAddModalOpen && (

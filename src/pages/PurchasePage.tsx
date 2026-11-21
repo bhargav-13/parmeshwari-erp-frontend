@@ -12,6 +12,8 @@ import SearchIcon from '../assets/search.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import { formatDate } from '../utils/format';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 const PurchasePage: React.FC = () => {
   const [purchases, setPurchases] = useState<PurchaseResponse[]>([]);
@@ -109,6 +111,7 @@ const PurchasePage: React.FC = () => {
   const totalDeposited = purchases.reduce((sum, p) => sum + (p.amountDeposited || 0), 0);
   const totalPending = totalAmount - totalDeposited;
 
+  const pagedPurchases = usePagedRows(purchases);
   if (loading) {
     return <Loading message="Loading purchases..." />;
   }
@@ -183,9 +186,9 @@ const PurchasePage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {purchases.map((purchase, index) => (
+            {pagedPurchases.rows.map((purchase, index) => (
               <tr key={purchase.purchaseId}>
-                <td>{String(index + 1).padStart(2, '0')}</td>
+                <td>{String(pagedPurchases.offset + index + 1).padStart(2, '0')}</td>
                 <td>{formatDate(purchase.purchaseDate)}</td>
                 <td>{purchase.chNo}</td>
                 <td>{purchase.partyId}</td>
@@ -231,6 +234,7 @@ const PurchasePage: React.FC = () => {
             )}
           </tbody>
         </table>
+        <Pagination {...pagedPurchases.pagination} />
       </div>
 
       {isModalOpen && (

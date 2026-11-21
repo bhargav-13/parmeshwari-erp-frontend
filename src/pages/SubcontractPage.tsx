@@ -8,6 +8,8 @@ import DownloadIcon from '../assets/download.svg';
 import ViewIcon from '../assets/view.svg';
 import './SubcontractPage.css';
 import DateInput from '../components/DateInput';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 const SubcontractPage: React.FC = () => {
   const [subcontractors, setSubcontractors] = useState<SubcontractingBySubcontractInfo[]>([]);
@@ -112,6 +114,7 @@ const SubcontractPage: React.FC = () => {
     }
   };
 
+  const pagedSubcontractors = usePagedRows(filteredSubcontractors);
   return (
     <div className="subcontract-page">
       <div className="page-header">
@@ -149,6 +152,7 @@ const SubcontractPage: React.FC = () => {
         ) : filteredSubcontractors.length === 0 ? (
           <div className="no-data">No subcontractors found.</div>
         ) : (
+          <>
           <table className="subcontract-table">
             <thead>
               <tr>
@@ -160,7 +164,7 @@ const SubcontractPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredSubcontractors.map((contractor, index) => (
+              {pagedSubcontractors.rows.map((contractor, index) => (
                 <tr key={`${contractor.contractorName}-${index}`}>
                   <td>{contractor.contractorName}</td>
                   <td>{formatDate(contractor.lastUpdatedAt)}</td>
@@ -201,6 +205,8 @@ const SubcontractPage: React.FC = () => {
               ))}
             </tbody>
           </table>
+          <Pagination {...pagedSubcontractors.pagination} />
+          </>
         )}
       </div>
 

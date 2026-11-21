@@ -13,6 +13,8 @@ import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import { formatQty, formatDate } from '../utils/format';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 const InventoryPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'stock' | 'raw'>('stock');
@@ -219,6 +221,9 @@ const InventoryPage: React.FC = () => {
     }
   };
 
+  const pagedItems = usePagedRows(filteredItems);
+
+  const pagedRawItems = usePagedRows(filteredRawItems);
   if (loading) {
     return <Loading message="Loading inventory..." />;
   }
@@ -350,9 +355,9 @@ const InventoryPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredItems.map((item, index) => (
+                {pagedItems.rows.map((item, index) => (
                   <tr key={item.stockItemId}>
-                    <td>{String(index + 1).padStart(2, '0')}</td>
+                    <td>{String(pagedItems.offset + index + 1).padStart(2, '0')}</td>
                     <td>{item.product.productName}</td>
                     <td>{item.category.categoryName}</td>
                     <td>{formatQty(item.quantityInKg)} Kg</td>
@@ -408,6 +413,7 @@ const InventoryPage: React.FC = () => {
                 )}
               </tbody>
             </table>
+            <Pagination {...pagedItems.pagination} />
           </div>
 
           <div className="inventory-summary">
@@ -471,9 +477,9 @@ const InventoryPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredRawItems.map((item, index) => (
+                {pagedRawItems.rows.map((item, index) => (
                   <tr key={item.rawItemId}>
-                    <td>{String(index + 1).padStart(2, '0')}</td>
+                    <td>{String(pagedRawItems.offset + index + 1).padStart(2, '0')}</td>
                     <td>{item.product.productName}</td>
                     <td>{formatQty(item.quantityInKg)} Kg</td>
                     <td>{formatLastUpdated(item.lastUpdatedAt)}</td>
@@ -527,6 +533,7 @@ const InventoryPage: React.FC = () => {
                 )}
               </tbody>
             </table>
+            <Pagination {...pagedRawItems.pagination} />
           </div>
         </>
       )}

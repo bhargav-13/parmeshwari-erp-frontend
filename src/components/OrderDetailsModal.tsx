@@ -24,6 +24,8 @@ const currency = (value?: number | null) => {
 
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose }) => {
   const note = order.note?.trim();
+  const hasRejection = (order.rejectionTotal ?? 0) > 0
+    || (order.products ?? []).some((p) => (p.rejectedQuantity ?? 0) > 0);
   return (
     <div className="order-details-overlay drawer-overlay" onClick={onClose}>
       <div className="order-details-modal" onClick={(e) => e.stopPropagation()}>
@@ -99,6 +101,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
                 <th>Market Rate / Price/Pc</th>
                 <th>Rate Diff</th>
                 <th>Total Rate</th>
+                {hasRejection && <th>Rejection</th>}
               </tr>
             </thead>
             <tbody>
@@ -117,12 +120,19 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
                       <td>{currency(product.marketRate)}</td>
                       <td>{isPc ? '—' : Number(product.rateDifference).toLocaleString('en-IN')}</td>
                       <td>{currency(product.totalAmount)}</td>
+                      {hasRejection && (
+                        <td className="order-details-rejection">
+                          {product.rejectedQuantity
+                            ? `${Number(product.rejectedQuantity).toLocaleString('en-IN')} ${isPc ? 'pc' : 'kg'} · ${currency(product.rejectionAmount)}`
+                            : '—'}
+                        </td>
+                      )}
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className="order-details-empty">
+                  <td colSpan={hasRejection ? 7 : 6} className="order-details-empty">
                     No products available for this order.
                   </td>
                 </tr>
@@ -148,6 +158,12 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose })
             <p className="summary-label">GST</p>
             <p className="summary-value">{currency(order.gst)}</p>
           </div>
+          {hasRejection && (
+            <div className="amount-card rejection">
+              <p className="summary-label">Less Rejection</p>
+              <p className="summary-value">- {currency(order.rejectionTotal)}</p>
+            </div>
+          )}
           {(order.transport != null && order.transport > 0) && (
             <div className="amount-card">
               <p className="summary-label">Transport</p>
