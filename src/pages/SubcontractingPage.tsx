@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { subcontractingApi } from '../api/subcontracting';
 import type { Subcontracting, SubOrderRequest, SubcontractingStats } from '../types';
 import { SubcontractingStatus } from '../types';
@@ -8,7 +8,23 @@ import Pagination from '../components/Pagination';
 import Loading from '../components/Loading';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
+import { currentMonth, describeRange, subcontractTotals, type MonthRange, type PeriodMode } from '../utils/subcontractPeriod';
 import './SubcontractingPage.css';
+
+const PERIOD_KEY = 'subcontracting.period';
+
+const readSavedPeriod = (): { mode: PeriodMode; from: string; to: string } => {
+  const month = currentMonth();
+  try {
+    const saved = JSON.parse(localStorage.getItem(PERIOD_KEY) || 'null');
+    if (saved && ['month', 'all', 'custom'].includes(saved.mode)) {
+      return { mode: saved.mode, from: saved.from || month, to: saved.to || month };
+    }
+  } catch {
+    /* storage unavailable */
+  }
+  return { mode: 'month', from: month, to: month };
+};
 
 const SubcontractingPage: React.FC = () => {
   const [subcontracts, setSubcontracts] = useState<Subcontracting[]>([]);
@@ -25,6 +41,27 @@ const SubcontractingPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  // Figures cover this month unless All time or a custom month range is picked
+  const [periodMode, setPeriodMode] = useState<PeriodMode>(() => readSavedPeriod().mode);
+  const [customFrom, setCustomFrom] = useState(() => readSavedPeriod().from);
+  const [customTo, setCustomTo] = useState(() => readSavedPeriod().to);
+
+  const period: MonthRange | null = useMemo(() => {
+    if (periodMode === 'all') return null;
+    if (periodMode === 'custom' && customFrom && customTo) {
+      return customFrom <= customTo ? { from: customFrom, to: customTo } : { from: customTo, to: customFrom };
+    }
+    const month = currentMonth();
+    return { from: month, to: month };
+  }, [periodMode, customFrom, customTo]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(PERIOD_KEY, JSON.stringify({ mode: periodMode, from: customFrom, to: customTo }));
+    } catch {
+      /* storage unavailable */
+    }
+  }, [periodMode, customFrom, customTo]);
 
   useEffect(() => {
     fetchSubcontracts();
@@ -50,7 +87,6 @@ const SubcontractingPage: React.FC = () => {
       // But typically stats should come from a separate endpoint or the backend should return them.
       // For now, we keep it as is or accept it only reflects current page (or maybe we should fetch all for stats? No, too heavy).
       // The previous code was calculating stats on `response.data`.
-      calculateStats(response.data);
     } catch (error) {
       console.error('Error fetching subcontracts:', error);
     } finally {
@@ -58,22 +94,16 @@ const SubcontractingPage: React.FC = () => {
     }
   };
 
-  const calculateStats = (data: Subcontracting[]) => {
-    const inProgress = data.filter((s) => s.status === SubcontractingStatus.IN_PROCESS).length;
-    const completed = data.filter((s) => s.status === SubcontractingStatus.COMPLETED).length;
-
-    // Use backend-calculated totalAmount directly
-    const totalBilledAmount = data.reduce((sum, s) => {
-      return sum + (s.totalAmount || 0);
-    }, 0);
-
+  // Stats for the orders shown; the billed amount covers the picked period
+  useEffect(() => {
+    const data = subcontracts;
     setStats({
       totalOrders: data.length,
-      inProgress,
-      completed,
-      totalBilledAmount,
+      inProgress: data.filter((s) => s.status === SubcontractingStatus.IN_PROCESS).length,
+      completed: data.filter((s) => s.status === SubcontractingStatus.COMPLETED).length,
+      totalBilledAmount: data.reduce((sum, s) => sum + subcontractTotals(s, period).totalValue, 0),
     });
-  };
+  }, [subcontracts, period]);
 
   const handleAddSubcontract = async (data: SubOrderRequest) => {
     try {
@@ -131,7 +161,8 @@ const SubcontractingPage: React.FC = () => {
         <div className="stat-card">
           <div className="stat-content">
             <span className="stat-label">Total Billed Amount</span>
-            <span className="stat-value">₹ {stats.totalBilledAmount.toLocaleString('en-IN')}</span>
+            <span className="stat-value">₹ {stats.totalBilledAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+            <span className="stat-period">{describeRange(period)}</span>
           </div>
         </div>
       </div>
@@ -157,6 +188,40 @@ const SubcontractingPage: React.FC = () => {
         </div>
       </div>
 
+      <div className="sc-period-bar">
+        <span className="sc-period-label">Showing</span>
+        <div className="sc-period-toggle" role="group" aria-label="Period">
+          {([
+            ['month', 'This Month'],
+            ['custom', 'Custom'],
+            ['all', 'All Time'],
+          ] as [PeriodMode, string][]).map(([mode, label]) => (
+            <button
+              key={mode}
+              type="button"
+              className={`sc-period-btn ${periodMode === mode ? 'active' : ''}`}
+              onClick={() => setPeriodMode(mode)}
+              aria-pressed={periodMode === mode}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {periodMode === 'custom' && (
+          <div className="sc-period-range">
+            <label>
+              From
+              <input type="month" value={customFrom} max={customTo || undefined} onChange={(e) => setCustomFrom(e.target.value)} />
+            </label>
+            <label>
+              To
+              <input type="month" value={customTo} min={customFrom || undefined} onChange={(e) => setCustomTo(e.target.value)} />
+            </label>
+          </div>
+        )}
+        <span className="sc-period-current">{describeRange(period)}</span>
+      </div>
+
       <div className="subcontracts-list">
         {loading ? (
           <Loading message="Loading subcontracting orders..." size="large" />
@@ -167,6 +232,7 @@ const SubcontractingPage: React.FC = () => {
             <SubcontractingCard
               key={subcontract.subcontractingId}
               subcontract={subcontract}
+              period={period}
               onDelete={handleDeleteSubcontract}
               onRefresh={fetchSubcontracts}
             />
