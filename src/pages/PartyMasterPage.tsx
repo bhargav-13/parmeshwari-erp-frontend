@@ -16,6 +16,8 @@ import { partyApi } from '../api/party';
 import { purchasePartyApi } from '../api/purchaseParty';
 import { getUserFloor } from '../lib/auth';
 import { formatDate } from '../utils/format';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 type TabType = 'sales' | 'purchase';
 
@@ -136,6 +138,9 @@ const PartyMasterPage: React.FC = () => {
         party.name.toLowerCase().includes(purchaseSearchQuery.toLowerCase())
     );
 
+    const pagedParties = usePagedRows(filteredParties);
+
+    const pagedPurchaseParties = usePagedRows(filteredPurchaseParties);
     return (
         <div className="inventory-page">
             <div className="page-header">
@@ -280,9 +285,9 @@ const PartyMasterPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredParties.map((party, index) => (
+                                    {pagedParties.rows.map((party, index) => (
                                         <tr key={party.partyId}>
-                                            <td>{String(index + 1).padStart(2, '0')}</td>
+                                            <td>{String(pagedParties.offset + index + 1).padStart(2, '0')}</td>
                                             <td>{party.partyId}</td>
                                             <td>{party.name}</td>
                                             <td>{party.floor === 'GROUND_FLOOR' ? 'Ground Floor' : party.floor === 'FIRST_FLOOR' ? 'First Floor' : '—'}</td>
@@ -351,6 +356,7 @@ const PartyMasterPage: React.FC = () => {
                                     )}
                                 </tbody>
                             </table>
+                            <Pagination {...pagedParties.pagination} />
                         </div>
                     )}
                 </>
@@ -428,9 +434,9 @@ const PartyMasterPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredPurchaseParties.map((party, index) => (
+                                    {pagedPurchaseParties.rows.map((party, index) => (
                                         <tr key={party.id}>
-                                            <td>{String(index + 1).padStart(2, '0')}</td>
+                                            <td>{String(pagedPurchaseParties.offset + index + 1).padStart(2, '0')}</td>
                                             <td>{party.id}</td>
                                             <td>{party.name}</td>
                                             <td>{party.floor === 'GROUND_FLOOR' ? 'Ground Floor' : party.floor === 'FIRST_FLOOR' ? 'First Floor' : '—'}</td>
@@ -474,6 +480,7 @@ const PartyMasterPage: React.FC = () => {
                                     )}
                                 </tbody>
                             </table>
+                            <Pagination {...pagedPurchaseParties.pagination} />
                         </div>
                     )}
                 </>

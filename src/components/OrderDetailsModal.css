@@ -162,6 +162,11 @@
   border-color: transparent;
 }
 
+.amount-card.rejection .summary-value,
+.order-details-rejection {
+  color: #b91c1c;
+}
+
 @media (max-width: 640px) {
   .order-details-modal {
     border-radius: 20px;

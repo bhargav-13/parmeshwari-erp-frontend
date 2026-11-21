@@ -8,6 +8,8 @@ import SearchIcon from '../assets/search.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import { getUserFloor } from '../lib/auth';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 const InventoryProductsPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -72,6 +74,7 @@ const InventoryProductsPage: React.FC = () => {
     const groundCount = products.filter((p) => productFloor(p) === 'GROUND_FLOOR').length;
     const firstCount = products.length - groundCount;
 
+    const pagedProducts = usePagedRows(filteredProducts);
     if (loading) {
         return <Loading message="Loading products..." />;
     }
@@ -149,9 +152,9 @@ const InventoryProductsPage: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredProducts.map((product, index) => (
+                        {pagedProducts.rows.map((product, index) => (
                             <tr key={product.productId}>
-                                <td>{String(index + 1).padStart(2, '0')}</td>
+                                <td>{String(pagedProducts.offset + index + 1).padStart(2, '0')}</td>
                                 <td>{product.productId}</td>
                                 <td>{product.productName}</td>
                                 <td>{productFloor(product) === 'GROUND_FLOOR' ? 'Ground Floor' : 'First Floor'}</td>
@@ -191,6 +194,7 @@ const InventoryProductsPage: React.FC = () => {
                         )}
                     </tbody>
                 </table>
+                <Pagination {...pagedProducts.pagination} />
             </div>
 
             {isAddModalOpen && (

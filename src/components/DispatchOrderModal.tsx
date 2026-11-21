@@ -25,6 +25,7 @@ interface DispatchItemState {
 
 // Stock items whose product was removed come back without one
 const stockName = (stockItem: StockItem) => stockItem.product?.productName || `Item #${stockItem.stockItemId}`;
+const formatStock = (value?: number | null) => Number((value || 0).toFixed(3)).toLocaleString('en-IN');
 
 const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose, onSuccess, mode = 'dispatch' }) => {
   const isRevoke = mode === 'revoke';
@@ -183,6 +184,27 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
       return;
     }
 
+    // Dispatch takes the quantity out of stock, so it cannot be more than is in stock
+    if (!isRevoke) {
+      const short = dispatchRequestItems
+        .map((d) => {
+          const stock = stockItems.find((s) => s.stockItemId === d.itemId);
+          if (!stock) return null;
+          if (d.quantityKg != null && d.quantityKg > (stock.quantityInKg || 0)) {
+            return `${stockName(stock)}: ${formatStock(stock.quantityInKg)} kg in stock, ${d.quantityKg} kg asked for`;
+          }
+          if (d.quantityPc != null && d.quantityPc > (stock.quantityInPc || 0)) {
+            return `${stockName(stock)}: ${formatStock(stock.quantityInPc)} pc in stock, ${d.quantityPc} pc asked for`;
+          }
+          return null;
+        })
+        .filter(Boolean);
+      if (short.length > 0) {
+        setError(`Not enough stock. ${short.join('; ')}. Update the inventory or lower the quantity.`);
+        return;
+      }
+    }
+
     if (!isRevoke && !dispatchDate) {
       setError('Please enter the dispatch date.');
       return;
@@ -289,7 +311,20 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
                             className={`dispatch-items-row ${stockIndex === visibleStockItems.length - 1 ? 'last-row' : ''}`}
                             key={stockItem.stockItemId}
                           >
-                            <span className="item-name">{stockName(stockItem)}</span>
+                            <span className="item-name">
+                              {stockName(stockItem)}
+                              {!isRevoke && (() => {
+                                const inStock = hasKg ? stockItem.quantityInKg : stockItem.quantityInPc;
+                                const asked = item.selectedItems[stockItem.stockItemId]
+                                  ? item.selectedQuantities[stockItem.stockItemId] || 0
+                                  : 0;
+                                return (
+                                  <span className={`item-stock ${asked > (inStock || 0) ? 'short' : ''}`}>
+                                    In stock: {formatStock(inStock)} {hasKg ? 'kg' : 'pc'}
+                                  </span>
+                                );
+                              })()}
+                            </span>
                             <div className="item-controls">
                               <button
                                 type="button"

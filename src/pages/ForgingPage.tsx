@@ -10,6 +10,8 @@ import { forgingInwardApi, forgingInwardItemsApi, forgingOutwardApi, forgingPart
 import type { ForgingInward, ForgingOutward, ForgingParty } from '../types';
 import Loading from '../components/Loading';
 import DateInput from '../components/DateInput';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 // Download Icon
 const DownloadIcon = () => (
@@ -221,6 +223,9 @@ const ForgingPage: React.FC = () => {
     const netStock = totalInward - totalOutward;
     const pendingOrders = filteredInwardEntries.length + filteredOutwardEntries.length;
 
+    const pagedInward = usePagedRows(filteredInwardEntries);
+
+    const pagedOutward = usePagedRows(filteredOutwardEntries);
     if (loading) {
         return <Loading message="Loading forging data..." />;
     }
@@ -400,7 +405,7 @@ const ForgingPage: React.FC = () => {
                     <tbody>
                         {activeTab === 'inward' ? (
                             filteredInwardEntries.length > 0 ? (
-                                (filteredInwardEntries as ForgingInward[]).map((row) => (
+                                (pagedInward.rows as ForgingInward[]).map((row) => (
                                     <tr key={row.id}>
                                         <td>{row.date}</td>
                                         <td>{row.partyName}</td>
@@ -441,7 +446,7 @@ const ForgingPage: React.FC = () => {
                             )
                         ) : (
                             filteredOutwardEntries.length > 0 ? (
-                                (filteredOutwardEntries as ForgingOutward[]).map((row) => (
+                                (pagedOutward.rows as ForgingOutward[]).map((row) => (
                                     <tr key={row.id}>
                                         <td>{row.date}</td>
                                         <td>{row.partyName}</td>
@@ -482,6 +487,7 @@ const ForgingPage: React.FC = () => {
                         )}
                     </tbody>
                 </table>
+                <Pagination {...(activeTab === 'inward' ? pagedInward : pagedOutward).pagination} />
             </div>
 
             {isInwardModalOpen && (

@@ -10,6 +10,8 @@ import { formatQty } from '../utils/format';
 import './SubcontractingPage.css';
 import './SubcontractPage.css';
 import DateInput from '../components/DateInput';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 // One job work with rejected material
 interface RejectionRow {
@@ -114,6 +116,7 @@ const SubcontractRejectionPage: React.FC = () => {
 
   const formatDate = (iso: string) => (iso ? format(new Date(iso), 'dd-MM-yyyy') : '-');
 
+  const pagedRows = usePagedRows(filteredRows);
   return (
     <div className="subcontract-page">
       <div className="page-header">
@@ -186,6 +189,7 @@ const SubcontractRejectionPage: React.FC = () => {
         ) : filteredRows.length === 0 ? (
           <div className="no-data">{rows.length === 0 ? 'No rejections recorded yet.' : 'No rejections match the filters.'}</div>
         ) : (
+          <>
           <table className="subcontract-table">
             <thead>
               <tr>
@@ -201,7 +205,7 @@ const SubcontractRejectionPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredRows.map((r) => (
+              {pagedRows.rows.map((r) => (
                 <tr key={r.subcontract.subcontractingId}>
                   <td>{formatDate(r.orderDate)}</td>
                   <td>PBI-{r.subcontract.subcontractingId} ({new Date(r.orderDate).getFullYear()})</td>
@@ -242,6 +246,8 @@ const SubcontractRejectionPage: React.FC = () => {
               </tr>
             </tfoot>
           </table>
+          <Pagination {...pagedRows.pagination} />
+          </>
         )}
       </div>
 

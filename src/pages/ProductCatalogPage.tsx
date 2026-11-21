@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { stockItemApi } from '../api/inventory';
 import type { StockItem } from '../types';
 import ProductDetailModal from '../components/ProductDetailModal';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 import './ProductCatalogPage.css';
 
 const ProductCatalogPage: React.FC = () => {
@@ -44,6 +46,8 @@ const ProductCatalogPage: React.FC = () => {
     if (!location) return '';
     return location.startsWith('http') ? location : `${apiBaseUrl}${location}`;
   };
+
+  const pagedItems = usePagedRows(filteredItems, 24);
 
   if (loading) {
     return (
@@ -102,8 +106,9 @@ const ProductCatalogPage: React.FC = () => {
           <p>No products found</p>
         </div>
       ) : (
+        <>
         <div className="products-grid">
-          {filteredItems.map((item) => (
+          {pagedItems.rows.map((item) => (
             <div
               key={item.stockItemId}
               className="product-card"
@@ -172,6 +177,8 @@ const ProductCatalogPage: React.FC = () => {
             </div>
           ))}
         </div>
+        <Pagination {...pagedItems.pagination} />
+        </>
       )}
 
       <div className="catalog-footer">

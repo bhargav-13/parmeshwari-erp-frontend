@@ -34,6 +34,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSentExpanded, setIsSentExpanded] = useState(false);
+  const [showOlderSends, setShowOlderSends] = useState(false);
   // Crome records grouped by the return chunk they were sent from.
   // A chunk with any Crome record hides its "Send to Crome" button.
   const [cromesByReturnId, setCromesByReturnId] = useState<Map<number, Crome[]>>(new Map());
@@ -66,6 +67,12 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
   // Calculate Sent, Return, and Used values
   const subSends = subcontract.subSends || [];
   const hasMultipleSends = subSends.length > 1;
+  // The sent list shows this month's lots; older lots stay one click away. Totals cover every lot.
+  const monthKey = (d?: string) => (d || '').slice(0, 7);
+  const thisMonth = format(new Date(), 'yyyy-MM');
+  const currentMonthSends = subSends.filter((send) => monthKey(send.sendDate) === thisMonth);
+  const olderSendCount = subSends.length - currentMonthSends.length;
+  const visibleSends = showOlderSends ? subSends : currentMonthSends;
   const subReturns = subcontract.subReturns || [];
 
   // Calculate Total Net Return
@@ -304,7 +311,10 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
 
                   {isSentExpanded && (
                     <div className="sc-return-list sc-sent-list">
-                      {subSends.map((send, index) => (
+                      {visibleSends.length === 0 && (
+                        <div className="sc-return-row sc-muted sc-sent-empty">No lots sent this month.</div>
+                      )}
+                      {visibleSends.map((send, index) => (
                         <div key={send.sendId ?? index} className="sc-return-row">
                           <div className="sc-return-main">
                             <div className="detail-row">
@@ -335,6 +345,17 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, on
                           )}
                         </div>
                       ))}
+                      {olderSendCount > 0 && (
+                        <button
+                          type="button"
+                          className="sc-older-toggle"
+                          onClick={() => setShowOlderSends(!showOlderSends)}
+                        >
+                          {showOlderSends
+                            ? 'Show this month only'
+                            : `Show ${olderSendCount} older lot${olderSendCount === 1 ? '' : 's'}`}
+                        </button>
+                      )}
                     </div>
                   )}
                 </>

@@ -155,6 +155,19 @@ export function promisify<T>(
   return new Promise((resolve, reject) => {
     fn((error: any, data: T, _response: any) => {
       if (error) {
+        // The generated client (superagent) puts the server's error body on response.body;
+        // screens read err.response.data.message, so expose it there and as err.message too.
+        const res = error?.response;
+        if (res && res.data === undefined) {
+          let body = res.body;
+          if ((body == null || typeof body !== 'object') && typeof res.text === 'string') {
+            try { body = JSON.parse(res.text); } catch { /* not JSON */ }
+          }
+          try { res.data = body; } catch { /* read-only response */ }
+          if (body && typeof body.message === 'string' && body.message) {
+            error.message = body.message;
+          }
+        }
         reject(error);
       } else {
         resolve(data);

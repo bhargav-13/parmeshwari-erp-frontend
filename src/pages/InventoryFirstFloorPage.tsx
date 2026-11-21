@@ -12,6 +12,8 @@ import FilterIcon from '../assets/filter.svg';
 import EditIcon from '../assets/edit.svg';
 import DeleteIcon from '../assets/delete.svg';
 import { formatQty } from '../utils/format';
+import Pagination from '../components/Pagination';
+import { usePagedRows } from '../lib/usePagedRows';
 
 const InventoryFirstFloorPage: React.FC = () => {
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
@@ -146,6 +148,8 @@ const InventoryFirstFloorPage: React.FC = () => {
     }
   };
 
+  const pagedItems = usePagedRows(filteredItems);
+
   if (loading && stockItems.length === 0) {
     return <Loading message="Loading inventory..." />;
   }
@@ -256,9 +260,9 @@ const InventoryFirstFloorPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredItems.map((item, index) => (
+            {pagedItems.rows.map((item, index) => (
               <tr key={item.stockItemId}>
-                <td>{String(index + 1).padStart(2, '0')}</td>
+                <td>{String(pagedItems.offset + index + 1).padStart(2, '0')}</td>
                 <td>{item.product?.productName || 'N/A'}</td>
                 <td>{item.category?.categoryName || 'N/A'}</td>
                 <td>{formatQty(item.quantityInKg)} Kg</td>
@@ -326,6 +330,7 @@ const InventoryFirstFloorPage: React.FC = () => {
             </tfoot>
           )}
         </table>
+        <Pagination {...pagedItems.pagination} />
       </div>
 
       <div className="inventory-summary">

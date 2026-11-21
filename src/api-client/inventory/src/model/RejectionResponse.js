@@ -77,6 +77,9 @@ class RejectionResponse {
             if (data.hasOwnProperty('returnQty')) {
                 obj['returnQty'] = ApiClient.convertToType(data['returnQty'], 'Number');
             }
+            if (data.hasOwnProperty('orderId')) {
+                obj['orderId'] = ApiClient.convertToType(data['orderId'], 'Number');
+            }
         }
         return obj;
     }
@@ -148,6 +151,12 @@ RejectionResponse.prototype['stockItem'] = undefined;
  * @member {Number} returnQty
  */
 RejectionResponse.prototype['returnQty'] = undefined;
+
+/**
+ * Set when the rejection came from a sales order; edit it on the order
+ * @member {Number} orderId
+ */
+RejectionResponse.prototype['orderId'] = undefined;
 
 
 
