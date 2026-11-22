@@ -259,7 +259,7 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
     const weightPerPcInKg = unit === QuantityUnit.GM ? weightPerPc / 1000 : weightPerPc;
 
     // Calculate pieces: total kg / weight per piece in kg
-    return Math.floor(quantityInKg / weightPerPcInKg);
+    return Math.floor(quantityInKg / weightPerPcInKg + 1e-9);
   };
 
   const switchToEditMode = (item: StockItem) => {
@@ -738,7 +738,10 @@ const AddStockItemModal: React.FC<AddStockItemModalProps> = ({
                 <input
                   type="number"
                   name="quantityInPc"
-                  value={formData.quantityInPc}
+                  // Always shown from the kg and piece weight on screen, never a stored count
+                  value={formData.weightPerPc > 0 && formData.quantityUnit !== QuantityUnit.PCS
+                    ? calculateQuantityInPc(formData.quantityInKg, formData.weightPerPc, formData.quantityUnit)
+                    : formData.quantityInPc}
                   placeholder="Auto-calculated"
                   className="form-input"
                   readOnly
