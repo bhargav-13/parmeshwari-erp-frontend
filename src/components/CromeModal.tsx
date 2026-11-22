@@ -23,6 +23,8 @@ interface PackagingFormRow {
 interface CromeModalProps {
   subcontractingId: number;
   subcontractingReturnId: number;
+  /** Packaging the returned chunk came back in; the crome entry starts from it */
+  returnPackagings?: PackagingDetail[];
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -33,7 +35,7 @@ const createDefaultPackaging = (): PackagingFormRow => ({
   packagingCount: '',
 });
 
-const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractingReturnId, onClose, onSuccess }) => {
+const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractingReturnId, returnPackagings, onClose, onSuccess }) => {
   const [parties, setParties] = useState<Party[]>([]);
   const [cromeInfo, setCromeInfo] = useState<SubcontractingCromeInfo | null>(null);
   const [returnCromeInfo, setReturnCromeInfo] = useState<SubReturnCromeInfo | null>(null);
@@ -74,10 +76,18 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractin
         setCromeInfo(infoData);
         setReturnCromeInfo(returnInfo);
 
+        // Start from the chunk's own packaging (type, weight, count); fall back to the order's
+        const chunkPackagings = (returnPackagings || []).filter(p => p.packagingType && (p.packagingCount || 0) > 0);
         setFormData(prev => ({
           ...prev,
           sentStock: (returnInfo.availableStockForCrome || 0).toString(),
-          ...(infoData.returnPackagingType ? {
+          ...(chunkPackagings.length > 0 ? {
+            packagings: chunkPackagings.map(p => ({
+              packagingType: p.packagingType,
+              packagingWeight: p.packagingWeight != null ? p.packagingWeight.toString() : '',
+              packagingCount: p.packagingCount != null ? p.packagingCount.toString() : '',
+            })),
+          } : infoData.returnPackagingType ? {
             packagings: [{
               packagingType: infoData.returnPackagingType,
               packagingWeight: infoData.returnPackagingWeight?.toString() || '',
@@ -94,6 +104,7 @@ const CromeModal: React.FC<CromeModalProps> = ({ subcontractingId, subcontractin
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subcontractingId, subcontractingReturnId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

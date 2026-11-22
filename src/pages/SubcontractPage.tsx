@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { subcontractingApi } from '../api/subcontracting';
 import type { SubcontractingBySubcontractInfo } from '../types';
 import SubcontractViewModal from '../components/SubcontractViewModal';
@@ -210,7 +211,8 @@ const SubcontractPage: React.FC = () => {
         )}
       </div>
 
-      {pdfContractor && (
+      {/* Drawn on the page root so the page layout cannot shift or clip it */}
+      {pdfContractor && createPortal(
         <div className="pdf-range-overlay" onClick={() => setPdfContractor(null)}>
           <div className="pdf-range-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
             <h2 className="pdf-range-title">Download PDF</h2>
@@ -242,7 +244,8 @@ const SubcontractPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {isViewModalOpen && selectedContractor && (

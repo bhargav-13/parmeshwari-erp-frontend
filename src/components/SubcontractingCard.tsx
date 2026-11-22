@@ -569,6 +569,7 @@ const SubcontractingCard: React.FC<SubcontractingCardProps> = ({ subcontract, pe
         <CromeModal
           subcontractingId={subcontract.subcontractingId}
           subcontractingReturnId={cromeReturnId}
+          returnPackagings={allSubReturns.find(r => r.returnId === cromeReturnId)?.packagings}
           onClose={() => setCromeReturnId(null)}
           onSuccess={onRefresh}
         />

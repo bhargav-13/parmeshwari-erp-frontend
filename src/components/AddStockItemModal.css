@@ -370,3 +370,71 @@
     padding: 24px;
   }
 }
+
+/* Add Purchase: one card per item of the challan */
+.purchase-items {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.purchase-item-card {
+  border: 1px solid #dbe3ec;
+  border-radius: 10px;
+  padding: 14px 14px 4px;
+  background: #fafcfe;
+}
+
+.purchase-item-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.purchase-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.purchase-item-amount {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.purchase-item-remove {
+  margin-left: auto;
+  padding: 4px 10px;
+  border: 1px solid #f3c4c4;
+  border-radius: 6px;
+  background: #fff;
+  color: #c62828;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.purchase-items-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.purchase-add-item {
+  padding: 8px 14px;
+  border: 1px dashed var(--brand);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.purchase-items-total {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brand);
+}

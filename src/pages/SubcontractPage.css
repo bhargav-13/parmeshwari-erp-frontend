@@ -292,7 +292,8 @@
 }
 
 .pdf-range-dialog {
-  width: min(420px, calc(100vw - 32px));
+  box-sizing: border-box;
+  width: min(440px, calc(100vw - 32px));
   background: #FFFFFF;
   border-radius: 16px;
   padding: 24px;
@@ -315,19 +316,23 @@
 
 .pdf-range-fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
 }
 
 .pdf-range-field {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   gap: 6px;
   font-size: 13px;
   color: #334155;
 }
 
 .pdf-range-field input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   height: 40px;
   padding: 0 10px;
   border: 1px solid #CBD5E1;
