@@ -25,6 +25,16 @@ interface DispatchItemState {
 
 // Stock items whose product was removed come back without one
 const stockName = (stockItem: StockItem) => stockItem.product?.productName || `Item #${stockItem.stockItemId}`;
+// Pieces follow from kg when the piece weight is known (the backend keeps them the same way)
+const piecesInStock = (stock: StockItem): number => {
+  const w = stock.weightPerPc || 0;
+  const unit = String(stock.quantityUnit || 'KG').toUpperCase();
+  if (w > 0 && unit !== 'PCS') {
+    const perPcKg = unit === 'GM' ? w / 1000 : w;
+    return Math.floor((stock.quantityInKg || 0) / perPcKg + 1e-9);
+  }
+  return stock.quantityInPc || 0;
+};
 const formatStock = (value?: number | null) => Number((value || 0).toFixed(3)).toLocaleString('en-IN');
 
 const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose, onSuccess, mode = 'dispatch' }) => {
@@ -193,8 +203,8 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
           if (d.quantityKg != null && d.quantityKg > (stock.quantityInKg || 0)) {
             return `${stockName(stock)}: ${formatStock(stock.quantityInKg)} kg in stock, ${d.quantityKg} kg asked for`;
           }
-          if (d.quantityPc != null && d.quantityPc > (stock.quantityInPc || 0)) {
-            return `${stockName(stock)}: ${formatStock(stock.quantityInPc)} pc in stock, ${d.quantityPc} pc asked for`;
+          if (d.quantityPc != null && d.quantityPc > piecesInStock(stock)) {
+            return `${stockName(stock)}: ${formatStock(piecesInStock(stock))} pc in stock, ${d.quantityPc} pc asked for`;
           }
           return null;
         })
@@ -314,7 +324,7 @@ const DispatchOrderModal: React.FC<DispatchOrderModalProps> = ({ order, onClose,
                             <span className="item-name">
                               {stockName(stockItem)}
                               {!isRevoke && (() => {
-                                const inStock = hasKg ? stockItem.quantityInKg : stockItem.quantityInPc;
+                                const inStock = hasKg ? stockItem.quantityInKg : piecesInStock(stockItem);
                                 const asked = item.selectedItems[stockItem.stockItemId]
                                   ? item.selectedQuantities[stockItem.stockItemId] || 0
                                   : 0;
