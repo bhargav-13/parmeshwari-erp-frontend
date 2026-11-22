@@ -24,7 +24,9 @@ const PurchasePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPurchase, setEditingPurchase] = useState<PurchaseResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [alreadyExistsResponse, setAlreadyExistsResponse] = useState<PurchaseResponse | null>(null);
+  // Saved items whose product was already in inventory, asked about one at a time
+  const [alreadyExistsQueue, setAlreadyExistsQueue] = useState<PurchaseResponse[]>([]);
+  const alreadyExistsResponse = alreadyExistsQueue[0] ?? null;
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -59,8 +61,8 @@ const PurchasePage: React.FC = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleAlreadyExists = (response: PurchaseResponse) => {
-    setAlreadyExistsResponse(response);
+  const handleAlreadyExists = (responses: PurchaseResponse[]) => {
+    setAlreadyExistsQueue((prev) => [...prev, ...responses]);
   };
 
   const handleEditClick = (purchase: PurchaseResponse) => {
@@ -251,7 +253,8 @@ const PurchasePage: React.FC = () => {
 
       {alreadyExistsResponse && (
         <InventoryUpdateModal
-          onClose={() => setAlreadyExistsResponse(null)}
+          key={alreadyExistsResponse.purchaseId}
+          onClose={() => setAlreadyExistsQueue((prev) => prev.slice(1))}
           onSuccess={fetchData}
           purchaseResponse={alreadyExistsResponse}
         />
