@@ -1,0 +1,187 @@
+/* Wide drawer for the history table */
+/* Doubled class: must beat the 820px rule for `.modal-content:not(.small-modal)` */
+body .drawer-overlay.drawer-overlay > .modal-content.stock-history-modal.stock-history-modal {
+  --drawer-width: 1120px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.stock-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stock-history-header .modal-title {
+  margin: 0 0 4px 0;
+}
+
+.stock-history-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted, #6b7280);
+}
+
+.stock-history-close {
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--text-muted, #6b7280);
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.stock-history-search {
+  width: 100%;
+  max-width: 340px;
+  padding: 9px 12px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.stock-history-table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+}
+
+.stock-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.stock-history-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-muted, #f8fafc);
+  text-align: left;
+  font-weight: 600;
+  padding: 10px 12px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.stock-history-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border, #eef0f3);
+  vertical-align: top;
+}
+
+.stock-history-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.stock-history-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.stock-history-table .nowrap {
+  white-space: nowrap;
+}
+
+.stock-history-action {
+  display: inline-block;
+  font-weight: 600;
+}
+
+.stock-history-action.correction {
+  color: #b45309;
+}
+
+.stock-history-note {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted, #6b7280);
+}
+
+.stock-history-diff {
+  font-weight: 600;
+}
+
+.stock-history-diff.down {
+  color: #b42318;
+}
+
+.stock-history-diff.up {
+  color: #067647;
+}
+
+.stock-history-diff.none {
+  color: var(--text-muted, #9ca3af);
+  font-weight: 400;
+}
+
+.stock-history-empty {
+  text-align: center;
+  padding: 28px 12px !important;
+  color: var(--text-muted, #6b7280);
+}
+
+.stock-history-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-muted, #6b7280);
+}
+
+.stock-history-pager {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stock-history-pager button {
+  padding: 6px 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.stock-history-pager button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* History button in the Inventory table's Actions column */
+.icon-button.history-button {
+  font-size: 12px;
+  font-weight: 600;
+  width: auto;
+  padding: 0 8px;
+  color: var(--brand, #1f3a5f);
+}
+
+@media (max-width: 720px) {
+  body .drawer-overlay.drawer-overlay > .stock-history-modal {
+    padding: 16px;
+  }
+}
+
+.stock-history-product {
+  min-width: 150px;
+  font-weight: 500;
+}
+
+.stock-history-arrow {
+  color: var(--text-muted, #9ca3af);
+  margin: 0 2px;
+}
