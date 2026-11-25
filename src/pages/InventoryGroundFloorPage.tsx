@@ -6,6 +6,7 @@ import Loading from '../components/Loading';
 import AddStockItemModal from '../components/AddStockItemModal';
 import AddProductModal from '../components/AddProductModal';
 import AddCategoryModal from '../components/AddCategoryModal';
+import StockHistoryModal from '../components/StockHistoryModal';
 import './InventoryPage.css';
 import SearchIcon from '../assets/search.svg';
 import FilterIcon from '../assets/filter.svg';
@@ -29,6 +30,8 @@ const InventoryGroundFloorPage: React.FC = () => {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [editingLoadingId, setEditingLoadingId] = useState<number | null>(null);
   const [copyLinkSuccess, setCopyLinkSuccess] = useState(false);
+  // null = closed, 'all' = every change on this floor, otherwise one item's history
+  const [historyTarget, setHistoryTarget] = useState<StockItem | 'all' | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -175,6 +178,14 @@ const InventoryGroundFloorPage: React.FC = () => {
           <button
             type="button"
             className="action-button secondary-button"
+            onClick={() => setHistoryTarget('all')}
+            title="Every change to stock, with date and user"
+          >
+            <span className="button-text">Stock History</span>
+          </button>
+          <button
+            type="button"
+            className="action-button secondary-button"
             onClick={() => setIsAddCategoryModalOpen(true)}
           >
             <span className="button-icon">+</span>
@@ -281,6 +292,14 @@ const InventoryGroundFloorPage: React.FC = () => {
                   <div className="action-buttons">
                     <button
                       type="button"
+                      className="icon-button history-button"
+                      onClick={() => setHistoryTarget(item)}
+                      title="Stock history of this item"
+                    >
+                      History
+                    </button>
+                    <button
+                      type="button"
                       className="icon-button"
                       onClick={() => handleEdit(item)}
                       title="Edit"
@@ -352,6 +371,15 @@ const InventoryGroundFloorPage: React.FC = () => {
           categories={categories}
           initialData={editingItem}
           fixedFloor={InventoryFloor.GROUND_FLOOR}
+        />
+      )}
+
+      {historyTarget && (
+        <StockHistoryModal
+          onClose={() => setHistoryTarget(null)}
+          stockItemId={historyTarget === 'all' ? undefined : historyTarget.stockItemId}
+          itemName={historyTarget === 'all' ? undefined : historyTarget.product?.productName}
+          floor={InventoryFloor.GROUND_FLOOR}
         />
       )}
 

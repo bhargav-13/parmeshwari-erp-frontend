@@ -294,7 +294,8 @@ const OrderManagementPage: React.FC = () => {
                     >
                       <option value="PENDING">Pending</option>
                       <option value="COMPLETED">Completed</option>
-                      <option value="DISPATCHED">Dispatched</option>
+                      {/* Dispatched is set by the Dispatch button, which takes the stock off */}
+                      {order.orderStatus === 'DISPATCHED' && <option value="DISPATCHED">Dispatched</option>}
                       {order.orderStatus === 'REVOKED' && <option value="REVOKED">Revoked</option>}
                     </select>
                   </td>
