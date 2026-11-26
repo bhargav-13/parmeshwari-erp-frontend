@@ -533,6 +533,34 @@ export interface SubcontractingBySubcontractList {
   totalRejectionAmount?: number; // already taken off totalJobPaidAmount
   totalElements?: string | null;
   totalUsed: number;
+  totalNetReturnStock?: number;
+  /** Every lot sent in the date range, oldest first */
+  sentEntries?: SubcontractSentEntry[];
+  /** Every return made in the date range, oldest first */
+  returnEntries?: SubcontractReturnEntry[];
+}
+
+export interface SubcontractSentEntry {
+  date: string;
+  orderId?: number;
+  itemName: string;
+  sentStock: number;
+  price: number;
+  jobWorkPay: number;
+  value: number; // sentStock x price
+  jobPay: number; // sentStock x jobWorkPay
+  remark?: string | null;
+}
+
+export interface SubcontractReturnEntry {
+  date: string;
+  orderId?: number;
+  itemName: string;
+  grossStock: number;
+  elements?: string | null; // this return's packaging ("2 PETI, 9 FOAM")
+  rejectionStock: number;
+  netStock: number;
+  remark?: string | null;
 }
 
 // Party Types

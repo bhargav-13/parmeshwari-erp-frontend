@@ -333,6 +333,65 @@
   }
 }
 
+/* Statement: every send and return listed, with month totals */
+.subcontract-view-totals-top {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(125, 153, 169, 0.2);
+}
+
+.subcontract-view-totals-top .totals-row {
+  gap: 12px 32px;
+}
+
+.subcontract-section-title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--brand);
+  margin: 20px 0 10px;
+}
+
+.subcontract-section-count {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.subcontract-entries-table {
+  min-width: 760px;
+}
+
+.subcontract-entries-table th.num,
+.subcontract-entries-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.subcontract-entries-table td.remark-cell {
+  white-space: normal;
+  min-width: 120px;
+  color: var(--text-muted);
+}
+
+.subcontract-entries-table tr.month-total-row td {
+  background: var(--surface-muted);
+  font-weight: 500;
+}
+
+.subcontract-entries-table tr.grand-total-row td {
+  font-weight: 600;
+  border-top: 2px solid rgba(125, 153, 169, 0.35);
+}
+
+.no-data-small {
+  padding: 16px;
+  font-size: 14px;
+}
+
 .rejection-amount-sub {
   font-size: 11px;
   color: #c0392b;
