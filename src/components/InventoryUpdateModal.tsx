@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { stockItemApi, rawItemApi } from '../api/inventory';
-import type { PurchaseResponse, RawItemRequest, StockItemRequest } from '../types';
+import { stockItemApi } from '../api/inventory';
+import type { PurchaseResponse, StockItemRequest } from '../types';
 import { PurchaseInventoryType, QuantityUnit, InventoryFloor } from '../types';
 import './InventoryUpdateModal.css';
 
@@ -16,10 +16,12 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
   purchaseResponse,
 }) => {
   const isRaw = purchaseResponse.inventoryType === PurchaseInventoryType.RAW_MATERIAL;
-  const existingQty = isRaw
+  // The server has already added this purchase to the stock, so the figure it sends back
+  // is the new total. This popup only settles the price per kg.
+  const totalQty = isRaw
     ? (purchaseResponse.rawInventory?.quantityInKg || 0)
     : (purchaseResponse.stockInventory?.quantityInKg || 0);
-  const totalQty = existingQty + purchaseResponse.qty;
+  const existingQty = Math.max(0, totalQty - purchaseResponse.qty);
 
   const calculateWeightedAvgPrice = () => {
     if (isRaw) return 0;
@@ -43,12 +45,7 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
   };
 
   const getAutoCalculatedPc = () => {
-    const stock = purchaseResponse.stockInventory;
-    if (!stock || stock.weightPerPc <= 0) return stock?.quantityInPc || 0;
-    const weightInKg = stock.quantityUnit === QuantityUnit.GM
-      ? stock.weightPerPc / 1000
-      : stock.weightPerPc;
-    return Math.floor(totalQty / weightInKg);
+    return purchaseResponse.stockInventory?.quantityInPc || 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,26 +55,18 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
     try {
       setLoading(true);
 
-      if (isRaw && purchaseResponse.rawInventory) {
-        const raw = purchaseResponse.rawInventory;
-        const updateData: RawItemRequest = {
-          productId: raw.product.productId,
-          quantityInKg: totalQty,
-          lowStockAlert: raw.lowStockAlert,
-        };
-        await rawItemApi.updateRawItem(raw.rawItemId, updateData);
-      } else if (!isRaw && purchaseResponse.stockInventory) {
-        const stock = purchaseResponse.stockInventory;
-        const unit = stock.quantityUnit || QuantityUnit.KG;
-
+      if (!isRaw && purchaseResponse.stockInventory) {
+        // Only the price changes here. The quantity is read fresh so a dispatch made in
+        // the meantime is not undone.
+        const stock = await stockItemApi.getStockItemById(purchaseResponse.stockInventory.stockItemId);
         const updateData: StockItemRequest = {
           productId: stock.product.productId,
           categoryId: stock.category.categoryId,
-          quantityInKg: totalQty,
-          quantityInPc: getAutoCalculatedPc(),
+          quantityInKg: stock.quantityInKg,
+          quantityInPc: stock.quantityInPc,
           weightPerPc: stock.weightPerPc,
           pricePerKg: pricePerKg,
-          quantityUnit: unit,
+          quantityUnit: stock.quantityUnit || QuantityUnit.KG,
           inventoryFloor: stock.inventoryFloor || InventoryFloor.GROUND_FLOOR,
           lowStockAlert: stock.lowStockAlert,
         };
@@ -100,10 +89,10 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
   return (
     <div className="modal-overlay drawer-overlay" onClick={onClose}>
       <div className="modal-content add-stock-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Update Existing Inventory</h2>
+        <h2 className="modal-title">Stock Added — Confirm Price</h2>
 
         <div className="inventory-update-warning">
-          This product already exists in inventory. Quantity will be added automatically. You can update the amount below.
+          This product was already in inventory, so the purchased quantity has been added to its stock. Check the price per kg below and save it, or close this to keep the current price.
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -160,7 +149,7 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
           {/* Row 3: Existing Qty + Purchase Qty */}
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label" htmlFor="inv-existing-qty">Existing Quantity (Kg)</label>
+              <label className="form-label" htmlFor="inv-existing-qty">Stock Before (Kg)</label>
               <input
                 id="inv-existing-qty"
                 type="number"
@@ -184,7 +173,7 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
           {/* Row 4: Total Qty (auto sum) + Low Stock */}
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label" htmlFor="inv-total-qty">Total Quantity (Kg) (Auto-calculated)</label>
+              <label className="form-label" htmlFor="inv-total-qty">Stock Now (Kg)</label>
               <input
                 id="inv-total-qty"
                 type="number"
@@ -236,7 +225,7 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
 
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label" htmlFor="inv-qty-pc">Quantity in Pc. (Auto-calculated)</label>
+                  <label className="form-label" htmlFor="inv-qty-pc">Stock Now (Pcs)</label>
                   <input
                     id="inv-qty-pc"
                     type="number"
@@ -269,10 +258,10 @@ const InventoryUpdateModal: React.FC<InventoryUpdateModalProps> = ({
 
           <div className="modal-actions">
             <button type="submit" className="save-button" disabled={loading}>
-              {loading ? 'Updating...' : 'Update Inventory'}
+              {loading ? 'Saving...' : 'Save Price'}
             </button>
             <button type="button" className="cancel-button" onClick={onClose}>
-              Cancel
+              Keep Current Price
             </button>
           </div>
         </form>
