@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { purchaseApi } from '../api/purchase';
 import { productApi, categoryApi } from '../api/inventory';
 import { purchasePartyApi } from '../api/purchaseParty';
@@ -31,19 +31,31 @@ const PurchasePage: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // The search runs a moment after typing stops, so the list is not reloaded on every key
+  const [appliedSearch, setAppliedSearch] = useState('');
+  const requestId = useRef(0);
+
   useEffect(() => {
-    fetchData();
+    const timer = setTimeout(() => setAppliedSearch(searchQuery.trim()), 300);
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  useEffect(() => {
+    fetchData();
+  }, [appliedSearch]);
+
+  // Reloads behind the page. Only the very first load shows the full-page loader:
+  // replacing the page while searching would take the cursor out of the search box.
   const fetchData = async () => {
+    const id = ++requestId.current;
     try {
-      setLoading(true);
       const [purchasesResult, productsData, purchasePartiesData, categoriesData] = await Promise.all([
-        purchaseApi.getPurchases(0, 1000, searchQuery || undefined),
+        purchaseApi.getPurchases(0, 1000, appliedSearch || undefined),
         productApi.getProducts(),
         purchasePartyApi.getAll(),
         categoryApi.getCategories(),
       ]);
+      if (id !== requestId.current) return; // an older search answered late
       const data = (purchasesResult as any)?.data ?? [];
       setPurchases(data);
       setProducts(productsData);
@@ -52,7 +64,7 @@ const PurchasePage: React.FC = () => {
     } catch (error) {
       console.error('Error fetching purchase data:', error);
     } finally {
-      setLoading(false);
+      if (id === requestId.current) setLoading(false);
     }
   };
 
