@@ -73,12 +73,25 @@ const PurchasePage: React.FC = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
+  // The stock is already added by the server. Only floor stock has a price to confirm;
+  // raw material has none, so it needs no popup.
   const handleAlreadyExists = (responses: PurchaseResponse[]) => {
-    setAlreadyExistsQueue((prev) => [...prev, ...responses]);
+    const withPrice = responses.filter(
+      (r) => r.inventoryType !== PurchaseInventoryType.RAW_MATERIAL && r.stockInventory
+    );
+    if (withPrice.length > 0) setAlreadyExistsQueue((prev) => [...prev, ...withPrice]);
+    fetchData();
   };
 
-  const handleEditClick = (purchase: PurchaseResponse) => {
-    setEditingPurchase(purchase);
+  // The list rows carry no item details; the single purchase does (category, pieces, weight)
+  const handleEditClick = async (purchase: PurchaseResponse) => {
+    let full = purchase;
+    try {
+      full = await purchaseApi.getPurchaseById(purchase.purchaseId);
+    } catch (error) {
+      console.error('Error loading purchase:', error);
+    }
+    setEditingPurchase(full);
     setIsModalOpen(true);
   };
 
